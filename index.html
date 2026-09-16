@@ -34,6 +34,9 @@
     .slider-group label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #4b5563; }
     input[type="range"] { width: 100%; accent-color: var(--primary); }
 
+    /* Single Preview Box in Panel 2 */
+    .single-preview-box { display: flex; justify-content: center; margin-bottom: 20px; padding: 15px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb; }
+
     /* Print Preview Layout Fix */
     .preview-container { 
       width: 100%; 
@@ -79,7 +82,6 @@
     }
     .coin-img-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-repeat: no-repeat; background-position: center; }
     
-    /* NEU: Optimierter Titel am unteren Rand (Pillen-Design) */
     .tag-info-text {
       position: absolute;
       bottom: 2mm;
@@ -115,7 +117,14 @@
 
     /* Print Styles */
     @media print {
-      body { background: #fff; margin: 0; padding: 0; }
+      /* WICHTIG: Erlaubt den Druck von CSS-Hintergrundbildern (den Covern) in allen Browsern */
+      body { 
+        background: #fff; 
+        margin: 0; 
+        padding: 0; 
+        -webkit-print-color-adjust: exact !important; 
+        print-color-adjust: exact !important; 
+      }
       .no-print { display: none !important; }
       .preview-container { background: transparent; padding: 0; margin: 0; overflow: visible; display: block; }
       .print-sheet { transform: none !important; box-shadow: none; margin: 0; padding: 0; width: 210mm; height: 297mm; }
@@ -137,7 +146,7 @@
         <option value="album">Album / iTunes</option>
       </select>
       <input type="text" id="search-input" placeholder="Titel suchen (z.B. Conni)..." style="flex-grow: 1;">
-      <button id="search-btn">Suche</button>
+      <button type="button" id="search-btn">Suche</button>
     </div>
     <div id="search-status">Datenbank wird im Hintergrund geladen...</div>
     <div id="search-results"></div>
@@ -145,6 +154,17 @@
 
   <div class="panel" id="img-tool-panel" style="display: none;">
     <span class="panel-title">2. Vorschau anpassen</span>
+    
+    <!-- NEU: Direkte visuelle Vorschau im Werkzeug-Panel -->
+    <div class="single-preview-box">
+      <div class="tag-slot">
+        <div class="coin-circle" id="live-preview-circle" style="width: 43mm; height: 43mm; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
+          <div class="coin-img-layer" id="live-preview-img"></div>
+          <div class="tag-info-text" id="live-preview-text"></div>
+        </div>
+      </div>
+    </div>
+
     <div class="slider-grid">
       <div class="slider-group">
         <label><span>Zoom</span> <span id="zoom-val">100%</span></label>
@@ -182,18 +202,22 @@
       </label>
     </div>
     
-    <button class="full-width" onclick="window.print()">🖨️ Jetzt Drucken (A4)</button>
-  </div>
-
-  <div class="disclaimer">
-    <strong>Disclaimer:</strong> Dieses Projekt ist inoffiziell, ein rein privates Hobby-Projekt und steht in keinerlei Verbindung zur Boxine GmbH. "tonies®" und "Toniebox®" sind eingetragene Marken der Boxine GmbH. Alle Rechte an den verwendeten Bildern, Covern und Titeln liegen bei den jeweiligen Urhebern.
+    <button type="button" class="full-width" onclick="window.print()">🖨️ Jetzt Drucken (A4)</button>
   </div>
 </div>
 
-<div class="preview-container no-print">
-  <div style="margin-bottom: 15px; font-weight: bold; color: #6b7280; text-align: center;">Live Druckvorschau (A4 Bogen)</div>
+<!-- Korrigierter Bereich für die Druckvorschau (ohne no-print im äußeren Container) -->
+<div class="preview-container">
+  <div class="no-print" style="margin-bottom: 15px; font-weight: bold; color: #6b7280; text-align: center;">Live Druckvorschau (A4 Bogen)</div>
   <div class="print-sheet" id="print-sheet-preview">
     <div id="sheet-grid" class="grid-standard"></div>
+  </div>
+</div>
+
+<!-- Disclaimer nach unten verschoben, mit no-print damit er nicht mit auf die Etiketten gedruckt wird -->
+<div class="container no-print">
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> Dieses Projekt ist inoffiziell, ein rein privates Hobby-Projekt und steht in keinerlei Verbindung zur Boxine GmbH. "tonies®" und "Toniebox®" sind eingetragene Marken der Boxine GmbH. Alle Rechte an den verwendeten Bildern, Covern und Titeln liegen bei den jeweiligen Urhebern.
   </div>
 </div>
 
@@ -218,7 +242,12 @@
     tagCount: document.getElementById("tag-count"),
     tagCountWrap: document.getElementById("tag-count-wrap"),
     showTextToggle: document.getElementById("show-text-toggle"),
-    sheetGrid: document.getElementById("sheet-grid")
+    sheetGrid: document.getElementById("sheet-grid"),
+    
+    // Elemente für die Live-Vorschau in Panel 2
+    livePreviewCircle: document.getElementById("live-preview-circle"),
+    livePreviewImg: document.getElementById("live-preview-img"),
+    livePreviewText: document.getElementById("live-preview-text")
   };
 
   fetch(TONIES_JSON_URL)
@@ -283,8 +312,9 @@
 
   function updateGrid() {
     elements.sheetGrid.innerHTML = "";
+    
     const isAvery = elements.presetSelect.value === "avery-40";
-    let diameter = isAvery ? 40 : parseInt(elements.presetSelect.value);
+    let diameter = isAvery ? 40 : (parseInt(elements.presetSelect.value) || 43); // NaN Validierung
     
     if(isAvery) {
       elements.tagCountWrap.style.display = "none";
@@ -292,9 +322,26 @@
       elements.tagCountWrap.style.display = "flex";
     }
     
-    let count = isAvery ? 24 : parseInt(elements.tagCount.value);
+    let count = isAvery ? 24 : (parseInt(elements.tagCount.value) || 1); // NaN Validierung
     elements.sheetGrid.className = isAvery ? "grid-avery" : "grid-standard";
 
+    // 1. Update Panel 2 Live Preview
+    if(currentImgUrl) {
+      elements.livePreviewCircle.style.width = `${diameter}mm`;
+      elements.livePreviewCircle.style.height = `${diameter}mm`;
+      elements.livePreviewImg.style.backgroundImage = `url('${currentImgUrl}')`;
+      elements.livePreviewImg.style.backgroundSize = `${imgZoom}%`;
+      elements.livePreviewImg.style.backgroundPosition = `calc(50% + ${imgPosX}px) calc(50% + ${imgPosY}px)`;
+      
+      if (elements.showTextToggle.checked && currentTitle) {
+        elements.livePreviewText.textContent = currentTitle;
+        elements.livePreviewText.style.display = "block";
+      } else {
+        elements.livePreviewText.style.display = "none";
+      }
+    }
+
+    // 2. Update Print Sheet Grid
     for(let i = 0; i < count; i++) {
       const slot = document.createElement("div");
       slot.className = "tag-slot";
@@ -316,7 +363,7 @@
       if (elements.showTextToggle.checked && currentTitle) {
         const lbl = document.createElement("div");
         lbl.className = "tag-info-text";
-        lbl.textContent = currentTitle; // Die Begrenzung erfolgt jetzt über CSS (-webkit-line-clamp)
+        lbl.textContent = currentTitle; 
         circle.appendChild(lbl);
       }
 
@@ -337,7 +384,6 @@
   elements.tagCount.oninput = updateGrid;
   elements.showTextToggle.onchange = updateGrid;
 
-  updateGrid();
 </script>
 </body>
 </html>
