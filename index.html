@@ -1,679 +1,682 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Tonie & Münzkapsel Cover Generator Pro</title>
-  <style>
-    :root { --primary: #e30613; --bg: #f0f2f5; --card: #fff; --border: #d1d5db; --selected: #3b82f6; }
-    * { box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 15px; background: var(--bg); color: #1f2937; overflow-x: hidden; }
-    
-    .container { max-width: 800px; margin: 0 auto; }
-    h1 { color: var(--primary); font-size: 24px; margin-top: 0; text-align: center; }
-    
-    .panel { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .panel-title { font-weight: 700; font-size: 16px; margin-bottom: 15px; display: block; border-bottom: 2px solid var(--bg); padding-bottom: 8px; }
-    
-    .form-group { margin-bottom: 15px; }
-    .form-row { display: flex; gap: 10px; flex-wrap: wrap; }
-    input[type="text"], select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; background: #fafafa; }
-    button { padding: 10px 20px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-    button:hover { background: #cc0510; }
-    button.btn-secondary { background: #4b5563; }
-    button.btn-secondary:hover { background: #374151; }
-    button.btn-outline { background: transparent; color: #4b5563; border: 1px solid var(--border); }
-    button.btn-outline:hover { background: #e5e7eb; }
-    button.btn-danger { background: transparent; color: #ef4444; border: 1px solid #ef4444; }
-    button.btn-danger:hover { background: #fef2f2; }
-    button.full-width { width: 100%; font-size: 16px; padding: 14px; margin-top: 10px; }
-
-    /* Tabs für Tonie vs Album */
-    .search-tabs { display: flex; background: #e5e7eb; padding: 4px; border-radius: 10px; margin-bottom: 15px; }
-    .tab-btn { flex: 1; background: transparent; color: #6b7280; border: none; padding: 8px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s ease; }
-    .tab-btn.active { background: #fff; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-
-    #search-status { font-size: 13px; color: #6b7280; margin-bottom: 10px; min-height: 20px; }
-    #search-results { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; max-height: 250px; overflow-y: auto; padding-right: 5px; }
-    .result-card { border: 1px solid var(--border); border-radius: 8px; padding: 8px; text-align: center; cursor: pointer; background: #fff; transition: transform 0.1s, border-color 0.1s; position: relative; }
-    .result-card:active { transform: scale(0.97); }
-    .result-card:hover { border-color: var(--primary); }
-    .result-card img { width: 100%; height: 80px; object-fit: contain; margin-bottom: 5px; }
-    .result-card .title { font-size: 11px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .result-card .add-badge { position: absolute; top: -5px; right: -5px; background: var(--primary); color: #fff; width: 22px; height: 22px; border-radius: 50%; font-size: 16px; line-height: 22px; font-weight: bold; display: none; }
-    .result-card:hover .add-badge { display: block; }
-
-    .slider-grid { display: grid; grid-template-columns: 1fr; gap: 15px; background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb; }
-    @media (min-width: 600px) { .slider-grid { grid-template-columns: 1fr 1fr; } }
-    .slider-group label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #4b5563; }
-    input[type="range"] { width: 100%; accent-color: var(--primary); }
-
-    .tool-actions { display: flex; gap: 10px; margin-top: 15px; justify-content: center; flex-wrap: wrap; }
-
-    /* Print Preview Layout */
-    .preview-container { width: 100%; background: #e5e7eb; padding: 20px; border-radius: 12px; margin-top: 20px; display: flex; flex-direction: column; align-items: center; overflow: hidden; }
-    .print-sheet { background: #fff; width: 210mm; min-height: 297mm; box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: relative; flex-shrink: 0; transform-origin: top center; }
-    
-    @media screen and (max-width: 850px) { .print-sheet { transform: scale(0.40); margin-bottom: -178mm; } }
-    @media screen and (max-width: 500px) { .print-sheet { transform: scale(0.35); margin-bottom: -193mm; } }
-    @media screen and (max-width: 400px) { .print-sheet { transform: scale(0.28); margin-bottom: -213mm; } }
-
-    /* Grids */
-    .grid-avery { display: grid; grid-template-columns: repeat(4, 40mm); grid-auto-rows: 40mm; gap: 5mm; justify-content: center; padding-top: 15mm; }
-    .grid-standard { display: flex; flex-wrap: wrap; gap: 8mm; padding: 15mm; justify-content: flex-start; align-content: flex-start; }
-
-    .tag-slot { display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.1s; }
-    .tag-slot:hover { transform: scale(1.02); }
-    
-    .coin-circle { border-radius: 50%; border: 0.5pt dashed #9ca3af; position: relative; overflow: hidden; background-color: #fff; display: flex; justify-content: center; }
-    .coin-circle.selected { border: 2.5px solid var(--selected); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); }
-    .coin-circle.empty-slot { background: #f3f4f6; border: 1px dashed #d1d5db; }
-    .coin-circle.empty-slot::after { content: "+"; color: #9ca3af; font-size: 24px; font-weight: bold; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
-
-    .coin-img-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-repeat: no-repeat; background-position: center; pointer-events: none; }
-    
-    /* Perfekt zentrierte, runde Einpassung */
-    .tag-info-text { 
-      position: absolute; 
-      left: 50%; 
-      transform: translateX(-50%); 
-      width: 72%; 
-      text-align: center; 
-      font-size: 5pt; 
-      font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
-      font-weight: 700; 
-      color: #111; 
-      background: rgba(255, 255, 255, 0.9); 
-      padding: 3px; 
-      border-radius: 5px; 
-      z-index: 2; 
-      line-height: 1.1; 
-      display: -webkit-box; 
-      -webkit-line-clamp: 2; 
-      -webkit-box-orient: vertical; 
-      overflow: hidden; 
-      pointer-events: none; 
-    }
-    .tag-info-text.top { top: 4mm; } 
-    .tag-info-text.bottom { bottom: 4mm; } 
-
-    .stats-badge { background: #e5e7eb; color: #374151; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
-    .stats-badge.full { background: #fee2e2; color: #ef4444; }
-
-    /* Modals & Footer */
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.65); z-index: 1000; justify-content: center; align-items: center; padding: 15px; }
-    .modal-box { background: #fff; width: 100%; max-width: 520px; border-radius: 12px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-    .modal-header { font-size: 18px; font-weight: 700; margin-bottom: 15px; }
-    .modal-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-    
-    .disclaimer { margin-top: 25px; padding: 15px; font-size: 11px; color: #6b7280; text-align: center; line-height: 1.5; border-top: 1px solid var(--border); }
-    .disclaimer a { color: var(--primary); text-decoration: none; font-weight: 600; }
-    .disclaimer a:hover { text-decoration: underline; }
-
-    /* Print Styles */
-    @media print {
-      body { background: #fff; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-      .no-print, .modal-overlay { display: none !important; }
-      .preview-container { background: transparent; padding: 0; margin: 0; overflow: visible; display: block; }
-      .print-sheet { transform: none !important; box-shadow: none; margin: 0; padding: 0; width: 210mm; height: 297mm; }
-      .coin-circle { border: 0.5pt dashed #9ca3af !important; box-shadow: none !important; }
-      .coin-circle.empty-slot { display: none !important; }
-      @page { size: A4 portrait; margin: 0; }
-      .grid-avery { padding-top: 13.5mm; padding-left: 9.5mm; gap: 4mm; justify-content: flex-start; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Tonie Cover Generator Pro</title>
+<style>
+:root {
+--primary: #e30613;
+--bg: #f0f2f5;
+--card: #fff;
+--border: #d1d5db;
+--selected: #3b82f6;
+}
+* { box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 15px; background: var(--bg); color: #1f2937; overflow-x: hidden; }
+.container { max-width: 800px; margin: 0 auto; }
+h1 { color: var(--primary); font-size: 24px; margin-top: 0; text-align: center; }
+.panel { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.panel-title { font-weight: 700; font-size: 16px; margin-bottom: 15px; display: block; border-bottom: 2px solid var(--bg); padding-bottom: 8px; }
+.form-group { margin-bottom: 15px; }
+.form-row { display: flex; gap: 10px; flex-wrap: wrap; }
+input[type="text"], select, input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; background: #fafafa; }
+button { padding: 10px 20px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+button:hover { background: #cc0510; }
+button.btn-secondary { background: #4b5563; }
+button.btn-secondary:hover { background: #374151; }
+button.btn-outline { background: transparent; color: #4b5563; border: 1px solid var(--border); }
+button.btn-outline:hover { background: #e5e7eb; }
+button.btn-danger { background: transparent; color: #ef4444; border: 1px solid #ef4444; }
+button.btn-danger:hover { background: #fef2f2; }
+button.full-width { width: 100%; font-size: 16px; padding: 14px; margin-top: 10px; }
+#search-status { font-size: 13px; color: #6b7280; margin-bottom: 10px; min-height: 20px; }
+#search-results { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; max-height: 250px; overflow-y: auto; padding-right: 5px; }
+.result-card { border: 1px solid var(--border); border-radius: 8px; padding: 8px; text-align: center; cursor: pointer; background: #fff; transition: transform 0.1s, border-color 0.1s; position: relative; }
+.result-card:active { transform: scale(0.97); }
+.result-card:hover { border-color: var(--primary); }
+.result-card img { width: 100%; height: 80px; object-fit: contain; margin-bottom: 5px; }
+.result-card .title { font-size: 11px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.result-card .add-badge { position: absolute; top: -5px; right: -5px; background: var(--primary); color: #fff; width: 22px; height: 22px; border-radius: 50%; font-size: 16px; line-height: 22px; font-weight: bold; display: none; }
+.result-card:hover .add-badge { display: block; }
+.slider-grid { display: grid; grid-template-columns: 1fr; gap: 15px; background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb; }
+@media (min-width: 600px) { .slider-grid { grid-template-columns: 1fr 1fr; } }
+.slider-group label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #4b5563; }
+input[type="range"] { width: 100%; accent-color: var(--primary); }
+.tool-actions { display: flex; gap: 10px; margin-top: 15px; justify-content: center; flex-wrap: wrap; }
+/* Single Live Preview Box in Panel 2 */
+.single-preview-box { display: flex; justify-content: center; margin-bottom: 20px; padding: 15px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb; }
+/* Print Preview Layout Fix */
+.preview-container { width: 100%; background: #e5e7eb; padding: 20px; border-radius: 12px; margin-top: 20px; display: flex; flex-direction: column; align-items: center; overflow: hidden; }
+.print-sheet { background: #fff; width: 210mm; min-height: 297mm; box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: relative; flex-shrink: 0; transform-origin: top center; }
+@media screen and (max-width: 850px) { .print-sheet { transform: scale(0.40); margin-bottom: -178mm; } }
+@media screen and (max-width: 500px) { .print-sheet { transform: scale(0.35); margin-bottom: -193mm; } }
+@media screen and (max-width: 400px) { .print-sheet { transform: scale(0.28); margin-bottom: -213mm; } }
+/* Grids */
+.grid-avery { display: grid; grid-template-columns: repeat(4, 40mm); grid-auto-rows: 40mm; gap: 5mm; justify-content: center; padding-top: 15mm; }
+.grid-standard { display: flex; flex-wrap: wrap; gap: 8mm; padding: 15mm; justify-content: flex-start; align-content: flex-start; }
+.tag-slot { display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.1s; }
+.tag-slot:hover { transform: scale(1.02); }
+.coin-circle { border-radius: 50%; border: 0.5pt dashed #9ca3af; position: relative; overflow: hidden; background-color: #fff; display: flex; justify-content: center; }
+.coin-circle.selected { border: 2.5px solid var(--selected); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); }
+.coin-circle.empty-slot { background: #f3f4f6; border: 1px dashed #d1d5db; }
+.coin-circle.empty-slot::after { content: "+"; color: #9ca3af; font-size: 24px; font-weight: bold; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+.coin-img-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-repeat: no-repeat; background-position: center; pointer-events: none; }
+/* Perfekt zentrierte, runde Einpassung */
+.tag-info-text {
+position: absolute;
+left: 50%;
+transform: translateX(-50%);
+width: 72%;
+text-align: center;
+font-size: 5pt;
+font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+font-weight: 700;
+color: #111;
+background: rgba(255, 255, 255, 0.9);
+padding: 3px;
+border-radius: 5px;
+z-index: 2;
+line-height: 1.1;
+display: -webkit-box;
+-webkit-line-clamp: 2;
+-webkit-box-orient: vertical;
+overflow: hidden;
+pointer-events: none;
+}
+.tag-info-text.top { top: 4mm; }
+.tag-info-text.bottom { bottom: 4mm; }
+.stats-badge { background: #e5e7eb; color: #374151; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+.stats-badge.full { background: #fee2e2; color: #ef4444; }
+/* Modals & Footer */
+.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.65); z-index: 1000; justify-content: center; align-items: center; padding: 15px; }
+.modal-box { background: #fff; width: 100%; max-width: 520px; border-radius: 12px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+.modal-header { font-size: 18px; font-weight: 700; margin-bottom: 15px; }
+.modal-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+.disclaimer { margin-top: 25px; padding: 15px; font-size: 11px; color: #6b7280; text-align: center; line-height: 1.5; border-top: 1px solid var(--border); }
+.disclaimer a { color: var(--primary); text-decoration: none; font-weight: 600; }
+.disclaimer a:hover { text-decoration: underline; }
+/* Tabs */
+.search-tabs { display: flex; background: #e5e7eb; padding: 4px; border-radius: 10px; margin-bottom: 15px; }
+.tab-btn { flex: 1; background: transparent; color: #6b7280; border: none; padding: 8px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s ease; }
+.tab-btn.active { background: #fff; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+/* Print Styles */
+@media print {
+body { background: #fff; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+.no-print, .modal-overlay { display: none !important; }
+.preview-container { background: transparent; padding: 0; margin: 0; overflow: visible; display: block; }
+.print-sheet { transform: none !important; box-shadow: none; margin: 0; padding: 0; width: 210mm; height: 297mm; }
+.coin-circle { border: 0.5pt dashed #9ca3af !important; box-shadow: none !important; }
+.coin-circle.empty-slot { display: none !important; }
+@page { size: A4 portrait; margin: 0; }
+.grid-avery { padding-top: 13.5mm; padding-left: 9.5mm; gap: 4mm; justify-content: flex-start; }
+}
+</style>
 </head>
 <body>
-
 <div class="container no-print">
-  <h1>Tonie & Album Etiketten Generator</h1>
-  
-  <div class="panel">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid var(--bg); padding-bottom: 8px;">
-      <span class="panel-title" style="border: none; margin: 0; padding: 0;">1. Suchen & Hinzufügen</span>
-      <button type="button" class="btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="promptClearSheet()">🗑️ Bogen leeren</button>
-    </div>
-    
-    <!-- Schöne Tabs für Tonie vs Album -->
-    <div class="search-tabs" id="search-tabs">
-      <button class="tab-btn active" data-type="tonie">🪀 Tonie-Figuren</button>
-      <button class="tab-btn" data-type="album">🎵 Apple Music / Alben</button>
-    </div>
-
-    <div class="form-row" style="flex-wrap: nowrap; gap: 8px;">
-      <input type="text" id="search-input" placeholder="Tonie Titel suchen (z.B. Conni)..." style="flex-grow: 1;">
-      <button type="button" id="search-btn">Suche</button>
-    </div>
-    
-    <div id="search-status">Datenbank wird im Hintergrund geladen...</div>
-    <div id="search-results"></div>
-  </div>
-
-  <div class="panel" id="img-tool-panel" style="display: none; border: 2px solid var(--selected);">
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--bg); padding-bottom: 8px; margin-bottom: 15px;">
-      <span class="panel-title" style="border: none; margin: 0; padding: 0; color: var(--selected);">2. Ausgewähltes Etikett anpassen</span>
-      <button type="button" class="btn-outline" style="padding: 4px 8px; font-size: 12px;" onclick="deselectLabel()">✖ Schließen</button>
-    </div>
-    
-    <div class="slider-grid">
-      <div class="slider-group">
-        <label><span>Zoom</span> <span id="zoom-val">100%</span></label>
-        <input type="range" id="zoom-slider" min="30" max="250" value="100">
-      </div>
-      <div class="slider-group">
-        <label><span>Verschiebung Rechts/Links</span></label>
-        <input type="range" id="pos-x-slider" min="-100" max="100" value="0">
-      </div>
-      <div class="slider-group">
-        <label><span>Verschiebung Oben/Unten</span></label>
-        <input type="range" id="pos-y-slider" min="-100" max="100" value="0">
-      </div>
-    </div>
-    <div class="tool-actions">
-      <button type="button" class="btn-secondary" onclick="duplicateSelected()">➕ Etikett duplizieren</button>
-      <button type="button" class="btn-danger" onclick="removeSelected()">🗑️ Entfernen</button>
-    </div>
-  </div>
-
-  <div class="panel">
-    <span class="panel-title">3. Layout & Druck</span>
-    <div class="form-group">
-      <select id="preset-select">
-        <option value="43" selected>Münzkapsel Standard (43 mm, freies Raster)</option>
-        <option value="avery-40">Avery L3415-10 Etiketten (40mm, fest 24 Plätze)</option>
-        <option value="40">Münzkapsel Klein (40 mm, freies Raster)</option>
-        <option value="30">RFIDfriend Token (30 mm, freies Raster)</option>
-      </select>
-    </div>
-    <div class="form-row" style="align-items: center; justify-content: space-between;">
-      <div class="stats-badge" id="sheet-stats">0 Etiketten auf dem Bogen</div>
-      <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer;">
-        <input type="checkbox" id="show-text-toggle" checked style="width: 18px; height: 18px;">
-        Titel andrucken
-      </label>
-    </div>
-    
-    <button type="button" class="full-width" id="btn-print" onclick="openPrintModal()">🖨️ Bogen Drucken & Exportieren</button>
-  </div>
+<h1>Tonie & Album Etiketten Generator</h1>
+<div class="panel">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid var(--bg); padding-bottom: 8px;">
+<span class="panel-title" style="border: none; margin: 0; padding: 0;">1. Suchen & Eigene Grafiken</span>
+<button type="button" class="btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="promptClearSheet()">🗑️ Bogen leeren</button>
 </div>
-
+<div class="search-tabs" id="search-tabs">
+<button class="tab-btn active" data-type="tonie">🪀 Tonie-Figuren</button>
+<button class="tab-btn" data-type="album">🎵 Apple Music / Alben</button>
+<button class="tab-btn" data-type="upload">📁 Eigene Grafik</button>
+</div>
+<div id="search-section">
+<div class="form-row" style="flex-wrap: nowrap; gap: 8px;">
+<input type="text" id="search-input" placeholder="Titel suchen (z.B. Conni)..." style="flex-grow: 1;">
+<button type="button" id="search-btn">Suche</button>
+</div>
+<div id="search-status">Datenbank wird im Hintergrund geladen...</div>
+<div id="search-results"></div>
+</div>
+<div id="upload-section" style="display: none; text-align: center; padding: 20px; border: 2px dashed #d1d5db; border-radius: 8px; background: #fafafa;">
+<p style="font-size: 14px; color: #4b5563; margin-top: 0;">Lade ein eigenes Foto oder Bild als Cover hoch (z.B. gemaltes Bild oder eigenes Motiv):</p>
+<input type="file" id="custom-file-input" accept="image/*" style="display: none;">
+<button type="button" onclick="document.getElementById('custom-file-input').click()">🖼️ Bild von Gerät auswählen</button>
+</div>
+</div>
+<div class="panel" id="img-tool-panel" style="display: none; border: 2px solid var(--selected);">
+<div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--bg); padding-bottom: 8px; margin-bottom: 15px;">
+<span class="panel-title" style="border: none; margin: 0; padding: 0; color: var(--selected);">2. Ausgewähltes Etikett anpassen</span>
+<button type="button" class="btn-outline" style="padding: 4px 8px; font-size: 12px;" onclick="deselectLabel()">✖ Schließen</button>
+</div>
+<!-- Die visuelle Vorschau im Editor-Bereich -->
+<div class="single-preview-box">
+<div class="tag-slot">
+<div class="coin-circle" id="editor-preview-circle" style="width: 43mm; height: 43mm;">
+<div class="coin-img-layer" id="editor-preview-img"></div>
+<div class="tag-info-text top" id="editor-preview-top"></div>
+<div class="tag-info-text bottom" id="editor-preview-bottom"></div>
+</div>
+</div>
+</div>
+<div class="form-row" style="margin-bottom: 15px; align-items: center; justify-content: space-between;">
+<label style="font-size: 13px; font-weight: 600; color: #4b5563;">Hintergrundfarbe des Etiketts:</label>
+<input type="color" id="bg-color-picker" value="#ffffff" style="width: 60px; height: 35px; border: 1px solid #ccc; border-radius: 6px; cursor: pointer; background: none; padding: 0;">
+</div>
+<div class="slider-grid">
+<div class="slider-group">
+<label><span>Zoom</span> <span id="zoom-val">100%</span></label>
+<input type="range" id="zoom-slider" min="30" max="250" value="100">
+</div>
+<div class="slider-group">
+<label><span>Verschiebung Rechts/Links</span></label>
+<input type="range" id="pos-x-slider" min="-100" max="100" value="0">
+</div>
+<div class="slider-group">
+<label><span>Verschiebung Oben/Unten</span></label>
+<input type="range" id="pos-y-slider" min="-100" max="100" value="0">
+</div>
+</div>
+<div class="tool-actions">
+<button type="button" class="btn-secondary" onclick="duplicateSelected()">➕ Duplizieren</button>
+<button type="button" class="btn-danger" onclick="removeSelected()">🗑️ Entfernen</button>
+</div>
+</div>
+<div class="panel">
+<span class="panel-title">3. Layout & Druck</span>
+<div class="form-group">
+<select id="preset-select">
+<option value="43" selected>Münzkapsel Standard (43 mm, freies Raster)</option>
+<option value="avery-40">Avery L3415-10 Etiketten (40mm, fest 24 Plätze)</option>
+<option value="40">Münzkapsel Klein (40 mm, freies Raster)</option>
+<option value="30">RFIDfriend Token (30 mm, freies Raster)</option>
+</select>
+</div>
+<div class="form-row" style="align-items: center; justify-content: space-between;">
+<div class="stats-badge" id="sheet-stats">0 Etiketten auf dem Bogen</div>
+<label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer;">
+<input type="checkbox" id="show-text-toggle" checked style="width: 18px; height: 18px;">
+Titel andrucken
+</label>
+</div>
+<button type="button" class="full-width" id="btn-print" onclick="openPrintModal()">🖨️ Bogen Drucken & Exportieren</button>
+</div>
+</div>
 <div class="preview-container">
-  <div class="no-print" style="margin-bottom: 15px; font-weight: bold; color: #6b7280; text-align: center;">Live Druckvorschau <span style="font-weight:normal; font-size:14px; display:block;">(Klicke auf ein Etikett auf dem Bogen, um es zu bearbeiten)</span></div>
-  <div class="print-sheet" id="print-sheet-preview">
-    <div id="sheet-grid" class="grid-standard"></div>
-  </div>
+<div class="no-print" style="margin-bottom: 15px; font-weight: bold; color: #6b7280; text-align: center;">Live Druckvorschau <span style="font-weight:normal; font-size:14px; display:block;">(Klicke auf ein Etikett auf dem Bogen, um es zu bearbeiten)</span></div>
+<div class="print-sheet" id="print-sheet-preview">
+<div id="sheet-grid" class="grid-standard"></div>
 </div>
-
+</div>
 <div class="container no-print">
-  <div class="disclaimer">
-    <strong>Rechtlicher Hinweis / Lizenz (MIT Open Source):</strong> Dieses Projekt ist ein freies, inoffizielles Hobby-Projekt unter MIT-Lizenz und steht in keinerlei Verbindung zur Boxine GmbH. "tonies®" und "Toniebox®" sind eingetragene Marken der Boxine GmbH.<br>
-    Passende benutzerdefinierte NFC-Tags für deine eigene Toniebox erhältst du bei <a href="http://rfidfriend.com/" target="_blank">RFIDfriend.com</a>.
-  </div>
-</div>
+<div class="disclaimer">
+<strong>Rechtlicher Hinweis / Lizenz (MIT Open Source):</strong> Dieses Projekt ist ein freies, inoffizielles Hobby-Projekt unter MIT-Lizenz und steht in keinerlei Verbindung zur Boxine GmbH. "tonies®" und "Toniebox®" sind eingetragene Marken der Boxine GmbH.
 
+Passende benutzerdefinierte NFC-Tags für deine eigene Toniebox erhältst du bei <a href="http://rfidfriend.com/" target="_blank">RFIDfriend.com</a>.
+</div>
+</div>
 <!-- Modal: Druck & Export -->
 <div class="modal-overlay" id="print-modal">
-  <div class="modal-box">
-    <div class="modal-header">Druck- & Exportoptionen</div>
-    <p style="font-size: 14px; color: #4b5563; margin-top: 0;">Wie möchtest du deinen fertigen Bogen ausgeben?</p>
-    <div class="modal-actions">
-      <button type="button" onclick="executePrint()">📄 Jetzt Drucken (A4 / PDF)</button>
-      <button type="button" class="btn-secondary" id="btn-export-png" onclick="exportAsPng()">🖼️ Als hochauflösendes PNG speichern</button>
-      <button type="button" class="btn-outline" onclick="closePrintModal()">Abbrechen</button>
-    </div>
-  </div>
+<div class="modal-box">
+<div class="modal-header">Druck- & Exportoptionen</div>
+<p style="font-size: 14px; color: #4b5563; margin-top: 0;">Wie möchtest du deinen fertigen Bogen ausgeben?</p>
+<div class="modal-actions">
+<button type="button" onclick="executePrint()">📄 Jetzt Drucken (A4 / PDF)</button>
+<button type="button" class="btn-secondary" id="btn-export-png" onclick="exportAsPng()">🖼️ Als hochauflösendes PNG speichern</button>
+<button type="button" class="btn-outline" onclick="closePrintModal()">Abbrechen</button>
 </div>
-
+</div>
+</div>
 <!-- Modal: Bogen leeren Bestätigung -->
 <div class="modal-overlay" id="clear-modal">
-  <div class="modal-box" style="max-width: 400px; text-align: center;">
-    <div class="modal-header" style="color: #ef4444;">Bogen leeren?</div>
-    <p style="font-size: 14px; color: #4b5563;">Möchtest du wirklich alle Etiketten von deinem Bogen löschen?</p>
-    <div class="modal-actions" style="flex-direction: row; justify-content: center; margin-top: 20px;">
-      <button type="button" class="btn-outline" onclick="closeClearModal()">Abbrechen</button>
-      <button type="button" class="btn-danger" style="background: #ef4444; color: white;" onclick="executeClearSheet()">Ja, Bogen leeren</button>
-    </div>
-  </div>
+<div class="modal-box" style="max-width: 400px; text-align: center;">
+<div class="modal-header" style="color: #ef4444;">Bogen leeren?</div>
+<p style="font-size: 14px; color: #4b5563;">Möchtest du wirklich alle Etiketten von deinem Bogen löschen?</p>
+<div class="modal-actions" style="flex-direction: row; justify-content: center; margin-top: 20px;">
+<button type="button" class="btn-outline" onclick="closeClearModal()">Abbrechen</button>
+<button type="button" class="btn-danger" style="background: #ef4444; color: white;" onclick="executeClearSheet()">Ja, Bogen leeren</button>
 </div>
-
+</div>
+</div>
 <canvas id="export-canvas" style="display: none;"></canvas>
-  <script>
-  const TONIES_JSON_URL = "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json";
-  let tonieDb = [];
-  
-  let appState = {
-    labels: [],
-    selectedId: null,
-    preset: '43',
-    showText: true,
-    searchType: 'tonie'
-  };
-
-  const elements = {
-    searchInput: document.getElementById("search-input"),
-    searchBtn: document.getElementById("search-btn"),
-    tabBtns: document.querySelectorAll(".tab-btn"),
-    searchResults: document.getElementById("search-results"),
-    statusMsg: document.getElementById("search-status"),
-    imgToolPanel: document.getElementById("img-tool-panel"),
-    zoomSlider: document.getElementById("zoom-slider"),
-    posXSlider: document.getElementById("pos-x-slider"),
-    posYSlider: document.getElementById("pos-y-slider"),
-    presetSelect: document.getElementById("preset-select"),
-    showTextToggle: document.getElementById("show-text-toggle"),
-    sheetGrid: document.getElementById("sheet-grid"),
-    sheetStats: document.getElementById("sheet-stats"),
-    printModal: document.getElementById("print-modal"),
-    clearModal: document.getElementById("clear-modal")
-  };
-
-  function promptClearModal() { elements.clearModal.style.display = "flex"; }
-  function closeClearModal() { elements.clearModal.style.display = "none"; }
-  function executeClearSheet() {
-    appState.labels = [];
-    deselectLabel();
-    closeClearModal();
-  }
-
-  function loadState() {
-    const saved = localStorage.getItem("tonieGeneratorStatePro");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        appState.labels = parsed.labels || [];
-        appState.preset = parsed.preset || '43';
-        appState.showText = parsed.showText !== undefined ? parsed.showText : true;
-        appState.selectedId = null; 
-        
-        elements.presetSelect.value = appState.preset;
-        elements.showTextToggle.checked = appState.showText;
-      } catch(e) {}
-    }
-    renderGrid();
-  }
-
-  function saveState() {
-    localStorage.setItem("tonieGeneratorStatePro", JSON.stringify({
-      labels: appState.labels,
-      preset: appState.preset,
-      showText: appState.showText
-    }));
-  }
-
-  fetch(TONIES_JSON_URL)
-    .then(res => res.json())
-    .then(data => { 
-      tonieDb = data; 
-      elements.statusMsg.textContent = "Datenbank bereit. Suchbegriff eingeben."; 
-    })
-    .catch(() => elements.statusMsg.textContent = "Fehler beim Laden der Datenbank.");
-
-  // Tab Logik
-  elements.tabBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      elements.tabBtns.forEach(b => b.classList.remove('active'));
-      e.currentTarget.classList.add('active');
-      appState.searchType = e.currentTarget.dataset.type;
-      
-      elements.searchInput.placeholder = appState.searchType === 'album' 
-        ? "Interpret oder Album suchen (z.B. Disney)..." 
-        : "Tonie Titel suchen (z.B. Conni)...";
-      
-      elements.searchInput.focus();
-      if(elements.searchInput.value.trim().length >= 3) {
-        doSearch();
-      } else {
-        elements.searchResults.innerHTML = "";
-        elements.statusMsg.textContent = "Bereit für neue Suche.";
-      }
-    });
-  });
-
-  async function doSearch() {
-    const q = elements.searchInput.value.trim().toLowerCase();
-    if(!q) { elements.searchResults.innerHTML = ""; elements.statusMsg.textContent = "Bitte Suchbegriff eingeben."; return; }
-    
-    elements.searchResults.innerHTML = "";
-    elements.statusMsg.textContent = "Suche läuft...";
-    
-    if (appState.searchType === "album") {
-      try {
-        const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=album&limit=12`);
-        const data = await res.json();
-        if(data.results.length === 0) { elements.statusMsg.textContent = "Keine Alben gefunden."; return; }
-        elements.statusMsg.textContent = `${data.results.length} Alben gefunden. Klicke zum Hinzufügen.`;
-        data.results.forEach(album => {
-          const imgUrl = album.artworkUrl100.replace('100x100bb', '600x600bb');
-          createResultCard(imgUrl, album.artistName, album.collectionName);
-        });
-      } catch (err) { elements.statusMsg.textContent = "Netzwerkfehler."; }
-    } else {
-      if(tonieDb.length === 0) return;
-      
-      // Filtern und strikt nach Serie/Titel alphabetisch sortieren (damit "Ärzte" richtig einsortiert wird)
-      const matches = tonieDb
-        .filter(item => {
-          if(!item.pic) return false;
-          // Filter: Keine reinen generischen Web-Platzhalter
-          if(item.pic.includes('placeholder') || item.pic.includes('default')) return false;
-          return (item.title||"").toLowerCase().includes(q) || (item.series||"").toLowerCase().includes(q);
-        })
-        .sort((a, b) => (a.series || a.title || "").localeCompare(b.series || b.title || "", 'de'))
-        .slice(0, 16);
-
-      if(matches.length === 0) { elements.statusMsg.textContent = "Keine Tonies gefunden."; return; }
-      elements.statusMsg.textContent = `${matches.length} Tonies gefunden. Klicke zum Hinzufügen.`;
-      
-      matches.forEach(item => {
-        createResultCard(item.pic, item.series || "", item.episodes || item.title || "");
-      });
-    }
-  }
-
-  function createResultCard(imgUrl, seriesText, titleText) {
-    const card = document.createElement("div");
-    card.className = "result-card";
-    const displayName = titleText || seriesText || "Ohne Titel";
-    card.innerHTML = `<div class="add-badge">+</div><img src="${imgUrl}"><div class="title">${displayName}</div>`;
-    card.onclick = () => {
-      let finalSeries = seriesText;
-      let finalTitle = titleText;
-      if(!finalSeries && finalTitle) { finalSeries = finalTitle; finalTitle = ""; }
-      addLabel(imgUrl, finalSeries, finalTitle);
-    };
-    elements.searchResults.appendChild(card);
-  }
-
-  function addLabel(imgUrl, series, title) {
-    if (appState.preset === 'avery-40' && appState.labels.length >= 24) {
-      alert("Ein Avery-Bogen hat maximal 24 Plätze."); 
-      return;
-    }
-    const newId = Date.now().toString() + Math.floor(Math.random()*1000);
-    appState.labels.push({ id: newId, imgUrl, series, title, zoom: 100, posX: 0, posY: 0 });
-    selectLabel(newId);
-  }
-
-  function selectLabel(id) {
-    appState.selectedId = id;
-    const label = appState.labels.find(l => l.id === id);
-    if(label) {
-      elements.imgToolPanel.style.display = "block";
-      elements.zoomSlider.value = label.zoom;
-      elements.posXSlider.value = label.posX;
-      elements.posYSlider.value = label.posY;
-      document.getElementById("zoom-val").textContent = `${label.zoom}%`;
-      elements.imgToolPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    }
-    renderGrid();
-  }
-
-  function deselectLabel() {
-    appState.selectedId = null;
-    elements.imgToolPanel.style.display = "none";
-    renderGrid();
-  }
-
-  function duplicateSelected() {
-    const labelToCopy = appState.labels.find(l => l.id === appState.selectedId);
-    if(labelToCopy) {
-      if (appState.preset === 'avery-40' && appState.labels.length >= 24) {
-        alert("Der Avery-Bogen hat sein Maximum von 24 Stück erreicht."); 
-        return;
-      }
-      const newId = Date.now().toString() + Math.floor(Math.random()*1000);
-      appState.labels.push({ ...labelToCopy, id: newId });
-      selectLabel(newId);
-    }
-  }
-
-  function removeSelected() {
-    appState.labels = appState.labels.filter(l => l.id !== appState.selectedId);
-    deselectLabel();
-  }
-
-  function updateSelectedLabelProps() {
-    if(!appState.selectedId) return;
-    const idx = appState.labels.findIndex(l => l.id === appState.selectedId);
-    if(idx > -1) {
-      appState.labels[idx].zoom = elements.zoomSlider.value;
-      appState.labels[idx].posX = elements.posXSlider.value;
-      appState.labels[idx].posY = elements.posYSlider.value;
-      document.getElementById("zoom-val").textContent = `${elements.zoomSlider.value}%`;
-      renderGrid();
-    }
-  }
-
-  elements.zoomSlider.oninput = updateSelectedLabelProps;
-  elements.posXSlider.oninput = updateSelectedLabelProps;
-  elements.posYSlider.oninput = updateSelectedLabelProps;
-
-  function renderGrid() {
-    elements.sheetGrid.innerHTML = "";
-    saveState();
-    
-    appState.preset = elements.presetSelect.value;
-    appState.showText = elements.showTextToggle.checked;
-    
-    const isAvery = appState.preset === "avery-40";
-    let diameter = isAvery ? 40 : (parseInt(appState.preset) || 43);
-    
-    elements.sheetGrid.className = isAvery ? "grid-avery" : "grid-standard";
-    
-    elements.sheetStats.textContent = `${appState.labels.length}${isAvery ? '/24' : ''} Etikett${appState.labels.length !== 1 ? 'en' : ''} auf dem Bogen`;
-    if(isAvery && appState.labels.length >= 24) {
-      elements.sheetStats.classList.add('full');
-    } else {
-      elements.sheetStats.classList.remove('full');
-    }
-
-    if(appState.labels.length === 0 && !isAvery) {
-      elements.sheetGrid.innerHTML = `
-        <div style="width:100%; text-align:center; padding: 60px 20px; color: #9ca3af; display:flex; flex-direction:column; align-items:center;">
-          <div style="font-size: 16px; font-weight: 500;">Dein Bogen ist leer.</div>
-          <div style="font-size: 13px; margin-top: 5px;">Suche oben nach Titeln und klicke sie an, um sie hinzuzufügen.</div>
-        </div>`;
-      return;
-    }
-
-    const totalSlots = isAvery ? 24 : appState.labels.length;
-
-    for(let i = 0; i < totalSlots; i++) {
-      const label = appState.labels[i];
-      
-      const slot = document.createElement("div");
-      slot.className = "tag-slot";
-      
-      const circle = document.createElement("div");
-      circle.className = "coin-circle";
-      circle.style.width = `${diameter}mm`;
-      circle.style.height = `${diameter}mm`;
-
-      if (label) {
-        if(label.id === appState.selectedId) circle.classList.add("selected");
-        
-        slot.onclick = () => selectLabel(label.id);
-
-        const imgLayer = document.createElement("div");
-        imgLayer.className = "coin-img-layer";
-        imgLayer.style.backgroundImage = `url('${label.imgUrl}')`;
-        imgLayer.style.backgroundSize = `${label.zoom}%`;
-        imgLayer.style.backgroundPosition = `calc(50% + ${label.posX}px) calc(50% + ${label.posY}px)`;
-        circle.appendChild(imgLayer);
-
-        if (appState.showText) {
-          if(label.series) {
-            const lblTop = document.createElement("div");
-            lblTop.className = "tag-info-text top";
-            lblTop.textContent = label.series; 
-            circle.appendChild(lblTop);
-          }
-          if(label.title) {
-            const lblBottom = document.createElement("div");
-            lblBottom.className = "tag-info-text bottom";
-            lblBottom.textContent = label.title; 
-            circle.appendChild(lblBottom);
-          }
-        }
-      } else {
-        circle.classList.add("empty-slot");
-      }
-      slot.appendChild(circle);
-      elements.sheetGrid.appendChild(slot);
-    }
-  }
-
-  let searchTimeout = null;
-  elements.searchInput.addEventListener("input", () => {
-    if (elements.searchInput.value.trim().length >= 3) {
-      elements.statusMsg.textContent = "Tippen... Suche startet gleich.";
-      clearTimeout(searchTimeout);
-      searchTimeout = setTimeout(doSearch, 400); 
-    }
-  });
-  elements.searchBtn.onclick = () => { clearTimeout(searchTimeout); doSearch(); };
-  elements.searchInput.onkeydown = e => { if (e.key === "Enter") { clearTimeout(searchTimeout); doSearch(); }};
-  
-  elements.presetSelect.onchange = renderGrid;
-  elements.showTextToggle.onchange = renderGrid;
-
-  function openPrintModal() {
-    if(appState.labels.length === 0) { alert("Bitte füge zuerst Etiketten hinzu."); return; }
-    elements.printModal.style.display = "flex";
-  }
-  function closePrintModal() { elements.printModal.style.display = "none"; }
-  function executePrint() {
-    closePrintModal();
-    deselectLabel();
-    setTimeout(() => window.print(), 250);
-  }
-
-  async function loadImagesForExport() {
-    const cache = {};
-    for (const lbl of appState.labels) {
-      if (!cache[lbl.imgUrl]) {
-        cache[lbl.imgUrl] = await new Promise((resolve) => {
-          const img = new Image();
-          img.crossOrigin = "anonymous";
-          img.onload = () => resolve(img);
-          img.onerror = () => resolve(null);
-          img.src = lbl.imgUrl;
-        });
-      }
-    }
-    return cache;
-  }
-
-  async function exportAsPng() {
-    const exportBtn = document.getElementById("btn-export-png");
-    exportBtn.textContent = "⏳ Bogen wird generiert...";
-    exportBtn.disabled = true;
-
-    try {
-      const isAvery = appState.preset === "avery-40";
-      const diameterMm = isAvery ? 40 : (parseInt(appState.preset) || 43);
-      
-      const canvas = document.getElementById("export-canvas");
-      canvas.width = 2480; canvas.height = 3508; 
-      const ctx = canvas.getContext("2d");
-
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      const pxPerMm = 2480 / 210;
-      const diameterPx = diameterMm * pxPerMm;
-
-      let startX = 15 * pxPerMm, startY = 15 * pxPerMm, gapX = 8 * pxPerMm, gapY = 8 * pxPerMm;
-      let cols = isAvery ? 4 : Math.floor((2480 - (2 * startX)) / (diameterPx + gapX));
-
-      if (isAvery) {
-        startX = 9.5 * pxPerMm; startY = 13.5 * pxPerMm; gapX = 4 * pxPerMm; gapY = 4 * pxPerMm;
-      }
-
-      const imgCache = await loadImagesForExport();
-      const totalSlots = isAvery ? 24 : appState.labels.length;
-
-      for (let i = 0; i < totalSlots; i++) {
-        const col = i % cols;
-        const row = Math.floor(i / cols);
-        const x = startX + col * (diameterPx + gapX);
-        const y = startY + row * (diameterPx + gapY);
-        const label = appState.labels[i];
-
-        ctx.save();
-        ctx.beginPath();
-        ctx.setLineDash([10, 10]);
-        ctx.strokeStyle = "#9ca3af";
-        ctx.lineWidth = 2;
-        ctx.arc(x + diameterPx / 2, y + diameterPx / 2, diameterPx / 2, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.restore();
-
-        if (label) {
-          ctx.save();
-          ctx.beginPath();
-          ctx.arc(x + diameterPx / 2, y + diameterPx / 2, diameterPx / 2, 0, Math.PI * 2);
-          ctx.closePath();
-          ctx.clip();
-          ctx.fillStyle = "#ffffff";
-          ctx.fill();
-
-          const loadedImg = imgCache[label.imgUrl];
-          if (loadedImg) {
-            const scale = (label.zoom / 100);
-            const w = diameterPx * scale;
-            const h = diameterPx * scale;
-            const posX = (label.posX * (pxPerMm / 3.78));
-            const posY = (label.posY * (pxPerMm / 3.78));
-            const drawX = (x + diameterPx / 2 - w / 2) + posX;
-            const drawY = (y + diameterPx / 2 - h / 2) + posY;
-            ctx.drawImage(loadedImg, drawX, drawY, w, h);
-          }
-          ctx.restore();
-
-          if (appState.showText) {
-            ctx.save();
-            ctx.font = `bold ${Math.round(18 * (pxPerMm / 3.78))}px -apple-system, sans-serif`;
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-
-            const boxWidth = diameterPx * 0.72;
-            const boxX = x + (diameterPx - boxWidth) / 2;
-            const boxHeight = 28; 
-
-            if (label.series) {
-              const topBoxY = y + (4 * pxPerMm);
-              ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-              ctx.fillRect(boxX, topBoxY, boxWidth, boxHeight);
-              ctx.fillStyle = "#111";
-              ctx.fillText(label.series, x + diameterPx / 2, topBoxY + (boxHeight/2), boxWidth * 0.9);
-            }
-            if (label.title) {
-              const btmBoxY = y + diameterPx - (4 * pxPerMm) - boxHeight;
-              ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-              ctx.fillRect(boxX, btmBoxY, boxWidth, boxHeight);
-              ctx.fillStyle = "#111";
-              ctx.fillText(label.title, x + diameterPx / 2, btmBoxY + (boxHeight/2), boxWidth * 0.9);
-            }
-            ctx.restore();
-          }
-        }
-      }
-      
-      const link = document.createElement("a");
-      link.download = `tonie-cover-bogen.png`;
-      link.href = canvas.toDataURL("image/png");
-      link.click();
-    } catch (e) {
-      alert("Beim Exportieren ist ein Fehler aufgetreten.");
-    } finally {
-      exportBtn.textContent = "🖼️ Als hochauflösendes PNG speichern";
-      exportBtn.disabled = false;
-      closePrintModal();
-    }
-  }
-
-  loadState();
+<script>
+const TONIES_JSON_URL = "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json";
+let tonieDb = [];
+let appState = {
+labels: [],
+selectedId: null,
+preset: '43',
+showText: true,
+searchType: 'tonie'
+};
+const elements = {
+searchInput: document.getElementById("search-input"),
+searchBtn: document.getElementById("search-btn"),
+tabBtns: document.querySelectorAll(".tab-btn"),
+searchSection: document.getElementById("search-section"),
+uploadSection: document.getElementById("upload-section"),
+customFileInput: document.getElementById("custom-file-input"),
+searchResults: document.getElementById("search-results"),
+statusMsg: document.getElementById("search-status"),
+imgToolPanel: document.getElementById("img-tool-panel"),
+zoomSlider: document.getElementById("zoom-slider"),
+posXSlider: document.getElementById("pos-x-slider"),
+posYSlider: document.getElementById("pos-y-slider"),
+bgColorPicker: document.getElementById("bg-color-picker"),
+presetSelect: document.getElementById("preset-select"),
+showTextToggle: document.getElementById("show-text-toggle"),
+sheetGrid: document.getElementById("sheet-grid"),
+sheetStats: document.getElementById("sheet-stats"),
+printModal: document.getElementById("print-modal"),
+clearModal: document.getElementById("clear-modal"),
+editorCircle: document.getElementById("editor-preview-circle"),
+editorImg: document.getElementById("editor-preview-img"),
+editorTop: document.getElementById("editor-preview-top"),
+editorBottom: document.getElementById("editor-preview-bottom")
+};
+function promptClearSheet() { elements.clearModal.style.display = "flex"; }
+function closeClearModal() { elements.clearModal.style.display = "none"; }
+function executeClearSheet() {
+appState.labels = [];
+deselectLabel();
+closeClearModal();
+}
+function loadState() {
+const saved = localStorage.getItem("tonieGeneratorStateProV2");
+if (saved) {
+try {
+const parsed = JSON.parse(saved);
+appState.labels = parsed.labels || [];
+appState.preset = parsed.preset || '43';
+appState.showText = parsed.showText !== undefined ? parsed.showText : true;
+appState.selectedId = null;
+elements.presetSelect.value = appState.preset;
+elements.showTextToggle.checked = appState.showText;
+} catch(e) {}
+}
+renderGrid();
+}
+function saveState() {
+localStorage.setItem("tonieGeneratorStateProV2", JSON.stringify({
+labels: appState.labels,
+preset: appState.preset,
+showText: appState.showText
+}));
+}
+fetch(TONIES_JSON_URL)
+.then(res => res.json())
+.then(data => {
+tonieDb = data;
+elements.statusMsg.textContent = "Datenbank bereit. Suchbegriff eingeben.";
+})
+.catch(() => elements.statusMsg.textContent = "Fehler beim Laden der Datenbank.");
+// Tab Logik
+elements.tabBtns.forEach(btn => {
+btn.addEventListener('click', (e) => {
+elements.tabBtns.forEach(b => b.classList.remove('active'));
+e.currentTarget.classList.add('active');
+appState.searchType = e.currentTarget.dataset.type;
+if (appState.searchType === 'upload') {
+elements.searchSection.style.display = 'none';
+elements.uploadSection.style.display = 'block';
+} else {
+elements.searchSection.style.display = 'block';
+elements.uploadSection.style.display = 'none';
+elements.searchInput.placeholder = appState.searchType === 'album'
+? "Interpret oder Album suchen (z.B. Disney)..."
+: "Tonie Titel suchen (z.B. Conni)...";
+elements.searchInput.focus();
+if(elements.searchInput.value.trim().length >= 3) {
+doSearch();
+} else {
+elements.searchResults.innerHTML = "";
+elements.statusMsg.textContent = "Bereit für neue Suche.";
+}
+}
+});
+});
+// Eigene Grafik Upload Handling
+elements.customFileInput.addEventListener('change', (e) => {
+const file = e.target.files[0];
+if(!file) return;
+const reader = new FileReader();
+reader.onload = function(event) {
+const imgUrl = event.target.result;
+addLabel(imgUrl, "Eigene Grafik", file.name.replace(/.[^/.]+$/, ""));
+elements.customFileInput.value = "";
+};
+reader.readAsDataURL(file);
+});
+async function doSearch() {
+const q = elements.searchInput.value.trim().toLowerCase();
+if(!q) { elements.searchResults.innerHTML = ""; elements.statusMsg.textContent = "Bitte Suchbegriff eingeben."; return; }
+elements.searchResults.innerHTML = "";
+elements.statusMsg.textContent = "Suche läuft...";
+if (appState.searchType === "album") {
+try {
+const res = await fetch(⁠https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=album&limit=12⁠);
+const data = await res.json();
+if(data.results.length === 0) { elements.statusMsg.textContent = "Keine Alben gefunden."; return; }
+elements.statusMsg.textContent = ⁠${data.results.length} Alben gefunden. Klicke zum Hinzufügen.⁠;
+data.results.forEach(album => {
+const imgUrl = album.artworkUrl100.replace('100x100bb', '600x600bb');
+createResultCard(imgUrl, album.artistName, album.collectionName);
+});
+} catch (err) { elements.statusMsg.textContent = "Netzwerkfehler."; }
+} else {
+if(tonieDb.length === 0) return;
+// Strikt saubere Filterung für echte Figuren und Vermeidung von Buch/Album-Covern in der Tonie-Suche
+const matches = tonieDb
+.filter(item => {
+if(!item.pic) return false;
+if(item.pic.includes('placeholder') || item.pic.includes('default')) return false;
+const title = (item.title||"").toLowerCase();
+const series = (item.series||"").toLowerCase();
+return title.includes(q) || series.includes(q);
+})
+.sort((a, b) => (a.series || a.title || "").localeCompare(b.series || b.title || "", 'de'))
+.slice(0, 16);
+if(matches.length === 0) { elements.statusMsg.textContent = "Keine Tonies gefunden."; return; }
+elements.statusMsg.textContent = ⁠${matches.length} Tonies gefunden. Klicke zum Hinzufügen.⁠;
+matches.forEach(item => {
+createResultCard(item.pic, item.series || "", item.episodes || item.title || "");
+});
+}
+}
+function createResultCard(imgUrl, seriesText, titleText) {
+const card = document.createElement("div");
+card.className = "result-card";
+const displayName = titleText || seriesText || "Ohne Titel";
+card.innerHTML = ⁠<div class="add-badge">+</div><img src="${imgUrl}"><div class="title">${displayName}</div>⁠;
+card.onclick = () => {
+let finalSeries = seriesText;
+let finalTitle = titleText;
+if(!finalSeries && finalTitle) { finalSeries = finalTitle; finalTitle = ""; }
+addLabel(imgUrl, finalSeries, finalTitle);
+};
+elements.searchResults.appendChild(card);
+}
+function addLabel(imgUrl, series, title) {
+if (appState.preset === 'avery-40' && appState.labels.length >= 24) {
+alert("Ein Avery-Bogen hat maximal 24 Plätze.");
+return;
+}
+const newId = Date.now().toString() + Math.floor(Math.random()*1000);
+appState.labels.push({
+id: newId,
+imgUrl,
+series,
+title,
+zoom: 100,
+posX: 0,
+posY: 0,
+bgColor: '#ffffff'
+});
+selectLabel(newId);
+}
+function selectLabel(id) {
+appState.selectedId = id;
+const label = appState.labels.find(l => l.id === id);
+if(label) {
+elements.imgToolPanel.style.display = "block";
+elements.zoomSlider.value = label.zoom;
+elements.posXSlider.value = label.posX;
+elements.posYSlider.value = label.posY;
+elements.bgColorPicker.value = label.bgColor || '#ffffff';
+document.getElementById("zoom-val").textContent = ⁠${label.zoom}%⁠;
+updateEditorPreview();
+elements.imgToolPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+renderGrid();
+}
+function deselectLabel() {
+appState.selectedId = null;
+elements.imgToolPanel.style.display = "none";
+renderGrid();
+}
+function duplicateSelected() {
+const labelToCopy = appState.labels.find(l => l.id === appState.selectedId);
+if(labelToCopy) {
+if (appState.preset === 'avery-40' && appState.labels.length >= 24) {
+alert("Der Avery-Bogen hat sein Maximum von 24 Stück erreicht.");
+return;
+}
+const newId = Date.now().toString() + Math.floor(Math.random()*1000);
+appState.labels.push({ ...labelToCopy, id: newId });
+selectLabel(newId);
+}
+}
+function removeSelected() {
+appState.labels = appState.labels.filter(l => l.id !== appState.selectedId);
+deselectLabel();
+}
+function updateSelectedLabelProps() {
+if(!appState.selectedId) return;
+const idx = appState.labels.findIndex(l => l.id === appState.selectedId);
+if(idx > -1) {
+appState.labels[idx].zoom = elements.zoomSlider.value;
+appState.labels[idx].posX = elements.posXSlider.value;
+appState.labels[idx].posY = elements.posYSlider.value;
+appState.labels[idx].bgColor = elements.bgColorPicker.value;
+document.getElementById("zoom-val").textContent = ⁠${elements.zoomSlider.value}%⁠;
+updateEditorPreview();
+renderGrid();
+}
+}
+elements.zoomSlider.oninput = updateSelectedLabelProps;
+elements.posXSlider.oninput = updateSelectedLabelProps;
+elements.posYSlider.oninput = updateSelectedLabelProps;
+elements.bgColorPicker.oninput = updateSelectedLabelProps;
+function updateEditorPreview() {
+const label = appState.labels.find(l => l.id === appState.selectedId);
+const isAvery = appState.preset === "avery-40";
+let diameter = isAvery ? 40 : (parseInt(appState.preset) || 43);
+elements.editorCircle.style.width = ⁠${diameter}mm⁠;
+elements.editorCircle.style.height = ⁠${diameter}mm⁠;
+if (label) {
+elements.editorCircle.style.backgroundColor = label.bgColor || '#ffffff';
+elements.editorImg.style.backgroundImage = ⁠url('${label.imgUrl}')⁠;
+elements.editorImg.style.backgroundSize = ⁠${label.zoom}%⁠;
+elements.editorImg.style.backgroundPosition = ⁠calc(50% + ${label.posX}px) calc(50% + ${label.posY}px)⁠;
+if (appState.showText) {
+elements.editorTop.textContent = label.series || "";
+elements.editorTop.style.display = label.series ? "block" : "none";
+elements.editorBottom.textContent = label.title || "";
+elements.editorBottom.style.display = label.title ? "block" : "none";
+} else {
+elements.editorTop.style.display = "none";
+elements.editorBottom.style.display = "none";
+}
+}
+}
+function renderGrid() {
+elements.sheetGrid.innerHTML = "";
+saveState();
+appState.preset = elements.presetSelect.value;
+appState.showText = elements.showTextToggle.checked;
+const isAvery = appState.preset === "avery-40";
+let diameter = isAvery ? 40 : (parseInt(appState.preset) || 43);
+elements.sheetGrid.className = isAvery ? "grid-avery" : "grid-standard";
+elements.sheetStats.textContent = ⁠${appState.labels.length}${isAvery ? '/24' : ''} Etikett${appState.labels.length !== 1 ? 'en' : ''} auf dem Bogen⁠;
+if(isAvery && appState.labels.length >= 24) {
+elements.sheetStats.classList.add('full');
+} else {
+elements.sheetStats.classList.remove('full');
+}
+if(appState.labels.length === 0 && !isAvery) {
+elements.sheetGrid.innerHTML = ⁠ <div style="width:100%; text-align:center; padding: 60px 20px; color: #9ca3af; display:flex; flex-direction:column; align-items:center;"> <div style="font-size: 16px; font-weight: 500;">Dein Bogen ist leer.</div> <div style="font-size: 13px; margin-top: 5px;">Suche oben nach Titeln oder lade eigene Grafiken hoch, um sie hierher hinzuzufügen.</div> </div>⁠;
+return;
+}
+const totalSlots = isAvery ? 24 : appState.labels.length;
+for(let i = 0; i < totalSlots; i++) {
+const label = appState.labels[i];
+const slot = document.createElement("div");
+slot.className = "tag-slot";
+const circle = document.createElement("div");
+circle.className = "coin-circle";
+circle.style.width = ⁠${diameter}mm⁠;
+circle.style.height = ⁠${diameter}mm⁠;
+if (label) {
+if(label.id === appState.selectedId) circle.classList.add("selected");
+circle.style.backgroundColor = label.bgColor || '#ffffff';
+slot.onclick = () => selectLabel(label.id);
+const imgLayer = document.createElement("div");
+imgLayer.className = "coin-img-layer";
+imgLayer.style.backgroundImage = ⁠url('${label.imgUrl}')⁠;
+imgLayer.style.backgroundSize = ⁠${label.zoom}%⁠;
+imgLayer.style.backgroundPosition = ⁠calc(50% + ${label.posX}px) calc(50% + ${label.posY}px)⁠;
+circle.appendChild(imgLayer);
+if (appState.showText) {
+if(label.series) {
+const lblTop = document.createElement("div");
+lblTop.className = "tag-info-text top";
+lblTop.textContent = label.series;
+circle.appendChild(lblTop);
+}
+if(label.title) {
+const lblBottom = document.createElement("div");
+lblBottom.className = "tag-info-text bottom";
+lblBottom.textContent = label.title;
+circle.appendChild(lblBottom);
+}
+}
+} else {
+circle.classList.add("empty-slot");
+}
+slot.appendChild(circle);
+elements.sheetGrid.appendChild(slot);
+}
+if (appState.selectedId) {
+updateEditorPreview();
+}
+}
+let searchTimeout = null;
+elements.searchInput.addEventListener("input", () => {
+if (elements.searchInput.value.trim().length >= 3) {
+elements.statusMsg.textContent = "Tippen... Suche startet gleich.";
+clearTimeout(searchTimeout);
+searchTimeout = setTimeout(doSearch, 400);
+}
+});
+elements.searchBtn.onclick = () => { clearTimeout(searchTimeout); doSearch(); };
+elements.searchInput.onkeydown = e => { if (e.key === "Enter") { clearTimeout(searchTimeout); doSearch(); }};
+elements.presetSelect.onchange = renderGrid;
+elements.showTextToggle.onchange = renderGrid;
+function openPrintModal() {
+if(appState.labels.length === 0) { alert("Bitte füge zuerst Etiketten hinzu."); return; }
+elements.printModal.style.display = "flex";
+}
+function closePrintModal() { elements.printModal.style.display = "none"; }
+function executePrint() {
+closePrintModal();
+deselectLabel();
+setTimeout(() => window.print(), 250);
+}
+async function loadImagesForExport() {
+const cache = {};
+for (const lbl of appState.labels) {
+if (!cache[lbl.imgUrl]) {
+cache[lbl.imgUrl] = await new Promise((resolve) => {
+const img = new Image();
+img.crossOrigin = "anonymous";
+img.onload = () => resolve(img);
+img.onerror = () => resolve(null);
+img.src = lbl.imgUrl;
+});
+}
+}
+return cache;
+}
+async function exportAsPng() {
+const exportBtn = document.getElementById("btn-export-png");
+exportBtn.textContent = "⏳ Bogen wird generiert...";
+exportBtn.disabled = true;
+try {
+const isAvery = appState.preset === "avery-40";
+const diameterMm = isAvery ? 40 : (parseInt(appState.preset) || 43);
+const canvas = document.getElementById("export-canvas");
+canvas.width = 2480; canvas.height = 3508;
+const ctx = canvas.getContext("2d");
+ctx.fillStyle = "#ffffff";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+const pxPerMm = 2480 / 210;
+const diameterPx = diameterMm * pxPerMm;
+let startX = 15 * pxPerMm, startY = 15 * pxPerMm, gapX = 8 * pxPerMm, gapY = 8 * pxPerMm;
+let cols = isAvery ? 4 : Math.floor((2480 - (2 * startX)) / (diameterPx + gapX));
+if (isAvery) {
+startX = 9.5 * pxPerMm; startY = 13.5 * pxPerMm; gapX = 4 * pxPerMm; gapY = 4 * pxPerMm;
+}
+const imgCache = await loadImagesForExport();
+const totalSlots = isAvery ? 24 : appState.labels.length;
+for (let i = 0; i < totalSlots; i++) {
+const col = i % cols;
+const row = Math.floor(i / cols);
+const x = startX + col * (diameterPx + gapX);
+const y = startY + row * (diameterPx + gapY);
+const label = appState.labels[i];
+ctx.save();
+ctx.beginPath();
+ctx.setLineDash([10, 10]);
+ctx.strokeStyle = "#9ca3af";
+ctx.lineWidth = 2;
+ctx.arc(x + diameterPx / 2, y + diameterPx / 2, diameterPx / 2, 0, Math.PI * 2);
+ctx.stroke();
+ctx.restore();
+if (label) {
+ctx.save();
+ctx.beginPath();
+ctx.arc(x + diameterPx / 2, y + diameterPx / 2, diameterPx / 2, 0, Math.PI * 2);
+ctx.closePath();
+ctx.clip();
+ctx.fillStyle = label.bgColor || "#ffffff";
+ctx.fill();
+const loadedImg = imgCache[label.imgUrl];
+if (loadedImg) {
+const scale = (label.zoom / 100);
+const w = diameterPx * scale;
+const h = diameterPx * scale;
+const posX = (label.posX * (pxPerMm / 3.78));
+const posY = (label.posY * (pxPerMm / 3.78));
+const drawX = (x + diameterPx / 2 - w / 2) + posX;
+const drawY = (y + diameterPx / 2 - h / 2) + posY;
+ctx.drawImage(loadedImg, drawX, drawY, w, h);
+}
+ctx.restore();
+if (appState.showText) {
+ctx.save();
+ctx.font = ⁠bold ${Math.round(18 * (pxPerMm / 3.78))}px -apple-system, sans-serif⁠;
+ctx.textAlign = "center";
+ctx.textBaseline = "middle";
+const boxWidth = diameterPx * 0.72;
+const boxX = x + (diameterPx - boxWidth) / 2;
+const boxHeight = 28;
+if (label.series) {
+const topBoxY = y + (4 * pxPerMm);
+ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+ctx.fillRect(boxX, topBoxY, boxWidth, boxHeight);
+ctx.fillStyle = "#111";
+ctx.fillText(label.series, x + diameterPx / 2, topBoxY + (boxHeight/2), boxWidth * 0.9);
+}
+if(label.title) {
+const btmBoxY = y + diameterPx - (4 * pxPerMm) - boxHeight;
+ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+ctx.fillRect(boxX, btmBoxY, boxWidth, boxHeight);
+ctx.fillStyle = "#111";
+ctx.fillText(label.title, x + diameterPx / 2, btmBoxY + (boxHeight/2), boxWidth * 0.9);
+}
+ctx.restore();
+}
+}
+}
+const link = document.createElement("a");
+link.download = ⁠tonie-cover-bogen.png⁠;
+link.href = canvas.toDataURL("image/png");
+link.click();
+} catch (e) {
+alert("Beim Exportieren ist ein Fehler aufgetreten.");
+} finally {
+exportBtn.textContent = "🖼️ Als hochauflösendes PNG speichern";
+exportBtn.disabled = false;
+closePrintModal();
+}
+}
+loadState();
 </script>
 </body>
 </html>
