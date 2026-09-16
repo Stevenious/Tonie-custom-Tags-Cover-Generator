@@ -62,7 +62,6 @@ input[type="range"] { width: 100%; accent-color: var(--primary); }
 .coin-circle.empty-slot { background: #f3f4f6; border: 1px dashed #d1d5db; }
 .coin-circle.empty-slot::after { content: "+"; color: #9ca3af; font-size: 24px; font-weight: bold; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 .coin-img-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-repeat: no-repeat; background-position: center; pointer-events: none; }
-/* Perfekt zentrierte, runde Einpassung */
 .tag-info-text {
 position: absolute;
 left: 50%;
@@ -145,7 +144,6 @@ body { background: #fff; margin: 0; padding: 0; -webkit-print-color-adjust: exac
 <span class="panel-title" style="border: none; margin: 0; padding: 0; color: var(--selected);">2. Ausgewähltes Etikett anpassen</span>
 <button type="button" class="btn-outline" style="padding: 4px 8px; font-size: 12px;" onclick="deselectLabel()">✖ Schließen</button>
 </div>
-<!-- Die visuelle Vorschau im Editor-Bereich -->
 <div class="single-preview-box">
 <div class="tag-slot">
 <div class="coin-circle" id="editor-preview-circle" style="width: 43mm; height: 43mm;">
@@ -473,7 +471,7 @@ if (label) {
 elements.editorCircle.style.backgroundColor = label.bgColor || '#ffffff';
 elements.editorImg.style.backgroundImage = ⁠url('${label.imgUrl}')⁠;
 elements.editorImg.style.backgroundSize = ⁠${label.zoom}%⁠;
-elements.editorImg.style.backgroundPosition = ⁠calc(50% + ${label.posX}px) calc(50% + ${label.posY}px)⁠;
+elements.editorImg.style.backgroundPosition = ⁠calc(50% + ${label.posX}px) calc(50\% +${label.posY}px)⁠;
 if (appState.showText) {
 elements.editorTop.textContent = label.series || "";
 elements.editorTop.style.display = label.series ? "block" : "none";
@@ -520,7 +518,7 @@ const imgLayer = document.createElement("div");
 imgLayer.className = "coin-img-layer";
 imgLayer.style.backgroundImage = ⁠url('${label.imgUrl}')⁠;
 imgLayer.style.backgroundSize = ⁠${label.zoom}%⁠;
-imgLayer.style.backgroundPosition = ⁠calc(50% + ${label.posX}px) calc(50% + ${label.posY}px)⁠;
+imgLayer.style.backgroundPosition = ⁠calc(50% + ${label.posX}px) calc(50\% +${label.posY}px)⁠;
 circle.appendChild(imgLayer);
 if (appState.showText) {
 if(label.series) {
@@ -655,7 +653,7 @@ ctx.fillText(label.series, x + diameterPx / 2, topBoxY + (boxHeight/2), boxWidth
 }
 if(label.title) {
 const btmBoxY = y + diameterPx - (4 * pxPerMm) - boxHeight;
-ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+ctx.fillStyle = "rgba(255, 255, 2`]helvetica";
 ctx.fillRect(boxX, btmBoxY, boxWidth, boxHeight);
 ctx.fillStyle = "#111";
 ctx.fillText(label.title, x + diameterPx / 2, btmBoxY + (boxHeight/2), boxWidth * 0.9);
