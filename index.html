@@ -3,389 +3,306 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tonie Münzkapsel & NFC Tag Cover Generator</title>
+  <title>Tonie & Cover Generator</title>
   <style>
-    :root {
-      --primary: #e30613;
-      --bg: #f4f6f8;
-      --card-bg: #ffffff;
-      --border: #dcdcdc;
-    }
+    :root { --primary: #e30613; --bg: #f4f6f8; --card-bg: #fff; --border: #dcdcdc; }
     * { box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      margin: 0;
-      padding: 20px;
-      background: var(--bg);
-      color: #333;
-    }
+    body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 15px; background: var(--bg); color: #333; }
     .no-print { display: block; }
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      background: var(--card-bg);
-      padding: 24px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    }
-    h1 { margin-top: 0; color: var(--primary); font-size: 24px; }
-    p.sub { margin-top: -6px; color: #666; font-size: 14px; }
+    .container { max-width: 900px; margin: 0 auto; background: var(--card-bg); padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    h1 { color: var(--primary); font-size: 22px; margin-top: 0; }
     
-    .panel {
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 16px;
-      margin-bottom: 20px;
-      background: #fafafa;
-    }
+    .panel { border: 1px solid var(--border); border-radius: 8px; padding: 15px; margin-bottom: 15px; background: #fafafa; }
     .panel-title { font-weight: bold; margin-bottom: 10px; display: block; }
+    .form-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; align-items: center; }
     
-    .form-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-    input[type="text"], select {
-      flex: 1;
-      padding: 8px 12px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
-      font-size: 14px;
-      min-width: 200px;
-    }
-    button {
-      padding: 8px 18px;
-      background: var(--primary);
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 14px;
-    }
+    input[type="text"], select, input[type="number"] { padding: 8px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; }
+    button { padding: 8px 16px; background: var(--primary); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
     button:hover { opacity: 0.9; }
-    
-    /* Scraper Grid */
-    #search-results {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-      gap: 10px;
-      max-height: 250px;
-      overflow-y: auto;
-      margin-top: 10px;
-    }
-    .result-card {
-      border: 1px solid #e0e0e0;
-      border-radius: 6px;
-      padding: 6px;
-      background: #fff;
-      text-align: center;
-      cursor: pointer;
-      font-size: 11px;
-    }
-    .result-card:hover { border-color: var(--primary); }
-    .result-card img { width: 100%; height: 70px; object-fit: contain; }
 
-    /* Print Preview & Canvas */
+    /* Suchergebnisse */
+    #search-results { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; max-height: 200px; overflow-y: auto; margin-top: 10px; }
+    .result-card { border: 1px solid #ddd; padding: 5px; border-radius: 6px; text-align: center; cursor: pointer; background: #fff; font-size: 11px; }
+    .result-card img { width: 100%; height: 75px; object-fit: contain; }
+    .result-card:hover { border-color: var(--primary); }
+
+    /* Grafik-Anpassungstool */
+    .img-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; background: #fff; padding: 10px; border: 1px solid #ddd; border-radius: 6px; }
+    .slider-group label { display: block; font-size: 12px; margin-bottom: 4px; }
+    .slider-group input { width: 100%; }
+
+    /* Print Preview & A4 Sheet */
+    .print-wrapper { overflow-x: auto; margin-top: 20px; }
     .print-sheet {
-      background: #fff;
-      margin: 20px auto;
-      padding: 10mm;
-      width: 210mm;
-      min-height: 297mm;
+      background: #fff; margin: 0 auto; padding: 10mm;
+      width: 210mm; min-height: 297mm;
       box-shadow: 0 0 10px rgba(0,0,0,0.15);
       position: relative;
     }
-    .calibration-bar {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 15mm;
-      font-size: 11px;
-      color: #555;
-    }
-    .ruler {
-      width: 50mm;
-      height: 6px;
-      background: repeating-linear-gradient(90deg, #000, #000 1mm, #fff 1mm, #fff 5mm);
-      border: 1px solid #000;
-    }
-    .tag-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10mm;
-    }
-    .tag-slot {
-      display: inline-flex;
-      align-items: center;
-      position: relative;
-    }
-    .coin-circle {
-      border-radius: 50%;
-      border: 0.5pt dashed #999;
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+    
+    /* Avery L3415-10 Layout (4x6) */
+    .grid-avery {
+      display: grid;
+      grid-template-columns: repeat(4, 40mm);
+      grid-auto-rows: 40mm;
+      gap: 5mm; /* Abstand zwischen Etiketten anpassen, falls nötig */
       justify-content: center;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
+      padding-top: 10mm;
     }
-    .duplex-separator {
-      width: 4mm;
-      height: 0;
-      border-top: 0.5pt dashed #bbb;
-    }
-    .tag-info-text {
-      position: absolute;
-      bottom: 2mm;
-      font-size: 7pt;
-      font-family: monospace;
-      background: rgba(255,255,255,0.85);
-      padding: 0 3px;
-      border-radius: 2px;
-      max-width: 80%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
+    .grid-standard {
+      display: flex; flex-wrap: wrap; gap: 8mm;
     }
 
-    /* Print Rules */
+    .tag-slot { display: inline-flex; align-items: center; justify-content: center; }
+    .coin-circle {
+      border-radius: 50%; border: 0.5pt dashed #999;
+      position: relative; overflow: hidden;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    /* Die Bildfläche im Kreis */
+    .coin-img-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; transform-origin: center; background-repeat: no-repeat; background-position: center; }
+    .tag-info-text { position: absolute; bottom: 3mm; font-size: 6pt; font-family: monospace; background: rgba(255,255,255,0.8); padding: 1px 4px; border-radius: 3px; z-index: 2; }
+
+    /* Mobile Skalierung für Druckvorschau */
+    @media screen and (max-width: 768px) {
+      .print-sheet { transform: scale(0.45); transform-origin: top center; margin-bottom: -150mm; }
+    }
+
     @media print {
-      body {
-        margin: 0;
-        padding: 0;
-        background: #fff;
-      }
-      .no-print { display: none !important; }
-      .print-sheet {
-        margin: 0;
-        padding: 10mm;
-        width: 100%;
-        box-shadow: none;
-      }
-      @page {
-        size: A4 portrait;
-        margin: 0;
-      }
+      body { background: #fff; margin: 0; padding: 0; }
+      .no-print, .print-wrapper { display: none !important; }
+      .print-sheet { transform: none; box-shadow: none; margin: 0; padding: 0; } /* Padding ggf. für Avery anpassen */
+      @page { size: A4 portrait; margin: 0; }
+      body::after { content: ""; display: block; clear: both; page-break-after: always; }
+      /* Avery Druck bündig */
+      .grid-avery { padding-top: 13mm; padding-left: 9mm; gap: 4mm; }
     }
   </style>
 </head>
 <body>
 
 <div class="container no-print">
-  <h1>Tonie Tag & Münzkapsel Cover Generator</h1>
-  <p class="sub">Passgenau für RFIDfriend Magic Tags, Sticker und Münzkapseln (43 mm, 40 mm, 30 mm, 25 mm).</p>
-
-  <!-- 1. Live Scraper / Suche -->
+  <h1>Tonie Cover & Etiketten Generator</h1>
+  
+  <!-- 1. Suche: Tonie vs Album -->
   <div class="panel">
-    <span class="panel-title">1. Cover Scraper (tonies.json Suche)</span>
+    <span class="panel-title">1. Motiv-Suche</span>
     <div class="form-row">
-      <input type="text" id="scraper-input" placeholder="Titel, Serie oder Modell eingeben (z. B. Paw Patrol, 01-0001)...">
+      <select id="search-type" style="width: 200px; flex: none;">
+        <option value="album">Album-Cover (iTunes)</option>
+        <option value="tonie">Tonie-Figur (Community)</option>
+      </select>
+      <input type="text" id="search-input" placeholder="Titel oder Serie (z. B. Paw Patrol, Conni)..." style="flex: 1;">
       <button id="search-btn">Suchen</button>
     </div>
     <div id="status-msg" style="font-size: 12px; color: #666;"></div>
     <div id="search-results"></div>
   </div>
 
-  <!-- 2. Tag-Konfiguration -->
+  <!-- 2. Grafik-Anpassungstool -->
+  <div class="panel" id="img-tool-panel" style="display: none;">
+    <span class="panel-title">2. Grafik-Anpassung</span>
+    <div class="img-controls">
+      <div class="slider-group">
+        <label>Größe (Zoom): <span id="zoom-val">100</span>%</label>
+        <input type="range" id="zoom-slider" min="30" max="250" value="100">
+      </div>
+      <div class="slider-group">
+        <label>Verschiebung Oben/Unten:</label>
+        <input type="range" id="pos-y-slider" min="-100" max="100" value="0">
+      </div>
+      <div class="slider-group">
+        <label>Verschiebung Links/Rechts:</label>
+        <input type="range" id="pos-x-slider" min="-100" max="100" value="0">
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Layout & Druck -->
   <div class="panel">
-    <span class="panel-title">2. Abmessungen & Duplex-Option</span>
+    <span class="panel-title">3. Format & Etiketten-Layout</span>
     <div class="form-row">
-      <label>Preset:
-        <select id="preset-select">
-          <option value="43" selected>Münzkapsel Standard (43 mm)</option>
-          <option value="40">Münzkapsel Klein (40 mm)</option>
-          <option value="30">RFIDfriend Token / Coin Tag (30 mm)</option>
-          <option value="25">RFIDfriend Sticker / Coin (25 mm)</option>
-          <option value="custom">Benutzerdefiniert...</option>
-        </select>
-      </label>
-      <label id="custom-size-wrap" style="display: none;">Durchmesser (mm):
-        <input type="number" id="custom-size" value="43" min="15" max="80" style="width: 70px;">
-      </label>
-      <label>Anzahl Tags:
-        <input type="number" id="tag-count" value="4" min="1" max="18" style="width: 60px;">
-      </label>
+      <select id="preset-select" style="flex: 1;">
+        <option value="avery-40">Avery Zweckform L3415-10 (40 mm, 24 Stk.)</option>
+        <option value="43" selected>Münzkapsel Standard (43 mm, freies Raster)</option>
+        <option value="30">RFIDfriend Token (30 mm)</option>
+      </select>
+      <label id="tag-count-wrap">Anzahl: <input type="number" id="tag-count" value="4" min="1" max="24" style="width: 60px;"></label>
     </div>
     <div class="form-row">
-      <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
-        <input type="checkbox" id="duplex-toggle">
-        <strong>Duplex-Option aktivieren (Vorder- & Rückseite zum Falten)</strong>
-      </label>
-      <label style="display: flex; align-items: center; gap: 6px; margin-left: 20px; cursor: pointer;">
-        <input type="checkbox" id="model-tag-toggle" checked>
-        Modell / Audio-ID klein andrucken
-      </label>
+      <label><input type="checkbox" id="show-text-toggle" checked> Titel/ID unten einblenden</label>
     </div>
-  </div>
-
-  <div style="text-align: right;">
-    <button onclick="window.print()" style="font-size: 16px; padding: 10px 24px;">🖨️ Drucken / PDF speichern</button>
+    <button onclick="window.print()" style="width: 100%; margin-top: 10px; font-size: 16px;">🖨️ Drucken / PDF speichern</button>
   </div>
 </div>
 
-<!-- A4 Print Canvas -->
-<div class="print-sheet">
-  <div class="calibration-bar">
-    <span>Maßstabs-Prüfung (50 mm):</span>
-    <div class="ruler"></div>
-    <span>(Beim Drucken: „Tatsächliche Größe / 100 %“ wählen!)</span>
+<!-- A4 Print Sheet -->
+<div class="print-wrapper">
+  <div class="print-sheet" id="print-sheet">
+    <div id="sheet-grid" class="grid-standard"></div>
   </div>
-  <div class="tag-grid" id="sheet-grid"></div>
 </div>
+<!-- Für den tatsächlichen Druck (wird per JS geklont, um CSS Media Queries besser zu nutzen) -->
+<div class="print-sheet no-print" id="print-layer" style="display: none;"></div>
 
 <script>
   const TONIES_JSON_URL = "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json";
-  let db = [];
-  let currentCover = "";
-  let currentModel = "";
+  let tonieDb = [];
+  let currentImgUrl = "";
   let currentTitle = "";
+  
+  // Bild-Transformationen
+  let imgZoom = 100;
+  let imgPosX = 0;
+  let imgPosY = 0;
 
-  const scraperInput = document.getElementById("scraper-input");
+  // DOM Elements
+  const searchType = document.getElementById("search-type");
+  const searchInput = document.getElementById("search-input");
   const searchBtn = document.getElementById("search-btn");
-  const statusMsg = document.getElementById("status-msg");
   const searchResults = document.getElementById("search-results");
+  const statusMsg = document.getElementById("status-msg");
+  
+  const imgToolPanel = document.getElementById("img-tool-panel");
+  const zoomSlider = document.getElementById("zoom-slider");
+  const posXSlider = document.getElementById("pos-x-slider");
+  const posYSlider = document.getElementById("pos-y-slider");
+  
   const presetSelect = document.getElementById("preset-select");
-  const customSizeWrap = document.getElementById("custom-size-wrap");
-  const customSizeInput = document.getElementById("custom-size");
-  const tagCountInput = document.getElementById("tag-count");
-  const duplexToggle = document.getElementById("duplex-toggle");
-  const modelTagToggle = document.getElementById("model-tag-toggle");
+  const tagCount = document.getElementById("tag-count");
+  const tagCountWrap = document.getElementById("tag-count-wrap");
+  const showTextToggle = document.getElementById("show-text-toggle");
   const sheetGrid = document.getElementById("sheet-grid");
 
-  async function loadDatabase() {
-    if (db.length > 0) return;
-    statusMsg.textContent = "Lade Tonie-Katalog...";
-    try {
-      const res = await fetch(TONIES_JSON_URL);
-      db = await res.json();
-      statusMsg.textContent = `${db.length} Tonies geladen.`;
-    } catch (err) {
-      statusMsg.textContent = "Fehler beim Laden der tonies.json.";
-    }
-  }
-
-  function runSearch() {
-    const q = scraperInput.value.trim().toLowerCase();
+  async function searchMotiv() {
+    const q = searchInput.value.trim();
+    if(!q) return;
     searchResults.innerHTML = "";
-    if (!q) return;
-
-    if (db.length === 0) {
-      loadDatabase().then(runSearch);
-      return;
+    statusMsg.textContent = "Suche läuft...";
+    
+    if (searchType.value === "album") {
+      // iTunes API (Album Covers)
+      try {
+        const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=album&limit=15`);
+        const data = await res.json();
+        if(data.results.length === 0) { statusMsg.textContent = "Keine Alben gefunden."; return; }
+        
+        statusMsg.textContent = `${data.results.length} Alben gefunden.`;
+        data.results.forEach(album => {
+          // Lade hochauflösendes Cover (600x600 statt 100x100)
+          const imgUrl = album.artworkUrl100.replace('100x100bb', '600x600bb');
+          createResultCard(imgUrl, album.collectionName);
+        });
+      } catch (err) { statusMsg.textContent = "Fehler bei der Album-Suche."; }
+      
+    } else {
+      // Tonie Community API
+      if (tonieDb.length === 0) {
+        try {
+          const res = await fetch(TONIES_JSON_URL);
+          tonieDb = await res.json();
+        } catch(err) { statusMsg.textContent = "Fehler beim Laden der Tonie-DB."; return; }
+      }
+      
+      const matches = tonieDb.filter(item => 
+        (item.title||"").toLowerCase().includes(q.toLowerCase()) || 
+        (item.series||"").toLowerCase().includes(q.toLowerCase())
+      ).slice(0, 20);
+      
+      if(matches.length === 0) { statusMsg.textContent = "Keine Tonies gefunden."; return; }
+      statusMsg.textContent = `${matches.length} Tonies gefunden.`;
+      
+      matches.forEach(item => {
+        if(item.pic) createResultCard(item.pic, item.episodes || item.title);
+      });
     }
-
-    const matches = db.filter(item => {
-      const t = (item.title || "").toLowerCase();
-      const s = (item.series || "").toLowerCase();
-      const e = (item.episodes || "").toLowerCase();
-      const m = (item.model || "").toLowerCase();
-      return t.includes(q) || s.includes(q) || e.includes(q) || m.includes(q);
-    }).slice(0, 24);
-
-    if (matches.length === 0) {
-      statusMsg.textContent = "Keine Treffer gefunden.";
-      return;
-    }
-    statusMsg.textContent = `${matches.length} Treffer (Klick wählt das Cover):`;
-
-    matches.forEach(item => {
-      if (!item.pic) return;
-      const card = document.createElement("div");
-      card.className = "result-card";
-      card.innerHTML = `
-        <img src="${item.pic}" crossorigin="anonymous" />
-        <div style="margin-top:4px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-          ${item.episodes || item.title || "Tonie"}
-        </div>
-      `;
-      card.onclick = () => {
-        currentCover = item.pic;
-        currentModel = item.model || "";
-        currentTitle = item.episodes || item.title || "";
-        statusMsg.textContent = `Aktiv: ${currentTitle} (${currentModel})`;
-        renderGrid();
-      };
-      searchResults.appendChild(card);
-    });
   }
 
-  function getDiameter() {
-    return presetSelect.value === "custom" ? parseFloat(customSizeInput.value) || 43 : parseFloat(presetSelect.value);
+  function createResultCard(imgUrl, title) {
+    const card = document.createElement("div");
+    card.className = "result-card";
+    card.innerHTML = `<img src="${imgUrl}" crossorigin="anonymous"><div style="margin-top:4px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">${title}</div>`;
+    card.onclick = () => {
+      currentImgUrl = imgUrl;
+      currentTitle = title;
+      // Reset Slider
+      imgZoom = 100; imgPosX = 0; imgPosY = 0;
+      zoomSlider.value = 100; posXSlider.value = 0; posYSlider.value = 0;
+      document.getElementById("zoom-val").textContent = "100";
+      
+      imgToolPanel.style.display = "block";
+      updateGrid();
+    };
+    searchResults.appendChild(card);
   }
 
-  function renderGrid() {
+  function updateGrid() {
     sheetGrid.innerHTML = "";
-    const diameter = getDiameter();
-    const count = parseInt(tagCountInput.value) || 1;
-    const isDuplex = duplexToggle.checked;
-    const showModel = modelTagToggle.checked;
+    const isAvery = presetSelect.value === "avery-40";
+    let diameter = isAvery ? 40 : parseInt(presetSelect.value);
+    let count = isAvery ? 24 : parseInt(tagCount.value);
+    
+    tagCountWrap.style.display = isAvery ? "none" : "inline-block";
+    sheetGrid.className = isAvery ? "grid-avery" : "grid-standard";
 
-    for (let i = 0; i < count; i++) {
+    for(let i = 0; i < count; i++) {
       const slot = document.createElement("div");
       slot.className = "tag-slot";
+      
+      const circle = document.createElement("div");
+      circle.className = "coin-circle";
+      circle.style.width = `${diameter}mm`;
+      circle.style.height = `${diameter}mm`;
+      
+      if (currentImgUrl) {
+        const imgLayer = document.createElement("div");
+        imgLayer.className = "coin-img-layer";
+        // WICHTIG: Die Bildgröße via CSS Background manipulieren für das Anpassungstool
+        const bgSize = searchType.value === "tonie" ? `${imgZoom}%` : `cover`; // Alben immer cover, Tonies prozentual
+        imgLayer.style.backgroundImage = `url('${currentImgUrl}')`;
+        
+        // Album Cover verhalten sich als Cover, Tonies lassen sich zoomen
+        if(searchType.value === "album") {
+          imgLayer.style.backgroundSize = `${imgZoom}%`;
+        } else {
+          imgLayer.style.backgroundSize = `${imgZoom}%`; 
+        }
+        
+        imgLayer.style.backgroundPosition = `calc(50% + ${imgPosX}px) calc(50% + ${imgPosY}px)`;
+        circle.appendChild(imgLayer);
+      }
 
-      // Front
-      const front = document.createElement("div");
-      front.className = "coin-circle";
-      front.style.width = `${diameter}mm`;
-      front.style.height = `${diameter}mm`;
-      if (currentCover) front.style.backgroundImage = `url('${currentCover}')`;
-
-      if (showModel && currentModel) {
+      if (showTextToggle.checked && currentTitle) {
         const lbl = document.createElement("div");
         lbl.className = "tag-info-text";
-        lbl.textContent = currentModel;
-        front.appendChild(lbl);
-      }
-      slot.appendChild(front);
-
-      // Back (Duplex Option)
-      if (isDuplex) {
-        const fold = document.createElement("div");
-        fold.className = "duplex-separator";
-        slot.appendChild(fold);
-
-        const back = document.createElement("div");
-        back.className = "coin-circle";
-        back.style.width = `${diameter}mm`;
-        back.style.height = `${diameter}mm`;
-        back.style.background = "#fff";
-        back.innerHTML = `
-          <div style="font-size: 8pt; font-weight: bold; text-align: center; padding: 4px; max-width: 90%;">
-            ${currentTitle || "Tonie"}
-          </div>
-          <div style="font-size: 6pt; font-family: monospace; color: #555; margin-top: 2px;">
-            ${currentModel ? "ID: " + currentModel : ""}
-          </div>
-        `;
-        slot.appendChild(back);
+        lbl.textContent = currentTitle;
+        circle.appendChild(lbl);
       }
 
+      slot.appendChild(circle);
       sheetGrid.appendChild(slot);
     }
+    
+    // Kopiere Grid in die reine Druckebene für bessere Formatierung beim Druck
+    document.getElementById("print-layer").innerHTML = document.getElementById("print-sheet").innerHTML;
+    document.getElementById("print-layer").className = "print-sheet no-print print-only"; 
   }
 
-  // Events
-  searchBtn.onclick = runSearch;
-  scraperInput.onkeydown = e => { if (e.key === "Enter") runSearch(); };
-  scraperInput.onfocus = loadDatabase;
-  presetSelect.onchange = () => {
-    customSizeWrap.style.display = presetSelect.value === "custom" ? "inline-block" : "none";
-    renderGrid();
-  };
-  customSizeInput.oninput = renderGrid;
-  tagCountInput.oninput = renderGrid;
-  duplexToggle.onchange = renderGrid;
-  modelTagToggle.onchange = renderGrid;
+  // Event Listener
+  searchBtn.onclick = searchMotiv;
+  searchInput.onkeydown = e => { if (e.key === "Enter") searchMotiv(); };
+  
+  // Update Live Preview on slider move
+  zoomSlider.oninput = e => { imgZoom = e.target.value; document.getElementById("zoom-val").textContent = imgZoom; updateGrid(); };
+  posXSlider.oninput = e => { imgPosX = e.target.value; updateGrid(); };
+  posYSlider.oninput = e => { imgPosY = e.target.value; updateGrid(); };
+  
+  presetSelect.onchange = updateGrid;
+  tagCount.oninput = updateGrid;
+  showTextToggle.onchange = updateGrid;
+  searchType.onchange = () => { searchInput.placeholder = searchType.value === "album" ? "Album oder Künstler suchen..." : "Tonie Titel/Serie suchen..."; };
 
-  // Initialer Render
-  renderGrid();
+  updateGrid();
 </script>
 </body>
 </html>
