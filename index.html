@@ -3,15 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Tonie Cover Generator Pro</title>
+  <title>Tonie & Münzkapsel Cover Generator Pro</title>
   <style>
-    :root { 
-      --primary: #e30613; 
-      --bg: #f0f2f5; 
-      --card: #fff; 
-      --border: #d1d5db; 
-      --selected: #3b82f6; 
-    }
+    :root { --primary: #e30613; --bg: #f0f2f5; --card: #fff; --border: #d1d5db; --selected: #3b82f6; }
     * { box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 15px; background: var(--bg); color: #1f2937; overflow-x: hidden; }
     
@@ -23,7 +17,7 @@
     
     .form-group { margin-bottom: 15px; }
     .form-row { display: flex; gap: 10px; flex-wrap: wrap; }
-    input[type="text"], select, input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; background: #fafafa; }
+    input[type="text"], select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; background: #fafafa; }
     button { padding: 10px 20px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
     button:hover { background: #cc0510; }
     button.btn-secondary { background: #4b5563; }
@@ -33,6 +27,11 @@
     button.btn-danger { background: transparent; color: #ef4444; border: 1px solid #ef4444; }
     button.btn-danger:hover { background: #fef2f2; }
     button.full-width { width: 100%; font-size: 16px; padding: 14px; margin-top: 10px; }
+
+    /* Tabs für Tonie vs Album */
+    .search-tabs { display: flex; background: #e5e7eb; padding: 4px; border-radius: 10px; margin-bottom: 15px; }
+    .tab-btn { flex: 1; background: transparent; color: #6b7280; border: none; padding: 8px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s ease; }
+    .tab-btn.active { background: #fff; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
     #search-status { font-size: 13px; color: #6b7280; margin-bottom: 10px; min-height: 20px; }
     #search-results { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; max-height: 250px; overflow-y: auto; padding-right: 5px; }
@@ -51,7 +50,7 @@
 
     .tool-actions { display: flex; gap: 10px; margin-top: 15px; justify-content: center; flex-wrap: wrap; }
 
-    /* Print Preview Layout Fix */
+    /* Print Preview Layout */
     .preview-container { width: 100%; background: #e5e7eb; padding: 20px; border-radius: 12px; margin-top: 20px; display: flex; flex-direction: column; align-items: center; overflow: hidden; }
     .print-sheet { background: #fff; width: 210mm; min-height: 297mm; box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: relative; flex-shrink: 0; transform-origin: top center; }
     
@@ -73,18 +72,18 @@
 
     .coin-img-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-repeat: no-repeat; background-position: center; pointer-events: none; }
     
-    /* OPTIMIERTER TEXT: Besser in die Rundung gepasst */
+    /* Perfekt zentrierte, runde Einpassung */
     .tag-info-text { 
       position: absolute; 
-      left: 50%; /* Echtes Zentrieren */
-      transform: translateX(-50%); /* Echtes Zentrieren */
-      width: 72%; /* Schmaler, damit es nicht in die Rundung ragt */
+      left: 50%; 
+      transform: translateX(-50%); 
+      width: 72%; 
       text-align: center; 
-      font-size: 5pt; /* Minimal kleiner für mehr Text */
+      font-size: 5pt; 
       font-family: -apple-system, BlinkMacSystemFont, sans-serif; 
       font-weight: 700; 
       color: #111; 
-      background: rgba(255, 255, 255, 0.9); /* Etwas deckender */
+      background: rgba(255, 255, 255, 0.9); 
       padding: 3px; 
       border-radius: 5px; 
       z-index: 2; 
@@ -95,7 +94,6 @@
       overflow: hidden; 
       pointer-events: none; 
     }
-    /* Weiter weg vom Rand, damit sie im Kreis bleiben */
     .tag-info-text.top { top: 4mm; } 
     .tag-info-text.bottom { bottom: 4mm; } 
 
@@ -107,12 +105,10 @@
     .modal-box { background: #fff; width: 100%; max-width: 520px; border-radius: 12px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
     .modal-header { font-size: 18px; font-weight: 700; margin-bottom: 15px; }
     .modal-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+    
     .disclaimer { margin-top: 25px; padding: 15px; font-size: 11px; color: #6b7280; text-align: center; line-height: 1.5; border-top: 1px solid var(--border); }
-
-    /* Tabs */
-    .search-tabs { display: flex; background: #e5e7eb; padding: 4px; border-radius: 10px; margin-bottom: 15px; }
-    .tab-btn { flex: 1; background: transparent; color: #6b7280; border: none; padding: 8px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s ease; }
-    .tab-btn.active { background: #fff; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .disclaimer a { color: var(--primary); text-decoration: none; font-weight: 600; }
+    .disclaimer a:hover { text-decoration: underline; }
 
     /* Print Styles */
     @media print {
@@ -138,6 +134,7 @@
       <button type="button" class="btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="promptClearSheet()">🗑️ Bogen leeren</button>
     </div>
     
+    <!-- Schöne Tabs für Tonie vs Album -->
     <div class="search-tabs" id="search-tabs">
       <button class="tab-btn active" data-type="tonie">🪀 Tonie-Figuren</button>
       <button class="tab-btn" data-type="album">🎵 Apple Music / Alben</button>
@@ -209,7 +206,8 @@
 
 <div class="container no-print">
   <div class="disclaimer">
-    <strong>Disclaimer:</strong> Dieses Projekt ist inoffiziell, ein rein privates Hobby-Projekt und steht in keinerlei Verbindung zur Boxine GmbH. "tonies®" sind eingetragene Marken der Boxine GmbH.
+    <strong>Rechtlicher Hinweis / Lizenz (MIT Open Source):</strong> Dieses Projekt ist ein freies, inoffizielles Hobby-Projekt unter MIT-Lizenz und steht in keinerlei Verbindung zur Boxine GmbH. "tonies®" und "Toniebox®" sind eingetragene Marken der Boxine GmbH.<br>
+    Passende benutzerdefinierte NFC-Tags für deine eigene Toniebox erhältst du bei <a href="http://rfidfriend.com/" target="_blank">RFIDfriend.com</a>.
   </div>
 </div>
 
@@ -230,7 +228,7 @@
 <div class="modal-overlay" id="clear-modal">
   <div class="modal-box" style="max-width: 400px; text-align: center;">
     <div class="modal-header" style="color: #ef4444;">Bogen leeren?</div>
-    <p style="font-size: 14px; color: #4b5563;">Möchtest du wirklich alle Etiketten von deinem Bogen löschen? Dies kann nicht rückgängig gemacht werden.</p>
+    <p style="font-size: 14px; color: #4b5563;">Möchtest du wirklich alle Etiketten von deinem Bogen löschen?</p>
     <div class="modal-actions" style="flex-direction: row; justify-content: center; margin-top: 20px;">
       <button type="button" class="btn-outline" onclick="closeClearModal()">Abbrechen</button>
       <button type="button" class="btn-danger" style="background: #ef4444; color: white;" onclick="executeClearSheet()">Ja, Bogen leeren</button>
@@ -238,24 +236,11 @@
   </div>
 </div>
 
-<!-- Modal: Hinweis -->
-<div class="modal-overlay" id="alert-modal">
-  <div class="modal-box" style="max-width: 400px; text-align: center;">
-    <div class="modal-header" id="alert-title">Hinweis</div>
-    <p style="font-size: 14px; color: #4b5563;" id="alert-msg"></p>
-    <div class="modal-actions">
-      <button type="button" onclick="closeAlertModal()">OK</button>
-    </div>
-  </div>
-</div>
-
 <canvas id="export-canvas" style="display: none;"></canvas>
-
-<script>
+  <script>
   const TONIES_JSON_URL = "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json";
   let tonieDb = [];
   
-  // --- STATE MANAGEMENT ---
   let appState = {
     labels: [],
     selectedId: null,
@@ -279,20 +264,10 @@
     sheetGrid: document.getElementById("sheet-grid"),
     sheetStats: document.getElementById("sheet-stats"),
     printModal: document.getElementById("print-modal"),
-    clearModal: document.getElementById("clear-modal"),
-    alertModal: document.getElementById("alert-modal"),
-    alertTitle: document.getElementById("alert-title"),
-    alertMsg: document.getElementById("alert-msg")
+    clearModal: document.getElementById("clear-modal")
   };
 
-  // Modals Controller
-  function customAlert(title, msg) {
-    elements.alertTitle.textContent = title;
-    elements.alertMsg.textContent = msg;
-    elements.alertModal.style.display = "flex";
-  }
-  function closeAlertModal() { elements.alertModal.style.display = "none"; }
-  function promptClearSheet() { elements.clearModal.style.display = "flex"; }
+  function promptClearModal() { elements.clearModal.style.display = "flex"; }
   function closeClearModal() { elements.clearModal.style.display = "none"; }
   function executeClearSheet() {
     appState.labels = [];
@@ -327,7 +302,10 @@
 
   fetch(TONIES_JSON_URL)
     .then(res => res.json())
-    .then(data => { tonieDb = data; elements.statusMsg.textContent = "Datenbank bereit. Suchbegriff eingeben."; })
+    .then(data => { 
+      tonieDb = data; 
+      elements.statusMsg.textContent = "Datenbank bereit. Suchbegriff eingeben."; 
+    })
     .catch(() => elements.statusMsg.textContent = "Fehler beim Laden der Datenbank.");
 
   // Tab Logik
@@ -371,10 +349,24 @@
       } catch (err) { elements.statusMsg.textContent = "Netzwerkfehler."; }
     } else {
       if(tonieDb.length === 0) return;
-      const matches = tonieDb.filter(item => (item.title||"").toLowerCase().includes(q) || (item.series||"").toLowerCase().includes(q)).slice(0, 16);
+      
+      // Filtern und strikt nach Serie/Titel alphabetisch sortieren (damit "Ärzte" richtig einsortiert wird)
+      const matches = tonieDb
+        .filter(item => {
+          if(!item.pic) return false;
+          // Filter: Keine reinen generischen Web-Platzhalter
+          if(item.pic.includes('placeholder') || item.pic.includes('default')) return false;
+          return (item.title||"").toLowerCase().includes(q) || (item.series||"").toLowerCase().includes(q);
+        })
+        .sort((a, b) => (a.series || a.title || "").localeCompare(b.series || b.title || "", 'de'))
+        .slice(0, 16);
+
       if(matches.length === 0) { elements.statusMsg.textContent = "Keine Tonies gefunden."; return; }
       elements.statusMsg.textContent = `${matches.length} Tonies gefunden. Klicke zum Hinzufügen.`;
-      matches.forEach(item => { if(item.pic) createResultCard(item.pic, item.series || "", item.episodes || item.title || ""); });
+      
+      matches.forEach(item => {
+        createResultCard(item.pic, item.series || "", item.episodes || item.title || "");
+      });
     }
   }
 
@@ -394,7 +386,7 @@
 
   function addLabel(imgUrl, series, title) {
     if (appState.preset === 'avery-40' && appState.labels.length >= 24) {
-      customAlert("Bogen ist voll", "Ein Avery-Bogen hat maximal 24 Plätze. Bitte lösche zuerst ein Etikett."); 
+      alert("Ein Avery-Bogen hat maximal 24 Plätze."); 
       return;
     }
     const newId = Date.now().toString() + Math.floor(Math.random()*1000);
@@ -426,7 +418,7 @@
     const labelToCopy = appState.labels.find(l => l.id === appState.selectedId);
     if(labelToCopy) {
       if (appState.preset === 'avery-40' && appState.labels.length >= 24) {
-        customAlert("Bogen ist voll", "Der Avery-Bogen hat sein Maximum von 24 Stück erreicht."); 
+        alert("Der Avery-Bogen hat sein Maximum von 24 Stück erreicht."); 
         return;
       }
       const newId = Date.now().toString() + Math.floor(Math.random()*1000);
@@ -478,9 +470,8 @@
     if(appState.labels.length === 0 && !isAvery) {
       elements.sheetGrid.innerHTML = `
         <div style="width:100%; text-align:center; padding: 60px 20px; color: #9ca3af; display:flex; flex-direction:column; align-items:center;">
-          <svg style="width:48px; height:48px; margin-bottom:15px; opacity:0.5;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
           <div style="font-size: 16px; font-weight: 500;">Dein Bogen ist leer.</div>
-          <div style="font-size: 13px; margin-top: 5px;">Suche oben nach Titeln und klicke sie an, um sie hierher hinzuzufügen.</div>
+          <div style="font-size: 13px; margin-top: 5px;">Suche oben nach Titeln und klicke sie an, um sie hinzuzufügen.</div>
         </div>`;
       return;
     }
@@ -547,7 +538,7 @@
   elements.showTextToggle.onchange = renderGrid;
 
   function openPrintModal() {
-    if(appState.labels.length === 0) { customAlert("Bogen leer", "Bitte füge zuerst Etiketten hinzu."); return; }
+    if(appState.labels.length === 0) { alert("Bitte füge zuerst Etiketten hinzu."); return; }
     elements.printModal.style.display = "flex";
   }
   function closePrintModal() { elements.printModal.style.display = "none"; }
@@ -640,7 +631,6 @@
           }
           ctx.restore();
 
-          // Korrigierter, passender PNG Text-Export
           if (appState.showText) {
             ctx.save();
             ctx.font = `bold ${Math.round(18 * (pxPerMm / 3.78))}px -apple-system, sans-serif`;
@@ -675,7 +665,7 @@
       link.href = canvas.toDataURL("image/png");
       link.click();
     } catch (e) {
-      customAlert("Fehler", "Beim Exportieren des Bildes ist ein Fehler aufgetreten.");
+      alert("Beim Exportieren ist ein Fehler aufgetreten.");
     } finally {
       exportBtn.textContent = "🖼️ Als hochauflösendes PNG speichern";
       exportBtn.disabled = false;
@@ -683,7 +673,6 @@
     }
   }
 
-  // Initialisieren
   loadState();
 </script>
 </body>
