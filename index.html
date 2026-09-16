@@ -161,9 +161,9 @@ body { background: #fff; margin: 0; padding: 0; -webkit-print-color-adjust: exac
 <button type="button" class="btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="promptClearSheet()">🗑️ Bogen leeren</button>
 </div>
 <div class="search-tabs" id="search-tabs">
-<button class="tab-btn active" data-type="tonie">🪀 Tonie-Figuren</button>
-<button class="tab-btn" data-type="album">🎵 Apple Music / Alben</button>
-<button class="tab-btn" data-type="upload">📁 Eigene Grafik</button>
+<button class="tab-btn active" data-type="tonie" onclick="switchSearchTab('tonie')">🪀 Tonie-Figuren</button>
+<button class="tab-btn" data-type="album" onclick="switchSearchTab('album')">🎵 Apple Music / Alben</button>
+<button class="tab-btn" data-type="upload" onclick="switchSearchTab('upload')">📁 Eigene Grafik</button>
 </div>
 <div id="search-section">
 <div class="form-row">
@@ -244,7 +244,7 @@ body { background: #fff; margin: 0; padding: 0; -webkit-print-color-adjust: exac
 <div class="stats-badge" id="sheet-stats">0 Etiketten auf dem Bogen</div>
 <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; font-size: 13px;">
 <input type="checkbox" id="show-text-toggle" checked style="width: 16px; height: 16px;">
-Titel & Serie andrucken
+Titel & Serie übernehmen
 </label>
 </div>
 <button type="button" class="full-width" onclick="openPrintModal()">🖨️ Bogen Drucken & Exportieren</button>
@@ -259,14 +259,14 @@ Live Druckvorschau <span style="font-weight:normal; font-size:12px; display:bloc
 <div id="sheet-grid" class="grid-standard"></div>
 </div>
 </div>
-<!-- Disclaimer & Credits -->
+<!-- Footer & Disclaimer -->
 <div class="container no-print">
 <div class="disclaimer">
 <strong>Rechtlicher Hinweis & Open Source (MIT License):</strong> Dieses private Hobby-Projekt steht in keinerlei Verbindung zur Boxine GmbH. "tonies®" und "Toniebox®" sind eingetragene Marken der Boxine GmbH.
 
 Passende NFC-Tags für deine eigene Toniebox erhältst du bei <a href="http://rfidfriend.com/" target="_blank">RFIDfriend.com</a>.
 
-Mit ❤️ entwickelt für die Community. Quellcode & Mitwirken auf <a href="https://github.com/toniebox-reverse-engineering/tonies-json" target="_blank">GitHub</a>.
+Quellcode & Mitwirken auf <a href="https://github.com/" target="_blank">GitHub</a>.
 </div>
 </div>
 <!-- Modal: Druck & Export -->
@@ -302,7 +302,7 @@ selectedId: null,
 preset: '43',
 showText: true,
 searchType: 'tonie',
-mode: 'simple' // 'simple' oder 'pro'
+mode: 'simple'
 };
 const elements = {
 searchInput: document.getElementById("search-input"),
@@ -366,34 +366,37 @@ preset: appState.preset,
 showText: appState.showText
 }));
 }
-// Daten laden
+// Datenbank laden mit präziser Rückmeldung
 fetch(TONIES_JSON_URL)
 .then(res => res.json())
 .then(data => {
 tonieDb = data;
-elements.statusMsg.textContent = "Datenbank bereit. Suchbegriff eingeben.";
+elements.statusMsg.textContent = ⁠${tonieDb.length} Tonies geladen! Suchbegriff eingeben.⁠;
 })
 .catch(() => elements.statusMsg.textContent = "Fehler beim Laden der Datenbank.");
-// Tabs
+// Tabs wechseln
+function switchSearchTab(type) {
+appState.searchType = type;
 elements.tabBtns.forEach(btn => {
-btn.addEventListener('click', (e) => {
-elements.tabBtns.forEach(b => b.classList.remove('active'));
-e.currentTarget.classList.add('active');
-appState.searchType = e.currentTarget.dataset.type;
-if (appState.searchType === 'upload') {
+if(btn.dataset.type === type) {
+btn.classList.add('active');
+} else {
+btn.classList.remove('active');
+}
+});
+if (type === 'upload') {
 elements.searchSection.style.display = 'none';
 elements.uploadSection.style.display = 'block';
 } else {
 elements.searchSection.style.display = 'block';
 elements.uploadSection.style.display = 'none';
-elements.searchInput.placeholder = appState.searchType === 'album'
+elements.searchInput.placeholder = type === 'album'
 ? "Interpret oder Album suchen (z.B. Disney)..."
-: "Tonie Titel suchen (z.B. Conni)...";
+: "Titel oder Serie suchen (z.B. Conni)...";
 elements.searchInput.focus();
 if(elements.searchInput.value.trim().length >= 2) doSearch();
 }
-});
-});
+}
 // Eigene Grafik Upload
 elements.customFileInput.addEventListener('change', (e) => {
 const file = e.target.files[0];
@@ -591,8 +594,8 @@ imgLayer.className = "coin-img-layer";
 imgLayer.style.backgroundImage = ⁠url('${label.imgUrl}')⁠;
 imgLayer.style.backgroundSize = ⁠${label.zoom}%⁠;
 imgLayer.style.backgroundPosition = ⁠calc(50% + ${label.posX}px) calc(50% + ${label.posY}px)⁠;
-imgLayer.style.transform = ⁠rotate(${label.rot || 0}deg)⁠;
 circle.appendChild(imgLayer);
+imgLayer.style.transform = ⁠rotate(${label.rot || 0}deg)⁠;
 if (appState.showText) {
 if(label.series) {
 const lblTop = document.createElement("div");
@@ -625,7 +628,7 @@ clearTimeout(searchTimeout);
 searchTimeout = setTimeout(doSearch, 300);
 } else {
 elements.searchResults.innerHTML = "";
-elements.statusMsg.textContent = "Datenbank bereit. Suchbegriff eingeben.";
+elements.statusMsg.textContent = ⁠${tonieDb.length} Tonies geladen! Suchbegriff eingeben.⁠;
 }
 });
 elements.searchBtn.onclick = () => { clearTimeout(searchTimeout); doSearch(); };
@@ -731,7 +734,7 @@ ctx.fillStyle = "#111";
 ctx.fillText(label.series, x + diameterPx / 2, topBoxY + (boxHeight/2), boxWidth * 0.9);
 }
 if (label.title) {
-const btmBoxY = y + diameterPx - (4 * pxPerMm) - boxHeight;
+const btmBoxY = y + diameterpx - (4 * pxPerMm) - boxHeight;
 ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
 ctx.fillRect(boxX, btmBoxY, boxWidth, boxHeight);
 ctx.fillStyle = "#111";
