@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Tonie & Tag Cover Generator V6</title>
+<title>Tonie & Tag Cover Generator</title>
 <style>
 :root {
 --primary: #e30613;
@@ -135,7 +135,7 @@ position: absolute; top: -5px; right: -5px; background: var(--primary); color: #
 border-radius: 50%; font-size: 13px; font-weight: bold; display: none; align-items: center; justify-content: center;
 }
 .result-card:hover .badge { display: flex; }
-/* Editor Card (Step 2) */
+/* Editor Card */
 .editor-preview-box { display: flex; justify-content: center; padding: 16px; background: #f8fafc; border-radius: 12px; border: 1.5px dashed var(--border); margin-bottom: 14px; }
 .controls-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 14px; }
 @media(min-width: 600px) { .controls-grid { grid-template-columns: 1fr 1fr; } }
@@ -193,7 +193,7 @@ body { background: #fff; margin: 0; padding: 0; }
 <body>
 <div class="app-wrapper">
 <header class="no-print">
-<h1>Tonie & Tag Cover Generator V6</h1>
+<h1>Tonie & Tag Cover Generator</h1>
 <div class="subtitle">Der elegante Designer für Münzkapseln, RFIDfriend Token & Avery Etiketten</div>
 </header>
 <!-- SEKTION 1: SUCHEN & HINZUFÜGEN -->
@@ -224,7 +224,7 @@ body { background: #fff; margin: 0; padding: 0; }
 <button type="button" class="btn" onclick="document.getElementById('custom-file').click()">🖼️ Bilddatei auswählen</button>
 </div>
 </div>
-<!-- SEKTION 2: EDITOR (NUR BEI AUSWAHL SICHTBAR) -->
+<!-- SEKTION 2: EDITOR -->
 <div class="card no-print" id="editor-card" style="display: none; border: 2px solid var(--selected);">
 <div class="card-header">
 <span style="color: var(--selected);">2. Etikett feinjustieren</span>
@@ -232,7 +232,7 @@ body { background: #fff; margin: 0; padding: 0; }
 </div>
 <div class="editor-preview-box">
 <div class="tag-slot">
-<div class="coin-circle" id="editor-circle" style="width: 44mm; height: 44mm;">
+<div class="coin-circle" id="editor-circle" style="width: 43mm; height: 43mm;">
 <div class="coin-img-layer" id="editor-img"></div>
 <div class="tag-text top" id="editor-text-top"></div>
 <div class="tag-text bottom" id="editor-text-bottom"></div>
@@ -297,7 +297,7 @@ Live Druckvorschau <span style="font-weight:400; font-size:11px; display:block; 
 <div id="sheet-grid" class="grid-standard"></div>
 </div>
 </div>
-<!-- FOOTER & DISCLAIMER -->
+<!-- FOOTER -->
 <div class="app-wrapper no-print">
 <div class="footer-box">
 <strong>Open Source & Rechtlicher Hinweis:</strong> Dieses Projekt ist unter <a href="https://opensource.org/licenses/MIT" target="_blank">MIT-Lizenz</a> lizenziert.
@@ -306,7 +306,7 @@ Inoffizielles Hobby-Projekt in keinerlei Verbindung zur Boxine GmbH. "tonies®" 
 
 Passende NFC-Tags für deine eigene Toniebox erhältst du bei <a href="http://rfidfriend.com/" target="_blank">RFIDfriend.com</a>.
 
-Quellcode & Mitwirken auf <a href="https://github.com/" target="_blank">GitHub</a>.
+Quellcode & Mitwirken auf <a href="https://github.com/stevenious" target="_blank">GitHub</a>.
 </div>
 </div>
 <!-- MODAL: DRUCK & EXPORT -->
@@ -356,29 +356,26 @@ presetSelect: document.getElementById("preset-select"),
 toggleText: document.getElementById("toggle-text"),
 sheetGrid: document.getElementById("sheet-grid"),
 statsBadge: document.getElementById("stats-badge"),
-// Editor controls
 zoom: document.getElementById("slider-zoom"),
 rot: document.getElementById("slider-rot"),
 posx: document.getElementById("slider-posx"),
 posy: document.getElementById("slider-posy"),
 bgColor: document.getElementById("bg-color"),
-// Editor preview
 edCircle: document.getElementById("editor-circle"),
 edImg: document.getElementById("editor-img"),
 edTop: document.getElementById("editor-text-top"),
 edBottom: document.getElementById("editor-text-bottom")
 };
-// 1. Datenbank initialisieren
+// Datenbank initialisieren
 fetch(TONIES_URL)
 .then(res => res.json())
 .then(data => {
 toniesDb = data;
-DOM.dbStatus.textContent = ⁠${toniesDb.length} Tonies bereit! Suchbegriff eingeben.⁠;
+DOM.dbStatus.textContent = ⁠${toniesDb.length} Tonies geladen! Suchbegriff eingeben.⁠;
 })
 .catch(() => DOM.dbStatus.textContent = "Fehler beim Laden der Tonie-Datenbank.");
-// State aus LocalStorage laden
 function loadSession() {
-const saved = localStorage.getItem("tonieGenV6State");
+const saved = localStorage.getItem("tonieGenFinalState");
 if(saved) {
 try {
 const parsed = JSON.parse(saved);
@@ -392,13 +389,12 @@ DOM.toggleText.checked = appState.showText;
 renderGrid();
 }
 function saveSession() {
-localStorage.setItem("tonieGenV6State", JSON.stringify({
+localStorage.setItem("tonieGenFinalState", JSON.stringify({
 labels: appState.labels,
 preset: appState.preset,
 showText: appState.showText
 }));
 }
-// Tabs umschalten
 function switchSource(src) {
 appState.source = src;
 document.querySelectorAll(".source-tab").forEach(btn => {
@@ -415,7 +411,6 @@ DOM.searchInput.focus();
 if(DOM.searchInput.value.trim().length >= 2) runSearch();
 }
 }
-// Eigene Grafik hochladen
 DOM.customFile.addEventListener('change', (e) => {
 const file = e.target.files[0];
 if(!file) return;
@@ -426,7 +421,6 @@ DOM.customFile.value = "";
 };
 reader.readAsDataURL(file);
 });
-// Suchlogik
 async function runSearch() {
 const q = DOM.searchInput.value.trim().toLowerCase();
 if(!q) { DOM.searchResults.innerHTML = ""; DOM.dbStatus.textContent = "Bitte Suchbegriff eingeben."; return; }
@@ -444,7 +438,7 @@ createResultCard(imgUrl, album.artistName, album.collectionName);
 });
 } catch(e) { DOM.dbStatus.textContent = "Netzwerkfehler bei der Suche."; }
 } else {
-if(toniesDb.length === 0) return;
+if(toniesDb.length === 0) { DOM.dbStatus.textContent = "Datenbank noch nicht bereit."; return; }
 const matches = toniesDb
 .filter(item => {
 if(!item.pic || item.pic.includes('placeholder') || item.pic.includes('default')) return false;
@@ -471,7 +465,6 @@ addLabel(imgUrl, fSeries, fTitle);
 };
 DOM.searchResults.appendChild(card);
 }
-// Label Management
 function addLabel(imgUrl, series, title) {
 const isAvery = appState.preset === 'avery-40';
 if(isAvery && appState.labels.length >= 24) { alert("Avery-Bogen ist auf 24 Stück limitiert."); return; }
@@ -557,7 +550,6 @@ DOM.edBottom.style.display = "none";
 }
 }
 }
-// Render Grid
 function renderGrid() {
 DOM.sheetGrid.innerHTML = "";
 saveSession();
@@ -620,7 +612,6 @@ DOM.sheetGrid.appendChild(slot);
 }
 if(appState.selectedId) updateEditorPreview();
 }
-// Such Events
 let tOut = null;
 DOM.searchInput.addEventListener("input", () => {
 if(DOM.searchInput.value.trim().length >= 2) {
@@ -629,14 +620,13 @@ clearTimeout(tOut);
 tOut = setTimeout(runSearch, 300);
 } else {
 DOM.searchResults.innerHTML = "";
-DOM.dbStatus.textContent = ⁠${toniesDb.length} Tonies bereit! Suchbegriff eingeben.⁠;
+DOM.dbStatus.textContent = toniesDb.length > 0 ? ⁠${toniesDb.length} Tonies geladen! Suchbegriff eingeben.⁠ : "Lade Datenbank...";
 }
 });
 DOM.searchBtn.onclick = () => { clearTimeout(tOut); runSearch(); };
 DOM.searchInput.onkeydown = e => { if(e.key === 'Enter') { clearTimeout(tOut); runSearch(); }};
 DOM.presetSelect.onchange = renderGrid;
 DOM.toggleText.onchange = renderGrid;
-// Modals
 function openModal(name) {
 if(name === 'print' && appState.labels.length === 0) { alert("Bitte füge zuerst Etiketten hinzu."); return; }
 document.getElementById(⁠modal-${name}⁠).style.display = "flex";
@@ -654,7 +644,6 @@ appState.labels = [];
 deselectLabel();
 closeModal('clear');
 }
-// PNG Export
 async function exportPng() {
 const btn = document.getElementById("btn-png");
 btn.textContent = "⏳ Generiere PNG...";
@@ -663,7 +652,7 @@ try {
 const isAvery = appState.preset === 'avery-40';
 const diamMm = isAvery ? 40 : (parseInt(appState.preset) || 43);
 const canvas = document.getElementById("export-canvas");
-canvas.width = 2480; canvas.height = 3508; // A4 @ 300 DPI
+canvas.width = 2480; canvas.height = 3508;
 const ctx = canvas.getContext("2d");
 ctx.fillStyle = "#ffffff";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -674,7 +663,6 @@ let cols = isAvery ? 4 : Math.floor((2480 - (2 * startX)) / (diamPx + gapX));
 if (isAvery) {
 startX = 9.5 * pxPerMm; startY = 13.5 * pxPerMm; gapX = 4 * pxPerMm; gapY = 4 * pxPerMm;
 }
-// Cache images
 const cache = {};
 for(const l of appState.labels) {
 if(!cache[l.imgUrl]) {
@@ -694,7 +682,6 @@ const row = Math.floor(i / cols);
 const x = startX + col * (diamPx + gapX);
 const y = startY + row * (diamPx + gapY);
 const l = appState.labels[i];
-// Schnittkante
 ctx.save();
 ctx.beginPath();
 ctx.setLineDash([10, 10]);
