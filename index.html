@@ -75,9 +75,32 @@
     .coin-circle {
       border-radius: 50%; border: 0.5pt dashed #9ca3af;
       position: relative; overflow: hidden; background-color: #fff;
+      display: flex; justify-content: center;
     }
     .coin-img-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-repeat: no-repeat; background-position: center; }
-    .tag-info-text { position: absolute; bottom: 4mm; width: 100%; text-align: center; font-size: 7pt; font-family: monospace; font-weight: bold; background: rgba(255,255,255,0.85); padding: 2px 0; z-index: 2; }
+    
+    /* NEU: Optimierter Titel am unteren Rand (Pillen-Design) */
+    .tag-info-text {
+      position: absolute;
+      bottom: 2mm;
+      width: 85%;
+      text-align: center;
+      font-size: 6pt;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      font-weight: 600;
+      color: #333;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 3px 6px;
+      border-radius: 10px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      z-index: 2;
+      line-height: 1.1;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      backdrop-filter: blur(2px);
+    }
 
     /* Footer Disclaimer */
     .disclaimer {
@@ -293,7 +316,7 @@
       if (elements.showTextToggle.checked && currentTitle) {
         const lbl = document.createElement("div");
         lbl.className = "tag-info-text";
-        lbl.textContent = currentTitle.length > 25 ? currentTitle.substring(0, 22) + '...' : currentTitle;
+        lbl.textContent = currentTitle; // Die Begrenzung erfolgt jetzt über CSS (-webkit-line-clamp)
         circle.appendChild(lbl);
       }
 
