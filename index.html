@@ -1,1313 +1,391 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="TonieCover">
-    <meta name="theme-color" content="#e11d48">
-    <meta name="description" content="Erstelle passgenaue Cover für Tonie Custom Tags – 43mm Münzkapseln oder 40mm Avery L3415 Etiketten – suche in der Tonie-Datenbank, passe Zoom, Position und Drehung an und drucke einen fertigen A4-Bogen.">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tonie Münzkapsel & NFC Tag Cover Generator</title>
+  <style>
+    :root {
+      --primary: #e30613;
+      --bg: #f4f6f8;
+      --card-bg: #ffffff;
+      --border: #dcdcdc;
+    }
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: var(--bg);
+      color: #333;
+    }
+    .no-print { display: block; }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+    h1 { margin-top: 0; color: var(--primary); font-size: 24px; }
+    p.sub { margin-top: -6px; color: #666; font-size: 14px; }
+    
+    .panel {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+      background: #fafafa;
+    }
+    .panel-title { font-weight: bold; margin-bottom: 10px; display: block; }
+    
+    .form-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    input[type="text"], select {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 14px;
+      min-width: 200px;
+    }
+    button {
+      padding: 8px 18px;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    button:hover { opacity: 0.9; }
+    
+    /* Scraper Grid */
+    #search-results {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 10px;
+      max-height: 250px;
+      overflow-y: auto;
+      margin-top: 10px;
+    }
+    .result-card {
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      padding: 6px;
+      background: #fff;
+      text-align: center;
+      cursor: pointer;
+      font-size: 11px;
+    }
+    .result-card:hover { border-color: var(--primary); }
+    .result-card img { width: 100%; height: 70px; object-fit: contain; }
 
-    <title>Cover-Generator für Tonie Custom Tags (43 mm / 40 mm)</title>
+    /* Print Preview & Canvas */
+    .print-sheet {
+      background: #fff;
+      margin: 20px auto;
+      padding: 10mm;
+      width: 210mm;
+      min-height: 297mm;
+      box-shadow: 0 0 10px rgba(0,0,0,0.15);
+      position: relative;
+    }
+    .calibration-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 15mm;
+      font-size: 11px;
+      color: #555;
+    }
+    .ruler {
+      width: 50mm;
+      height: 6px;
+      background: repeating-linear-gradient(90deg, #000, #000 1mm, #fff 1mm, #fff 5mm);
+      border: 1px solid #000;
+    }
+    .tag-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10mm;
+    }
+    .tag-slot {
+      display: inline-flex;
+      align-items: center;
+      position: relative;
+    }
+    .coin-circle {
+      border-radius: 50%;
+      border: 0.5pt dashed #999;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+    .duplex-separator {
+      width: 4mm;
+      height: 0;
+      border-top: 0.5pt dashed #bbb;
+    }
+    .tag-info-text {
+      position: absolute;
+      bottom: 2mm;
+      font-size: 7pt;
+      font-family: monospace;
+      background: rgba(255,255,255,0.85);
+      padding: 0 3px;
+      border-radius: 2px;
+      max-width: 80%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
 
-    <!-- PWA Web App Manifest (Injected via Blob) -->
-    <link id="manifest-placeholder" rel="manifest">
-
-    <!-- iOS Touch Icons & Fonts -->
-    <link rel="apple-touch-icon" href="https://placehold.co/192x192/e11d48/ffffff?text=TonieCover">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <style>
-        body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            -webkit-tap-highlight-color: transparent;
-            touch-action: manipulation;
-        }
-
-        /* Screen scaling for the active format — 43mm capsule or 40mm Avery label */
-        :root {
-            --capsule-size: 43mm;
-        }
-        .capsule-size {
-            width: var(--capsule-size);
-            height: var(--capsule-size);
-            min-width: var(--capsule-size);
-            min-height: var(--capsule-size);
-        }
-
-        /* Subtle canvas grid pattern */
-        .bg-grid-dots {
-            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-            background-size: 12px 12px;
-        }
-
-        /* Hide scrollbars for clean iOS look while keeping scrollability */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-
-        /* A4 Screen Representation — one node per physical page. Capsules sit at
-           absolute millimetre offsets instead of in a CSS grid, so the screen sheet,
-           the printout and the PNG export all derive from the same geometry. */
-        .sheet-page {
-            position: relative;
-            width: 210mm;
-            height: 297mm;
-            background: white;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            border: 1px solid #cbd5e1;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        .sheet-slot {
-            position: absolute;
-            border-radius: 50%;
-        }
-        /* A page keeps its true 210x297mm layout size so the slots stay printable at
-           1:1. On screens narrower than a sheet it is only visually shrunk via
-           --sheet-scale, and its .sheet-frame reserves the scaled-down space. */
-        .sheet-page {
-            transform: scale(var(--sheet-scale, 1));
-            transform-origin: top left;
-        }
-        .sheet-frame {
-            max-width: 100%;
-        }
-
-        /* PRINT MEDIA - Strict 1:1 Scale Output */
-        @media print {
-            /* Browsers drop backgrounds and flatten colors when printing unless
-               every element opts back in explicitly. */
-            *, *::before, *::after {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-            html, body {
-                background: white !important;
-                color: black !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                /* min-h-screen would otherwise push a blank second page */
-                min-height: 0 !important;
-                height: auto !important;
-            }
-            .no-print {
-                display: none !important;
-            }
-            /* Zero page margin: every capsule is placed at an absolute millimetre
-               offset from the physical page corner, which is what lets the 40mm sheet
-               land on pre-cut Avery L3415 labels. */
-            @page {
-                size: A4 portrait;
-                margin: 0;
-            }
-            main {
-                max-width: none !important;
-                margin: 0 !important;
-                padding: 0 !important;
-            }
-            /* The sheet prints even if the editor tab is the active one. */
-            #view-editor {
-                display: none !important;
-            }
-            #view-print {
-                display: block !important;
-            }
-            #sheet-pages {
-                display: block !important;
-                gap: 0 !important;
-            }
-            /* The frame only reserves space for the shrunk on-screen sheet; the page
-               breaks are carried by it so one forced break sits per physical page. */
-            .sheet-frame {
-                display: block !important;
-                width: auto !important;
-                height: auto !important;
-                max-width: none !important;
-                margin: 0 !important;
-                break-after: page;
-                page-break-after: always;
-            }
-            .sheet-frame:last-child {
-                break-after: auto;
-                page-break-after: auto;
-            }
-            .sheet-page {
-                transform: none !important;
-                margin: 0 !important;
-                border: 0 !important;
-                border-radius: 0 !important;
-                box-shadow: none !important;
-                overflow: visible !important;
-                break-inside: avoid;
-                page-break-inside: avoid;
-            }
-        }
-    </style>
+    /* Print Rules */
+    @media print {
+      body {
+        margin: 0;
+        padding: 0;
+        background: #fff;
+      }
+      .no-print { display: none !important; }
+      .print-sheet {
+        margin: 0;
+        padding: 10mm;
+        width: 100%;
+        box-shadow: none;
+      }
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+    }
+  </style>
 </head>
-<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col pb-20 md:pb-0">
+<body>
 
-    <header class="sticky top-0 z-40 bg-gradient-to-r from-rose-600 to-red-600 text-white shadow-md border-b border-rose-700/50 no-print">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-inner">
-                    <i class="fa-solid fa-compact-disc text-xl text-amber-300"></i>
-                </div>
-                <div>
-                    <h1 class="font-extrabold text-base md:text-lg leading-none tracking-tight flex items-center gap-2">
-                        TonieCover
-                        <span id="format-badge" class="bg-amber-400 text-rose-950 text-[10px] font-bold px-1.5 py-0.5 rounded-full">43 mm</span>
-                    </h1>
-                    <p class="text-[11px] text-rose-100/90 font-medium">Cover-Generator für Tonie Custom Tags</p>
-                </div>
-            </div>
+<div class="container no-print">
+  <h1>Tonie Tag & Münzkapsel Cover Generator</h1>
+  <p class="sub">Passgenau für RFIDfriend Magic Tags, Sticker und Münzkapseln (43 mm, 40 mm, 30 mm, 25 mm).</p>
 
-            <div class="flex items-center space-x-2">
-                <button onclick="openIOSGuide()" class="px-3 py-1.5 bg-white/15 hover:bg-white/25 rounded-xl text-xs font-semibold backdrop-blur-md transition flex items-center gap-1.5 border border-white/20">
-                    <i class="fa-solid fa-arrow-down-to-square text-amber-300"></i>
-                    <span class="hidden sm:inline">App-Installation</span>
-                </button>
-                <button onclick="switchTab('print')" id="tab-btn-print" class="px-3.5 py-1.5 bg-rose-900/60 hover:bg-rose-900/80 rounded-xl text-xs font-semibold backdrop-blur-md transition flex items-center gap-2 border border-rose-400/30">
-                    <i class="fa-solid fa-print"></i>
-                    <span class="hidden sm:inline">Druckbogen</span>
-                    <span id="print-badge" class="bg-amber-400 text-rose-950 text-[10px] font-bold px-1.5 py-0.5 rounded-full hidden">0</span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Format Switcher — 43mm coin capsule vs. 40mm Avery L3415 label sheet -->
-        <div class="max-w-7xl mx-auto px-4 pb-3 flex justify-center">
-            <div id="format-switch" class="inline-flex items-center gap-1 bg-rose-900/40 border border-rose-400/30 rounded-2xl p-1 backdrop-blur-md">
-                <button type="button" data-format="capsule43" onclick="setFormat('capsule43')" class="format-btn px-3 py-1.5 rounded-xl text-[11px] font-bold transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-circle-dot"></i> 43 mm Münzkapsel
-                </button>
-                <button type="button" data-format="label40" onclick="setFormat('label40')" class="format-btn px-3 py-1.5 rounded-xl text-[11px] font-bold transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-tag"></i> 40 mm Etikett <span class="hidden sm:inline">· Avery L3415</span>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <main class="flex-1 max-w-7xl w-full mx-auto p-3 md:p-6">
-
-        <!-- MAIN VIEW: GENERATOR & SEARCH -->
-        <div id="view-editor" class="grid grid-cols-1 lg:grid-cols-12 gap-5 no-print">
-
-            <!-- LEFT PANEL: Search, Filter, DB -->
-            <div class="lg:col-span-5 flex flex-col space-y-4">
-
-                <div class="bg-white rounded-3xl p-4 md:p-5 shadow-xs border border-slate-200/80 space-y-3">
-                    <div class="flex items-center justify-between">
-                        <span class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-                            <i class="fa-solid fa-magnifying-glass text-rose-500"></i> Tonie-Suche
-                        </span>
-                        <span id="result-count" class="text-[11px] font-semibold text-rose-600 bg-rose-50 px-2.5 py-0.5 rounded-full">0 geladen</span>
-                    </div>
-
-                    <!-- Search Input Field -->
-                    <div class="relative">
-                        <input type="text" id="search-input" placeholder="Name, Serie, Hörspiel oder ID..."
-                            class="w-full pl-10 pr-9 py-2.5 bg-slate-100/80 focus:bg-white border border-slate-200 focus:border-rose-500 rounded-2xl outline-none text-sm font-medium transition-all shadow-inner">
-                        <i class="fa-solid fa-search absolute left-3.5 top-3 text-slate-400 text-sm"></i>
-                        <button id="clear-search" onclick="clearSearch()" class="hidden absolute right-3 top-2.5 text-slate-400 hover:text-slate-600">
-                            <i class="fa-solid fa-circle-xmark"></i>
-                        </button>
-                    </div>
-
-                    <!-- Filter Pills -->
-                    <div id="filter-pills" class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
-                        <button onclick="setFilterCategory('')" class="filter-pill active border px-3 py-1 rounded-full text-xs font-semibold shrink-0 bg-rose-600 text-white border-rose-600">Alle</button>
-                        <button onclick="setFilterCategory('Hörspiel')" class="filter-pill border px-3 py-1 rounded-full text-xs font-medium shrink-0 bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200">Hörspiele</button>
-                        <button onclick="setFilterCategory('Musik')" class="filter-pill border px-3 py-1 rounded-full text-xs font-medium shrink-0 bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200">Musik</button>
-                        <button onclick="setFilterCategory('Wissen')" class="filter-pill border px-3 py-1 rounded-full text-xs font-medium shrink-0 bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200">Wissen</button>
-                        <button onclick="setFilterCategory('Disney')" class="filter-pill border px-3 py-1 rounded-full text-xs font-medium shrink-0 bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200">Disney</button>
-                    </div>
-
-                    <!-- Database Status Indicator -->
-                    <div id="db-status" class="text-[11px] flex items-center gap-1.5 text-slate-500 pt-1 border-t border-slate-100">
-                        <i class="fa-solid fa-spinner fa-spin text-rose-500"></i> Lade Tonie JSON-Datenbank...
-                    </div>
-
-                    <!-- Search Results Scroll Box -->
-                    <div id="search-results" class="max-h-80 md:max-h-96 overflow-y-auto space-y-1.5 pr-1 divide-y divide-slate-100">
-                        <!-- Populated by JS -->
-                    </div>
-                </div>
-
-                <!-- Upload Own Cover File -->
-                <div class="bg-white rounded-3xl p-4 shadow-xs border border-slate-200/80 flex items-center justify-between gap-3">
-                    <div>
-                        <h3 class="text-xs font-bold text-slate-800">Eigenes Foto / Motiv hochladen</h3>
-                        <p class="text-[11px] text-slate-500">Eigene Audio-Dateien oder fehlende Tonies</p>
-                    </div>
-                    <input type="file" id="custom-file-input" accept="image/*" class="hidden" onchange="handleCustomUpload(event)">
-                    <button onclick="document.getElementById('custom-file-input').click()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 text-xs font-semibold rounded-2xl transition shrink-0 flex items-center gap-1.5">
-                        <i class="fa-solid fa-cloud-arrow-up text-rose-500"></i> Datei wählen
-                    </button>
-                </div>
-
-            </div>
-
-            <!-- RIGHT PANEL: Interactive Editor Canvas (43mm or 40mm) -->
-            <div class="lg:col-span-7 flex flex-col space-y-4">
-
-                <div class="bg-white rounded-3xl p-4 md:p-6 shadow-xs border border-slate-200/80 flex flex-col md:flex-row gap-6">
-
-                    <!-- Canvas Container, sized by the active format -->
-                    <div class="flex flex-col items-center justify-center bg-slate-100/70 p-6 rounded-2xl border border-slate-200/80 bg-grid-dots shrink-0">
-                        <span id="preview-scale-label" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Vorschau (Exakt 43mm Scale)</span>
-
-                        <!-- Outer Capsule Shield -->
-                        <div class="relative p-2.5 bg-white rounded-full shadow-md border border-slate-200/80">
-                            <!-- Target Interactive Container -->
-                            <div id="preview-capsule" class="capsule-size rounded-full overflow-hidden relative shadow-inner flex items-center justify-center cursor-grab active:cursor-grabbing select-none" style="background-color: #ffffff;">
-                                <img id="preview-img" src="" alt="Vorschau" class="absolute inset-0 w-full h-full object-contain origin-center transition-transform duration-75" style="transform: translate(0px, 0px) scale(1) rotate(0deg);" onerror="this.src='https://placehold.co/300x300/f1f5f9/94a3b8?text=Tonie'">
-
-                                <canvas id="text-canvas" class="absolute inset-0 pointer-events-none z-10" width="163" height="163"></canvas>
-                                <div id="cutting-guide" class="absolute inset-0 rounded-full border-2 border-dashed border-red-500/70 pointer-events-none z-20"></div>
-                            </div>
-                        </div>
-
-                        <div class="mt-4 text-[11px] font-medium text-slate-500 bg-white px-3 py-1 rounded-full border border-slate-200 shadow-2xs flex items-center gap-1.5">
-                            <i class="fa-solid fa-circle-dot text-rose-500"></i> <span id="preview-fit-note">Passgenau für 43 mm Kapseln</span>
-                        </div>
-                    </div>
-
-                    <!-- Fine Controls Form -->
-                    <div class="flex-1 flex flex-col justify-between space-y-3">
-                        <div>
-                            <span id="selected-badge" class="text-[10px] font-bold text-rose-600 bg-rose-50 px-2 py-0.5 rounded-full uppercase">Keine Auswahl</span>
-                            <h3 id="selected-title" class="font-bold text-slate-900 text-base leading-snug mt-1">Bitte Tonie aus der Suche wählen</h3>
-                            <p id="selected-subtitle" class="text-xs text-slate-500">Wähle links ein Motiv aus der Datenbank.</p>
-                        </div>
-
-                        <!-- Adjustment Sliders & Tools -->
-                        <div class="space-y-2.5 bg-slate-50 p-3.5 rounded-2xl border border-slate-200/80">
-
-                            <!-- Zoom -->
-                            <div>
-                                <div class="flex justify-between text-xs text-slate-600 font-medium mb-1">
-                                    <span><i class="fa-solid fa-magnifying-glass-plus mr-1 text-slate-400"></i> Zoom</span>
-                                    <span id="zoom-val" class="font-bold text-slate-800">100%</span>
-                                </div>
-                                <input type="range" id="zoom-slider" min="0.3" max="3" step="0.05" value="1" oninput="updateTransform()" class="w-full accent-rose-600 h-1.5 bg-slate-200 rounded-lg cursor-pointer">
-                            </div>
-
-                            <!-- Rotate -->
-                            <div>
-                                <div class="flex justify-between text-xs text-slate-600 font-medium mb-1">
-                                    <span><i class="fa-solid fa-rotate mr-1 text-slate-400"></i> Drehung</span>
-                                    <span id="rotate-val" class="font-bold text-slate-800">0°</span>
-                                </div>
-                                <input type="range" id="rotate-slider" min="-180" max="180" step="1" value="0" oninput="updateTransform()" class="w-full accent-rose-600 h-1.5 bg-slate-200 rounded-lg cursor-pointer">
-                            </div>
-
-                            <!-- X & Y Sliders -->
-                            <div class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <div class="flex justify-between text-[11px] text-slate-600 font-medium mb-1">
-                                        <span>X-Versatz</span>
-                                        <span id="pos-x-val" class="font-bold text-slate-800">0px</span>
-                                    </div>
-                                    <input type="range" id="pos-x-slider" min="-80" max="80" step="1" value="0" oninput="updateTransform()" class="w-full accent-rose-600 h-1.5 bg-slate-200 rounded-lg cursor-pointer">
-                                </div>
-                                <div>
-                                    <div class="flex justify-between text-[11px] text-slate-600 font-medium mb-1">
-                                        <span>Y-Versatz</span>
-                                        <span id="pos-y-val" class="font-bold text-slate-800">0px</span>
-                                    </div>
-                                    <input type="range" id="pos-y-slider" min="-80" max="80" step="1" value="0" oninput="updateTransform()" class="w-full accent-rose-600 h-1.5 bg-slate-200 rounded-lg cursor-pointer">
-                                </div>
-                            </div>
-
-                            <!-- Text Overlay Ring -->
-                            <div>
-                                <label class="block text-xs font-medium text-slate-600 mb-1"><i class="fa-solid fa-font mr-1 text-slate-400"></i> Kreis-Textaufschrift (Optional)</label>
-                                <input type="text" id="text-overlay-input" placeholder="z. B. Tonie Name oder Nummer..." oninput="renderCurvedText()" class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-rose-500">
-                            </div>
-
-                            <!-- Border & Bg Options -->
-                            <div class="pt-2 border-t border-slate-200/60 flex items-center justify-between gap-2">
-                                <div class="flex items-center gap-1.5">
-                                    <label class="text-xs font-medium text-slate-600">Farbe:</label>
-                                    <input type="color" id="bg-color" value="#ffffff" onchange="updateBgColor()" class="w-6 h-6 rounded-md border border-slate-300 cursor-pointer p-0">
-                                </div>
-
-                                <div class="flex items-center gap-1.5">
-                                    <label class="text-xs font-medium text-slate-600">Schnittlinie:</label>
-                                    <select id="border-style" onchange="updateBorderStyle()" class="text-xs bg-white border border-slate-200 rounded-lg px-2 py-1 outline-none">
-                                        <option value="dashed-red">Gestrichelt (Rot)</option>
-                                        <option value="solid-gray">Fein (Grau)</option>
-                                        <option value="none">Ohne Rand</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Action Controls -->
-                        <div class="flex gap-2 pt-1">
-                            <button onclick="resetTransform()" class="px-3.5 py-2.5 border border-slate-200 hover:bg-slate-100 text-slate-600 text-xs font-semibold rounded-2xl transition">
-                                <i class="fa-solid fa-arrow-rotate-left"></i>
-                            </button>
-                            <button onclick="addToPrintSheet()" id="btn-add-sheet" disabled class="flex-1 py-2.5 px-4 bg-rose-600 hover:bg-rose-700 active:scale-98 text-white font-semibold text-xs rounded-2xl shadow-sm transition flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
-                                <i class="fa-solid fa-plus-circle text-sm"></i> Zum Druckbogen hinzufügen
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Print Queue Quick-Bar -->
-                <div class="bg-white rounded-3xl p-4 shadow-xs border border-slate-200/80">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
-                            <i class="fa-solid fa-layer-group text-rose-500"></i> Druckbogen Auswahl (<span id="sheet-count">0</span>)
-                        </span>
-                        <button onclick="switchTab('print')" class="text-xs font-semibold text-rose-600 hover:text-rose-700 flex items-center gap-1">
-                            Bogen öffnen <i class="fa-solid fa-arrow-right"></i>
-                        </button>
-                    </div>
-
-                    <div id="mini-sheet-list" class="flex gap-2.5 overflow-x-auto no-scrollbar py-1 min-h-[52px] items-center text-xs text-slate-400">
-                        <p class="text-slate-400 italic text-xs">Noch keine Tonie-Cover hinzugefügt.</p>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- PRINT SHEET VIEW (A4 Preview & Action Header) -->
-        <div id="view-print" class="hidden flex flex-col items-center">
-
-            <div class="w-full max-w-4xl bg-white p-4 rounded-3xl shadow-xs border border-slate-200/80 mb-6 flex flex-wrap justify-between items-center gap-3 no-print">
-                <div>
-                    <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-print text-rose-500"></i> <span id="sheet-heading">A4 Druckbogen (Exakte 43 mm Münzkapseln)</span>
-                    </h2>
-                    <p id="sheet-hint" class="text-xs text-slate-500">
-                        Wichtig beim Drucken: Im Druckdialog Skalierung auf <strong>"100 %" bzw. "Tatsächliche Größe"</strong> stellen!
-                    </p>
-                    <p id="sheet-status" class="text-[11px] font-medium text-slate-500 flex items-center gap-1.5 mt-1"></p>
-                </div>
-
-                <div class="flex items-center gap-2">
-                    <button onclick="switchTab('editor')" class="px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 border border-slate-200 rounded-2xl transition">
-                        <i class="fa-solid fa-arrow-left mr-1"></i> Abbrechen
-                    </button>
-                    <button onclick="clearPrintSheet()" class="px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 border border-red-200 rounded-2xl transition">
-                        Leeren
-                    </button>
-                    <button id="btn-png-sheet" onclick="downloadSheetPNG()" disabled class="px-3.5 py-2 text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 border border-slate-200 rounded-2xl transition flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed">
-                        <i class="fa-solid fa-image text-rose-500"></i> Als PNG
-                    </button>
-                    <button id="btn-print-sheet" onclick="printSheet()" disabled class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs rounded-2xl shadow-sm transition flex items-center gap-1.5 disabled:opacity-40 disabled:cursor-not-allowed">
-                        <i class="fa-solid fa-print"></i> Drucken
-                    </button>
-                </div>
-            </div>
-
-            <!-- Screen A4 Simulation Sheet — one .sheet-page node per printed page -->
-            <div id="sheet-pages" class="w-full flex flex-col items-center gap-6">
-                <!-- Populated dynamically -->
-            </div>
-        </div>
-
-    </main>
-
-    <!-- iOS Quicklink / Installation Modal -->
-    <div id="ios-guide-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-3 hidden transition-all">
-        <div class="bg-white w-full max-w-md rounded-3xl p-6 shadow-2xl border border-slate-100 space-y-4">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-2.5">
-                    <div class="w-9 h-9 rounded-2xl bg-rose-600 flex items-center justify-center text-white">
-                        <i class="fa-solid fa-mobile-screen-button text-lg"></i>
-                    </div>
-                    <div>
-                        <h3 class="font-bold text-slate-900 text-sm">Als iPhone App speichern</h3>
-                        <p class="text-[11px] text-slate-500">Schnellzugriff direkt vom Home-Bildschirm</p>
-                    </div>
-                </div>
-                <button onclick="closeIOSGuide()" class="text-slate-400 hover:text-slate-600 p-1">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-
-            <div class="space-y-3 py-2 text-xs text-slate-600">
-                <div class="flex items-start gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                    <span class="w-6 h-6 rounded-full bg-rose-100 text-rose-700 font-bold flex items-center justify-center text-xs shrink-0">1</span>
-                    <p>Tippe unten im Safari-Browser auf den <strong>Teilen-Button</strong> (Quadrat mit Pfeil <i class="fa-solid fa-arrow-up-from-bracket text-rose-600"></i>).</p>
-                </div>
-                <div class="flex items-start gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                    <span class="w-6 h-6 rounded-full bg-rose-100 text-rose-700 font-bold flex items-center justify-center text-xs shrink-0">2</span>
-                    <p>Scrolle im Options-Menü nach unten und wähle <strong>"Zum Home-Bildschirm"</strong> (<i class="fa-solid fa-square-plus text-rose-600"></i>).</p>
-                </div>
-                <div class="flex items-start gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                    <span class="w-6 h-6 rounded-full bg-rose-100 text-rose-700 font-bold flex items-center justify-center text-xs shrink-0">3</span>
-                    <p>Bestätige mit <strong>"Hinzufügen"</strong>. Schon startet der Generator wie eine native iOS App!</p>
-                </div>
-            </div>
-
-            <button onclick="closeIOSGuide()" class="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs rounded-2xl transition">
-                Verstanden
-            </button>
-        </div>
+  <!-- 1. Live Scraper / Suche -->
+  <div class="panel">
+    <span class="panel-title">1. Cover Scraper (tonies.json Suche)</span>
+    <div class="form-row">
+      <input type="text" id="scraper-input" placeholder="Titel, Serie oder Modell eingeben (z. B. Paw Patrol, 01-0001)...">
+      <button id="search-btn">Suchen</button>
     </div>
-
-    <script>
-        // Global State
-        let toniesData = [];
-        let filteredTonies = [];
-        let selectedTonie = null;
-        let printQueue = [];
-        let activeCategory = '';
-
-        // 43mm at 96dpi — the pixel equivalent of the .capsule-size CSS box that both
-        // the editor preview and the print canvases are laid out in. Print canvases use
-        // a supersampled buffer so the sheet stays sharp at ~385dpi.
-        const CAPSULE_PX = 163;
-        const CAPSULE_SS = 4;
-
-        // 43mm is the reference diameter the transform state is expressed in. Other
-        // formats are derived from it, so switching format rescales a composition
-        // instead of invalidating it.
-        const CAPSULE_MM = 43;
-
-        // Sheet geometry in millimetres. The screen sheet, the browser printout and the
-        // 300dpi PNG export all place capsules from these numbers, so all three match
-        // the physical sheet. The L3415 values close exactly to A4:
-        // 16 + 4*40 + 3*6 + 16 = 210 and 13.5 + 6*40 + 5*6 + 13.5 = 297.
-        const FORMATS = {
-            capsule43: {
-                key: 'capsule43',
-                short: '43 mm',
-                diameter: 43,
-                cols: 4,
-                rows: 5,
-                marginLeft: 13,
-                marginTop: 12,
-                pitchX: 47,
-                pitchY: 49,
-                slotGuides: false,
-                heading: 'A4 Druckbogen (Exakte 43 mm Münzkapseln)',
-                caption: 'DIN A4 Druckbereich — 43 mm Münzkapsel-Raster',
-                fitNote: 'Passgenau für 43 mm Kapseln',
-                hint: 'Wichtig beim Drucken: Im Druckdialog Skalierung auf <strong>"100 %" bzw. "Tatsächliche Größe"</strong> stellen!'
-            },
-            label40: {
-                key: 'label40',
-                short: '40 mm',
-                diameter: 40,
-                cols: 4,
-                rows: 6,
-                marginLeft: 16,
-                marginTop: 13.5,
-                pitchX: 46,
-                pitchY: 46,
-                slotGuides: true,
-                heading: 'A4 Etikettenbogen (Avery Zweckform L3415, Ø 40 mm)',
-                caption: 'Avery Zweckform L3415 — 24 Etiketten (Ø 40 mm, 4 × 6)',
-                fitNote: 'Passgenau für Avery L3415 Etiketten',
-                hint: 'Wichtig beim Drucken: Skalierung <strong>"100 %"</strong> und Seitenränder <strong>"Keine"</strong> wählen — sonst verrutscht das Etikettenraster gegenüber dem Bogen!'
-            }
-        };
-
-        let activeFormat = FORMATS.capsule43;
-
-        const imageCache = new Map();
-        const taintingImages = new WeakSet();
-        let sheetRenderToken = 0;
-        let sheetRenderPromise = Promise.resolve();
-
-        let transformState = {
-            scale: 1,
-            rotation: 0,
-            x: 0,
-            y: 0,
-            bgColor: '#ffffff',
-            borderStyle: 'dashed-red',
-            overlayText: ''
-        };
-
-        // Maps the many raw category strings used across the Tonies catalog
-        // onto the four German labels shown in the filter pills.
-        const CATEGORY_LABELS = {
-            'audio-play': 'Hörspiel',
-            'audio-play-educational': 'Hörspiel',
-            'audio-book': 'Hörspiel',
-            'audio-book-songs': 'Hörspiel',
-            'Audiobook': 'Hörspiel',
-            'Hörspiele & Hörbücher': 'Hörspiel',
-            'music': 'Musik',
-            'Musik': 'Musik',
-            'audio-play-songs': 'Musik',
-            'Wissen': 'Wissen',
-            'Wissen & Lernen': 'Wissen',
-            'creative-tonie': 'Creative-Tonie',
-            'Creative Tonie': 'Creative-Tonie',
-            'JAKO-O': 'Sonstige',
-            'system': 'Sonstige',
-            'DEMO TONIE': 'Sonstige',
-            'Tonie': 'Sonstige'
-        };
-
-        // DOM elements
-        const searchInput = document.getElementById('search-input');
-        const searchResults = document.getElementById('search-results');
-        const resultCount = document.getElementById('result-count');
-        const dbStatus = document.getElementById('db-status');
-
-        const previewImg = document.getElementById('preview-img');
-        const previewCapsule = document.getElementById('preview-capsule');
-        const textCanvas = document.getElementById('text-canvas');
-        const cuttingGuide = document.getElementById('cutting-guide');
-
-        const zoomSlider = document.getElementById('zoom-slider');
-        const rotateSlider = document.getElementById('rotate-slider');
-        const posXSlider = document.getElementById('pos-x-slider');
-        const posYSlider = document.getElementById('pos-y-slider');
-        const bgColorInput = document.getElementById('bg-color');
-        const borderStyleSelect = document.getElementById('border-style');
-        const textOverlayInput = document.getElementById('text-overlay-input');
-
-        const zoomVal = document.getElementById('zoom-val');
-        const rotateVal = document.getElementById('rotate-val');
-        const posXVal = document.getElementById('pos-x-val');
-        const posYVal = document.getElementById('pos-y-val');
-
-        window.addEventListener('DOMContentLoaded', () => {
-            setFormat('capsule43');
-            initPWA();
-            fetchToniesDB();
-            setupTouchDrag();
-
-            searchInput.addEventListener('input', () => {
-                document.getElementById('clear-search').classList.toggle('hidden', searchInput.value.trim() === '');
-                filterTonies();
-            });
-        });
-
-        // Dynamic PWA Manifest and SW registration
-        function initPWA() {
-            const manifest = {
-                name: "Tonie Cover Generator",
-                short_name: "TonieCover",
-                start_url: "./",
-                display: "standalone",
-                background_color: "#ffffff",
-                theme_color: "#e11d48",
-                icons: [
-                    { src: "https://placehold.co/192x192/e11d48/ffffff?text=TonieCover", sizes: "192x192", type: "image/png" },
-                    { src: "https://placehold.co/512x512/e11d48/ffffff?text=TonieCover", sizes: "512x512", type: "image/png" }
-                ]
-            };
-            const stringManifest = JSON.stringify(manifest);
-            const blob = new Blob([stringManifest], {type: 'application/json'});
-            const manifestURL = URL.createObjectURL(blob);
-            document.getElementById('manifest-placeholder').setAttribute('href', manifestURL);
-
-            if ('serviceWorker' in navigator) {
-                const swCode = `
-                    self.addEventListener('install', e => self.skipWaiting());
-                    self.addEventListener('fetch', e => e.respondWith(fetch(e.request).catch(() => caches.match(e.request))));
-                `;
-                const swBlob = new Blob([swCode], {type: 'application/javascript'});
-                navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(() => {});
-            }
-        }
-
-        async function fetchToniesDB() {
-            try {
-                const res = await fetch('https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/toniesV2.json');
-                if (!res.ok) throw new Error('Network error');
-                const raw = await res.json();
-
-                // The upstream JSON groups localizations under `data: [...]` per
-                // article, so it's flattened here into the flat {title, pic, ...}
-                // shape the rest of the UI expects, using the first entry (mostly de-de).
-                toniesData = raw
-                    .map(entry => {
-                        const info = entry.data && entry.data[0];
-                        if (!info || !info.image) return null;
-                        return {
-                            article: entry.article,
-                            title: info.episode || info.series || 'Unbenannter Tonie',
-                            series: info.series || '',
-                            category: CATEGORY_LABELS[info.category] || info.category || 'Sonstige',
-                            pic: info.image,
-                            audioSample: info.sample || ''
-                        };
-                    })
-                    .filter(Boolean);
-
-                dbStatus.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-500"></i> ${toniesData.length} Tonies bereit`;
-                dbStatus.className = "text-[11px] flex items-center gap-1.5 text-emerald-700 pt-1 border-t border-slate-100 font-medium";
-
-                filterTonies();
-            } catch (err) {
-                console.error(err);
-                dbStatus.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-500"></i> Fehler beim Laden der Datenbank.`;
-            }
-        }
-
-        function filterTonies() {
-            const q = searchInput.value.trim().toLowerCase();
-
-            filteredTonies = toniesData.filter(item => {
-                const title = (item.title || '').toLowerCase();
-                const series = (item.series || '').toLowerCase();
-                const category = (item.category || '').toLowerCase();
-                const model = (item.model || '').toLowerCase();
-                const audioSample = (item.audioSample || '').toLowerCase();
-
-                const matchesQuery = !q || title.includes(q) || series.includes(q) || category.includes(q) || model.includes(q) || audioSample.includes(q);
-                const matchesCat = !activeCategory || category.toLowerCase().includes(activeCategory.toLowerCase()) || series.toLowerCase().includes(activeCategory.toLowerCase());
-
-                return matchesQuery && matchesCat;
-            });
-
-            resultCount.textContent = `${filteredTonies.length} gefunden`;
-            renderSearchResults();
-        }
-
-        function renderSearchResults() {
-            searchResults.innerHTML = '';
-            const slice = filteredTonies.slice(0, 40);
-
-            if (slice.length === 0) {
-                searchResults.innerHTML = `
-                    <div class="text-center py-6 text-slate-400 text-xs">
-                        Keine Tonies mit diesem Suchbegriff gefunden.
-                    </div>`;
-                return;
-            }
-
-            slice.forEach(item => {
-                const el = document.createElement('div');
-                el.className = 'p-2 flex items-center gap-3 hover:bg-rose-50/70 rounded-2xl cursor-pointer transition border border-transparent hover:border-rose-100 group';
-                el.onclick = () => selectTonie(item);
-
-                el.innerHTML = `
-                    <img src="${item.pic}" alt="${item.title}" class="w-9 h-9 object-contain rounded-xl bg-slate-100 p-0.5 border border-slate-200 shrink-0 group-hover:bg-white" onerror="this.src='https://placehold.co/80x80/f1f5f9/94a3b8?text=Tonie'">
-                    <div class="min-w-0 flex-1">
-                        <h4 class="text-xs font-bold text-slate-800 truncate group-hover:text-rose-600">${item.title}</h4>
-                        <p class="text-[10px] text-slate-400 truncate">${item.series || item.category || 'Standard Tonie'}</p>
-                    </div>
-                    <i class="fa-solid fa-circle-plus text-slate-300 text-sm group-hover:text-rose-500 transition"></i>
-                `;
-                searchResults.appendChild(el);
-            });
-        }
-
-        function setFilterCategory(cat) {
-            activeCategory = cat;
-            document.querySelectorAll('.filter-pill').forEach(btn => {
-                const isActive = btn.textContent.toLowerCase().includes(cat.toLowerCase()) || (cat === '' && btn.textContent === 'Alle');
-                btn.className = isActive
-                    ? 'filter-pill active border px-3 py-1 rounded-full text-xs font-semibold shrink-0 bg-rose-600 text-white border-rose-600'
-                    : 'filter-pill border px-3 py-1 rounded-full text-xs font-medium shrink-0 bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200';
-            });
-            filterTonies();
-        }
-
-        // Transform offsets are stored in the 43mm reference space, so the CSS preview
-        // has to be scaled by the same factor the print canvases are.
-        function formatScale() {
-            return activeFormat.diameter / CAPSULE_MM;
-        }
-
-        function slotsPerPage(fmt) {
-            return fmt.cols * fmt.rows;
-        }
-
-        // Top-left corner of a slot in millimetres from the page corner.
-        function slotPosition(fmt, slot) {
-            return {
-                x: fmt.marginLeft + (slot % fmt.cols) * fmt.pitchX,
-                y: fmt.marginTop + Math.floor(slot / fmt.cols) * fmt.pitchY
-            };
-        }
-
-        function setFormat(key) {
-            const fmt = FORMATS[key];
-            if (!fmt) return;
-            activeFormat = fmt;
-
-            document.documentElement.style.setProperty('--capsule-size', `${fmt.diameter}mm`);
-            document.title = `Cover-Generator für Tonie Custom Tags (${fmt.short})`;
-            document.getElementById('format-badge').innerText = fmt.short;
-            document.getElementById('preview-scale-label').innerText = `Vorschau (Exakt ${fmt.diameter}mm Scale)`;
-            document.getElementById('preview-fit-note').innerText = fmt.fitNote;
-            document.getElementById('sheet-heading').innerText = fmt.heading;
-            document.getElementById('sheet-hint').innerHTML = fmt.hint;
-
-            document.querySelectorAll('#format-switch .format-btn').forEach(btn => {
-                const active = btn.dataset.format === fmt.key;
-                btn.className = 'format-btn px-3 py-1.5 rounded-xl text-[11px] font-bold transition flex items-center gap-1.5 '
-                    + (active ? 'bg-white text-rose-700 shadow-sm' : 'text-rose-100/90 hover:bg-white/10');
-            });
-
-            updateTransform();
-            updatePrintSheetUI();
-        }
-
-        function selectTonie(item) {
-            selectedTonie = item;
-            document.getElementById('selected-badge').innerText = item.category || 'Tonie Cover';
-            document.getElementById('selected-title').innerText = item.title;
-            document.getElementById('selected-subtitle').innerText = item.series || 'Standard Tonie Vorlage';
-
-            previewImg.src = item.pic;
-            resetTransform();
-            document.getElementById('btn-add-sheet').disabled = false;
-        }
-
-        function handleCustomUpload(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (evt) => {
-                selectTonie({
-                    title: file.name.replace(/\.[^/.]+$/, ""),
-                    series: 'Eigenes Bild',
-                    category: 'Upload',
-                    pic: evt.target.result
-                });
-            };
-            reader.readAsDataURL(file);
-        }
-
-        function updateTransform() {
-            transformState.scale = parseFloat(zoomSlider.value);
-            transformState.rotation = parseInt(rotateSlider.value);
-            transformState.x = parseInt(posXSlider.value);
-            transformState.y = parseInt(posYSlider.value);
-
-            zoomVal.innerText = `${Math.round(transformState.scale * 100)}%`;
-            rotateVal.innerText = `${transformState.rotation}°`;
-            posXVal.innerText = `${transformState.x}px`;
-            posYVal.innerText = `${transformState.y}px`;
-
-            const k = formatScale();
-            previewImg.style.transform = `translate(${transformState.x * k}px, ${transformState.y * k}px) scale(${transformState.scale}) rotate(${transformState.rotation}deg)`;
-        }
-
-        function updateBgColor() {
-            transformState.bgColor = bgColorInput.value;
-            previewCapsule.style.backgroundColor = transformState.bgColor;
-        }
-
-        function updateBorderStyle() {
-            transformState.borderStyle = borderStyleSelect.value;
-            cuttingGuide.className = 'absolute inset-0 rounded-full pointer-events-none z-20 ';
-            if (transformState.borderStyle === 'dashed-red') {
-                cuttingGuide.className += 'border-2 border-dashed border-red-500/70';
-            } else if (transformState.borderStyle === 'solid-gray') {
-                cuttingGuide.className += 'border border-slate-400';
-            } else {
-                cuttingGuide.className += 'border-0';
-            }
-        }
-
-        function renderCurvedText() {
-            transformState.overlayText = textOverlayInput.value.trim();
-
-            const ctx = textCanvas.getContext('2d');
-            ctx.clearRect(0, 0, textCanvas.width, textCanvas.height);
-            drawCapsuleText(ctx, transformState.overlayText, textCanvas.width);
-        }
-
-        function resetTransform() {
-            zoomSlider.value = 1;
-            rotateSlider.value = 0;
-            posXSlider.value = 0;
-            posYSlider.value = 0;
-            bgColorInput.value = '#ffffff';
-            borderStyleSelect.value = 'dashed-red';
-            textOverlayInput.value = '';
-
-            updateTransform();
-            updateBgColor();
-            updateBorderStyle();
-            renderCurvedText();
-        }
-
-        function setupTouchDrag() {
-            let isDragging = false;
-            let startX, startY;
-
-            const startDrag = (e) => {
-                if (!selectedTonie) return;
-                isDragging = true;
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-                startX = clientX - transformState.x * formatScale();
-                startY = clientY - transformState.y * formatScale();
-            };
-
-            const moveDrag = (e) => {
-                if (!isDragging) return;
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-
-                const k = formatScale();
-                transformState.x = Math.max(-80, Math.min(80, Math.round((clientX - startX) / k)));
-                transformState.y = Math.max(-80, Math.min(80, Math.round((clientY - startY) / k)));
-
-                posXSlider.value = transformState.x;
-                posYSlider.value = transformState.y;
-                updateTransform();
-            };
-
-            const stopDrag = () => { isDragging = false; };
-
-            previewCapsule.addEventListener('mousedown', startDrag);
-            window.addEventListener('mousemove', moveDrag);
-            window.addEventListener('mouseup', stopDrag);
-
-            previewCapsule.addEventListener('touchstart', startDrag);
-            window.addEventListener('touchmove', moveDrag);
-            window.addEventListener('touchend', stopDrag);
-        }
-
-        function addToPrintSheet() {
-            if (!selectedTonie) return;
-            printQueue.push({
-                id: Date.now(),
-                title: selectedTonie.title,
-                pic: selectedTonie.pic,
-                transform: { ...transformState }
-            });
-            updatePrintSheetUI();
-        }
-
-        function removeFromPrintQueue(id) {
-            printQueue = printQueue.filter(i => i.id !== id);
-            updatePrintSheetUI();
-        }
-
-        function clearPrintSheet() {
-            printQueue = [];
-            updatePrintSheetUI();
-        }
-
-        function updatePrintSheetUI() {
-            const count = printQueue.length;
-            document.getElementById('sheet-count').innerText = count;
-
-            const badge = document.getElementById('print-badge');
-            if (count > 0) {
-                badge.innerText = count;
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-            }
-
-            // Render mini preview bar
-            const miniList = document.getElementById('mini-sheet-list');
-            if (count === 0) {
-                miniList.innerHTML = `<p class="text-slate-400 italic text-xs">Noch keine Tonie-Cover hinzugefügt.</p>`;
-            } else {
-                miniList.innerHTML = printQueue.map(item => `
-                    <div class="relative shrink-0 group">
-                        <div class="w-10 h-10 rounded-full overflow-hidden border border-slate-300 shadow-2xs relative" style="background-color: ${item.transform.bgColor};">
-                            <img src="${item.pic}" class="absolute inset-0 w-full h-full object-contain origin-center" style="transform: translate(${item.transform.x * 0.25}px, ${item.transform.y * 0.25}px) scale(${item.transform.scale}) rotate(${item.transform.rotation}deg);" onerror="this.src='https://placehold.co/80x80/f1f5f9/94a3b8?text=Tonie'">
-                        </div>
-                        <button onclick="removeFromPrintQueue(${item.id})" class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 text-[10px] flex items-center justify-center opacity-90 group-hover:opacity-100 shadow">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
-                    </div>
-                `).join('');
-            }
-
-            renderA4PrintGrid();
-        }
-
-        // Cover art lives on CDNs with inconsistent CORS support, so canvas-safe sources
-        // are tried in order: the same-origin Netlify Image CDN proxy first, then a CORS
-        // request, then a plain load as a last resort. A plain load still prints fine, it
-        // only taints the canvas and therefore blocks the PNG export.
-        function loadCapsuleImage(src) {
-            if (!src) return Promise.resolve(null);
-            if (imageCache.has(src)) return imageCache.get(src);
-
-            const attempt = (url, cors) => new Promise((resolve, reject) => {
-                const img = new Image();
-                if (cors) img.crossOrigin = 'anonymous';
-                img.decoding = 'sync';
-                img.onload = () => img.naturalWidth ? resolve(img) : reject(new Error(`Leeres Bild: ${url}`));
-                img.onerror = () => reject(new Error(`Bild nicht ladbar: ${url}`));
-                img.src = url;
-            });
-
-            const chain = /^https?:/i.test(src)
-                ? attempt(`/.netlify/images?url=${encodeURIComponent(src)}&w=1000`, false)
-                    .catch(() => attempt(src, true))
-                    .catch(() => attempt(src, false).then(img => {
-                        taintingImages.add(img);
-                        return img;
-                    }))
-                : attempt(src, false);
-
-            const pending = chain.catch(err => {
-                console.warn(err);
-                return null;
-            });
-            imageCache.set(src, pending);
-            return pending;
-        }
-
-        // Reproduces the editor preview 1:1 on a canvas of any resolution: the motif is
-        // fitted into the capsule box, centred, then offset/zoomed/rotated exactly like
-        // the CSS transform does on screen.
-        function drawCapsule(ctx, item, size, img) {
-            const t = item.transform;
-            const k = size / CAPSULE_PX;
-            const r = size / 2;
-
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(r, r, r, 0, Math.PI * 2);
-            ctx.closePath();
-            ctx.clip();
-
-            ctx.fillStyle = t.bgColor || '#ffffff';
-            ctx.fillRect(0, 0, size, size);
-
-            if (img) {
-                const fit = Math.min(size / img.naturalWidth, size / img.naturalHeight);
-                const w = img.naturalWidth * fit;
-                const h = img.naturalHeight * fit;
-
-                ctx.save();
-                ctx.translate(r + t.x * k, r + t.y * k);
-                ctx.scale(t.scale, t.scale);
-                ctx.rotate(t.rotation * Math.PI / 180);
-                ctx.drawImage(img, -w / 2, -h / 2, w, h);
-                ctx.restore();
-            } else {
-                ctx.fillStyle = '#94a3b8';
-                ctx.font = `600 ${11 * k}px 'Plus Jakarta Sans', sans-serif`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('Bild fehlt', r, r);
-            }
-
-            drawCapsuleText(ctx, t.overlayText, size);
-            ctx.restore();
-
-            drawCapsuleBorder(ctx, t.borderStyle, size);
-        }
-
-        function drawCapsuleText(ctx, text, size) {
-            const label = (text || '').trim();
-            if (!label) return;
-
-            const k = size / CAPSULE_PX;
-            const center = size / 2;
-            const radius = 68 * k;
-            const anglePerChar = 0.12;
-            const startAngle = -Math.PI / 2 - ((label.length - 1) * anglePerChar) / 2;
-
-            ctx.save();
-            ctx.font = `bold ${11 * k}px 'Plus Jakarta Sans', sans-serif`;
-            ctx.fillStyle = '#000000';
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'alphabetic';
-
-            for (let i = 0; i < label.length; i++) {
-                const angle = startAngle + i * anglePerChar;
-                ctx.save();
-                ctx.translate(center + radius * Math.cos(angle), center + radius * Math.sin(angle));
-                ctx.rotate(angle + Math.PI / 2);
-                ctx.fillText(label[i], 0, 0);
-                ctx.restore();
-            }
-            ctx.restore();
-        }
-
-        function drawCapsuleBorder(ctx, style, size) {
-            if (style === 'none') return;
-
-            const k = size / CAPSULE_PX;
-            const lineWidth = (style === 'solid-gray' ? 1 : 2) * k;
-
-            ctx.save();
-            ctx.lineWidth = lineWidth;
-            ctx.strokeStyle = style === 'solid-gray' ? '#94a3b8' : 'rgba(239, 68, 68, 0.7)';
-            if (style !== 'solid-gray') ctx.setLineDash([4 * k, 3 * k]);
-            ctx.beginPath();
-            ctx.arc(size / 2, size / 2, size / 2 - lineWidth / 2, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.restore();
-        }
-
-        function setSheetStatus(html) {
-            document.getElementById('sheet-status').innerHTML = html;
-        }
-
-        function setSheetActionsEnabled(enabled) {
-            document.getElementById('btn-print-sheet').disabled = !enabled;
-            document.getElementById('btn-png-sheet').disabled = !enabled;
-        }
-
-        // All motifs are preloaded before anything is drawn — drawing while images are
-        // still in flight is what leaves blank circles on the sheet. One .sheet-page is
-        // built per physical A4 page and each capsule is placed at its exact millimetre
-        // slot, so what the browser prints is the sheet itself.
-        function renderA4PrintGrid() {
-            const host = document.getElementById('sheet-pages');
-            const token = ++sheetRenderToken;
-            const fmt = activeFormat;
-
-            if (printQueue.length === 0) {
-                host.innerHTML = `
-                    <div class="w-full max-w-4xl text-center py-20 text-slate-400 text-sm no-print">
-                        Der Druckbogen ist noch leer. Füge Cover aus dem Editor hinzu.
-                    </div>`;
-                setSheetStatus('');
-                setSheetActionsEnabled(false);
-                sheetRenderPromise = Promise.resolve();
-                return sheetRenderPromise;
-            }
-
-            const items = printQueue.slice();
-            setSheetStatus('<i class="fa-solid fa-spinner fa-spin text-rose-500"></i> Motive werden für den Druck geladen …');
-            setSheetActionsEnabled(false);
-
-            sheetRenderPromise = Promise.all(items.map(item => loadCapsuleImage(item.pic)))
-                .then(images => {
-                    if (token !== sheetRenderToken) return;
-
-                    const perPage = slotsPerPage(fmt);
-                    const pageCount = Math.ceil(items.length / perPage);
-                    const size = Math.round(fmt.diameter / 25.4 * 96 * CAPSULE_SS);
-
-                    host.innerHTML = '';
-
-                    for (let page = 0; page < pageCount; page++) {
-                        const sheet = document.createElement('div');
-                        sheet.className = 'sheet-page';
-
-                        const caption = document.createElement('div');
-                        caption.className = 'no-print absolute inset-x-0 top-2 text-center text-[10px] text-slate-400';
-                        caption.textContent = pageCount > 1
-                            ? `${fmt.caption} — Seite ${page + 1} von ${pageCount}`
-                            : fmt.caption;
-                        sheet.appendChild(caption);
-
-                        // On a pre-cut label sheet the empty positions matter too, so
-                        // every slot gets a screen-only ring to check the alignment.
-                        if (fmt.slotGuides) {
-                            for (let slot = 0; slot < perPage; slot++) {
-                                const pos = slotPosition(fmt, slot);
-                                const ring = document.createElement('div');
-                                ring.className = 'sheet-slot no-print border border-dashed border-slate-300';
-                                ring.style.left = `${pos.x}mm`;
-                                ring.style.top = `${pos.y}mm`;
-                                ring.style.width = `${fmt.diameter}mm`;
-                                ring.style.height = `${fmt.diameter}mm`;
-                                sheet.appendChild(ring);
-                            }
-                        }
-
-                        items.slice(page * perPage, (page + 1) * perPage).forEach((item, slot) => {
-                            const pos = slotPosition(fmt, slot);
-
-                            const canvas = document.createElement('canvas');
-                            canvas.width = size;
-                            canvas.height = size;
-                            canvas.className = 'sheet-slot';
-                            canvas.style.left = `${pos.x}mm`;
-                            canvas.style.top = `${pos.y}mm`;
-                            canvas.style.width = `${fmt.diameter}mm`;
-                            canvas.style.height = `${fmt.diameter}mm`;
-                            drawCapsule(canvas.getContext('2d'), item, size, images[page * perPage + slot]);
-
-                            const label = document.createElement('span');
-                            label.className = 'no-print absolute block text-[8px] leading-none text-slate-400 text-center truncate px-0.5';
-                            label.style.left = `${pos.x}mm`;
-                            label.style.top = `${pos.y + fmt.diameter + 0.8}mm`;
-                            label.style.width = `${fmt.diameter}mm`;
-                            label.textContent = item.title;
-
-                            sheet.appendChild(canvas);
-                            sheet.appendChild(label);
-                        });
-
-                        const frame = document.createElement('div');
-                        frame.className = 'sheet-frame';
-                        frame.appendChild(sheet);
-                        host.appendChild(frame);
-                    }
-
-                    fitSheetToViewport();
-
-                    const missing = images.filter(img => !img).length;
-                    setSheetStatus(missing
-                        ? `<i class="fa-solid fa-triangle-exclamation text-amber-500"></i> ${items.length - missing} von ${items.length} Motiven gezeichnet — ${missing} Bild(er) nicht erreichbar.`
-                        : `<i class="fa-solid fa-circle-check text-emerald-500"></i> ${items.length} Motiv(e) druckfertig auf ${pageCount} A4-Seite(n) — ${perPage} pro Bogen.`);
-                    setSheetActionsEnabled(true);
-                });
-
-            return sheetRenderPromise;
-        }
-
-        async function printSheet() {
-            if (printQueue.length === 0) return;
-
-            await sheetRenderPromise;
-            await new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
-            window.print();
-        }
-
-        // Renders the queue onto full A4 pages at 300dpi and downloads them as PNG.
-        async function downloadSheetPNG() {
-            if (printQueue.length === 0) return;
-
-            await sheetRenderPromise;
-            const fmt = activeFormat;
-            const items = printQueue.slice();
-            const images = await Promise.all(items.map(item => loadCapsuleImage(item.pic)));
-
-            const mm = value => Math.round(value * 300 / 25.4);
-            const pageW = mm(210);
-            const pageH = mm(297);
-            const capsule = mm(fmt.diameter);
-            const perPage = slotsPerPage(fmt);
-            const pages = Math.ceil(items.length / perPage);
-
-            for (let page = 0; page < pages; page++) {
-                const canvas = document.createElement('canvas');
-                canvas.width = pageW;
-                canvas.height = pageH;
-
-                const ctx = canvas.getContext('2d');
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, pageW, pageH);
-
-                items.slice(page * perPage, (page + 1) * perPage).forEach((item, slot) => {
-                    const pos = slotPosition(fmt, slot);
-                    ctx.save();
-                    ctx.translate(mm(pos.x), mm(pos.y));
-                    drawCapsule(ctx, item, capsule, images[page * perPage + slot]);
-                    ctx.restore();
-                });
-
-                let dataURL;
-                try {
-                    dataURL = canvas.toDataURL('image/png');
-                } catch (err) {
-                    console.error(err);
-                    setSheetStatus('<i class="fa-solid fa-triangle-exclamation text-amber-500"></i> PNG-Export vom Browser blockiert (CORS) — bitte "Drucken" nutzen.');
-                    return;
-                }
-
-                const link = document.createElement('a');
-                link.href = dataURL;
-                link.download = pages > 1
-                    ? `toniecover-a4-${fmt.diameter}mm-seite-${page + 1}.png`
-                    : `toniecover-a4-${fmt.diameter}mm.png`;
-                link.click();
-
-                await new Promise(resolve => setTimeout(resolve, 400));
-            }
-
-            setSheetStatus(`<i class="fa-solid fa-circle-check text-emerald-500"></i> ${pages} A4-Seite(n) als PNG gespeichert (300dpi, Druck auf 100 % stellen).`);
-        }
-
-        function switchTab(tab) {
-            const viewEditor = document.getElementById('view-editor');
-            const viewPrint = document.getElementById('view-print');
-            if (tab === 'editor') {
-                viewEditor.classList.remove('hidden');
-                viewPrint.classList.add('hidden');
-            } else {
-                viewEditor.classList.add('hidden');
-                viewPrint.classList.remove('hidden');
-                fitSheetToViewport();
-            }
-        }
-
-        // A sheet is laid out at its real 210x297mm so the slots stay printable at 1:1,
-        // which is wider than a phone screen — so it is visually scaled down and its
-        // frame is given the resulting size, keeping the whole page visible and centred.
-        function fitSheetToViewport() {
-            const host = document.getElementById('sheet-pages');
-            if (!host || host.offsetParent === null) return;
-
-            const frames = host.querySelectorAll('.sheet-frame');
-            if (!frames.length) return;
-
-            const available = host.clientWidth;
-            const naturalWidth = frames[0].firstElementChild.offsetWidth;
-            if (!available || !naturalWidth) return;
-
-            const scale = Math.min(1, available / naturalWidth);
-            frames.forEach(frame => {
-                const page = frame.firstElementChild;
-                page.style.setProperty('--sheet-scale', scale);
-                frame.style.width = Math.floor(naturalWidth * scale) + 'px';
-                frame.style.height = Math.ceil(page.offsetHeight * scale) + 'px';
-            });
-        }
-
-        window.addEventListener('resize', fitSheetToViewport);
-        window.addEventListener('orientationchange', fitSheetToViewport);
-
-        function clearSearch() {
-            searchInput.value = '';
-            document.getElementById('clear-search').classList.add('hidden');
-            filterTonies();
-        }
-
-        function openIOSGuide() {
-            document.getElementById('ios-guide-modal').classList.remove('hidden');
-        }
-
-        function closeIOSGuide() {
-            document.getElementById('ios-guide-modal').classList.add('hidden');
-        }
-    </script>
-    <!-- Rechtlicher Hinweis & Support -->
-    <footer class="no-print mt-auto border-t border-slate-200 bg-white/70">
-        <div class="max-w-4xl mx-auto px-4 py-6 space-y-4">
-            <div class="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-3.5">
-                <i class="fa-solid fa-circle-info text-slate-400 mt-0.5"></i>
-                <div class="text-[11px] leading-relaxed text-slate-500">
-                    <p class="font-bold text-slate-700 text-xs mb-1">Hinweis zur Nutzung</p>
-                    <p>
-                        Alle angezeigten Cover-Motive stammen aus der öffentlichen Tonies-Datenbank und sind
-                        Eigentum der jeweiligen Rechteinhaber (u.&nbsp;a. tonies GmbH und deren Lizenzgeber).
-                        Sie dürfen ausschließlich für <strong>private, nicht-kommerzielle Zwecke</strong> genutzt
-                        werden — etwa zum Bedrucken eigener Tonie Custom Tags. Weitergabe, Verkauf oder jede
-                        kommerzielle Verwendung der Motive und der damit erstellten Druckbogen ist nicht gestattet.
-                        Dieses Projekt ist ein privates Fan-Werkzeug und steht in keiner Verbindung zur tonies GmbH.
-                    </p>
-                </div>
-            </div>
-
-            <div class="flex items-start gap-3 rounded-2xl border border-rose-100 bg-rose-50/60 p-3.5">
-                <i class="fa-solid fa-heart text-rose-500 mt-0.5"></i>
-                <div class="text-[11px] leading-relaxed text-slate-600">
-                    <p class="font-bold text-slate-700 text-xs mb-1">Support ist willkommen</p>
-                    <p>
-                        Der Generator läuft kostenlos auf Netlify — jeder Aufruf verbraucht allerdings
-                        Build- und Traffic-Credits. Wer das Projekt unterstützen möchte, kann eine
-                        <a href="https://app.netlify.com/start" target="_blank" rel="noopener noreferrer" class="font-semibold text-rose-600 hover:underline">eigene Kopie bei Netlify deployen</a>
-                        (das entlastet die Credits hier) oder sich die
-                        <a href="https://www.netlify.com/pricing/" target="_blank" rel="noopener noreferrer" class="font-semibold text-rose-600 hover:underline">Netlify-Pläne und Credit-Optionen</a>
-                        ansehen, um Hosting-Kosten mitzutragen. Danke für jede Unterstützung!
-                    </p>
-                </div>
-            </div>
+    <div id="status-msg" style="font-size: 12px; color: #666;"></div>
+    <div id="search-results"></div>
+  </div>
+
+  <!-- 2. Tag-Konfiguration -->
+  <div class="panel">
+    <span class="panel-title">2. Abmessungen & Duplex-Option</span>
+    <div class="form-row">
+      <label>Preset:
+        <select id="preset-select">
+          <option value="43" selected>Münzkapsel Standard (43 mm)</option>
+          <option value="40">Münzkapsel Klein (40 mm)</option>
+          <option value="30">RFIDfriend Token / Coin Tag (30 mm)</option>
+          <option value="25">RFIDfriend Sticker / Coin (25 mm)</option>
+          <option value="custom">Benutzerdefiniert...</option>
+        </select>
+      </label>
+      <label id="custom-size-wrap" style="display: none;">Durchmesser (mm):
+        <input type="number" id="custom-size" value="43" min="15" max="80" style="width: 70px;">
+      </label>
+      <label>Anzahl Tags:
+        <input type="number" id="tag-count" value="4" min="1" max="18" style="width: 60px;">
+      </label>
+    </div>
+    <div class="form-row">
+      <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+        <input type="checkbox" id="duplex-toggle">
+        <strong>Duplex-Option aktivieren (Vorder- & Rückseite zum Falten)</strong>
+      </label>
+      <label style="display: flex; align-items: center; gap: 6px; margin-left: 20px; cursor: pointer;">
+        <input type="checkbox" id="model-tag-toggle" checked>
+        Modell / Audio-ID klein andrucken
+      </label>
+    </div>
+  </div>
+
+  <div style="text-align: right;">
+    <button onclick="window.print()" style="font-size: 16px; padding: 10px 24px;">🖨️ Drucken / PDF speichern</button>
+  </div>
+</div>
+
+<!-- A4 Print Canvas -->
+<div class="print-sheet">
+  <div class="calibration-bar">
+    <span>Maßstabs-Prüfung (50 mm):</span>
+    <div class="ruler"></div>
+    <span>(Beim Drucken: „Tatsächliche Größe / 100 %“ wählen!)</span>
+  </div>
+  <div class="tag-grid" id="sheet-grid"></div>
+</div>
+
+<script>
+  const TONIES_JSON_URL = "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json";
+  let db = [];
+  let currentCover = "";
+  let currentModel = "";
+  let currentTitle = "";
+
+  const scraperInput = document.getElementById("scraper-input");
+  const searchBtn = document.getElementById("search-btn");
+  const statusMsg = document.getElementById("status-msg");
+  const searchResults = document.getElementById("search-results");
+  const presetSelect = document.getElementById("preset-select");
+  const customSizeWrap = document.getElementById("custom-size-wrap");
+  const customSizeInput = document.getElementById("custom-size");
+  const tagCountInput = document.getElementById("tag-count");
+  const duplexToggle = document.getElementById("duplex-toggle");
+  const modelTagToggle = document.getElementById("model-tag-toggle");
+  const sheetGrid = document.getElementById("sheet-grid");
+
+  async function loadDatabase() {
+    if (db.length > 0) return;
+    statusMsg.textContent = "Lade Tonie-Katalog...";
+    try {
+      const res = await fetch(TONIES_JSON_URL);
+      db = await res.json();
+      statusMsg.textContent = `${db.length} Tonies geladen.`;
+    } catch (err) {
+      statusMsg.textContent = "Fehler beim Laden der tonies.json.";
+    }
+  }
+
+  function runSearch() {
+    const q = scraperInput.value.trim().toLowerCase();
+    searchResults.innerHTML = "";
+    if (!q) return;
+
+    if (db.length === 0) {
+      loadDatabase().then(runSearch);
+      return;
+    }
+
+    const matches = db.filter(item => {
+      const t = (item.title || "").toLowerCase();
+      const s = (item.series || "").toLowerCase();
+      const e = (item.episodes || "").toLowerCase();
+      const m = (item.model || "").toLowerCase();
+      return t.includes(q) || s.includes(q) || e.includes(q) || m.includes(q);
+    }).slice(0, 24);
+
+    if (matches.length === 0) {
+      statusMsg.textContent = "Keine Treffer gefunden.";
+      return;
+    }
+    statusMsg.textContent = `${matches.length} Treffer (Klick wählt das Cover):`;
+
+    matches.forEach(item => {
+      if (!item.pic) return;
+      const card = document.createElement("div");
+      card.className = "result-card";
+      card.innerHTML = `
+        <img src="${item.pic}" crossorigin="anonymous" />
+        <div style="margin-top:4px; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+          ${item.episodes || item.title || "Tonie"}
         </div>
-    </footer>
+      `;
+      card.onclick = () => {
+        currentCover = item.pic;
+        currentModel = item.model || "";
+        currentTitle = item.episodes || item.title || "";
+        statusMsg.textContent = `Aktiv: ${currentTitle} (${currentModel})`;
+        renderGrid();
+      };
+      searchResults.appendChild(card);
+    });
+  }
 
+  function getDiameter() {
+    return presetSelect.value === "custom" ? parseFloat(customSizeInput.value) || 43 : parseFloat(presetSelect.value);
+  }
+
+  function renderGrid() {
+    sheetGrid.innerHTML = "";
+    const diameter = getDiameter();
+    const count = parseInt(tagCountInput.value) || 1;
+    const isDuplex = duplexToggle.checked;
+    const showModel = modelTagToggle.checked;
+
+    for (let i = 0; i < count; i++) {
+      const slot = document.createElement("div");
+      slot.className = "tag-slot";
+
+      // Front
+      const front = document.createElement("div");
+      front.className = "coin-circle";
+      front.style.width = `${diameter}mm`;
+      front.style.height = `${diameter}mm`;
+      if (currentCover) front.style.backgroundImage = `url('${currentCover}')`;
+
+      if (showModel && currentModel) {
+        const lbl = document.createElement("div");
+        lbl.className = "tag-info-text";
+        lbl.textContent = currentModel;
+        front.appendChild(lbl);
+      }
+      slot.appendChild(front);
+
+      // Back (Duplex Option)
+      if (isDuplex) {
+        const fold = document.createElement("div");
+        fold.className = "duplex-separator";
+        slot.appendChild(fold);
+
+        const back = document.createElement("div");
+        back.className = "coin-circle";
+        back.style.width = `${diameter}mm`;
+        back.style.height = `${diameter}mm`;
+        back.style.background = "#fff";
+        back.innerHTML = `
+          <div style="font-size: 8pt; font-weight: bold; text-align: center; padding: 4px; max-width: 90%;">
+            ${currentTitle || "Tonie"}
+          </div>
+          <div style="font-size: 6pt; font-family: monospace; color: #555; margin-top: 2px;">
+            ${currentModel ? "ID: " + currentModel : ""}
+          </div>
+        `;
+        slot.appendChild(back);
+      }
+
+      sheetGrid.appendChild(slot);
+    }
+  }
+
+  // Events
+  searchBtn.onclick = runSearch;
+  scraperInput.onkeydown = e => { if (e.key === "Enter") runSearch(); };
+  scraperInput.onfocus = loadDatabase;
+  presetSelect.onchange = () => {
+    customSizeWrap.style.display = presetSelect.value === "custom" ? "inline-block" : "none";
+    renderGrid();
+  };
+  customSizeInput.oninput = renderGrid;
+  tagCountInput.oninput = renderGrid;
+  duplexToggle.onchange = renderGrid;
+  modelTagToggle.onchange = renderGrid;
+
+  // Initialer Render
+  renderGrid();
+</script>
 </body>
 </html>
