@@ -3,17 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Tonie & Tag Cover Generator V5</title>
+<title>Tonie & Tag Cover Generator V6</title>
 <style>
 :root {
 --primary: #e30613;
 --primary-hover: #c5050f;
---bg: #f4f6f9;
+--bg: #f8fafc;
 --card-bg: #ffffff;
---text-main: #1e293b;
+--text-main: #0f172a;
 --text-muted: #64748b;
---border: #cbd5e1;
---radius: 14px;
+--border: #e2e8f0;
+--radius: 16px;
 --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
 --selected: #2563eb;
 }
@@ -23,15 +23,15 @@ font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, s
 background: var(--bg);
 color: var(--text-main);
 margin: 0;
-padding: 12px;
+padding: 16px;
 -webkit-font-smoothing: antialiased;
 }
-.app-container { max-width: 900px; margin: 0 auto; padding-bottom: 40px; }
+.app-wrapper { max-width: 850px; margin: 0 auto; padding-bottom: 50px; }
 /* Header */
-header { text-align: center; margin: 15px 0 25px 0; }
-h1 { color: var(--primary); font-size: 24px; font-weight: 800; margin: 0 0 6px 0; letter-spacing: -0.5px; }
+header { text-align: center; margin: 10px 0 24px 0; }
+h1 { color: var(--primary); font-size: 26px; font-weight: 800; margin: 0 0 6px 0; letter-spacing: -0.5px; }
 .subtitle { font-size: 13px; color: var(--text-muted); font-weight: 500; }
-/* Cards / Panels */
+/* Cards */
 .card {
 background: var(--card-bg);
 border: 1px solid var(--border);
@@ -40,12 +40,12 @@ padding: 20px;
 margin-bottom: 16px;
 box-shadow: var(--shadow);
 }
-.card-title { font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
-/* Source Tabs */
+.card-header { font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; }
+/* Source Switcher Tabs */
 .source-tabs {
 display: grid;
 grid-template-columns: repeat(3, 1fr);
-background: #e2e8f0;
+background: #f1f5f9;
 padding: 4px;
 border-radius: 12px;
 gap: 4px;
@@ -66,10 +66,10 @@ text-align: center;
 .source-tab.active {
 background: #ffffff;
 color: var(--primary);
-box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+box-shadow: 0 2px 6px rgba(0,0,0,0.06);
 }
-/* Search Bar & Inputs */
-.search-row { display: flex; gap: 8px; }
+/* Inputs & Buttons */
+.search-box { display: flex; gap: 8px; }
 input[type="text"], select {
 flex: 1;
 padding: 12px 14px;
@@ -106,18 +106,18 @@ gap: 6px;
 .btn-danger { background: #ef4444; color: #fff; }
 .btn-danger:hover { background: #dc2626; }
 .btn-full { width: 100%; padding: 14px; font-size: 15px; }
-.status-text { font-size: 12px; color: var(--text-muted); margin-top: 8px; min-height: 18px; font-weight: 500; }
-/* Search Results Grid */
+.status-msg { font-size: 12px; color: var(--text-muted); margin-top: 8px; min-height: 18px; font-weight: 500; }
+/* Results Grid */
 .results-grid {
 display: grid;
 grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
 gap: 10px;
-max-height: 250px;
+max-height: 240px;
 overflow-y: auto;
 margin-top: 12px;
 padding-right: 4px;
 }
-.result-item {
+.result-card {
 background: #fff;
 border: 1px solid var(--border);
 border-radius: 10px;
@@ -127,25 +127,22 @@ cursor: pointer;
 position: relative;
 transition: transform 0.15s, border-color 0.15s;
 }
-.result-item:hover { border-color: var(--primary); transform: translateY(-2px); }
-.result-item img { width: 100%; height: 75px; object-fit: contain; margin-bottom: 4px; }
-.result-item .title { font-size: 11px; font-weight: 700; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.result-item .add-badge {
+.result-card:hover { border-color: var(--primary); transform: translateY(-2px); }
+.result-card img { width: 100%; height: 75px; object-fit: contain; margin-bottom: 4px; }
+.result-card .title { font-size: 11px; font-weight: 700; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.result-card .badge {
 position: absolute; top: -5px; right: -5px; background: var(--primary); color: #fff; width: 20px; height: 20px;
 border-radius: 50%; font-size: 13px; font-weight: bold; display: none; align-items: center; justify-content: center;
 }
-.result-item:hover .add-badge { display: flex; }
+.result-card:hover .badge { display: flex; }
 /* Editor Card (Step 2) */
-.mode-switch { display: flex; background: #e2e8f0; padding: 3px; border-radius: 10px; margin-bottom: 14px; }
-.mode-btn { flex: 1; border: none; background: transparent; padding: 8px; font-size: 12px; font-weight: 700; color: var(--text-muted); border-radius: 8px; cursor: pointer; }
-.mode-btn.active { background: #fff; color: var(--text-main); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-.editor-preview-container { display: flex; justify-content: center; padding: 15px; background: #f8fafc; border-radius: 12px; border: 1.5px dashed var(--border); margin-bottom: 14px; }
-.pro-controls { display: grid; grid-template-columns: 1fr; gap: 10px; }
-@media(min-width: 600px) { .pro-controls { grid-template-columns: 1fr 1fr; } }
-.control-group label { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px; }
+.editor-preview-box { display: flex; justify-content: center; padding: 16px; background: #f8fafc; border-radius: 12px; border: 1.5px dashed var(--border); margin-bottom: 14px; }
+.controls-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 14px; }
+@media(min-width: 600px) { .controls-grid { grid-template-columns: 1fr 1fr; } }
+.control-group label { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
 input[type="range"] { width: 100%; accent-color: var(--primary); }
-/* Print Sheet & Preview */
-.print-preview-wrapper { width: 100%; background: #cbd5e1; padding: 16px; border-radius: var(--radius); margin-top: 16px; display: flex; flex-direction: column; align-items: center; overflow: hidden; }
+/* Print Preview & Sheet */
+.preview-section { width: 100%; background: #cbd5e1; padding: 16px; border-radius: var(--radius); margin-top: 16px; display: flex; flex-direction: column; align-items: center; overflow: hidden; }
 .print-sheet { background: #fff; width: 210mm; min-height: 297mm; box-shadow: 0 15px 30px rgba(0,0,0,0.15); position: relative; flex-shrink: 0; transform-origin: top center; }
 @media screen and (max-width: 850px) { .print-sheet { transform: scale(0.38); margin-bottom: -183mm; } }
 @media screen and (max-width: 500px) { .print-sheet { transform: scale(0.32); margin-bottom: -201mm; } }
@@ -156,36 +153,36 @@ input[type="range"] { width: 100%; accent-color: var(--primary); }
 .coin-circle {
 border-radius: 50%; border: 0.5pt dashed #94a3b8; position: relative; overflow: hidden; background-color: #fff; display: flex; justify-content: center;
 }
-.coin-circle.selected { border: 3px solid var(--selected); box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.25); }
+.coin-circle.selected { border: 3px solid var(--selected); box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.2); }
 .coin-circle.empty { background: #f1f5f9; border: 1px dashed #cbd5e1; }
 .coin-circle.empty::after { content: "+"; color: #94a3b8; font-size: 20px; font-weight: bold; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 .coin-img-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-repeat: no-repeat; background-position: center; pointer-events: none; }
-.tag-info-text {
+.tag-text {
 position: absolute; left: 50%; transform: translateX(-50%); width: 72%; text-align: center;
-font-size: 5.5pt; font-family: system-ui, sans-serif; font-weight: 800; color: #111;
+font-size: 5pt; font-family: system-ui, sans-serif; font-weight: 800; color: #111;
 background: rgba(255, 255, 255, 0.92); padding: 2px 4px; border-radius: 4px; z-index: 2; line-height: 1.1;
 display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; pointer-events: none;
 }
-.tag-info-text.top { top: 3mm; }
-.tag-info-text.bottom { bottom: 3mm; }
+.tag-text.top { top: 3mm; }
+.tag-text.bottom { bottom: 3mm; }
 /* Modals */
 .modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(4px); }
-.modal-content { background: #fff; width: 100%; max-width: 420px; border-radius: var(--radius); padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); text-align: center; }
+.modal-box { background: #fff; width: 100%; max-width: 400px; border-radius: var(--radius); padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); text-align: center; }
 .modal-title { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
-.modal-body { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
-.modal-actions { display: flex; gap: 10px; justify-content: center; }
-/* Footer & Disclaimer */
+.modal-desc { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+.modal-btns { display: flex; gap: 10px; justify-content: center; }
+/* Footer */
 .footer-box {
 margin-top: 24px; padding: 20px; font-size: 11px; color: var(--text-muted); text-align: center; line-height: 1.6;
 background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
 }
 .footer-box a { color: var(--primary); text-decoration: none; font-weight: 700; }
 .footer-box a:hover { text-decoration: underline; }
-/* Print optimizations */
+/* Print rules */
 @media print {
 body { background: #fff; margin: 0; padding: 0; }
 .no-print, .modal-backdrop { display: none !important; }
-.print-preview-wrapper { background: transparent; padding: 0; margin: 0; overflow: visible; display: block; }
+.preview-section { background: transparent; padding: 0; margin: 0; overflow: visible; display: block; }
 .print-sheet { transform: none !important; box-shadow: none; margin: 0; padding: 0; width: 210mm; height: 297mm; }
 .coin-circle { border: 0.5pt dashed #94a3b8 !important; }
 .coin-circle.empty { display: none !important; }
@@ -194,62 +191,58 @@ body { background: #fff; margin: 0; padding: 0; }
 </style>
 </head>
 <body>
-<div class="app-container">
+<div class="app-wrapper">
 <header class="no-print">
-<h1>Tonie & Tag Cover Generator V5</h1>
+<h1>Tonie & Tag Cover Generator V6</h1>
 <div class="subtitle">Der elegante Designer für Münzkapseln, RFIDfriend Token & Avery Etiketten</div>
 </header>
 <!-- SEKTION 1: SUCHEN & HINZUFÜGEN -->
 <div class="card no-print">
-<div class="card-title">
+<div class="card-header">
 <span>1. Cover auswählen & hinzufügen</span>
-<button type="button" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="openClearModal()">🗑️ Bogen leeren</button>
+<button type="button" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="openModal('clear')">🗑️ Bogen leeren</button>
 </div>
+<!-- Tabs -->
 <div class="source-tabs">
 <button type="button" class="source-tab active" data-source="tonie" onclick="switchSource('tonie')">🪀 Tonie-Figuren</button>
 <button type="button" class="source-tab" data-source="album" onclick="switchSource('album')">🎵 Apple Alben</button>
 <button type="button" class="source-tab" data-source="upload" onclick="switchSource('upload')">📁 Eigene Grafik</button>
 </div>
-<!-- Suchfeld Bereich -->
-<div id="search-input-area">
-<div class="search-row">
+<!-- Suchfeld -->
+<div id="search-container">
+<div class="search-box">
 <input type="text" id="search-input" placeholder="Titel oder Serie eingeben (z.B. Conni)...">
 <button type="button" class="btn" id="search-btn">Suchen</button>
 </div>
-<div class="status-text" id="db-status">Lade Datenbank...</div>
+<div class="status-msg" id="db-status">Lade Datenbank...</div>
 <div class="results-grid" id="search-results"></div>
 </div>
 <!-- Upload Bereich -->
-<div id="upload-input-area" style="display: none; text-align: center; padding: 25px; border: 2px dashed var(--border); border-radius: 12px; background: #f8fafc;">
+<div id="upload-container" style="display: none; text-align: center; padding: 25px; border: 2px dashed var(--border); border-radius: 12px; background: #f8fafc;">
 <p style="font-size: 13px; color: var(--text-muted); margin: 0 0 12px 0; font-weight: 500;">Lade ein eigenes Artwork oder Foto von deinem Gerät hoch:</p>
-<input type="file" id="custom-file-input" accept="image/*" style="display: none;">
-<button type="button" class="btn" onclick="document.getElementById('custom-file-input').click()">🖼️ Bilddatei auswählen</button>
+<input type="file" id="custom-file" accept="image/*" style="display: none;">
+<button type="button" class="btn" onclick="document.getElementById('custom-file').click()">🖼️ Bilddatei auswählen</button>
 </div>
 </div>
-<!-- SEKTION 2: FEINTUNING (WIRD NUR GEZEIGT, WENN EIN ETIKETT GEWÄHLT IST) -->
+<!-- SEKTION 2: EDITOR (NUR BEI AUSWAHL SICHTBAR) -->
 <div class="card no-print" id="editor-card" style="display: none; border: 2px solid var(--selected);">
-<div class="card-title">
-<span style="color: var(--selected);">2. Etikett anpassen</span>
+<div class="card-header">
+<span style="color: var(--selected);">2. Etikett feinjustieren</span>
 <button type="button" class="btn btn-outline" style="padding: 4px 10px; font-size: 12px;" onclick="deselectLabel()">✖ Schließen</button>
 </div>
-<div class="mode-switch">
-<button type="button" class="mode-btn active" id="btn-mode-simple" onclick="setEditorMode('simple')">⚡ Simpel (Schnell)</button>
-<button type="button" class="mode-btn" id="btn-mode-pro" onclick="setEditorMode('pro')">🛠️ Fortgeschritten (Profi)</button>
-</div>
-<div class="editor-preview-container">
+<div class="editor-preview-box">
 <div class="tag-slot">
-<div class="coin-circle" id="editor-preview-circle" style="width: 44mm; height: 44mm;">
-<div class="coin-img-layer" id="editor-preview-img"></div>
-<div class="tag-info-text top" id="editor-preview-top"></div>
-<div class="tag-info-text bottom" id="editor-preview-bottom"></div>
+<div class="coin-circle" id="editor-circle" style="width: 44mm; height: 44mm;">
+<div class="coin-img-layer" id="editor-img"></div>
+<div class="tag-text top" id="editor-text-top"></div>
+<div class="tag-text bottom" id="editor-text-bottom"></div>
 </div>
 </div>
 </div>
-<!-- Erweiterte Pro-Regler -->
-<div class="pro-controls" id="pro-controls-box" style="display: none; margin-bottom: 14px;">
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+<div class="controls-grid">
+<div style="display: flex; justify-content: space-between; align-items: center;">
 <label style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Hintergrundfarbe:</label>
-<input type="color" id="bg-color-picker" value="#ffffff" style="width: 45px; height: 30px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; background: none; padding: 0;">
+<input type="color" id="bg-color" value="#ffffff" style="width: 50px; height: 32px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; background: none; padding: 0;">
 </div>
 <div class="control-group">
 <label><span>Zoom</span> <span id="lbl-zoom">100%</span></label>
@@ -269,13 +262,13 @@ body { background: #fff; margin: 0; padding: 0; }
 </div>
 </div>
 <div style="display: flex; gap: 8px; justify-content: center;">
-<button type="button" class="btn btn-secondary" onclick="duplicateSelected()">➕ Duplizieren</button>
-<button type="button" class="btn btn-danger" onclick="removeSelected()">🗑️ Löschen</button>
+<button type="button" class="btn btn-secondary" onclick="duplicateLabel()">➕ Duplizieren</button>
+<button type="button" class="btn btn-danger" onclick="deleteLabel()">🗑️ Löschen</button>
 </div>
 </div>
 <!-- SEKTION 3: FORMAT & DRUCK -->
 <div class="card no-print">
-<div class="card-title">3. Format & Druckoptionen</div>
+<div class="card-header">3. Format & Druckoptionen</div>
 <div style="margin-bottom: 12px;">
 <select id="preset-select">
 <option value="43" selected>Münzkapsel Standard (43 mm, freies Raster)</option>
@@ -292,313 +285,302 @@ body { background: #fff; margin: 0; padding: 0; }
 Titel & Serie übernehmen
 </label>
 </div>
-<button type="button" class="btn btn-full" onclick="openPrintModal()">🖨️ Bogen Drucken & Exportieren</button>
+<button type="button" class="btn btn-full" onclick="openModal('print')">🖨️ Bogen Drucken & Exportieren</button>
 </div>
 </div>
 <!-- LIVE DRUCK VORSCHAU -->
-<div class="print-preview-wrapper">
+<div class="preview-section">
 <div class="no-print" style="margin-bottom: 10px; font-weight: 700; color: #475569; font-size: 13px; text-align: center;">
-Live Druckvorschau <span style="font-weight:400; font-size:11px; display:block; color:#64748b;">(Klicke auf ein Etikett auf dem Bogen, um es im Editor anzupassen)</span>
+Live Druckvorschau <span style="font-weight:400; font-size:11px; display:block; color:#64748b;">(Klicke auf ein Etikett auf dem Bogen, um es zu bearbeiten)</span>
 </div>
 <div class="print-sheet" id="print-sheet">
 <div id="sheet-grid" class="grid-standard"></div>
 </div>
 </div>
 <!-- FOOTER & DISCLAIMER -->
-<div class="app-container no-print">
+<div class="app-wrapper no-print">
 <div class="footer-box">
-<strong>Open Source & Rechtlicher Hinweis:</strong> Dieses Projekt steht unter <a href="https://opensource.org/licenses/MIT" target="_blank">MIT-Lizenz</a>.
+<strong>Open Source & Rechtlicher Hinweis:</strong> Dieses Projekt ist unter <a href="https://opensource.org/licenses/MIT" target="_blank">MIT-Lizenz</a> lizenziert.
 
 Inoffizielles Hobby-Projekt in keinerlei Verbindung zur Boxine GmbH. "tonies®" und "Toniebox®" sind Marken der Boxine GmbH.
 
 Passende NFC-Tags für deine eigene Toniebox erhältst du bei <a href="http://rfidfriend.com/" target="_blank">RFIDfriend.com</a>.
 
-Mitwirken & Quellcode auf <a href="https://github.com/" target="_blank">GitHub</a>.
+Quellcode & Mitwirken auf <a href="https://github.com/" target="_blank">GitHub</a>.
 </div>
 </div>
 <!-- MODAL: DRUCK & EXPORT -->
 <div class="modal-backdrop" id="modal-print">
-<div class="modal-content">
+<div class="modal-box">
 <div class="modal-title">Druck- & Exportoptionen</div>
-<div class="modal-body">Wähle, wie dein vorbereiteter Etikettenbogen ausgegeben werden soll:</div>
+<div class="modal-desc">Wähle, wie dein vorbereiteter Etikettenbogen ausgegeben werden soll:</div>
 <div style="display: flex; flex-direction: column; gap: 8px;">
 <button type="button" class="btn btn-full" onclick="executePrint()">📄 Direkt Drucken (A4 / PDF)</button>
 <button type="button" class="btn btn-full btn-secondary" id="btn-png" onclick="exportPng()">🖼️ Als hochauflösendes PNG speichern</button>
-<button type="button" class="btn btn-full btn-outline" onclick="closePrintModal()">Abbrechen</button>
+<button type="button" class="btn btn-full btn-outline" onclick="closeModal('print')">Abbrechen</button>
 </div>
 </div>
 </div>
 <!-- MODAL: BOGEN LEEREN -->
 <div class="modal-backdrop" id="modal-clear">
-<div class="modal-content">
+<div class="modal-box">
 <div class="modal-title" style="color: #ef4444;">Bogen komplett leeren?</div>
-<div class="modal-body">Möchtest du wirklich alle Etiketten von deinem Bogen löschen?</div>
-<div class="modal-actions">
-<button type="button" class="btn btn-outline" style="flex:1;" onclick="closeClearModal()">Abbrechen</button>
-<button type="button" class="btn btn-danger" style="flex:1;" onclick="executeClearSheet()">Ja, leeren</button>
+<div class="modal-desc">Möchtest du wirklich alle Etiketten von deinem Bogen löschen?</div>
+<div class="modal-btns">
+<button type="button" class="btn btn-outline" style="flex:1;" onclick="closeModal('clear')">Abbrechen</button>
+<button type="button" class="btn btn-danger" style="flex:1;" onclick="executeClear()">Ja, leeren</button>
 </div>
 </div>
 </div>
 <canvas id="export-canvas" style="display: none;"></canvas>
 <script>
-const TONIES_JSON_URL = "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json";
-let tonieDb = [];
-let state = {
+const TONIES_URL = "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json";
+let toniesDb = [];
+let appState = {
+source: 'tonie',
 labels: [],
 selectedId: null,
 preset: '43',
-showText: true,
-source: 'tonie',
-editorMode: 'simple'
+showText: true
 };
-const el = {
+const DOM = {
 searchInput: document.getElementById("search-input"),
 searchBtn: document.getElementById("search-btn"),
 searchResults: document.getElementById("search-results"),
 dbStatus: document.getElementById("db-status"),
-uploadArea: document.getElementById("upload-input-area"),
-searchArea: document.getElementById("search-input-area"),
-customFile: document.getElementById("custom-file-input"),
+searchContainer: document.getElementById("search-container"),
+uploadContainer: document.getElementById("upload-container"),
+customFile: document.getElementById("custom-file"),
 editorCard: document.getElementById("editor-card"),
-proControls: document.getElementById("pro-controls-box"),
 presetSelect: document.getElementById("preset-select"),
 toggleText: document.getElementById("toggle-text"),
 sheetGrid: document.getElementById("sheet-grid"),
 statsBadge: document.getElementById("stats-badge"),
-modalPrint: document.getElementById("modal-print"),
-modalClear: document.getElementById("modal-clear"),
-// Sliders
+// Editor controls
 zoom: document.getElementById("slider-zoom"),
 rot: document.getElementById("slider-rot"),
 posx: document.getElementById("slider-posx"),
 posy: document.getElementById("slider-posy"),
-bgColor: document.getElementById("bg-color-picker"),
-// Editor Preview
-edCircle: document.getElementById("editor-preview-circle"),
-edImg: document.getElementById("editor-preview-img"),
-edTop: document.getElementById("editor-preview-top"),
-edBottom: document.getElementById("editor-preview-bottom")
+bgColor: document.getElementById("bg-color"),
+// Editor preview
+edCircle: document.getElementById("editor-circle"),
+edImg: document.getElementById("editor-img"),
+edTop: document.getElementById("editor-text-top"),
+edBottom: document.getElementById("editor-text-bottom")
 };
-// Datenbank laden
-fetch(TONIES_JSON_URL)
+// 1. Datenbank initialisieren
+fetch(TONIES_URL)
 .then(res => res.json())
 .then(data => {
-tonieDb = data;
-el.dbStatus.textContent = ⁠${tonieDb.length} Tonies bereit! Suchbegriff eingeben.⁠;
+toniesDb = data;
+DOM.dbStatus.textContent = ⁠${toniesDb.length} Tonies bereit! Suchbegriff eingeben.⁠;
 })
-.catch(() => el.dbStatus.textContent = "Fehler beim Laden der Tonie-Datenbank.");
-// State speichern / laden
-function saveState() {
-localStorage.setItem("tonieGenV5State", JSON.stringify({
-labels: state.labels,
-preset: state.preset,
-showText: state.showText
-}));
-}
-function loadState() {
-const saved = localStorage.getItem("tonieGenV5State");
-if (saved) {
+.catch(() => DOM.dbStatus.textContent = "Fehler beim Laden der Tonie-Datenbank.");
+// State aus LocalStorage laden
+function loadSession() {
+const saved = localStorage.getItem("tonieGenV6State");
+if(saved) {
 try {
 const parsed = JSON.parse(saved);
-state.labels = parsed.labels || [];
-state.preset = parsed.preset || '43';
-state.showText = parsed.showText !== undefined ? parsed.showText : true;
-el.presetSelect.value = state.preset;
-el.toggleText.checked = state.showText;
+appState.labels = parsed.labels || [];
+appState.preset = parsed.preset || '43';
+appState.showText = parsed.showText !== undefined ? parsed.showText : true;
+DOM.presetSelect.value = appState.preset;
+DOM.toggleText.checked = appState.showText;
 } catch(e) {}
 }
 renderGrid();
 }
-// Quellen Tabs umschalten
-function switchSource(source) {
-state.source = source;
+function saveSession() {
+localStorage.setItem("tonieGenV6State", JSON.stringify({
+labels: appState.labels,
+preset: appState.preset,
+showText: appState.showText
+}));
+}
+// Tabs umschalten
+function switchSource(src) {
+appState.source = src;
 document.querySelectorAll(".source-tab").forEach(btn => {
-btn.classList.toggle("active", btn.dataset.source === source);
+btn.classList.toggle("active", btn.dataset.source === src);
 });
-if (source === 'upload') {
-el.searchArea.style.display = "none";
-el.uploadArea.style.display = "block";
+if(src === 'upload') {
+DOM.searchContainer.style.display = "none";
+DOM.uploadContainer.style.display = "block";
 } else {
-el.searchArea.style.display = "block";
-el.uploadArea.style.display = "none";
-el.searchInput.placeholder = source === 'album' ? "Interpret oder Album suchen (z.B. Disney)..." : "Titel oder Serie suchen (z.B. Conni)...";
-el.searchInput.focus();
-if(el.searchInput.value.trim().length >= 2) performSearch();
+DOM.searchContainer.style.display = "block";
+DOM.uploadContainer.style.display = "none";
+DOM.searchInput.placeholder = src === 'album' ? "Interpret oder Album suchen (z.B. Disney)..." : "Titel oder Serie eingeben (z.B. Conni)...";
+DOM.searchInput.focus();
+if(DOM.searchInput.value.trim().length >= 2) runSearch();
 }
 }
-// Editor Modus (Simpel / Pro)
-function setEditorMode(mode) {
-state.editorMode = mode;
-document.getElementById("btn-mode-simple").classList.toggle("active", mode === 'simple');
-document.getElementById("btn-mode-pro").classList.toggle("active", mode === 'pro');
-el.proControls.style.display = mode === 'pro' ? 'grid' : 'none';
-}
-// Eigene Grafik Upload
-el.customFile.addEventListener('change', (e) => {
+// Eigene Grafik hochladen
+DOM.customFile.addEventListener('change', (e) => {
 const file = e.target.files[0];
 if(!file) return;
 const reader = new FileReader();
-reader.onload = (event) => {
-addLabel(event.target.result, "Eigene Grafik", file.name.replace(/.[^/.]+$/, ""));
-el.customFile.value = "";
+reader.onload = (evt) => {
+addLabel(evt.target.result, "Eigene Grafik", file.name.replace(/.[^/.]+$/, ""));
+DOM.customFile.value = "";
 };
 reader.readAsDataURL(file);
 });
 // Suchlogik
-async function performSearch() {
-const q = el.searchInput.value.trim().toLowerCase();
-if(!q) { el.searchResults.innerHTML = ""; el.dbStatus.textContent = "Bitte Suchbegriff eingeben."; return; }
-el.searchResults.innerHTML = "";
-el.dbStatus.textContent = "Suche läuft...";
-if (state.source === 'album') {
+async function runSearch() {
+const q = DOM.searchInput.value.trim().toLowerCase();
+if(!q) { DOM.searchResults.innerHTML = ""; DOM.dbStatus.textContent = "Bitte Suchbegriff eingeben."; return; }
+DOM.searchResults.innerHTML = "";
+DOM.dbStatus.textContent = "Suche läuft...";
+if (appState.source === 'album') {
 try {
 const res = await fetch(⁠https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=album&limit=12⁠);
 const data = await res.json();
-if(data.results.length === 0) { el.dbStatus.textContent = "Keine Alben gefunden."; return; }
-el.dbStatus.textContent = ⁠${data.results.length} Alben gefunden. Klicke zum Hinzufügen.⁠;
+if(data.results.length === 0) { DOM.dbStatus.textContent = "Keine Alben gefunden."; return; }
+DOM.dbStatus.textContent = ⁠${data.results.length} Alben gefunden. Klicke zum Hinzufügen.⁠;
 data.results.forEach(album => {
 const imgUrl = album.artworkUrl100.replace('100x100bb', '600x600bb');
-createCard(imgUrl, album.artistName, album.collectionName);
+createResultCard(imgUrl, album.artistName, album.collectionName);
 });
-} catch(e) { el.dbStatus.textContent = "Netzwerkfehler."; }
+} catch(e) { DOM.dbStatus.textContent = "Netzwerkfehler bei der Suche."; }
 } else {
-if(tonieDb.length === 0) return;
-const matches = tonieDb
+if(toniesDb.length === 0) return;
+const matches = toniesDb
 .filter(item => {
 if(!item.pic || item.pic.includes('placeholder') || item.pic.includes('default')) return false;
 return (item.title||"").toLowerCase().includes(q) || (item.series||"").toLowerCase().includes(q);
 })
 .sort((a,b) => (a.series||a.title||"").localeCompare(b.series||b.title||"", 'de'))
 .slice(0, 16);
-if(matches.length === 0) { el.dbStatus.textContent = "Keine Tonies gefunden."; return; }
-el.dbStatus.textContent = ⁠${matches.length} Tonies gefunden. Klicke zum Hinzufügen.⁠;
+if(matches.length === 0) { DOM.dbStatus.textContent = "Keine Tonies gefunden."; return; }
+DOM.dbStatus.textContent = ⁠${matches.length} Tonies gefunden. Klicke zum Hinzufügen.⁠;
 matches.forEach(item => {
-createCard(item.pic, item.series||"", item.episodes||item.title||"");
+createResultCard(item.pic, item.series||"", item.episodes||item.title||"");
 });
 }
 }
-function createCard(imgUrl, series, title) {
+function createResultCard(imgUrl, series, title) {
 const card = document.createElement("div");
-card.className = "result-item";
+card.className = "result-card";
 const name = title || series || "Cover";
-card.innerHTML = ⁠<div class="add-badge">+</div><img src="${imgUrl}"><div class="title">${name}</div>⁠;
+card.innerHTML = ⁠<div class="badge">+</div><img src="${imgUrl}"><div class="title">${name}</div>⁠;
 card.onclick = () => {
 let fSeries = series, fTitle = title;
 if(!fSeries && fTitle) { fSeries = fTitle; fTitle = ""; }
 addLabel(imgUrl, fSeries, fTitle);
 };
-el.searchResults.appendChild(card);
+DOM.searchResults.appendChild(card);
 }
-// Label Verwaltung
+// Label Management
 function addLabel(imgUrl, series, title) {
-const isAvery = state.preset === 'avery-40';
-if(isAvery && state.labels.length >= 24) { alert("Avery-Bogen ist auf 24 Stück limitiert."); return; }
+const isAvery = appState.preset === 'avery-40';
+if(isAvery && appState.labels.length >= 24) { alert("Avery-Bogen ist auf 24 Stück limitiert."); return; }
 const id = Date.now().toString() + Math.floor(Math.random()*1000);
-state.labels.push({ id, imgUrl, series, title, zoom: 100, rot: 0, posX: 0, posY: 0, bgColor: '#ffffff' });
+appState.labels.push({ id, imgUrl, series, title, zoom: 100, rot: 0, posX: 0, posY: 0, bgColor: '#ffffff' });
 selectLabel(id);
 }
 function selectLabel(id) {
-state.selectedId = id;
-const l = state.labels.find(item => item.id === id);
+appState.selectedId = id;
+const l = appState.labels.find(item => item.id === id);
 if(l) {
-el.editorCard.style.display = "block";
-el.zoom.value = l.zoom;
-el.rot.value = l.rot || 0;
-el.posx.value = l.posX;
-el.posy.value = l.posY;
-el.bgColor.value = l.bgColor || '#ffffff';
+DOM.editorCard.style.display = "block";
+DOM.zoom.value = l.zoom;
+DOM.rot.value = l.rot || 0;
+DOM.posx.value = l.posX;
+DOM.posy.value = l.posY;
+DOM.bgColor.value = l.bgColor || '#ffffff';
 document.getElementById("lbl-zoom").textContent = ⁠${l.zoom}%⁠;
 document.getElementById("lbl-rot").textContent = ⁠${l.rot || 0}°⁠;
 updateEditorPreview();
-el.editorCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+DOM.editorCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 renderGrid();
 }
 function deselectLabel() {
-state.selectedId = null;
-el.editorCard.style.display = "none";
+appState.selectedId = null;
+DOM.editorCard.style.display = "none";
 renderGrid();
 }
-function duplicateSelected() {
-const target = state.labels.find(l => l.id === state.selectedId);
+function duplicateLabel() {
+const target = appState.labels.find(l => l.id === appState.selectedId);
 if(target) {
-if(state.preset === 'avery-40' && state.labels.length >= 24) { alert("Avery-Bogen voll."); return; }
+if(appState.preset === 'avery-40' && appState.labels.length >= 24) { alert("Avery-Bogen voll."); return; }
 const id = Date.now().toString() + Math.floor(Math.random()*1000);
-state.labels.push({ ...target, id });
+appState.labels.push({ ...target, id });
 selectLabel(id);
 }
 }
-function removeSelected() {
-state.labels = state.labels.filter(l => l.id !== state.selectedId);
+function deleteLabel() {
+appState.labels = appState.labels.filter(l => l.id !== appState.selectedId);
 deselectLabel();
 }
-function updateProps() {
-if(!state.selectedId) return;
-const idx = state.labels.findIndex(l => l.id === state.selectedId);
+function updateActiveProps() {
+if(!appState.selectedId) return;
+const idx = appState.labels.findIndex(l => l.id === appState.selectedId);
 if(idx > -1) {
-state.labels[idx].zoom = el.zoom.value;
-state.labels[idx].rot = el.rot.value;
-state.labels[idx].posX = el.posx.value;
-state.labels[idx].posY = el.posy.value;
-state.labels[idx].bgColor = el.bgColor.value;
-document.getElementById("lbl-zoom").textContent = ⁠${el.zoom.value}%⁠;
-document.getElementById("lbl-rot").textContent = ⁠${el.rot.value}°⁠;
+appState.labels[idx].zoom = DOM.zoom.value;
+appState.labels[idx].rot = DOM.rot.value;
+appState.labels[idx].posX = DOM.posx.value;
+appState.labels[idx].posY = DOM.posy.value;
+appState.labels[idx].bgColor = DOM.bgColor.value;
+document.getElementById("lbl-zoom").textContent = ⁠${DOM.zoom.value}%⁠;
+document.getElementById("lbl-rot").textContent = ⁠${DOM.rot.value}°⁠;
 updateEditorPreview();
 renderGrid();
 }
 }
-el.zoom.oninput = updateProps;
-el.rot.oninput = updateProps;
-el.posx.oninput = updateProps;
-el.posy.oninput = updateProps;
-el.bgColor.oninput = updateProps;
+DOM.zoom.oninput = updateActiveProps;
+DOM.rot.oninput = updateActiveProps;
+DOM.posx.oninput = updateActiveProps;
+DOM.posy.oninput = updateActiveProps;
+DOM.bgColor.oninput = updateActiveProps;
 function updateEditorPreview() {
-const l = state.labels.find(item => item.id === state.selectedId);
-let diam = parseInt(state.preset) || 43;
-if(state.preset === 'avery-40') diam = 40;
-el.edCircle.style.width = ⁠${diam}mm⁠;
-el.edCircle.style.height = ⁠${diam}mm⁠;
+const l = appState.labels.find(item => item.id === appState.selectedId);
+let diam = parseInt(appState.preset) || 43;
+if(appState.preset === 'avery-40') diam = 40;
+DOM.edCircle.style.width = ⁠${diam}mm⁠;
+DOM.edCircle.style.height = ⁠${diam}mm⁠;
 if(l) {
-el.edCircle.style.backgroundColor = l.bgColor || '#ffffff';
-el.edImg.style.backgroundImage = ⁠url('${l.imgUrl}')⁠;
-el.edImg.style.backgroundSize = ⁠${l.zoom}%⁠;
-el.edImg.style.backgroundPosition = ⁠calc(50% + ${l.posX}px) calc(50% + ${l.posY}px)⁠;
-el.edImg.style.transform = ⁠rotate(${l.rot || 0}deg)⁠;
-if(state.showText) {
-el.edTop.textContent = l.series || "";
-el.edTop.style.display = l.series ? "block" : "none";
-el.edBottom.textContent = l.title || "";
-el.edBottom.style.display = l.title ? "block" : "none";
+DOM.edCircle.style.backgroundColor = l.bgColor || '#ffffff';
+DOM.edImg.style.backgroundImage = ⁠url('${l.imgUrl}')⁠;
+DOM.edImg.style.backgroundSize = ⁠${l.zoom}%⁠;
+DOM.edImg.style.backgroundPosition = ⁠calc(50% + ${l.posX}px) calc(50% + ${l.posY}px)⁠;
+DOM.edImg.style.transform = ⁠rotate(${l.rot || 0}deg)⁠;
+if(appState.showText) {
+DOM.edTop.textContent = l.series || "";
+DOM.edTop.style.display = l.series ? "block" : "none";
+DOM.edBottom.textContent = l.title || "";
+DOM.edBottom.style.display = l.title ? "block" : "none";
 } else {
-el.edTop.style.display = "none";
-el.edBottom.style.display = "none";
+DOM.edTop.style.display = "none";
+DOM.edBottom.style.display = "none";
 }
 }
 }
 // Render Grid
 function renderGrid() {
-el.sheetGrid.innerHTML = "";
-saveState();
-state.preset = el.presetSelect.value;
-state.showText = el.toggleText.checked;
-const isAvery = state.preset === 'avery-40';
-let diam = isAvery ? 40 : (parseInt(state.preset) || 43);
-el.sheetGrid.className = isAvery ? "grid-avery" : "grid-standard";
-el.statsBadge.textContent = ⁠${state.labels.length}${isAvery?'/24':''} Etikett${state.labels.length!==1?'en':''} auf dem Bogen⁠;
-if(isAvery && state.labels.length >= 24) {
-el.statsBadge.style.background = "#fee2e2";
-el.statsBadge.style.color = "#ef4444";
+DOM.sheetGrid.innerHTML = "";
+saveSession();
+appState.preset = DOM.presetSelect.value;
+appState.showText = DOM.toggleText.checked;
+const isAvery = appState.preset === 'avery-40';
+let diam = isAvery ? 40 : (parseInt(appState.preset) || 43);
+DOM.sheetGrid.className = isAvery ? "grid-avery" : "grid-standard";
+DOM.statsBadge.textContent = ⁠${appState.labels.length}${isAvery?'/24':''} Etikett${appState.labels.length!==1?'en':''} auf dem Bogen⁠;
+if(isAvery && appState.labels.length >= 24) {
+DOM.statsBadge.style.background = "#fee2e2";
+DOM.statsBadge.style.color = "#ef4444";
 } else {
-el.statsBadge.style.background = "#f1f5f9";
-el.statsBadge.style.color = "var(--text-main)";
+DOM.statsBadge.style.background = "#f1f5f9";
+DOM.statsBadge.style.color = "var(--text-main)";
 }
-if(state.labels.length === 0 && !isAvery) {
-el.sheetGrid.innerHTML = ⁠<div style="width:100%; text-align:center; padding: 45px 20px; color: var(--text-muted); font-size: 13px; font-weight:500;">Dein Bogen ist noch leer. Füge oben Cover hinzu.</div>⁠;
+if(appState.labels.length === 0 && !isAvery) {
+DOM.sheetGrid.innerHTML = ⁠<div style="width:100%; text-align:center; padding: 45px 20px; color: var(--text-muted); font-size: 13px; font-weight:500;">Dein Bogen ist noch leer. Füge oben Cover hinzu.</div>⁠;
 return;
 }
-const slots = isAvery ? 24 : state.labels.length;
+const slots = isAvery ? 24 : appState.labels.length;
 for(let i = 0; i < slots; i++) {
-const l = state.labels[i];
+const l = appState.labels[i];
 const slot = document.createElement("div");
 slot.className = "tag-slot";
 const circ = document.createElement("div");
@@ -606,7 +588,7 @@ circ.className = "coin-circle";
 circ.style.width = ⁠${diam}mm⁠;
 circ.style.height = ⁠${diam}mm⁠;
 if(l) {
-if(l.id === state.selectedId) circ.classList.add("selected");
+if(l.id === appState.selectedId) circ.classList.add("selected");
 circ.style.backgroundColor = l.bgColor || '#ffffff';
 slot.onclick = () => selectLabel(l.id);
 const layer = document.createElement("div");
@@ -616,16 +598,16 @@ layer.style.backgroundSize = ⁠${l.zoom}%⁠;
 layer.style.backgroundPosition = ⁠calc(50% + ${l.posX}px) calc(50% + ${l.posY}px)⁠;
 layer.style.transform = ⁠rotate(${l.rot || 0}deg)⁠;
 circ.appendChild(layer);
-if(state.showText) {
+if(appState.showText) {
 if(l.series) {
 const t = document.createElement("div");
-t.className = "tag-info-text top";
+t.className = "tag-text top";
 t.textContent = l.series;
 circ.appendChild(t);
 }
 if(l.title) {
 const b = document.createElement("div");
-b.className = "tag-info-text bottom";
+b.className = "tag-text bottom";
 b.textContent = l.title;
 circ.appendChild(b);
 }
@@ -634,66 +616,52 @@ circ.appendChild(b);
 circ.classList.add("empty");
 }
 slot.appendChild(circ);
-el.sheetGrid.appendChild(slot);
+DOM.sheetGrid.appendChild(slot);
 }
-if(state.selectedId) updateEditorPreview();
+if(appState.selectedId) updateEditorPreview();
 }
 // Such Events
-let timeout = null;
-el.searchInput.addEventListener("input", () => {
-if(el.searchInput.value.trim().length >= 2) {
-el.dbStatus.textContent = "Suche läuft...";
-clearTimeout(timeout);
-timeout = setTimeout(performSearch, 300);
+let tOut = null;
+DOM.searchInput.addEventListener("input", () => {
+if(DOM.searchInput.value.trim().length >= 2) {
+DOM.dbStatus.textContent = "Suche läuft...";
+clearTimeout(tOut);
+tOut = setTimeout(runSearch, 300);
 } else {
-el.searchResults.innerHTML = "";
-el.dbStatus.textContent = ⁠${tonieDb.length} Tonies bereit! Suchbegriff eingeben.⁠;
+DOM.searchResults.innerHTML = "";
+DOM.dbStatus.textContent = ⁠${toniesDb.length} Tonies bereit! Suchbegriff eingeben.⁠;
 }
 });
-el.searchBtn.onclick = () => { clearTimeout(timeout); performSearch(); };
-el.searchInput.onkeydown = e => { if(e.key === 'Enter') { clearTimeout(timeout); performSearch(); }};
-el.presetSelect.onchange = renderGrid;
-el.toggleText.onchange = renderGrid;
-// Modals & Export
-function openPrintModal() {
-if(state.labels.length === 0) { alert("Bitte füge zuerst Etiketten hinzu."); return; }
-el.modalPrint.style.display = "flex";
+DOM.searchBtn.onclick = () => { clearTimeout(tOut); runSearch(); };
+DOM.searchInput.onkeydown = e => { if(e.key === 'Enter') { clearTimeout(tOut); runSearch(); }};
+DOM.presetSelect.onchange = renderGrid;
+DOM.toggleText.onchange = renderGrid;
+// Modals
+function openModal(name) {
+if(name === 'print' && appState.labels.length === 0) { alert("Bitte füge zuerst Etiketten hinzu."); return; }
+document.getElementById(⁠modal-${name}⁠).style.display = "flex";
 }
-function closePrintModal() { el.modalPrint.style.display = "none"; }
+function closeModal(name) {
+document.getElementById(⁠modal-${name}⁠).style.display = "none";
+}
 function executePrint() {
-closePrintModal();
+closeModal('print');
 deselectLabel();
 setTimeout(() => window.print(), 250);
 }
-function openClearModal() { el.modalClear.style.display = "flex"; }
-function closeClearModal() { el.modalClear.style.display = "none"; }
-function executeClearSheet() {
-state.labels = [];
+function executeClear() {
+appState.labels = [];
 deselectLabel();
-closeClearModal();
+closeModal('clear');
 }
-async function loadCache() {
-const cache = {};
-for(const l of state.labels) {
-if(!cache[l.imgUrl]) {
-cache[l.imgUrl] = await new Promise(res => {
-const img = new Image();
-img.crossOrigin = "anonymous";
-img.onload = () => res(img);
-img.onerror = () => res(null);
-img.src = l.imgUrl;
-});
-}
-}
-return cache;
-}
+// PNG Export
 async function exportPng() {
 const btn = document.getElementById("btn-png");
 btn.textContent = "⏳ Generiere PNG...";
 btn.disabled = true;
 try {
-const isAvery = state.preset === 'avery-40';
-const diamMm = isAvery ? 40 : (parseInt(state.preset) || 43);
+const isAvery = appState.preset === 'avery-40';
+const diamMm = isAvery ? 40 : (parseInt(appState.preset) || 43);
 const canvas = document.getElementById("export-canvas");
 canvas.width = 2480; canvas.height = 3508; // A4 @ 300 DPI
 const ctx = canvas.getContext("2d");
@@ -706,14 +674,26 @@ let cols = isAvery ? 4 : Math.floor((2480 - (2 * startX)) / (diamPx + gapX));
 if (isAvery) {
 startX = 9.5 * pxPerMm; startY = 13.5 * pxPerMm; gapX = 4 * pxPerMm; gapY = 4 * pxPerMm;
 }
-const cache = await loadCache();
-const slots = isAvery ? 24 : state.labels.length;
+// Cache images
+const cache = {};
+for(const l of appState.labels) {
+if(!cache[l.imgUrl]) {
+cache[l.imgUrl] = await new Promise(res => {
+const img = new Image();
+img.crossOrigin = "anonymous";
+img.onload = () => res(img);
+img.onerror = () => res(null);
+img.src = l.imgUrl;
+});
+}
+}
+const slots = isAvery ? 24 : appState.labels.length;
 for(let i = 0; i < slots; i++) {
 const col = i % cols;
 const row = Math.floor(i / cols);
 const x = startX + col * (diamPx + gapX);
 const y = startY + row * (diamPx + gapY);
-const l = state.labels[i];
+const l = appState.labels[i];
 // Schnittkante
 ctx.save();
 ctx.beginPath();
@@ -745,7 +725,7 @@ ctx.drawImage(img, -w / 2 + px, -h / 2 + py, w, h);
 ctx.restore();
 }
 ctx.restore();
-if(state.showText) {
+if(appState.showText) {
 ctx.save();
 ctx.font = ⁠bold ${Math.round(18 * (pxPerMm / 3.78))}px system-ui, sans-serif⁠;
 ctx.textAlign = "center";
@@ -775,15 +755,15 @@ const link = document.createElement("a");
 link.download = "tonie-cover-bogen.png";
 link.href = canvas.toDataURL("image/png");
 link.click();
-}catch(e) {
+} catch(e) {
 alert("Fehler beim Exportieren.");
 } finally {
 btn.textContent = "🖼️ Als hochauflösendes PNG speichern";
 btn.disabled = false;
-closePrintModal();
+closeModal('print');
 }
 }
-loadState();
+loadSession();
 </script>
 </body>
 </html>
