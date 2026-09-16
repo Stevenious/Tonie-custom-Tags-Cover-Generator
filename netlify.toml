@@ -1,0 +1,24 @@
+[build]
+  publish = "."
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+
+# Cover art is proxied through the Netlify Image CDN so the print canvases stay
+# same-origin (and therefore exportable); every source host must be allowlisted.
+[images]
+  remote_images = [
+    "https://cdn\\.tonies\\.(de|com)/.*",
+    "https://images\\.cdn\\.[a-z0-9-]+\\.gcp\\.commercetools\\.com/.*",
+    "https://cdn\\.shopify\\.com/.*",
+    "https://media\\.moluna\\.de/.*",
+    "https://res\\.cloudinary\\.com/.*",
+    "https://s3\\.[a-z0-9-]+\\.amazonaws\\.com/.*",
+    "https://[a-z0-9-]+\\.ssl\\.cf[0-9]\\.rackcdn\\.com/.*",
+    "https://gt-blog\\.de/.*",
+    "https://www\\.drk-heidelberg\\.de/.*",
+    "https://placehold\\.co/.*"
+  ]
