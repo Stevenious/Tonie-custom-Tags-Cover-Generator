@@ -4,50 +4,76 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Tonie Cover Generator Pro</title>
+  
   <style>
-    :root { --primary: #e30613; --bg: #f0f2f5; --card: #fff; --border: #d1d5db; --selected: #3b82f6; }
+    :root { 
+      --primary: #e30613; 
+      --primary-hover: #cc0510;
+      --bg: #f3f4f6; 
+      --card: #ffffff; 
+      --border: #e5e7eb; 
+      --selected: #3b82f6; 
+      --text: #1f2937;
+      --text-light: #6b7280;
+    }
     * { box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 15px; background: var(--bg); color: #1f2937; overflow-x: hidden; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 15px; background: var(--bg); color: var(--text); overflow-x: hidden; }
     
-    .container { max-width: 800px; margin: 0 auto; }
-    h1 { color: var(--primary); font-size: 24px; margin-top: 0; text-align: center; }
+    .container { max-width: 850px; margin: 0 auto; }
+    h1 { color: var(--primary); font-size: 26px; font-weight: 800; margin-top: 0; text-align: center; letter-spacing: -0.5px; }
     
-    .panel { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .panel-title { font-weight: 700; font-size: 16px; margin-bottom: 15px; display: block; border-bottom: 2px solid var(--bg); padding-bottom: 8px; }
+    .panel { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03); }
+    .panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid var(--bg); padding-bottom: 12px; }
+    .panel-title { font-weight: 700; font-size: 17px; margin: 0; }
     
+    /* Segmented Control (Tabs) */
+    .search-tabs { display: flex; background: #e5e7eb; padding: 4px; border-radius: 10px; margin-bottom: 15px; }
+    .tab-btn { flex: 1; background: transparent; color: var(--text-light); border: none; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .tab-btn:hover:not(.active) { color: var(--text); }
+    .tab-btn.active { background: #fff; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
     .form-group { margin-bottom: 15px; }
     .form-row { display: flex; gap: 10px; flex-wrap: wrap; }
-    input[type="text"], select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; background: #fafafa; }
-    button { padding: 10px 20px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
-    button:hover { background: #cc0510; }
+    input[type="text"], select { width: 100%; padding: 12px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 15px; background: #fafafa; transition: border-color 0.2s; outline: none; }
+    input[type="text"]:focus, select:focus { border-color: var(--selected); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+    
+    button { padding: 12px 20px; background: var(--primary); color: #fff; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+    button:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
     button.btn-secondary { background: #4b5563; }
     button.btn-secondary:hover { background: #374151; }
-    button.btn-outline { background: transparent; color: #4b5563; border: 1px solid var(--border); }
-    button.btn-outline:hover { background: #e5e7eb; }
-    button.btn-danger { background: transparent; color: #ef4444; border: 1px solid #ef4444; }
-    button.btn-danger:hover { background: #fef2f2; }
-    button.full-width { width: 100%; font-size: 16px; padding: 14px; margin-top: 10px; }
+    button.btn-outline { background: transparent; color: #4b5563; border: 1px solid #d1d5db; }
+    button.btn-outline:hover { background: #f3f4f6; border-color: #9ca3af; }
+    button.btn-danger { background: #fee2e2; color: #ef4444; }
+    button.btn-danger:hover { background: #fecaca; }
+    button.full-width { width: 100%; font-size: 16px; padding: 16px; margin-top: 10px; }
 
-    #search-status { font-size: 13px; color: #6b7280; margin-bottom: 10px; min-height: 20px; }
-    #search-results { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; max-height: 250px; overflow-y: auto; padding-right: 5px; }
-    .result-card { border: 1px solid var(--border); border-radius: 8px; padding: 8px; text-align: center; cursor: pointer; background: #fff; transition: transform 0.1s, border-color 0.1s; position: relative; }
-    .result-card:active { transform: scale(0.97); }
-    .result-card:hover { border-color: var(--primary); }
-    .result-card img { width: 100%; height: 80px; object-fit: contain; margin-bottom: 5px; }
+    #search-status { font-size: 13px; color: var(--text-light); margin-bottom: 12px; min-height: 20px; font-weight: 500; }
+    #search-results { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; max-height: 280px; overflow-y: auto; padding-right: 5px; }
+    
+    /* Scrollbar Styling */
+    #search-results::-webkit-scrollbar { width: 6px; }
+    #search-results::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+    #search-results::-webkit-scrollbar-thumb { background: #c1c1c1; border-radius: 4px; }
+    
+    .result-card { border: 1px solid var(--border); border-radius: 10px; padding: 10px; text-align: center; cursor: pointer; background: #fff; transition: all 0.15s ease; position: relative; }
+    .result-card:active { transform: scale(0.96); }
+    .result-card:hover { border-color: var(--primary); box-shadow: 0 4px 6px rgba(227, 6, 19, 0.1); }
+    .result-card img { width: 100%; height: 85px; object-fit: contain; margin-bottom: 8px; transition: transform 0.2s; }
+    .result-card:hover img { transform: scale(1.05); }
     .result-card .title { font-size: 11px; font-weight: 600; line-height: 1.3; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .result-card .add-badge { position: absolute; top: -5px; right: -5px; background: var(--primary); color: #fff; width: 22px; height: 22px; border-radius: 50%; font-size: 16px; line-height: 22px; font-weight: bold; display: none; }
-    .result-card:hover .add-badge { display: block; }
+    .result-card .add-badge { position: absolute; top: -6px; right: -6px; background: var(--primary); color: #fff; width: 24px; height: 24px; border-radius: 50%; font-size: 18px; line-height: 22px; font-weight: bold; opacity: 0; transform: scale(0.8); transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+    .result-card:hover .add-badge { opacity: 1; transform: scale(1); }
 
-    .slider-grid { display: grid; grid-template-columns: 1fr; gap: 15px; background: #f9fafb; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb; }
+    .slider-grid { display: grid; grid-template-columns: 1fr; gap: 20px; background: #f9fafb; padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
     @media (min-width: 600px) { .slider-grid { grid-template-columns: 1fr 1fr; } }
-    .slider-group label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #4b5563; }
-    input[type="range"] { width: 100%; accent-color: var(--primary); }
+    .slider-group label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 8px; color: #4b5563; }
+    input[type="range"] { width: 100%; accent-color: var(--primary); height: 6px; border-radius: 3px; }
 
-    .tool-actions { display: flex; gap: 10px; margin-top: 15px; justify-content: center; flex-wrap: wrap; }
+    .tool-actions { display: flex; gap: 10px; margin-top: 20px; justify-content: center; flex-wrap: wrap; }
 
-    /* Print Preview Layout Fix */
-    .preview-container { width: 100%; background: #e5e7eb; padding: 20px; border-radius: 12px; margin-top: 20px; display: flex; flex-direction: column; align-items: center; overflow: hidden; }
-    .print-sheet { background: #fff; width: 210mm; min-height: 297mm; box-shadow: 0 4px 10px rgba(0,0,0,0.1); position: relative; flex-shrink: 0; transform-origin: top center; }
+    .preview-container { width: 100%; background: #e5e7eb; padding: 30px 20px; border-radius: 16px; margin-top: 20px; display: flex; flex-direction: column; align-items: center; overflow: hidden; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+    .print-sheet { background: #fff; width: 210mm; min-height: 297mm; box-shadow: 0 10px 25px rgba(0,0,0,0.1); position: relative; flex-shrink: 0; transform-origin: top center; border-radius: 2px; }
     
     @media screen and (max-width: 850px) { .print-sheet { transform: scale(0.40); margin-bottom: -178mm; } }
     @media screen and (max-width: 500px) { .print-sheet { transform: scale(0.35); margin-bottom: -193mm; } }
@@ -57,36 +83,46 @@
     .grid-avery { display: grid; grid-template-columns: repeat(4, 40mm); grid-auto-rows: 40mm; gap: 5mm; justify-content: center; padding-top: 15mm; }
     .grid-standard { display: flex; flex-wrap: wrap; gap: 8mm; padding: 15mm; justify-content: flex-start; align-content: flex-start; }
 
-    .tag-slot { display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.1s; }
-    .tag-slot:hover { transform: scale(1.02); }
+    .tag-slot { display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.15s; }
+    .tag-slot:hover { transform: scale(1.03); }
     
-    .coin-circle { border-radius: 50%; border: 0.5pt dashed #9ca3af; position: relative; overflow: hidden; background-color: #fff; display: flex; justify-content: center; }
-    .coin-circle.selected { border: 2.5px solid var(--selected); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3); }
-    .coin-circle.empty-slot { background: #f3f4f6; border: 1px dashed #d1d5db; }
-    .coin-circle.empty-slot::after { content: "+"; color: #9ca3af; font-size: 24px; font-weight: bold; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+    .coin-circle { border-radius: 50%; border: 0.5pt dashed #9ca3af; position: relative; overflow: hidden; background-color: #fff; display: flex; justify-content: center; transition: all 0.2s; }
+    .coin-circle.selected { border: 3px solid var(--selected); box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2); z-index: 10; }
+    .coin-circle.empty-slot { background: #f3f4f6; border: 2px dashed #d1d5db; }
+    .coin-circle.empty-slot:hover { border-color: #9ca3af; background: #e5e7eb; }
+    .coin-circle.empty-slot::after { content: "+"; color: #9ca3af; font-size: 28px; font-weight: 300; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 
     .coin-img-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-repeat: no-repeat; background-position: center; pointer-events: none; }
     
-    .tag-info-text { position: absolute; width: 85%; text-align: center; font-size: 5.5pt; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700; color: #111; background: rgba(255, 255, 255, 0.85); padding: 2.5px 5px; border-radius: 6px; z-index: 2; line-height: 1.1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; pointer-events: none; }
+    .tag-info-text { position: absolute; width: 85%; text-align: center; font-size: 5.5pt; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700; color: #111; background: rgba(255, 255, 255, 0.85); padding: 2.5px 5px; border-radius: 6px; z-index: 2; line-height: 1.1; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; pointer-events: none; backdrop-filter: blur(2px); }
     .tag-info-text.top { top: 2mm; }
     .tag-info-text.bottom { bottom: 2mm; }
 
-    .stats-badge { background: #e5e7eb; color: #374151; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+    .stats-badge { background: #e5e7eb; color: #374151; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: 700; transition: all 0.3s; }
+    .stats-badge.full { background: #fee2e2; color: #ef4444; animation: pulse 2s infinite; }
+    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4); } 70% { box-shadow: 0 0 0 6px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+
+    /* Empty State Notice */
+    .empty-state { width: 100%; text-align: center; padding: 60px 20px; color: #9ca3af; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .empty-state svg { width: 48px; height: 48px; margin-bottom: 15px; opacity: 0.5; }
+    .empty-state p { margin: 0; font-size: 15px; font-weight: 500; }
 
     /* Modals & Footer */
-    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.65); z-index: 1000; justify-content: center; align-items: center; padding: 15px; }
-    .modal-box { background: #fff; width: 100%; max-width: 520px; border-radius: 12px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-    .modal-header { font-size: 18px; font-weight: 700; margin-bottom: 15px; }
-    .modal-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-    .disclaimer { margin-top: 25px; padding: 15px; font-size: 11px; color: #6b7280; text-align: center; line-height: 1.5; border-top: 1px solid var(--border); }
+    .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(17, 24, 39, 0.7); z-index: 1000; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(3px); }
+    .modal-box { background: #fff; width: 100%; max-width: 520px; border-radius: 16px; padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); animation: modalSlideIn 0.3s ease-out; }
+    @keyframes modalSlideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+    .modal-header { font-size: 20px; font-weight: 800; margin-bottom: 10px; color: #111827; }
+    .modal-actions { display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap; justify-content: flex-end; }
+    
+    .disclaimer { margin-top: 30px; padding: 20px; font-size: 12px; color: var(--text-light); text-align: center; line-height: 1.6; border-top: 1px solid var(--border); }
 
-    /* Print Styles */
     @media print {
       body { background: #fff; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
       .no-print, .modal-overlay { display: none !important; }
-      .preview-container { background: transparent; padding: 0; margin: 0; overflow: visible; display: block; }
+      .preview-container { background: transparent; padding: 0; margin: 0; overflow: visible; display: block; box-shadow: none; }
       .print-sheet { transform: none !important; box-shadow: none; margin: 0; padding: 0; width: 210mm; height: 297mm; }
       .coin-circle { border: 0.5pt dashed #9ca3af !important; box-shadow: none !important; }
+      .coin-circle.selected { border: 0.5pt dashed #9ca3af !important; box-shadow: none !important; }
       .coin-circle.empty-slot { display: none !important; }
       @page { size: A4 portrait; margin: 0; }
       .grid-avery { padding-top: 13.5mm; padding-left: 9.5mm; gap: 4mm; justify-content: flex-start; }
@@ -99,32 +135,35 @@
   <h1>Tonie & Album Etiketten Generator</h1>
   
   <div class="panel">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid var(--bg); padding-bottom: 8px;">
-      <span class="panel-title" style="border: none; margin: 0; padding: 0;">1. Suchen & Hinzufügen</span>
-      <button type="button" class="btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="clearSheet()">🗑️ Bogen leeren</button>
+    <div class="panel-header">
+      <span class="panel-title">1. Suchen & Hinzufügen</span>
+      <button type="button" class="btn-danger" style="padding: 6px 12px; font-size: 13px;" onclick="promptClearSheet()">🗑️ Bogen leeren</button>
     </div>
-    <div style="font-size: 13px; color: #4b5563; margin-bottom: 15px;">Klicke auf ein Suchergebnis, um es als neues Etikett auf deinen Druckbogen zu legen.</div>
+    
+    <!-- Segmented Control (Tabs) anstelle eines Dropdowns -->
+    <div class="search-tabs" id="search-tabs">
+      <button class="tab-btn active" data-type="tonie">🪀 Tonie-Figuren</button>
+      <button class="tab-btn" data-type="album">🎵 Apple Music / Alben</button>
+    </div>
+
     <div class="form-row" style="flex-wrap: nowrap; gap: 8px;">
-      <select id="search-type" style="width: 140px; flex-shrink: 0;">
-        <option value="tonie">Tonie-Figur</option>
-        <option value="album">Album / iTunes</option>
-      </select>
-      <input type="text" id="search-input" placeholder="Titel suchen (z.B. Conni)..." style="flex-grow: 1;">
+      <input type="text" id="search-input" placeholder="Tonie Titel suchen (z.B. Conni)..." style="flex-grow: 1;">
       <button type="button" id="search-btn">Suche</button>
     </div>
+    
     <div id="search-status">Datenbank wird im Hintergrund geladen...</div>
     <div id="search-results"></div>
   </div>
 
-  <div class="panel" id="img-tool-panel" style="display: none; border: 2px solid var(--selected);">
-    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--bg); padding-bottom: 8px; margin-bottom: 15px;">
-      <span class="panel-title" style="border: none; margin: 0; padding: 0; color: var(--selected);">2. Ausgewähltes Etikett anpassen</span>
-      <button type="button" class="btn-outline" style="padding: 4px 8px; font-size: 12px;" onclick="deselectLabel()">✖ Schließen</button>
+  <div class="panel" id="img-tool-panel" style="display: none; border: 2px solid var(--selected); background: #eff6ff;">
+    <div class="panel-header" style="border-bottom-color: #bfdbfe;">
+      <span class="panel-title" style="color: var(--selected);">2. Ausgewähltes Etikett anpassen</span>
+      <button type="button" class="btn-outline" style="padding: 4px 10px; font-size: 12px; background: #fff;" onclick="deselectLabel()">✖ Schließen</button>
     </div>
     
-    <div class="slider-grid">
+    <div class="slider-grid" style="background: #fff; border-color: #bfdbfe;">
       <div class="slider-group">
-        <label><span>Zoom</span> <span id="zoom-val">100%</span></label>
+        <label><span>Zoom</span> <span id="zoom-val" style="color: var(--selected);">100%</span></label>
         <input type="range" id="zoom-slider" min="30" max="250" value="100">
       </div>
       <div class="slider-group">
@@ -143,7 +182,7 @@
   </div>
 
   <div class="panel">
-    <span class="panel-title">3. Layout & Druck</span>
+    <span class="panel-title" style="display:block; margin-bottom:15px;">3. Layout & Druck</span>
     <div class="form-group">
       <select id="preset-select">
         <option value="43" selected>Münzkapsel Standard (43 mm, freies Raster)</option>
@@ -152,7 +191,7 @@
         <option value="30">RFIDfriend Token (30 mm, freies Raster)</option>
       </select>
     </div>
-    <div class="form-row" style="align-items: center; justify-content: space-between;">
+    <div class="form-row" style="align-items: center; justify-content: space-between; margin-bottom: 10px;">
       <div class="stats-badge" id="sheet-stats">0 Etiketten auf dem Bogen</div>
       <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer;">
         <input type="checkbox" id="show-text-toggle" checked style="width: 18px; height: 18px;">
@@ -165,7 +204,9 @@
 </div>
 
 <div class="preview-container">
-  <div class="no-print" style="margin-bottom: 15px; font-weight: bold; color: #6b7280; text-align: center;">Live Druckvorschau (Klicke auf ein Etikett zum Bearbeiten)</div>
+  <div class="no-print" style="margin-bottom: 20px; font-weight: 700; color: #4b5563; text-align: center;">
+    Live Druckvorschau <span style="font-weight:400; font-size:14px; display:block; margin-top:4px;">(Klicke auf ein Etikett auf dem Bogen, um es zu bearbeiten)</span>
+  </div>
   <div class="print-sheet" id="print-sheet-preview">
     <div id="sheet-grid" class="grid-standard"></div>
   </div>
@@ -177,35 +218,50 @@
   </div>
 </div>
 
-<!-- Modal: Auswahl vor dem Druck -->
+<!-- Modal: Druck & Export -->
 <div class="modal-overlay" id="print-modal">
   <div class="modal-box">
     <div class="modal-header">Druck- & Exportoptionen</div>
-    <p style="font-size: 14px; color: #4b5563; margin-top: 0;">Wie möchtest du deinen fertigen Bogen ausgeben?</p>
-    <div class="modal-actions">
-      <button type="button" onclick="executePrint()">📄 Jetzt Drucken (A4 / PDF)</button>
+    <p style="font-size: 15px; color: #4b5563; margin-top: 0;">Wie möchtest du deinen fertigen Bogen ausgeben?</p>
+    <div class="modal-actions" style="flex-direction: column;">
+      <button type="button" onclick="executePrint()" style="padding: 16px; font-size:16px;">📄 Jetzt Drucken (A4 / PDF)</button>
       <button type="button" class="btn-secondary" id="btn-export-png" onclick="exportAsPng()">🖼️ Als hochauflösendes PNG speichern</button>
       <button type="button" class="btn-outline" onclick="closePrintModal()">Abbrechen</button>
     </div>
   </div>
 </div>
+
+<!-- Modal: Custom Alert / Confirm Dialog -->
+<div class="modal-overlay" id="dialog-modal">
+  <div class="modal-box">
+    <div class="modal-header" id="dialog-title">Hinweis</div>
+    <p style="font-size: 15px; color: #4b5563; margin-top: 0;" id="dialog-message"></p>
+    <div class="modal-actions">
+      <button type="button" class="btn-outline" id="dialog-cancel" style="display:none;">Abbrechen</button>
+      <button type="button" id="dialog-confirm">OK</button>
+    </div>
+  </div>
+</div>
+
 <canvas id="export-canvas" style="display: none;"></canvas>
+
 <script>
   const TONIES_JSON_URL = "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json";
   let tonieDb = [];
   
   // --- STATE MANAGEMENT ---
   let appState = {
-    labels: [], // Enthält alle Etiketten-Objekte
+    labels: [],
     selectedId: null,
     preset: '43',
-    showText: true
+    showText: true,
+    searchType: 'tonie'
   };
 
   const elements = {
     searchInput: document.getElementById("search-input"),
     searchBtn: document.getElementById("search-btn"),
-    searchType: document.getElementById("search-type"),
+    tabBtns: document.querySelectorAll(".tab-btn"),
     searchResults: document.getElementById("search-results"),
     statusMsg: document.getElementById("search-status"),
     imgToolPanel: document.getElementById("img-tool-panel"),
@@ -216,19 +272,39 @@
     showTextToggle: document.getElementById("show-text-toggle"),
     sheetGrid: document.getElementById("sheet-grid"),
     sheetStats: document.getElementById("sheet-stats"),
-    printModal: document.getElementById("print-modal")
+    printModal: document.getElementById("print-modal"),
+    dialogModal: document.getElementById("dialog-modal")
   };
 
-  // State aus LocalStorage laden
+  // --- CUSTOM DIALOGS (REPLACING ALERT/CONFIRM) ---
+  function showDialog(title, message, isConfirm, onConfirmCallback) {
+    document.getElementById('dialog-title').textContent = title;
+    document.getElementById('dialog-message').textContent = message;
+    const cancelBtn = document.getElementById('dialog-cancel');
+    const confirmBtn = document.getElementById('dialog-confirm');
+    
+    cancelBtn.style.display = isConfirm ? 'block' : 'none';
+    elements.dialogModal.style.display = 'flex';
+    
+    confirmBtn.onclick = () => {
+      elements.dialogModal.style.display = 'none';
+      if(onConfirmCallback) onConfirmCallback();
+    };
+    cancelBtn.onclick = () => {
+      elements.dialogModal.style.display = 'none';
+    };
+  }
+
+  // --- STATE PERSISTENCE ---
   function loadState() {
-    const saved = localStorage.getItem("tonieGeneratorState");
+    const saved = localStorage.getItem("tonieGeneratorStatePro");
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
         appState.labels = parsed.labels || [];
         appState.preset = parsed.preset || '43';
         appState.showText = parsed.showText !== undefined ? parsed.showText : true;
-        appState.selectedId = null; // Nach Reload nichts markiert
+        appState.selectedId = null; 
         
         elements.presetSelect.value = appState.preset;
         elements.showTextToggle.checked = appState.showText;
@@ -238,18 +314,39 @@
   }
 
   function saveState() {
-    localStorage.setItem("tonieGeneratorState", JSON.stringify({
+    localStorage.setItem("tonieGeneratorStatePro", JSON.stringify({
       labels: appState.labels,
       preset: appState.preset,
       showText: appState.showText
     }));
   }
 
-  // --- DATENBANK & SUCHE ---
   fetch(TONIES_JSON_URL)
     .then(res => res.json())
     .then(data => { tonieDb = data; elements.statusMsg.textContent = "Datenbank bereit. Suchbegriff eingeben."; })
     .catch(() => elements.statusMsg.textContent = "Fehler beim Laden der Datenbank.");
+
+  // Tab Logik
+  elements.tabBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      elements.tabBtns.forEach(b => b.classList.remove('active'));
+      e.currentTarget.classList.add('active');
+      appState.searchType = e.currentTarget.dataset.type;
+      
+      elements.searchInput.placeholder = appState.searchType === 'album' 
+        ? "Interpret oder Album suchen (z.B. Disney)..." 
+        : "Tonie Titel suchen (z.B. Conni)...";
+      
+      elements.searchInput.focus();
+      
+      if(elements.searchInput.value.trim().length >= 3) {
+        doSearch();
+      } else {
+        elements.searchResults.innerHTML = "";
+        elements.statusMsg.textContent = "Bereit für neue Suche.";
+      }
+    });
+  });
 
   async function doSearch() {
     const q = elements.searchInput.value.trim().toLowerCase();
@@ -258,7 +355,7 @@
     elements.searchResults.innerHTML = "";
     elements.statusMsg.textContent = "Suche läuft...";
     
-    if (elements.searchType.value === "album") {
+    if (appState.searchType === "album") {
       try {
         const res = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=album&limit=12`);
         const data = await res.json();
@@ -268,7 +365,7 @@
           const imgUrl = album.artworkUrl100.replace('100x100bb', '600x600bb');
           createResultCard(imgUrl, album.artistName, album.collectionName);
         });
-      } catch (err) { elements.statusMsg.textContent = "Netzwerkfehler."; }
+      } catch (err) { elements.statusMsg.textContent = "Netzwerkfehler bei iTunes-Suche."; }
     } else {
       if(tonieDb.length === 0) return;
       const matches = tonieDb.filter(item => (item.title||"").toLowerCase().includes(q) || (item.series||"").toLowerCase().includes(q)).slice(0, 16);
@@ -292,10 +389,10 @@
     elements.searchResults.appendChild(card);
   }
 
-  // --- LABEL MANAGEMENT (Der Warenkorb) ---
   function addLabel(imgUrl, series, title) {
     if (appState.preset === 'avery-40' && appState.labels.length >= 24) {
-      alert("Ein Avery-Bogen hat maximal 24 Plätze. Bitte lösche zuerst ein Etikett."); return;
+      showDialog("Bogen ist voll", "Ein Avery-Bogen hat maximal 24 Plätze. Bitte lösche zuerst ein Etikett.", false); 
+      return;
     }
     const newId = Date.now().toString() + Math.floor(Math.random()*1000);
     appState.labels.push({ id: newId, imgUrl, series, title, zoom: 100, posX: 0, posY: 0 });
@@ -311,7 +408,6 @@
       elements.posXSlider.value = label.posX;
       elements.posYSlider.value = label.posY;
       document.getElementById("zoom-val").textContent = `${label.zoom}%`;
-      // Zum Panel scrollen
       elements.imgToolPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
     renderGrid();
@@ -327,7 +423,8 @@
     const labelToCopy = appState.labels.find(l => l.id === appState.selectedId);
     if(labelToCopy) {
       if (appState.preset === 'avery-40' && appState.labels.length >= 24) {
-        alert("Der Avery-Bogen ist voll (24 Stück)."); return;
+        showDialog("Bogen ist voll", "Der Avery-Bogen hat sein Maximum von 24 Stück erreicht.", false); 
+        return;
       }
       const newId = Date.now().toString() + Math.floor(Math.random()*1000);
       appState.labels.push({ ...labelToCopy, id: newId });
@@ -340,14 +437,13 @@
     deselectLabel();
   }
 
-  function clearSheet() {
-    if(confirm("Möchtest du wirklich alle Etiketten vom Bogen entfernen?")) {
+  function promptClearSheet() {
+    showDialog("Bogen leeren", "Möchtest du wirklich alle Etiketten vom Bogen entfernen? Dieser Schritt kann nicht rückgängig gemacht werden.", true, () => {
       appState.labels = [];
       deselectLabel();
-    }
+    });
   }
 
-  // Live Update bei Slider-Bewegung
   function updateSelectedLabelProps() {
     if(!appState.selectedId) return;
     const idx = appState.labels.findIndex(l => l.id === appState.selectedId);
@@ -364,7 +460,6 @@
   elements.posXSlider.oninput = updateSelectedLabelProps;
   elements.posYSlider.oninput = updateSelectedLabelProps;
 
-  // --- RENDERING ---
   function renderGrid() {
     elements.sheetGrid.innerHTML = "";
     saveState();
@@ -376,18 +471,30 @@
     let diameter = isAvery ? 40 : (parseInt(appState.preset) || 43);
     
     elements.sheetGrid.className = isAvery ? "grid-avery" : "grid-standard";
-    elements.sheetStats.textContent = `${appState.labels.length} Etikett${appState.labels.length !== 1 ? 'en' : ''} auf dem Bogen`;
+    
+    // UI Update für Zähler
+    elements.sheetStats.textContent = `${appState.labels.length}${isAvery ? '/24' : ''} Etikett${appState.labels.length !== 1 ? 'en' : ''} auf dem Bogen`;
+    if(isAvery && appState.labels.length >= 24) {
+      elements.sheetStats.classList.add('full');
+      elements.sheetStats.textContent = "Bogen ist voll (24/24)";
+    } else {
+      elements.sheetStats.classList.remove('full');
+    }
 
-    // Wenn leer
     if(appState.labels.length === 0 && !isAvery) {
-      elements.sheetGrid.innerHTML = `<div style="width:100%; text-align:center; padding: 40px; color: #9ca3af;">Dein Bogen ist leer. Füge oben Etiketten hinzu.</div>`;
+      elements.sheetGrid.innerHTML = `
+        <div class="empty-state">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+          <p>Dein Bogen ist leer.</p>
+          <p style="font-size:13px; margin-top:5px; font-weight:normal;">Suche oben nach Titeln und klicke sie an, um sie hierher hinzuzufügen.</p>
+        </div>`;
       return;
     }
 
     const totalSlots = isAvery ? 24 : appState.labels.length;
 
     for(let i = 0; i < totalSlots; i++) {
-      const label = appState.labels[i]; // Kann undefined sein in Avery
+      const label = appState.labels[i];
       
       const slot = document.createElement("div");
       slot.className = "tag-slot";
@@ -424,7 +531,6 @@
           }
         }
       } else {
-        // Leerer Avery Slot
         circle.classList.add("empty-slot");
       }
       slot.appendChild(circle);
@@ -432,7 +538,6 @@
     }
   }
 
-  // --- EVENTS ---
   let searchTimeout = null;
   elements.searchInput.addEventListener("input", () => {
     if (elements.searchInput.value.trim().length >= 3) {
@@ -443,27 +548,24 @@
   });
   elements.searchBtn.onclick = () => { clearTimeout(searchTimeout); doSearch(); };
   elements.searchInput.onkeydown = e => { if (e.key === "Enter") { clearTimeout(searchTimeout); doSearch(); }};
-  elements.searchType.onchange = () => { 
-    elements.searchInput.placeholder = elements.searchType.value === "album" ? "Interpret oder Album suchen..." : "Tonie Titel suchen..."; 
-    if(elements.searchInput.value.trim().length >= 3) doSearch();
-  };
   
   elements.presetSelect.onchange = renderGrid;
   elements.showTextToggle.onchange = renderGrid;
 
-  // --- EXPORT & PRINT ---
   function openPrintModal() {
-    if(appState.labels.length === 0) { alert("Bitte füge zuerst Etiketten hinzu."); return; }
+    if(appState.labels.length === 0) { 
+      showDialog("Bogen leer", "Bitte füge zuerst Etiketten hinzu, bevor du druckst.", false);
+      return; 
+    }
     elements.printModal.style.display = "flex";
   }
   function closePrintModal() { elements.printModal.style.display = "none"; }
   function executePrint() {
     closePrintModal();
-    deselectLabel(); // Rahmen entfernen vorm Drucken
+    deselectLabel();
     setTimeout(() => window.print(), 250);
   }
 
-  // Async Image Loader für sicheren PNG Export
   async function loadImagesForExport() {
     const cache = {};
     for (const lbl of appState.labels) {
@@ -490,7 +592,7 @@
       const diameterMm = isAvery ? 40 : (parseInt(appState.preset) || 43);
       
       const canvas = document.getElementById("export-canvas");
-      canvas.width = 2480; canvas.height = 3508; // A4 @ 300 DPI
+      canvas.width = 2480; canvas.height = 3508; 
       const ctx = canvas.getContext("2d");
 
       ctx.fillStyle = "#ffffff";
@@ -516,7 +618,6 @@
         const y = startY + row * (diameterPx + gapY);
         const label = appState.labels[i];
 
-        // Immer gestrichelte Schnittkante zeichnen (hilft beim Ausschneiden/Positionieren)
         ctx.save();
         ctx.beginPath();
         ctx.setLineDash([10, 10]);
@@ -578,7 +679,7 @@
       link.href = canvas.toDataURL("image/png");
       link.click();
     } catch (e) {
-      alert("Fehler beim Exportieren des Bildes.");
+      showDialog("Fehler", "Beim Exportieren des Bildes ist ein Fehler aufgetreten.", false);
     } finally {
       exportBtn.textContent = "🖼️ Als hochauflösendes PNG speichern";
       exportBtn.disabled = false;
@@ -588,7 +689,6 @@
 
   // Initialisieren
   loadState();
-
 </script>
 </body>
 </html>
