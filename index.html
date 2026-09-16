@@ -82,27 +82,27 @@
     }
     .coin-img-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-repeat: no-repeat; background-position: center; }
     
+    /* Geteilter Text: Oben und Unten, ohne Schatten, flacher Look */
     .tag-info-text {
       position: absolute;
-      bottom: 2mm;
       width: 85%;
       text-align: center;
-      font-size: 6pt;
+      font-size: 5.5pt;
       font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-      font-weight: 600;
-      color: #333;
-      background: rgba(255, 255, 255, 0.9);
-      padding: 3px 6px;
-      border-radius: 10px;
-      box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+      font-weight: 700;
+      color: #111;
+      background: rgba(255, 255, 255, 0.8); /* Etwas transparenter, kein Schatten */
+      padding: 2.5px 5px;
+      border-radius: 6px;
       z-index: 2;
       line-height: 1.1;
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
       overflow: hidden;
-      backdrop-filter: blur(2px);
     }
+    .tag-info-text.top { top: 2mm; }
+    .tag-info-text.bottom { bottom: 2mm; }
 
     /* Footer Disclaimer */
     .disclaimer {
@@ -117,7 +117,6 @@
 
     /* Print Styles */
     @media print {
-      /* WICHTIG: Erlaubt den Druck von CSS-Hintergrundbildern (den Covern) in allen Browsern */
       body { 
         background: #fff; 
         margin: 0; 
@@ -155,12 +154,12 @@
   <div class="panel" id="img-tool-panel" style="display: none;">
     <span class="panel-title">2. Vorschau anpassen</span>
     
-    <!-- NEU: Direkte visuelle Vorschau im Werkzeug-Panel -->
     <div class="single-preview-box">
       <div class="tag-slot">
         <div class="coin-circle" id="live-preview-circle" style="width: 43mm; height: 43mm; box-shadow: 0 4px 10px rgba(0,0,0,0.15);">
           <div class="coin-img-layer" id="live-preview-img"></div>
-          <div class="tag-info-text" id="live-preview-text"></div>
+          <div class="tag-info-text top" id="live-preview-text-top" style="display: none;"></div>
+          <div class="tag-info-text bottom" id="live-preview-text-bottom" style="display: none;"></div>
         </div>
       </div>
     </div>
@@ -194,11 +193,12 @@
     <div class="form-row" style="align-items: center; justify-content: space-between;">
       <div id="tag-count-wrap" style="display: flex; align-items: center; gap: 10px;">
         <label style="font-weight: 600;">Anzahl:</label>
+        <!-- Die Anzahl ist jetzt immer sichtbar und anpassbar -->
         <input type="number" id="tag-count" value="4" min="1" max="24" style="width: 80px;">
       </div>
       <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer;">
         <input type="checkbox" id="show-text-toggle" checked style="width: 18px; height: 18px;">
-        Titel unten andrucken
+        Titel andrucken (Oben & Unten)
       </label>
     </div>
     
@@ -206,7 +206,6 @@
   </div>
 </div>
 
-<!-- Korrigierter Bereich für die Druckvorschau (ohne no-print im äußeren Container) -->
 <div class="preview-container">
   <div class="no-print" style="margin-bottom: 15px; font-weight: bold; color: #6b7280; text-align: center;">Live Druckvorschau (A4 Bogen)</div>
   <div class="print-sheet" id="print-sheet-preview">
@@ -214,7 +213,6 @@
   </div>
 </div>
 
-<!-- Disclaimer nach unten verschoben, mit no-print damit er nicht mit auf die Etiketten gedruckt wird -->
 <div class="container no-print">
   <div class="disclaimer">
     <strong>Disclaimer:</strong> Dieses Projekt ist inoffiziell, ein rein privates Hobby-Projekt und steht in keinerlei Verbindung zur Boxine GmbH. "tonies®" und "Toniebox®" sind eingetragene Marken der Boxine GmbH. Alle Rechte an den verwendeten Bildern, Covern und Titeln liegen bei den jeweiligen Urhebern.
@@ -225,6 +223,7 @@
   const TONIES_JSON_URL = "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json";
   let tonieDb = [];
   let currentImgUrl = "";
+  let currentSeries = "";
   let currentTitle = "";
   let imgZoom = 100, imgPosX = 0, imgPosY = 0;
 
@@ -240,14 +239,13 @@
     posYSlider: document.getElementById("pos-y-slider"),
     presetSelect: document.getElementById("preset-select"),
     tagCount: document.getElementById("tag-count"),
-    tagCountWrap: document.getElementById("tag-count-wrap"),
     showTextToggle: document.getElementById("show-text-toggle"),
     sheetGrid: document.getElementById("sheet-grid"),
     
-    // Elemente für die Live-Vorschau in Panel 2
     livePreviewCircle: document.getElementById("live-preview-circle"),
     livePreviewImg: document.getElementById("live-preview-img"),
-    livePreviewText: document.getElementById("live-preview-text")
+    livePreviewTextTop: document.getElementById("live-preview-text-top"),
+    livePreviewTextBottom: document.getElementById("live-preview-text-bottom")
   };
 
   fetch(TONIES_JSON_URL)
@@ -273,7 +271,7 @@
         elements.statusMsg.textContent = `${data.results.length} Alben gefunden.`;
         data.results.forEach(album => {
           const imgUrl = album.artworkUrl100.replace('100x100bb', '600x600bb');
-          createResultCard(imgUrl, album.collectionName);
+          createResultCard(imgUrl, album.artistName, album.collectionName);
         });
       } catch (err) { elements.statusMsg.textContent = "Netzwerkfehler bei Album-Suche."; }
       
@@ -289,18 +287,30 @@
       elements.statusMsg.textContent = `${matches.length} Tonies gefunden.`;
       
       matches.forEach(item => {
-        if(item.pic) createResultCard(item.pic, item.episodes || item.title);
+        if(item.pic) {
+          // Serie oben, Episodentitel (oder Fallback auf Titel) unten
+          createResultCard(item.pic, item.series || "", item.episodes || item.title || "");
+        }
       });
     }
   }
 
-  function createResultCard(imgUrl, title) {
+  function createResultCard(imgUrl, seriesText, titleText) {
     const card = document.createElement("div");
     card.className = "result-card";
-    card.innerHTML = `<img src="${imgUrl}"><div class="title">${title}</div>`;
+    const displayName = titleText || seriesText || "Ohne Titel";
+    card.innerHTML = `<img src="${imgUrl}"><div class="title">${displayName}</div>`;
     card.onclick = () => {
       currentImgUrl = imgUrl;
-      currentTitle = title;
+      currentSeries = seriesText;
+      currentTitle = titleText;
+      
+      // Wenn Serie leer ist aber Titel existiert (oder umgekehrt), verteilen wir es sinnvoll
+      if(!currentSeries && currentTitle) {
+         currentSeries = currentTitle;
+         currentTitle = "";
+      }
+
       imgZoom = 100; imgPosX = 0; imgPosY = 0;
       elements.zoomSlider.value = 100; elements.posXSlider.value = 0; elements.posYSlider.value = 0;
       document.getElementById("zoom-val").textContent = "100%";
@@ -314,15 +324,12 @@
     elements.sheetGrid.innerHTML = "";
     
     const isAvery = elements.presetSelect.value === "avery-40";
-    let diameter = isAvery ? 40 : (parseInt(elements.presetSelect.value) || 43); // NaN Validierung
+    let diameter = isAvery ? 40 : (parseInt(elements.presetSelect.value) || 43);
     
-    if(isAvery) {
-      elements.tagCountWrap.style.display = "none";
-    } else {
-      elements.tagCountWrap.style.display = "flex";
-    }
+    // Anzahl immer vom Input-Feld holen (sodass man auch auf Avery-Bögen gezielt weniger drucken kann)
+    let count = parseInt(elements.tagCount.value) || 1;
+    if(count > 24 && isAvery) { count = 24; elements.tagCount.value = 24; }
     
-    let count = isAvery ? 24 : (parseInt(elements.tagCount.value) || 1); // NaN Validierung
     elements.sheetGrid.className = isAvery ? "grid-avery" : "grid-standard";
 
     // 1. Update Panel 2 Live Preview
@@ -333,11 +340,23 @@
       elements.livePreviewImg.style.backgroundSize = `${imgZoom}%`;
       elements.livePreviewImg.style.backgroundPosition = `calc(50% + ${imgPosX}px) calc(50% + ${imgPosY}px)`;
       
-      if (elements.showTextToggle.checked && currentTitle) {
-        elements.livePreviewText.textContent = currentTitle;
-        elements.livePreviewText.style.display = "block";
+      if (elements.showTextToggle.checked) {
+        if(currentSeries) {
+          elements.livePreviewTextTop.textContent = currentSeries;
+          elements.livePreviewTextTop.style.display = "block";
+        } else {
+          elements.livePreviewTextTop.style.display = "none";
+        }
+        
+        if(currentTitle) {
+          elements.livePreviewTextBottom.textContent = currentTitle;
+          elements.livePreviewTextBottom.style.display = "block";
+        } else {
+          elements.livePreviewTextBottom.style.display = "none";
+        }
       } else {
-        elements.livePreviewText.style.display = "none";
+        elements.livePreviewTextTop.style.display = "none";
+        elements.livePreviewTextBottom.style.display = "none";
       }
     }
 
@@ -360,11 +379,19 @@
         circle.appendChild(imgLayer);
       }
 
-      if (elements.showTextToggle.checked && currentTitle) {
-        const lbl = document.createElement("div");
-        lbl.className = "tag-info-text";
-        lbl.textContent = currentTitle; 
-        circle.appendChild(lbl);
+      if (elements.showTextToggle.checked) {
+        if(currentSeries) {
+          const lblTop = document.createElement("div");
+          lblTop.className = "tag-info-text top";
+          lblTop.textContent = currentSeries; 
+          circle.appendChild(lblTop);
+        }
+        if(currentTitle) {
+          const lblBottom = document.createElement("div");
+          lblBottom.className = "tag-info-text bottom";
+          lblBottom.textContent = currentTitle; 
+          circle.appendChild(lblBottom);
+        }
       }
 
       slot.appendChild(circle);
