@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Tonie & Tag Cover Generator V3</title>
+<title>Tonie & Tag Cover Generator V4</title>
 <style>
 :root {
 --primary: #e30613;
@@ -196,7 +196,7 @@ body { background: #fff; margin: 0; padding: 0; }
 <body>
 <div class="app-container">
 <header class="no-print">
-<h1>Tonie & Tag Cover Generator V3</h1>
+<h1>Tonie & Tag Cover Generator V4</h1>
 <div class="subtitle">Der elegante Designer für Münzkapseln, RFIDfriend Token & Avery Etiketten</div>
 </header>
 <!-- SEKTION 1: SUCHEN & HINZUFÜGEN -->
@@ -389,14 +389,14 @@ el.dbStatus.textContent = ⁠${tonieDb.length} Tonies bereit! Suchbegriff eingeb
 .catch(() => el.dbStatus.textContent = "Fehler beim Laden der Tonie-Datenbank.");
 // State speichern / laden
 function saveState() {
-localStorage.setItem("tonieGenV3State", JSON.stringify({
+localStorage.setItem("tonieGenV4State", JSON.stringify({
 labels: state.labels,
 preset: state.preset,
 showText: state.showText
 }));
 }
 function loadState() {
-const saved = localStorage.getItem("tonieGenV3State");
+const saved = localStorage.getItem("tonieGenV4State");
 if (saved) {
 try {
 const parsed = JSON.parse(saved);
