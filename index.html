@@ -2,13 +2,12 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <!-- WICHTIG: blockiert Auto-Zoom auf iOS -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Tonie & Tag Cover Generator</title>
     <style>
-        /* === VARIABLEN & RESET === */
+        /* === VARIABLES & RESET === */
         :root {
-            --primary: #e30613; /* Tonie Rot */
+            --primary: #e30613; /* Tonie Red */
             --primary-hover: #b8050f;
             --bg-body: #f3f4f6;
             --bg-card: #ffffff;
@@ -28,32 +27,35 @@
             color: var(--text-main); 
             line-height: 1.5; 
             padding: 16px; 
-            padding-bottom: 60px;
+            padding-bottom: 80px; /* Space for mobile browser bar */
             overflow-x: hidden; 
+            display: flex;
+            flex-direction: column;
+            align-items: center; /* Center everything */
         }
 
-        /* === LAYOUT & KARTEN === */
-        .header { text-align: center; margin-bottom: 24px; padding-top: 10px; }
-        .header h1 { color: var(--primary); font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
-        .header p { color: var(--text-muted); font-size: 14px; margin-top: 4px; }
+        /* === LAYOUT & CARDS === */
+        .header { text-align: center; margin-bottom: 24px; padding-top: 10px; width: 100%; max-width: 1200px; }
+        .header h1 { color: var(--primary); font-size: 28px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2; }
+        .header p { color: var(--text-muted); font-size: 14px; margin-top: 8px; }
 
         .app-layout { 
             display: grid; 
             grid-template-columns: 1fr; 
             gap: 24px; 
+            width: 100%;
             max-width: 1200px; 
-            margin: 0 auto; 
         }
         @media(min-width: 1024px) { 
             .app-layout { grid-template-columns: 380px 1fr; align-items: start; } 
         }
 
-        .card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 2px solid #f3f4f6; padding-bottom: 12px; }
+        .card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow); width: 100%; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #f3f4f6; padding-bottom: 12px; }
         .card-header h2 { font-size: 18px; font-weight: 700; color: #111; }
 
         /* === BUTTONS & INPUTS === */
-        /* WICHTIG: font-size 16px verhindert iOS Zoom! */
+        /* font-size 16px prevents iOS Auto-Zoom */
         input[type="text"], select { 
             width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: var(--radius-md); 
             font-size: 16px; outline: none; background: #f9fafb; color: var(--text-main); font-weight: 500; transition: 0.2s; 
@@ -62,108 +64,175 @@
         
         .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; font-size: 16px; font-weight: 700; color: #fff; background: var(--primary); border: none; border-radius: var(--radius-md); cursor: pointer; transition: 0.2s; }
         .btn:hover { background: var(--primary-hover); transform: translateY(-1px); }
-        .btn-outline { background: #fff; color: var(--text-main); border: 2px solid var(--border); }
-        .btn-outline:hover { border-color: var(--text-muted); background: #f9fafb; }
+        .btn-secondary { background: #fff; color: var(--text-main); border: 2px solid var(--border); }
+        .btn-secondary:hover { border-color: var(--text-muted); background: #f9fafb; }
         .btn-sm { padding: 8px 12px; font-size: 13px; width: auto; border-radius: 8px; }
 
-        label { display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; margin-top: 16px; }
+        label { display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; margin-top: 16px; }
 
         /* === TABS === */
-        .tabs { display: flex; background: #f3f4f6; padding: 4px; border-radius: 12px; margin-bottom: 16px; }
-        .tab { flex: 1; text-align: center; padding: 10px; font-size: 14px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: 0.2s; }
+        .tabs { display: flex; background: #f3f4f6; padding: 4px; border-radius: 12px; margin-bottom: 20px; }
+        .tab { flex: 1; text-align: center; padding: 12px 10px; font-size: 14px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: 0.2s; }
         .tab.active { background: #fff; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
-        /* === BEREICH 1: SUCHE === */
-        .status-text { font-size: 13px; color: var(--text-muted); text-align: center; margin: 12px 0; font-weight: 600; }
-        .search-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-height: 400px; overflow-y: auto; padding-right: 4px; }
-        .search-item { border: 2px solid var(--border); border-radius: var(--radius-md); padding: 12px; text-align: center; cursor: pointer; transition: 0.2s; background: #fff; }
-        .search-item:hover { border-color: var(--primary); transform: translateY(-2px); }
-        .search-item img { width: 100%; aspect-ratio: 1; object-fit: contain; margin-bottom: 8px; border-radius: 8px; }
-        .search-item span { display: block; font-size: 12px; font-weight: 600; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        /* === SECTION 1: SEARCH & UPLOAD === */
+        .status-text { font-size: 14px; color: var(--text-muted); text-align: center; margin: 16px 0; font-weight: 600; }
+        .search-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-height: 450px; overflow-y: auto; padding-right: 8px; }
+        /* Custom Scrollbar for Search */
+        .search-grid::-webkit-scrollbar { width: 6px; }
+        .search-grid::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .search-grid::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .search-grid::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-        .upload-box { border: 2px dashed #cbd5e1; padding: 40px 20px; text-align: center; border-radius: var(--radius-md); background: #f8fafc; cursor: pointer; }
+        .search-item { border: 2px solid var(--border); border-radius: var(--radius-md); padding: 12px; text-align: center; cursor: pointer; transition: 0.2s; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center;}
+        .search-item:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .search-item img { width: 100%; max-width: 120px; aspect-ratio: 1; object-fit: contain; margin-bottom: 12px; border-radius: 8px; }
+        .search-item span { display: block; font-size: 12px; font-weight: 600; line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; width: 100%; }
+
+        .upload-box { border: 2px dashed #cbd5e1; padding: 60px 20px; text-align: center; border-radius: var(--radius-md); background: #f8fafc; cursor: pointer; transition: 0.2s; }
+        .upload-box:hover { border-color: var(--primary); background: #f1f5f9; }
         .upload-box input { display: none; }
 
-        /* === BEREICH 2: EDITOR === */
-        .editor-layout { display: flex; flex-direction: column; gap: 24px; align-items: center; }
+        /* === SECTION 2: EDITOR === */
+        .editor-layout { display: flex; flex-direction: column; gap: 32px; align-items: center; }
         @media(min-width: 600px) { .editor-layout { flex-direction: row; align-items: flex-start; } }
         
-        .preview-container { flex: 0 0 auto; background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px; display: flex; justify-content: center; width: 100%; max-width: 300px; }
+        .preview-container { flex: 0 0 auto; background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 32px; display: flex; justify-content: center; width: 100%; max-width: 320px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
         
-        /* Der große Editor-Kreis */
-        .circle-canvas { width: 220px; height: 220px; border-radius: 50%; border: 2px dashed #cbd5e1; position: relative; display: flex; justify-content: center; align-items: center; background: #fff; overflow: hidden; box-shadow: var(--shadow); transition: 0.3s; }
-        .circle-canvas.empty { background: #f1f5f9; }
+        /* The main Editor Circle */
+        .circle-canvas { width: 240px; height: 240px; border-radius: 50%; border: 2px dashed #cbd5e1; position: relative; display: flex; justify-content: center; align-items: center; background: #fff; overflow: hidden; box-shadow: var(--shadow); transition: 0.3s; }
+        .circle-canvas.empty { background: #f1f5f9; box-shadow: none; }
         .circle-canvas.empty::after { content: 'Wähle ein Motiv'; color: #94a3b8; font-weight: 700; font-size: 15px; }
         
-        /* WICHTIG: background-repeat: no-repeat verhindert das Klonen! */
-        .bg-layer { position: absolute; top:0; left:0; width: 100%; height: 100%; background-repeat: no-repeat; background-position: center; pointer-events: none; }
+        /* background-repeat: no-repeat prevents cloning when zoomed out */
+        .bg-layer { position: absolute; top:0; left:0; width: 100%; height: 100%; background-repeat: no-repeat; background-position: center; pointer-events: none; transition: background-color 0.2s; }
         
-        /* SVG für gebogenen Text (V10: Perfekte Symmetrie & Baseline) */
+        /* Perfect Curved Text SVG */
         .svg-overlay { position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
-        .svg-overlay text { font-family: -apple-system, sans-serif; font-weight: 800; font-size: 15px; fill: #111; stroke: #fff; stroke-width: 4px; paint-order: stroke fill; letter-spacing: 0.5px; }
+        .svg-overlay text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-weight: 800; font-size: 16px; fill: #111; stroke: #fff; stroke-width: 4px; paint-order: stroke fill; letter-spacing: 0.5px; }
 
         .editor-controls { flex: 1; width: 100%; }
         
-        /* Simpel / Pro Schalter */
-        .mode-switch { display: flex; background: #f3f4f6; border-radius: 10px; padding: 4px; margin-bottom: 16px; }
-        .mode-btn { flex: 1; text-align: center; padding: 8px; font-size: 13px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-radius: 8px; }
+        /* Simple / Pro Switch */
+        .mode-switch { display: flex; background: #f3f4f6; border-radius: 10px; padding: 4px; margin-bottom: 20px; }
+        .mode-btn { flex: 1; text-align: center; padding: 10px; font-size: 13px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: 0.2s;}
         .mode-btn.active { background: #fff; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
-        .pro-panel { background: #f8fafc; border: 1px solid var(--border); padding: 16px; border-radius: var(--radius-md); margin-top: 16px; }
-        .slider-row { margin-bottom: 12px; }
-        .slider-row label { margin: 0 0 6px 0; display: flex; justify-content: space-between; }
-        input[type="range"] { width: 100%; accent-color: var(--primary); cursor: pointer; }
+        .pro-panel { background: #f8fafc; border: 1px solid var(--border); padding: 20px; border-radius: var(--radius-md); margin-top: 20px; }
+        .slider-row { margin-bottom: 16px; }
+        .slider-row label { margin: 0 0 8px 0; display: flex; justify-content: space-between; font-size: 12px; }
+        input[type="range"] { width: 100%; accent-color: var(--primary); cursor: pointer; height: 6px; background: #e5e7eb; border-radius: 4px; outline: none; -webkit-appearance: none;}
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--primary); cursor: pointer; }
+
         
-        .color-row { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; border-top: 1px solid var(--border); padding-top: 12px; }
-        input[type="color"] { width: 44px; height: 44px; border: none; border-radius: 8px; cursor: pointer; background: transparent; }
+        .color-row { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px; }
+        input[type="color"] { width: 44px; height: 44px; border: none; border-radius: 8px; cursor: pointer; background: transparent; padding: 0;}
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
         input[type="color"]::-webkit-color-swatch { border: 2px solid var(--border); border-radius: 8px; }
 
-        /* === BEREICH 3: DYNAMISCHER A4 BOGEN (MOBILE FIX) === */
-        /* Dieser Container verhindert, dass der A4 Bogen das Handy-Layout sprengt */
+        /* === SECTION 3: DYNAMIC A4 SHEET (MOBILE FIX & VISUAL SLOTS) === */
+        /* Wrapper allows scaling without horizontal scroll */
         .sheet-scale-wrapper {
             width: 100%;
             overflow: hidden;
             background: #cbd5e1;
             border-radius: var(--radius-lg);
-            padding: 10px;
+            padding: 20px 10px;
             box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
             display: flex;
             justify-content: center;
+            margin-top: 20px;
         }
 
-        /* Der eigentliche Druckbogen (wird via JS skaliert, damit er auf den Screen passt) */
+        /* The Sheet - scaled via JS */
         .a4-sheet { 
             background: #fff; 
             box-shadow: var(--shadow-lg); 
             position: relative; 
-            /* Standard A4 Maße in Pixel bei ~96 DPI */
             width: 794px; 
             height: 1123px; 
             transform-origin: top center;
+            border-radius: 4px;
         }
         
-        /* Das Raster im Bogen */
-        .sheet-grid { display: flex; flex-wrap: wrap; gap: 30px; padding: 56px; align-content: flex-start; }
+        .sheet-grid { display: flex; flex-wrap: wrap; gap: 30px; padding: 56px; align-content: flex-start; justify-content: flex-start; }
         .grid-avery { display: grid; grid-template-columns: repeat(4, 151px); grid-auto-rows: 151px; gap: 19px; justify-content: center; padding-top: 56px; }
 
-        /* Einzelnes Etikett auf dem Bogen */
-        .label-slot { position: relative; border-radius: 50%; border: 2px dashed #94a3b8; overflow: hidden; cursor: pointer; display: flex; justify-content: center; align-items: center; background: #f8fafc; transition: 0.1s; }
-        .label-slot.empty::after { content: '+'; font-size: 30px; color: #cbd5e1; font-weight: bold; }
-        .label-slot:not(.empty):hover { border-color: var(--primary); transform: scale(1.02); z-index: 5; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-        .label-slot:not(.empty):hover::before { content: '✏️ Bearbeiten'; position: absolute; z-index: 20; background: rgba(0,0,0,0.7); color: #fff; font-size: 14px; padding: 8px 12px; border-radius: 12px; font-weight: bold; }
+        /* Single Label Slot - Now always visible as dashed circle when empty */
+        .label-slot { 
+            position: relative; 
+            border-radius: 50%; 
+            border: 2px dashed #cbd5e1; 
+            overflow: hidden; 
+            cursor: pointer; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            background: transparent; 
+            transition: all 0.2s ease; 
+        }
+        
+        /* Empty Slot Styling */
+        .label-slot.empty {
+             background: #f8fafc;
+        }
+        .label-slot.empty:hover {
+            border-color: var(--primary);
+            background: #fff;
+        }
+        .label-slot.empty::after { 
+            content: '+'; 
+            font-size: 32px; 
+            color: #94a3b8; 
+            font-weight: 300; 
+            transition: color 0.2s;
+        }
+        .label-slot.empty:hover::after {
+            color: var(--primary);
+        }
+
+        /* Filled Slot Styling */
+        .label-slot.filled {
+             border-style: solid;
+             border-color: transparent; /* Hide border when filled, rely on bg */
+             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .label-slot.filled:hover { 
+            transform: scale(1.03); 
+            z-index: 5; 
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15); 
+        }
+        .label-slot.filled:hover::before { 
+            content: '✏️ Bearbeiten'; 
+            position: absolute; 
+            z-index: 20; 
+            background: rgba(0,0,0,0.75); 
+            color: #fff; 
+            font-size: 14px; 
+            padding: 8px 14px; 
+            border-radius: 20px; 
+            font-weight: 600;
+            backdrop-filter: blur(4px);
+        }
 
         .hidden { display: none !important; }
         
-        footer { text-align: center; margin-top: 40px; font-size: 13px; color: var(--text-muted); }
-        footer a { color: var(--primary); text-decoration: none; font-weight: 700; }
+        footer { text-align: center; margin-top: 48px; font-size: 14px; color: var(--text-muted); width: 100%; max-width: 1200px; }
+        footer a { color: var(--primary); text-decoration: none; font-weight: 700; transition: 0.2s;}
+        footer a:hover { color: var(--primary-hover); text-decoration: underline;}
 
-        /* === DRUCK STYLES (A4 Nativ) === */
+        /* === PRINT STYLES (Native A4) === */
         @media print {
-            body { background: #fff; margin: 0; padding: 0; }
+            body { background: #fff; margin: 0; padding: 0; display: block;}
             .header, .app-layout > *:not(.print-section), .print-section > *:not(.sheet-scale-wrapper), footer { display: none !important; }
-            .sheet-scale-wrapper { background: transparent; padding: 0; box-shadow: none; display: block; border-radius: 0; }
-            .a4-sheet { transform: scale(1) !important; box-shadow: none; width: 210mm !important; height: 297mm !important; }
-            .label-slot.empty { display: none !important; }
+            .print-section { padding: 0; box-shadow: none; border-radius: 0; }
+            .sheet-scale-wrapper { background: transparent; padding: 0; box-shadow: none; display: block; border-radius: 0; margin: 0; overflow: visible;}
+            .a4-sheet { transform: scale(1) !important; box-shadow: none; width: 210mm !important; height: 297mm !important; border-radius: 0;}
+            
+            /* Hide empty slots when printing to save ink */
+            .label-slot.empty { border-color: transparent; background: transparent; }
+            .label-slot.empty::after { display: none; }
+            
             @page { size: A4 portrait; margin: 0; }
         }
     </style>
@@ -171,20 +240,20 @@
 <body>
 
 <div class="header">
-    <h1>Tonie Cover Generator V10</h1>
-    <p>Der ultimative Designer für Münzkapseln, RFIDfriend & Avery Etiketten</p>
+    <h1>Tonie Cover Generator V11</h1>
+    <p>Der elegante Designer für Münzkapseln, RFIDfriend & Avery Etiketten</p>
 </div>
 
 <div class="app-layout">
     
-    <!-- SPALTE 1: DATENBANK & UPLOAD -->
+    <!-- COLUMN 1: SEARCH & UPLOAD -->
     <div class="card">
         <div class="tabs">
             <div class="tab active" id="tab-tonie" onclick="switchSourceTab('tonie')">🟢 Tonie-Datenbank</div>
             <div class="tab" id="tab-upload" onclick="switchSourceTab('upload')">📁 Eigene Grafik</div>
         </div>
 
-        <!-- Tonie Suche -->
+        <!-- Tonie Search -->
         <div id="view-tonie">
             <input type="text" id="searchInput" placeholder="Titel oder Serie suchen (z.B. Conni)..." autocomplete="off">
             <div class="status-text" id="statusText">Verbinde zur Datenbank...</div>
@@ -194,45 +263,45 @@
         <!-- Upload -->
         <div id="view-upload" class="hidden">
             <label class="upload-box">
-                <div style="font-size: 40px; margin-bottom: 10px;">📸</div>
-                <div style="font-size: 16px; font-weight: 700; color: #111;">Bild auswählen</div>
-                <div style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">JPG oder PNG (Quadratisch empfohlen)</div>
+                <div style="font-size: 48px; margin-bottom: 16px;">📸</div>
+                <div style="font-size: 18px; font-weight: 700; color: #111;">Bild auswählen</div>
+                <div style="font-size: 14px; color: var(--text-muted); margin-top: 8px;">JPG oder PNG (Quadratisch empfohlen)</div>
                 <input type="file" id="customFileInput" accept="image/*">
             </label>
         </div>
     </div>
 
-    <!-- SPALTE 2: EDITOR & DRUCK -->
-    <div style="display: flex; flex-direction: column; gap: 24px;">
+    <!-- COLUMN 2: EDITOR & PRINT -->
+    <div style="display: flex; flex-direction: column; gap: 24px; width: 100%;">
         
         <!-- EDITOR -->
         <div class="card" id="editorCard">
             <div class="card-header">
                 <h2>Etikett gestalten</h2>
-                <button class="btn btn-outline btn-sm hidden" id="btnCancel" onclick="resetEditor()">Abbrechen</button>
+                <button class="btn btn-secondary btn-sm hidden" id="btnCancel" onclick="resetEditor()">Abbrechen</button>
             </div>
 
             <div class="editor-layout">
-                <!-- Große Vorschau -->
+                <!-- Large Preview -->
                 <div class="preview-container">
                     <div class="circle-canvas empty" id="previewCircle">
-                        <!-- BG Layer mit no-repeat Fix -->
+                        <!-- BG Layer with no-repeat -->
                         <div id="previewImage" class="bg-layer"></div>
                         
-                        <!-- SVG Text Overlay (V10 Fix für perfekten runden Text) -->
+                        <!-- SVG Text Overlay -->
                         <svg class="svg-overlay" viewBox="0 0 200 200" id="previewSvg" style="display: none;">
-                            <!-- Oben: Zeichnet links nach rechts über oben. Text sitzt AUF dem Pfad (auto) -->
+                            <!-- Top Text -->
                             <path id="pathTop" d="M 18,100 A 82,82 0 0,1 182,100" fill="none" stroke="none"/>
                             <text><textPath href="#pathTop" startOffset="50%" text-anchor="middle" dominant-baseline="auto" id="previewTextTop"></textPath></text>
                             
-                            <!-- Unten: Zeichnet links nach rechts über unten (Sweep 0). Text HÄNGT UNTER dem Pfad (hanging) -->
+                            <!-- Bottom Text (Sweep 0, Hanging) -->
                             <path id="pathBot" d="M 18,100 A 82,82 0 0,0 182,100" fill="none" stroke="none"/>
                             <text><textPath href="#pathBot" startOffset="50%" text-anchor="middle" dominant-baseline="hanging" id="previewTextBot"></textPath></text>
                         </svg>
                     </div>
                 </div>
 
-                <!-- Steuerungen -->
+                <!-- Controls -->
                 <div class="editor-controls">
                     <div class="mode-switch">
                         <div class="mode-btn active" id="mode-simple" onclick="switchMode('simple')">Simpel</div>
@@ -245,7 +314,7 @@
                     <label>Text Unten (z.B. Titel)</label>
                     <input type="text" id="editBot" placeholder="z.B. Der Superpapagei" oninput="updatePreview()">
 
-                    <!-- Pro Einstellungen -->
+                    <!-- Pro Settings -->
                     <div id="proPanel" class="pro-panel hidden">
                         <div class="slider-row">
                             <label><span>🔍 Zoom</span> <span id="valZoom">100%</span></label>
@@ -256,11 +325,11 @@
                             <input type="range" id="editRot" min="-180" max="180" value="0" oninput="updatePreview()">
                         </div>
                         <div class="slider-row">
-                            <label><span>↔️ Horizontal verschieben</span></label>
+                            <label><span>↔️ Horizontal</span></label>
                             <input type="range" id="editX" min="-100" max="100" value="0" oninput="updatePreview()">
                         </div>
                         <div class="slider-row">
-                            <label><span>↕️ Vertikal verschieben</span></label>
+                            <label><span>↕️ Vertikal</span></label>
                             <input type="range" id="editY" min="-100" max="100" value="0" oninput="updatePreview()">
                         </div>
                         <div class="color-row">
@@ -269,23 +338,23 @@
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 12px; margin-top: 16px;">
-                        <button class="btn" id="btnSave" onclick="saveToSheet()" style="background: #10b981;">➕ Auf den Bogen legen</button>
-                        <button class="btn btn-outline hidden" id="btnDelete" onclick="deleteLabel()" style="color: #e30613; border-color: #fca5a5;">🗑️ Löschen</button>
+                    <div style="display: flex; gap: 12px; margin-top: 24px;">
+                        <button class="btn" id="btnSave" onclick="saveToSheet()" style="background: #94a3b8; pointer-events: none;">Wähle zuerst ein Motiv (Links)</button>
+                        <button class="btn btn-secondary hidden" id="btnDelete" onclick="deleteLabel()" style="color: #e30613; border-color: #fca5a5;">🗑️ Löschen</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- BOGEN & DRUCK -->
+        <!-- SHEET & PRINT -->
         <div class="card print-section">
             <div class="card-header">
                 <h2>Format & Druck</h2>
-                <button class="btn btn-outline btn-sm" onclick="clearSheet()" style="color: #e30613; border-color: #fca5a5;">Bogen leeren</button>
+                <button class="btn btn-secondary btn-sm" onclick="clearSheet()" style="color: #e30613; border-color: #fca5a5;">Bogen leeren</button>
             </div>
             
             <label>Gewünschtes Etiketten-Format</label>
-            <select id="formatSelect" onchange="renderSheet()">
+            <select id="formatSelect" onchange="handleFormatChange()">
                 <option value="43">Münzkapsel Standard (43 mm)</option>
                 <option value="40">Münzkapsel Klein (40 mm)</option>
                 <option value="30">RFIDfriend Token (30 mm)</option>
@@ -293,44 +362,48 @@
                 <option value="avery-40">Avery Zweckform L3415-10 (40mm, 24 Stk)</option>
             </select>
 
-            <!-- V10 Mobile Skalierungs-Container (Löst das Wisch-Problem) -->
-            <div class="sheet-scale-wrapper" id="sheetWrapper" style="margin-top: 16px;">
+            <p style="text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 16px;">Tipp: Klicke auf einen freien Kreis auf dem Bogen, um ihn gezielt zu befüllen.</p>
+
+            <!-- Mobile Scaling Wrapper -->
+            <div class="sheet-scale-wrapper" id="sheetWrapper">
                 <div class="a4-sheet" id="printSheet">
                     <div id="sheetGrid" class="sheet-grid"></div>
                 </div>
             </div>
 
-            <!-- V10 Button Tausch: Drucken ist primär! -->
-            <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 24px;">
-                <button class="btn" onclick="window.print()">🖨️ Direkt im Browser drucken</button>
-                <button class="btn btn-outline" onclick="exportPNG()">🖼️ Als hochauflösendes PNG speichern</button>
+            <!-- Export Actions -->
+            <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 32px;">
+                <!-- Primary Action -->
+                <button class="btn" onclick="window.print()" style="font-size: 18px; padding: 16px;">🖨️ Direkt im Browser drucken</button>
+                <!-- Secondary Action -->
+                <button class="btn btn-secondary" onclick="exportPNG()">🖼️ Als hochauflösendes PNG speichern</button>
             </div>
         </div>
     </div>
 </div>
 
 <footer>
-    <p>Tonie Cover Generator V10 • Open Source unter MIT-Lizenz.</p>
-    <p>Premium NFC-Tags auf <a href="http://rfidfriend.com/" target="_blank">RFIDfriend.com</a> | Code by <a href="https://github.com/Stevenious/Tonie-custom-Tags-Cover-Generator" target="_blank">Stevenious</a></p>
+    <p>Tonie Cover Generator V11 • Open Source unter MIT-Lizenz.</p>
+    <p style="margin-top: 4px;">Premium NFC-Tags auf <a href="http://rfidfriend.com/" target="_blank">RFIDfriend.com</a> | Code by <a href="https://github.com/Stevenious/Tonie-custom-Tags-Cover-Generator" target="_blank">Stevenious</a></p>
 </footer>
 
-<!-- Verstecktes Canvas für PNG Export -->
+<!-- Hidden Canvas for PNG Export -->
 <canvas id="exportCanvas" style="display: none;"></canvas>
 
 <script>
     /**
-     * TONIE COVER GENERATOR V10 (MASTER EDITION)
-     * - Fix: Dynamische A4 Skalierung für Handys (Kein horizontales Scrollen)
-     * - Fix: Perfekter Curved Text für den PNG Export und SVG Vorschau (dy/hanging baseline)
-     * - Fix: Hintergrund wiederholt sich nicht mehr beim Herauszoomen
-     * - UX: Drucken-Button priorisiert, Caching via LocalStorage
+     * TONIE COVER GENERATOR V11 (REFINED MASTER EDITION)
+     * - Fix: Centered layout for mobile.
+     * - Fix: Renders ALL empty slots visually so users can pick specific positions.
+     * - Fix: Clear distinction between Print (Primary) and PNG Export (Secondary).
+     * - Core: Robust Async Fetching, iOS Zoom Fix, Auto-Save LocalStorage.
      */
 
     let toniesDB = [];
     let state = {
-        labels: [],
+        labels: [], // Array of objects or null (for empty slots)
         currentEdit: null,
-        editingIndex: null,
+        editingIndex: null, // Which slot on the sheet are we currently editing?
         format: '43'
     };
 
@@ -367,7 +440,7 @@
         sheet: document.getElementById('printSheet')
     };
 
-    // --- 1. INITIALISIERUNG & CACHE ---
+    // --- 1. INITIALIZATION & CACHE ---
     window.addEventListener('DOMContentLoaded', () => {
         loadCache();
         fetchDB();
@@ -375,13 +448,13 @@
         setupUpload();
         resetEditor(); 
         renderSheet();
-        scaleSheetForMobile(); // Einmal initial skalieren
-        window.addEventListener('resize', scaleSheetForMobile); // Bei Display-Drehung anpassen
+        scaleSheetForMobile(); 
+        window.addEventListener('resize', scaleSheetForMobile); 
     });
 
     function loadCache() {
         try {
-            const cache = JSON.parse(localStorage.getItem('TonieCacheV10'));
+            const cache = JSON.parse(localStorage.getItem('TonieCacheV11'));
             if (cache) {
                 state.labels = cache.labels || [];
                 if(cache.format) {
@@ -389,42 +462,42 @@
                     DOM.fSelect.value = cache.format;
                 }
             }
-        } catch(e) {}
+        } catch(e) { console.error("Cache load failed", e); }
     }
 
     function saveCache() {
-        localStorage.setItem('TonieCacheV10', JSON.stringify({ labels: state.labels, format: state.format }));
+        localStorage.setItem('TonieCacheV11', JSON.stringify({ labels: state.labels, format: state.format }));
     }
 
-    // --- 2. DYNAMISCHE MOBILE SKALIERUNG ---
+    // --- 2. DYNAMIC MOBILE SCALING ---
     function scaleSheetForMobile() {
         if (!DOM.wrapper || !DOM.sheet) return;
-        const targetWidth = DOM.wrapper.clientWidth - 20; // 20px padding abziehen
-        const originalWidth = 794; // Die feste Pixel-Breite von #printSheet
+        const targetWidth = DOM.wrapper.clientWidth - 20; 
+        const originalWidth = 794; 
         
         if (targetWidth < originalWidth) {
             const scale = targetWidth / originalWidth;
             DOM.sheet.style.transform = `scale(${scale})`;
-            DOM.wrapper.style.height = `${(1123 * scale) + 20}px`; // A4 Höhe anpassen
+            DOM.wrapper.style.height = `${(1123 * scale) + 40}px`; 
         } else {
             DOM.sheet.style.transform = `scale(1)`;
-            DOM.wrapper.style.height = `1143px`; // 1123 + 20 padding
+            DOM.wrapper.style.height = `1163px`; 
         }
     }
 
-    // --- 3. DATENBANK & SUCHE ---
+    // --- 3. DATABASE & SEARCH ---
     async function fetchDB() {
-        DOM.status.textContent = "Lade Tonie-Datenbank (ca. 7000 Figuren)...";
+        DOM.status.textContent = "Lade Tonie-Datenbank...";
         try {
             const res = await fetch('https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json');
-            if (!res.ok) throw new Error();
+            if (!res.ok) throw new Error('Netzwerk-Fehler');
             const data = await res.json();
             toniesDB = data.filter(t => t.pic && !t.pic.includes('placeholder'));
             DOM.status.textContent = `${toniesDB.length} Tonies bereit!`;
             DOM.status.style.color = "#10b981";
             renderSearch(toniesDB.slice(0, 12));
         } catch (e) {
-            DOM.status.textContent = 'Fehler beim Laden. Bitte Seite neu laden.';
+            DOM.status.textContent = 'Fehler beim Laden der Datenbank.';
             DOM.status.style.color = '#e30613';
         }
     }
@@ -438,6 +511,7 @@
                 if (term.length < 2) {
                     renderSearch(toniesDB.slice(0, 12));
                     DOM.status.textContent = `${toniesDB.length} Tonies bereit.`;
+                    DOM.status.style.color = "#10b981";
                     return;
                 }
                 const results = toniesDB.filter(t => 
@@ -447,19 +521,28 @@
                 DOM.status.textContent = `${results.length} Treffer für "${term}"`;
                 DOM.status.style.color = "#6b7280";
                 renderSearch(results);
-            }, 200);
+            }, 300);
         });
     }
 
     function renderSearch(items) {
-        DOM.grid.innerHTML = items.length === 0 ? '<div style="grid-column: 1/-1; text-align:center; padding:20px;">Keine Treffer.</div>' : '';
+        DOM.grid.innerHTML = items.length === 0 ? '<div style="grid-column: 1/-1; text-align:center; padding:20px; color: #6b7280;">Keine Treffer gefunden.</div>' : '';
         items.forEach(item => {
             const el = document.createElement('div');
             el.className = 'search-item';
             const s = item.series || '';
             const t = item.title || item.episodes || '';
-            el.innerHTML = `<img src="${item.pic}" loading="lazy"><span>${s ? s + ' - ' : ''}${t}</span>`;
-            el.onclick = () => loadEditor({ imgUrl: item.pic, series: s, title: t });
+            el.innerHTML = `<img src="${item.pic}" loading="lazy"><span>${s ? s + '<br>' : ''}${t}</span>`;
+            
+            el.onclick = () => {
+                // If we aren't targeting a specific slot, just load it for a new addition
+                if (state.editingIndex === null) {
+                    loadEditor({ imgUrl: item.pic, series: s, title: t });
+                } else {
+                     // We clicked an empty slot previously, now fill it with this search result
+                    loadEditor({ imgUrl: item.pic, series: s, title: t }, state.editingIndex);
+                }
+            };
             DOM.grid.appendChild(el);
         });
     }
@@ -479,14 +562,18 @@
             if (!file) return;
             const reader = new FileReader();
             reader.onload = (evt) => {
-                loadEditor({ imgUrl: evt.target.result, series: 'Eigene Grafik', title: file.name.split('.')[0] });
+                 if (state.editingIndex === null) {
+                    loadEditor({ imgUrl: evt.target.result, series: 'Eigene Grafik', title: file.name.split('.')[0] });
+                } else {
+                    loadEditor({ imgUrl: evt.target.result, series: 'Eigene Grafik', title: file.name.split('.')[0] }, state.editingIndex);
+                }
                 DOM.fileInput.value = ''; 
             };
             reader.readAsDataURL(file);
         });
     }
 
-    // --- 4. EDITOR LOGIK ---
+    // --- 4. EDITOR LOGIC ---
     function switchMode(mode) {
         document.getElementById('mode-simple').classList.remove('active');
         document.getElementById('mode-pro').classList.remove('active');
@@ -494,10 +581,17 @@
         mode === 'pro' ? document.getElementById('proPanel').classList.remove('hidden') : document.getElementById('proPanel').classList.add('hidden');
     }
 
+    // Index is passed if we are editing an existing slot or filling a specific empty slot
     function loadEditor(data, index = null) {
-        state.currentEdit = index !== null ? { ...state.labels[index] } : {
-            imgUrl: data.imgUrl, series: data.series || '', title: data.title || '',
-            zoom: 100, rot: 0, posX: 0, posY: 0, bg: '#ffffff'
+        state.currentEdit = {
+            imgUrl: data.imgUrl, 
+            series: data.series || '', 
+            title: data.title || '',
+            zoom: data.zoom || 100, 
+            rot: data.rot || 0, 
+            posX: data.posX || 0, 
+            posY: data.posY || 0, 
+            bg: data.bg || '#ffffff'
         };
         state.editingIndex = index;
 
@@ -509,23 +603,27 @@
         DOM.eY.value = state.currentEdit.posY;
         DOM.eBg.value = state.currentEdit.bg;
 
-        if (index !== null) {
+        DOM.btnSave.style.pointerEvents = 'auto';
+
+        if (index !== null && state.labels[index]) {
+            // Editing an EXISTING filled slot
             DOM.btnSave.textContent = '💾 Änderungen speichern';
             DOM.btnSave.style.background = '#3b82f6'; 
             DOM.btnDel.classList.remove('hidden');
             DOM.btnCan.classList.remove('hidden');
         } else {
-            DOM.btnSave.textContent = '➕ Auf den Bogen legen';
+            // New addition (or filling an empty slot)
+            DOM.btnSave.textContent = index !== null ? `➕ An Position ${index+1} einfügen` : '➕ Auf den Bogen legen';
             DOM.btnSave.style.background = '#10b981'; 
             DOM.btnDel.classList.add('hidden');
-            DOM.btnCan.classList.add('hidden');
+            DOM.btnCan.classList.remove('hidden'); // Allow cancel to un-target the slot
         }
 
         DOM.pCircle.classList.remove('empty');
         DOM.pSvg.style.display = 'block';
         updatePreview();
         
-        // Sanft zum Editor scrollen
+        // Scroll to editor smoothly
         document.getElementById('editorCard').scrollIntoView({behavior: 'smooth', block: 'start'});
     }
 
@@ -550,29 +648,50 @@
     }
 
     function resetEditor() {
-        state.currentEdit = null; state.editingIndex = null;
+        state.currentEdit = null; 
+        state.editingIndex = null;
+        
         DOM.pCircle.classList.add('empty');
         DOM.pImage.style.backgroundImage = 'none';
         DOM.pImage.style.backgroundColor = 'transparent';
         DOM.pSvg.style.display = 'none';
         DOM.eTop.value = ''; DOM.eBot.value = '';
         
-        DOM.btnSave.textContent = 'Wähle zuerst ein Motiv';
+        DOM.btnSave.textContent = 'Wähle zuerst ein Motiv (Links)';
         DOM.btnSave.style.background = '#94a3b8';
+        DOM.btnSave.style.pointerEvents = 'none';
         DOM.btnDel.classList.add('hidden');
         DOM.btnCan.classList.add('hidden');
+        
+        // Ensure array is padded correctly if we cancelled filling an empty slot
+        renderSheet();
     }
 
-    // --- 5. BOGEN & RENDER LOGIK ---
+    // --- 5. SHEET & RENDER LOGIC ---
+    function handleFormatChange() {
+        // If format changes, we might need to adjust array size (e.g. Avery max 24)
+        state.format = DOM.fSelect.value;
+        if (state.format === 'avery-40' && state.labels.length > 24) {
+            state.labels = state.labels.slice(0, 24);
+        }
+        saveCache();
+        renderSheet();
+    }
+
     function saveToSheet() {
         if (!state.currentEdit) return;
-        const isAvery = DOM.fSelect.value === 'avery-40';
         
         if (state.editingIndex !== null) {
+            // Replace or fill specific slot
             state.labels[state.editingIndex] = { ...state.currentEdit }; 
         } else {
-            if (isAvery && state.labels.length >= 24) return alert('Der Avery Bogen ist voll!');
-            state.labels.push({ ...state.currentEdit }); 
+            // Find first empty slot or push to end
+            const firstEmpty = state.labels.findIndex(l => l === null);
+            if (firstEmpty !== -1) {
+                state.labels[firstEmpty] = { ...state.currentEdit };
+            } else {
+                state.labels.push({ ...state.currentEdit }); 
+            }
         }
         
         saveCache();
@@ -583,36 +702,72 @@
 
     function deleteLabel() {
         if (state.editingIndex !== null) {
-            state.labels.splice(state.editingIndex, 1);
-            saveCache(); renderSheet(); resetEditor();
+            // Instead of splicing and shifting everything, set to null to preserve grid positions
+            state.labels[state.editingIndex] = null;
+            
+            // Clean up trailing nulls to shrink array if needed
+            while(state.labels.length > 0 && state.labels[state.labels.length - 1] === null) {
+                state.labels.pop();
+            }
+            
+            saveCache(); 
+            renderSheet(); 
+            resetEditor();
         }
     }
 
     function clearSheet() {
         if(confirm('Bist du sicher, dass du den gesamten Bogen leeren möchtest?')) {
-            state.labels = []; saveCache(); renderSheet(); resetEditor();
+            state.labels = []; 
+            saveCache(); 
+            renderSheet(); 
+            resetEditor();
         }
+    }
+
+    function getGridSpecs() {
+        const isAvery = state.format === 'avery-40';
+        const pxPerMm = 794 / 210; // ~3.78px per mm
+        const diamMm = isAvery ? 40 : parseInt(state.format);
+        const diamPx = diamMm * pxPerMm;
+        
+        // Calculate max slots for a standard sheet to render empty circles
+        let maxSlots = 24; 
+        if (!isAvery) {
+            // Rough estimation for visual grid based on diameter
+            // Grid container padding 56px, gap 30px, width 794
+            const availWidth = 794 - 112; 
+            const cols = Math.floor((availWidth + 30) / (diamPx + 30));
+            // Height 1123, padding 56 top/bottom
+            const availHeight = 1123 - 112;
+            const rows = Math.floor((availHeight + 30) / (diamPx + 30));
+            maxSlots = cols * rows;
+        }
+        
+        return { isAvery, diamPx, maxSlots };
     }
 
     function renderSheet() {
         DOM.sGrid.innerHTML = '';
-        state.format = DOM.fSelect.value;
-        const isAvery = state.format === 'avery-40';
+        const specs = getGridSpecs();
         
-        // Pixel-Umrechnung für das visuelle HTML Raster (794px = 210mm)
-        const pxPerMm = 794 / 210;
-        const diamMm = isAvery ? 40 : parseInt(state.format);
-        const diamPx = diamMm * pxPerMm;
-        
-        DOM.sGrid.className = isAvery ? 'grid-avery' : 'sheet-grid';
-        const total = isAvery ? 24 : Math.max(state.labels.length + 1, 1);
+        DOM.sGrid.className = specs.isAvery ? 'grid-avery' : 'sheet-grid';
 
-        for (let i = 0; i < total; i++) {
-            const data = state.labels[i];
+        // Pad the labels array with nulls up to maxSlots so we render empty circles
+        let renderArray = [...state.labels];
+        while (renderArray.length < specs.maxSlots) {
+            renderArray.push(null);
+        }
+        // Truncate if somehow exceeded (e.g., switched from small coins to Avery)
+        if (renderArray.length > specs.maxSlots) {
+            renderArray = renderArray.slice(0, specs.maxSlots);
+        }
+
+        renderArray.forEach((data, i) => {
             const slot = document.createElement('div');
-            slot.className = `label-slot ${!data && isAvery ? 'empty' : ''}`;
-            slot.style.width = `${diamPx}px`;
-            slot.style.height = `${diamPx}px`;
+            slot.className = `label-slot ${data ? 'filled' : 'empty'}`;
+            slot.style.width = `${specs.diamPx}px`;
+            slot.style.height = `${specs.diamPx}px`;
 
             if (data) {
                 slot.style.backgroundColor = data.bg;
@@ -622,7 +777,8 @@
                 imgWrap.style.width = '100%'; imgWrap.style.height = '100%';
                 imgWrap.style.backgroundImage = `url('${data.imgUrl}')`;
                 imgWrap.style.backgroundRepeat = 'no-repeat';
-                imgWrap.style.backgroundPosition = `calc(50% + ${data.posX * (diamPx/220)}px) calc(50% + ${data.posY * (diamPx/220)}px)`;
+                // Map editor pixel offsets to sheet display scale
+                imgWrap.style.backgroundPosition = `calc(50% + ${data.posX * (specs.diamPx/240)}px) calc(50% + ${data.posY * (specs.diamPx/240)}px)`;
                 imgWrap.style.backgroundSize = `${data.zoom}%`;
                 imgWrap.style.transform = `rotate(${data.rot}deg)`;
                 imgWrap.style.pointerEvents = 'none';
@@ -634,7 +790,7 @@
                     svg.style.position = 'absolute'; svg.style.width = '100%'; svg.style.height = '100%';
                     svg.style.pointerEvents = 'none';
                     svg.innerHTML = `
-                        <style>text { font-family: sans-serif; font-weight: 800; font-size: 15px; fill: #111; stroke: #fff; stroke-width: 4px; paint-order: stroke fill; letter-spacing: 0.5px; }</style>
+                        <style>text { font-family: -apple-system, sans-serif; font-weight: 800; font-size: 16px; fill: #111; stroke: #fff; stroke-width: 4px; paint-order: stroke fill; letter-spacing: 0.5px; }</style>
                         <path id="ptT${i}" d="M 18,100 A 82,82 0 0,1 182,100" fill="none"/>
                         <text><textPath href="#ptT${i}" startOffset="50%" text-anchor="middle" dominant-baseline="auto">${data.series}</textPath></text>
                         <path id="ptB${i}" d="M 18,100 A 82,82 0 0,0 182,100" fill="none"/>
@@ -642,20 +798,33 @@
                     `;
                     slot.appendChild(svg);
                 }
-                slot.onclick = () => loadEditor(null, i);
-            } else if (!isAvery) {
-                if(i !== state.labels.length) continue; 
-                slot.classList.add('empty');
-                slot.onclick = () => DOM.searchInput.focus();
+                
+                slot.onclick = () => loadEditor(data, i);
+                
+            } else {
+                // Clicking an empty slot primes it to receive the next search result
+                slot.onclick = () => {
+                    state.editingIndex = i;
+                    
+                    // Visual feedback that this slot is targeted
+                    document.querySelectorAll('.label-slot').forEach(s => s.style.borderColor = '');
+                    slot.style.borderColor = 'var(--primary)';
+                    
+                    // Scroll to search to pick an image
+                    document.querySelector('.app-layout').scrollIntoView({behavior: 'smooth', block: 'start'});
+                    DOM.searchInput.focus();
+                };
             }
+            
             DOM.sGrid.appendChild(slot);
-        }
-        saveCache();
+        });
     }
 
-    // --- 6. HIGH-RES PNG EXPORT (300 DPI, Perfekter Curved Text Fix) ---
+    // --- 6. HIGH-RES PNG EXPORT (300 DPI) ---
     async function exportPNG() {
-        if(state.labels.length === 0) return alert('Der Bogen ist leer!');
+        // Filter out nulls for export check
+        const activeLabels = state.labels.filter(l => l !== null);
+        if(activeLabels.length === 0) return alert('Der Bogen ist leer!');
         
         const canvas = document.getElementById('exportCanvas');
         canvas.width = 2480; canvas.height = 3508; // DIN A4 @ 300 DPI
@@ -669,19 +838,23 @@
         const diamPx = (isAvery ? 40 : parseInt(state.format)) * pxPerMm;
         const radius = diamPx / 2;
         
-        // Grid Berechnung
-        let startX = 15 * pxPerMm, startY = 15 * pxPerMm, gapX = 8 * pxPerMm, gapY = 8 * pxPerMm;
-        let cols = Math.floor((2480 - 30*pxPerMm)/(diamPx+gapX));
+        // Grid Calculation matching HTML visual grid
+        let startX = 56 * (794/210) * (2480/794); // Convert HTML padding to 300DPI
+        let startY = 56 * (794/210) * (2480/794);
+        let gapX = 30 * (794/210) * (2480/794);
+        let gapY = 30 * (794/210) * (2480/794);
+        let cols = Math.floor((2480 - (startX*2))/(diamPx+gapX)) + 1; // +1 heuristic adjustment
         
         if(isAvery) { 
-            // Avery L3415-10 exakte Maße
+            // Exact Avery L3415-10 measurements
             startX = 9.5 * pxPerMm; startY = 13.5 * pxPerMm; 
             gapX = 11.5 * pxPerMm; gapY = 11.5 * pxPerMm; 
             cols = 4; 
         }
 
+        // Cache images
         const cache = {};
-        for(let lbl of state.labels) {
+        for(let lbl of activeLabels) {
             if(!cache[lbl.imgUrl]) {
                 cache[lbl.imgUrl] = await new Promise(res => {
                     const img = new Image(); img.crossOrigin = 'anonymous';
@@ -691,21 +864,23 @@
             }
         }
 
+        // Draw
         for(let i=0; i < state.labels.length; i++) {
-            if(isAvery && i >= 24) break;
             const lbl = state.labels[i];
+            if (!lbl) continue; // Skip empty slots in print
+            if (isAvery && i >= 24) break;
             
             const cx = startX + (i % cols) * (diamPx + gapX) + radius;
             const cy = startY + Math.floor(i / cols) * (diamPx + gapY) + radius;
 
-            // Schnittkante
+            // Cut Line
             ctx.save(); ctx.beginPath(); ctx.setLineDash([15,15]); ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=3;
             ctx.arc(cx, cy, radius, 0, Math.PI*2); ctx.stroke(); ctx.restore();
 
-            // Maske
+            // Mask
             ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI*2); ctx.clip();
             
-            // BG & Bild
+            // BG & Image
             ctx.fillStyle = lbl.bg; ctx.fill();
             const img = cache[lbl.imgUrl];
             if(img) {
@@ -714,31 +889,26 @@
                 ctx.rotate(lbl.rot * Math.PI / 180);
                 const scale = lbl.zoom / 100;
                 const w = diamPx * scale;
-                // Offset bereinigt auf Canvas Größe
-                const oX = lbl.posX * (diamPx / 220); 
-                const oY = lbl.posY * (diamPx / 220);
+                const oX = lbl.posX * (diamPx / 240); 
+                const oY = lbl.posY * (diamPx / 240);
                 ctx.drawImage(img, -w/2 + oX, -w/2 + oY, w, w);
                 ctx.restore();
             }
-            ctx.restore(); // Maske zu
+            ctx.restore(); // Close Mask
 
-            // Curved Text Canvas Algorithmus V10 Fix
+            // Curved Text rendering
             const drawArcText = (text, isTop) => {
                 if(!text) return;
                 ctx.save();
-                const fSize = Math.round(18 * (pxPerMm/3.78));
+                const fSize = Math.round(19 * (pxPerMm/3.78)); // Scaled font size
                 ctx.font = `800 ${fSize}px sans-serif`;
                 ctx.textAlign = "center";
-                
-                // V10 Fix: Oben sitzt AUF der Linie, Unten HÄNGT unter der Linie.
                 ctx.textBaseline = isTop ? "bottom" : "top"; 
                 
                 ctx.fillStyle = "#111"; ctx.strokeStyle = "rgba(255,255,255,0.95)";
                 ctx.lineWidth = fSize * 0.25; ctx.lineJoin = "round";
                 
-                // Der Radius auf dem der Text läuft (symmetrisch wie im SVG)
                 const textRadius = radius * 0.82; 
-                
                 const totalAngle = (ctx.measureText(text).width + (text.length * 5)) / textRadius; 
                 let currentAngle = isTop ? (-Math.PI/2 - totalAngle/2) : (Math.PI/2 - totalAngle/2);
                 
@@ -750,7 +920,6 @@
                     ctx.save();
                     ctx.translate(cx + Math.cos(drawAngle) * textRadius, cy + Math.sin(drawAngle) * textRadius);
                     
-                    // V10 Fix: Buchstaben Rotation (Unten muss um 180° gedreht werden, damit er nicht auf dem Kopf steht)
                     let rotation = drawAngle + Math.PI / 2;
                     if(!isTop) rotation += Math.PI; 
                     
