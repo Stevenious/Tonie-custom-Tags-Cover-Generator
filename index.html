@@ -3,292 +3,339 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Tonie & Tag Cover Generator V2</title>
+<title>Tonie & Tag Cover Generator V3</title>
 <style>
 :root {
 --primary: #e30613;
---primary-hover: #cc0510;
---bg: #f8fafc;
---card: #ffffff;
---border: #e2e8f0;
---text: #1e293b;
+--primary-hover: #c5050f;
+--bg: #0f172a;
+--card-bg: #ffffff;
+--text-main: #0f172a;
 --text-muted: #64748b;
---selected: #3b82f6;
---radius: 14px;
+--border: #e2e8f0;
+--radius: 16px;
+--shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+--selected: #2563eb;
 }
-* { box-sizing: border-box; }
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body {
-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+background: #f8fafc;
+color: var(--text-main);
 margin: 0;
-padding: 15px;
-background: var(--bg);
-color: var(--text);
+padding: 12px;
 -webkit-font-smoothing: antialiased;
 }
-.container { max-width: 860px; margin: 0 auto; }
-header { text-align: center; margin-bottom: 20px; }
-h1 { color: var(--primary); font-size: 26px; margin: 0 0 5px 0; }
-.subtitle { font-size: 13px; color: var(--text-muted); }
-.panel {
-background: var(--card);
+.app-container { max-width: 900px; margin: 0 auto; padding-bottom: 40px; }
+/* Header */
+header { text-align: center; margin: 15px 0 25px 0; }
+h1 { color: var(--primary); font-size: 24px; font-weight: 800; margin: 0 0 6px 0; letter-spacing: -0.5px; }
+.subtitle { font-size: 13px; color: var(--text-muted); font-weight: 500; }
+/* Cards / Panels */
+.card {
+background: var(--card-bg);
 border: 1px solid var(--border);
 border-radius: var(--radius);
 padding: 20px;
-margin-bottom: 20px;
-box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02), 0 2px 4px -2px rgba(0,0,0,0.02);
+margin-bottom: 16px;
+box-shadow: var(--shadow);
 }
-.panel-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 15px;
-border-bottom: 2px solid #f1f5f9;
-padding-bottom: 10px;
+.card-title { font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+/* Source Tabs (Segmented Control) */
+.source-tabs {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+background: #f1f5f9;
+padding: 4px;
+border-radius: 12px;
+gap: 4px;
+margin-bottom: 14px;
 }
-.panel-title { font-weight: 700; font-size: 16px; color: var(--text); }
-/* Tabs */
-.search-tabs { display: flex; background: #f1f5f9; padding: 4px; border-radius: 10px; margin-bottom: 15px; gap: 4px; }
-.tab-btn {
-flex: 1; background: transparent; color: var(--text-muted); border: none; padding: 9px;
-border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; transition: all 0.2s;
+.source-tab {
+background: transparent;
+border: none;
+padding: 10px 6px;
+font-size: 12px;
+font-weight: 700;
+color: var(--text-muted);
+border-radius: 9px;
+cursor: pointer;
+transition: all 0.2s ease;
+text-align: center;
 }
-.tab-btn.active { background: #fff; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-.form-row { display: flex; gap: 10px; align-items: center; }
+.source-tab.active {
+background: #ffffff;
+color: var(--primary);
+box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+}
+/* Search Bar & Inputs */
+.search-row { display: flex; gap: 8px; }
 input[type="text"], select {
-width: 100%; padding: 11px 14px; border: 1px solid var(--border); border-radius: 10px; font-size: 15px; background: #f8fafc; color: var(--text); outline: none; transition: border-color 0.2s;
+flex: 1;
+padding: 12px 14px;
+border: 1px solid var(--border);
+border-radius: 12px;
+font-size: 14px;
+background: #f8fafc;
+color: var(--text-main);
+outline: none;
+transition: border-color 0.2s, background 0.2s;
 }
-input[type="text"]:focus, select:focus { border-color: var(--selected); background: #fff; }
-button {
-padding: 11px 20px; background: var(--primary); color: #fff; border: none; border-radius: 10px;
-font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s, transform 0.1s;
+input[type="text"]:focus, select:focus { border-color: var(--primary); background: #fff; }
+.btn {
+background: var(--primary);
+color: #fff;
+border: none;
+border-radius: 12px;
+padding: 12px 20px;
+font-size: 14px;
+font-weight: 700;
+cursor: pointer;
+transition: background 0.2s, transform 0.1s;
+display: inline-flex;
+align-items: center;
+justify-content: center;
+gap: 6px;
 }
-button:active { transform: scale(0.98); }
-button:hover { background: var(--primary-hover); }
-button.btn-secondary { background: var(--text-muted); }
-button.btn-secondary:hover { background: #475569; }
-button.btn-outline { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
-button.btn-outline:hover { background: #f1f5f9; }
-button.btn-danger { background: transparent; color: #ef4444; border: 1px solid #ef4444; }
-button.btn-danger:hover { background: #fef2f2; }
-button.full-width { width: 100%; margin-top: 10px; padding: 14px; font-size: 16px; }
-#search-status { font-size: 12px; color: var(--text-muted); margin-top: 8px; min-height: 18px; }
-#search-results {
-display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px;
-max-height: 260px; overflow-y: auto; padding-top: 10px; padding-right: 4px;
+.btn:active { transform: scale(0.97); }
+.btn:hover { background: var(--primary-hover); }
+.btn-secondary { background: #64748b; }
+.btn-secondary:hover { background: #475569; }
+.btn-outline { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+.btn-outline:hover { background: #f1f5f9; color: var(--text-main); }
+.btn-danger { background: #ef4444; color: #fff; }
+.btn-danger:hover { background: #dc2626; }
+.btn-full { width: 100%; padding: 14px; font-size: 15px; }
+.status-text { font-size: 12px; color: var(--text-muted); margin-top: 8px; min-height: 18px; font-weight: 500; }
+/* Search Results Grid */
+.results-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
+gap: 10px;
+max-height: 240px;
+overflow-y: auto;
+margin-top: 12px;
+padding-right: 4px;
 }
-.result-card {
-border: 1px solid var(--border); border-radius: 10px; padding: 8px; text-align: center;
-cursor: pointer; background: #fff; transition: all 0.15s; position: relative;
+.result-item {
+background: #fff;
+border: 1px solid var(--border);
+border-radius: 10px;
+padding: 8px;
+text-align: center;
+cursor: pointer;
+position: relative;
+transition: transform 0.15s, border-color 0.15s;
 }
-.result-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-.result-card img { width: 100%; height: 75px; object-fit: contain; margin-bottom: 6px; }
-.result-card .title { font-size: 11px; font-weight: 600; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.result-card .add-badge {
-position: absolute; top: -6px; right: -6px; background: var(--primary); color: #fff; width: 22px; height: 22px;
-border-radius: 50%; font-size: 14px; font-weight: bold; display: none; align-items: center; justify-content: center;
+.result-item:hover { border-color: var(--primary); transform: translateY(-2px); }
+.result-item img { width: 100%; height: 75px; object-fit: contain; margin-bottom: 4px; }
+.result-item .title { font-size: 11px; font-weight: 700; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.result-item .add-badge {
+position: absolute; top: -5px; right: -5px; background: var(--primary); color: #fff; width: 20px; height: 20px;
+border-radius: 50%; font-size: 13px; font-weight: bold; display: none; align-items: center; justify-content: center;
 }
-.result-card:hover .add-badge { display: flex; }
-/* Mode Switcher */
-.mode-switch-box { display: flex; background: #f1f5f9; padding: 3px; border-radius: 8px; margin-bottom: 15px; }
-.mode-btn { flex: 1; border: none; background: transparent; padding: 6px; font-size: 12px; font-weight: 600; color: var(--text-muted); border-radius: 6px; cursor: pointer; }
-.mode-btn.active { background: #fff; color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-/* Single Live Preview */
-.single-preview-box { display: flex; justify-content: center; margin-bottom: 15px; padding: 15px; background: #f8fafc; border-radius: 10px; border: 1px dashed var(--border); }
-.control-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
-@media (min-width: 600px) { .control-grid { grid-template-columns: 1fr 1fr; } }
-.control-group label { display: flex; justify-content: space-between; font-size: 12px; font-weight: 600; margin-bottom: 4px; color: var(--text-muted); }
+.result-item:hover .add-badge { display: flex; }
+/* Editor Card (Step 2) */
+.mode-switch { display: flex; background: #f1f5f9; padding: 3px; border-radius: 10px; margin-bottom: 14px; }
+.mode-btn { flex: 1; border: none; background: transparent; padding: 8px; font-size: 12px; font-weight: 700; color: var(--text-muted); border-radius: 8px; cursor: pointer; }
+.mode-btn.active { background: #fff; color: var(--text-main); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.editor-preview-container { display: flex; justify-content: center; padding: 15px; background: #f8fafc; border-radius: 12px; border: 1.5px dashed var(--border); margin-bottom: 14px; }
+.pro-controls { display: grid; grid-template-columns: 1fr; gap: 10px; }
+@media(min-width: 600px) { .pro-controls { grid-template-columns: 1fr 1fr; } }
+.control-group label { display: flex; justify-content: space-between; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 3px; }
 input[type="range"] { width: 100%; accent-color: var(--primary); }
-.tool-actions { display: flex; gap: 8px; margin-top: 15px; justify-content: center; flex-wrap: wrap; }
-/* Print Preview */
-.preview-container { width: 100%; background: #e2e8f0; padding: 20px; border-radius: var(--radius); margin-top: 20px; display: flex; flex-direction: column; align-items: center; overflow: hidden; }
-.print-sheet { background: #fff; width: 210mm; min-height: 297mm; box-shadow: 0 10px 25px rgba(0,0,0,0.1); position: relative; flex-shrink: 0; transform-origin: top center; }
+/* Print Sheet & Preview */
+.print-preview-wrapper { width: 100%; background: #cbd5e1; padding: 16px; border-radius: var(--radius); margin-top: 16px; display: flex; flex-direction: column; align-items: center; overflow: hidden; }
+.print-sheet { background: #fff; width: 210mm; min-height: 297mm; box-shadow: 0 15px 30px rgba(0,0,0,0.15); position: relative; flex-shrink: 0; transform-origin: top center; }
 @media screen and (max-width: 850px) { .print-sheet { transform: scale(0.38); margin-bottom: -183mm; } }
 @media screen and (max-width: 500px) { .print-sheet { transform: scale(0.32); margin-bottom: -201mm; } }
-/* Grids */
-.grid-standard { display: flex; flex-wrap: wrap; gap: 8mm; padding: 15mm; justify-content: flex-start; align-content: flex-start; }
+.grid-standard { display: flex; flex-wrap: wrap; gap: 8mm; padding: 15mm; align-content: flex-start; }
 .grid-avery { display: grid; grid-template-columns: repeat(4, 40mm); grid-auto-rows: 40mm; gap: 5mm; justify-content: center; padding-top: 15mm; }
 .tag-slot { display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.1s; }
 .tag-slot:hover { transform: scale(1.02); }
-.coin-circle { border-radius: 50%; border: 0.5pt dashed #94a3b8; position: relative; overflow: hidden; background-color: #fff; display: flex; justify-content: center; }
-.coin-circle.selected { border: 2.5px solid var(--selected); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); }
-.coin-circle.empty-slot { background: #f1f5f9; border: 1px dashed #cbd5e1; }
-.coin-circle.empty-slot::after { content: "+"; color: #94a3b8; font-size: 22px; font-weight: bold; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+.coin-circle {
+border-radius: 50%; border: 0.5pt dashed #94a3b8; position: relative; overflow: hidden; background-color: #fff; display: flex; justify-content: center;
+}
+.coin-circle.selected { border: 3px solid var(--selected); box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.25); }
+.coin-circle.empty { background: #f1f5f9; border: 1px dashed #cbd5e1; }
+.coin-circle.empty::after { content: "+"; color: #94a3b8; font-size: 20px; font-weight: bold; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); }
 .coin-img-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-repeat: no-repeat; background-position: center; pointer-events: none; }
 .tag-info-text {
-position: absolute; left: 50%; transform: translateX(-50%); width: 75%; text-align: center;
-font-size: 5pt; font-family: -apple-system, BlinkMacSystemFont, sans-serif; font-weight: 700; color: #111;
-background: rgba(255, 255, 255, 0.9); padding: 2px 4px; border-radius: 4px; z-index: 2; line-height: 1.1;
+position: absolute; left: 50%; transform: translateX(-50%); width: 72%; text-align: center;
+font-size: 5.5pt; font-family: system-ui, sans-serif; font-weight: 800; color: #111;
+background: rgba(255, 255, 255, 0.92); padding: 2px 4px; border-radius: 4px; z-index: 2; line-height: 1.1;
 display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; pointer-events: none;
 }
 .tag-info-text.top { top: 3mm; }
 .tag-info-text.bottom { bottom: 3mm; }
-.stats-badge { background: #f1f5f9; color: var(--text); padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; border: 1px solid var(--border); }
-.stats-badge.full { background: #fee2e2; color: #ef4444; border-color: #fca5a5; }
 /* Modals */
-.modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; padding: 15px; }
-.modal-box { background: #fff; width: 100%; max-width: 460px; border-radius: var(--radius); padding: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.15); animation: modalIn 0.2s ease; }
-@keyframes modalIn { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-.modal-header { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
-.modal-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; }
+.modal-backdrop { display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.6); z-index: 2000; justify-content: center; align-items: center; padding: 15px; backdrop-filter: blur(4px); }
+.modal-content { background: #fff; width: 100%; max-width: 420px; border-radius: var(--radius); padding: 24px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1); text-align: center; }
+.modal-title { font-size: 18px; font-weight: 800; margin-bottom: 8px; }
+.modal-body { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+.modal-actions { display: flex; gap: 10px; justify-content: center; }
 /* Footer & Disclaimer */
-.disclaimer {
-margin-top: 30px; padding: 20px; font-size: 11px; color: var(--text-muted); text-align: center; line-height: 1.5; border-top: 1px solid var(--border); background: #fff; border-radius: var(--radius);
+.footer-box {
+margin-top: 24px; padding: 20px; font-size: 11px; color: var(--text-muted); text-align: center; line-height: 1.6;
+background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
 }
-.disclaimer a { color: var(--primary); text-decoration: none; font-weight: 600; }
-.disclaimer a:hover { text-decoration: underline; }
-/* Print Optimizations */
+.footer-box a { color: var(--primary); text-decoration: none; font-weight: 700; }
+.footer-box a:hover { text-decoration: underline; }
+/* Print optimizations */
 @media print {
-body { background: #fff; margin: 0; padding: 0; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-.no-print, .modal-overlay { display: none !important; }
-.preview-container { background: transparent; padding: 0; margin: 0; overflow: visible; display: block; }
+body { background: #fff; margin: 0; padding: 0; }
+.no-print, .modal-backdrop { display: none !important; }
+.print-preview-wrapper { background: transparent; padding: 0; margin: 0; overflow: visible; display: block; }
 .print-sheet { transform: none !important; box-shadow: none; margin: 0; padding: 0; width: 210mm; height: 297mm; }
-.coin-circle { border: 0.5pt dashed #94a3b8 !important; box-shadow: none !important; }
-.coin-circle.empty-slot { display: none !important; }
+.coin-circle { border: 0.5pt dashed #94a3b8 !important; }
+.coin-circle.empty { display: none !important; }
 @page { size: A4 portrait; margin: 0; }
 }
 </style>
 </head>
 <body>
-<div class="container no-print">
-<header>
-<h1>Tonie & Tag Cover Generator V2</h1>
-<div class="subtitle">Erstelle perfekte Etiketten für Münzkapseln, RFIDfriend Token & Avery Bögen</div>
+<div class="app-container">
+<header class="no-print">
+<h1>Tonie & Tag Cover Generator V3</h1>
+<div class="subtitle">Der elegante Designer für Münzkapseln, RFIDfriend Token & Avery Etiketten</div>
 </header>
-<!-- Sektion 1: Suchen & Generieren -->
-<div class="panel">
-<div class="panel-header">
-<span class="panel-title">1. Cover auswählen & hinzufügen</span>
-<button type="button" class="btn-danger" style="padding: 5px 10px; font-size: 12px;" onclick="promptClearSheet()">🗑️ Bogen leeren</button>
+<!-- SEKTION 1: SUCHEN & HINZUFÜGEN -->
+<div class="card no-print">
+<div class="card-title">
+<span>1. Cover auswählen & hinzufügen</span>
+<button type="button" class="btn btn-danger" style="padding: 6px 12px; font-size: 12px;" onclick="openClearModal()">🗑️ Bogen leeren</button>
 </div>
-<div class="search-tabs" id="search-tabs">
-<button class="tab-btn active" data-type="tonie" onclick="switchSearchTab('tonie')">🪀 Tonie-Figuren</button>
-<button class="tab-btn" data-type="album" onclick="switchSearchTab('album')">🎵 Apple Music / Alben</button>
-<button class="tab-btn" data-type="upload" onclick="switchSearchTab('upload')">📁 Eigene Grafik</button>
+<div class="source-tabs">
+<button type="button" class="source-tab active" data-source="tonie" onclick="switchSource('tonie')">🪀 Tonie-Figuren</button>
+<button type="button" class="source-tab" data-source="album" onclick="switchSource('album')">🎵 Apple Alben</button>
+<button type="button" class="source-tab" data-source="upload" onclick="switchSource('upload')">📁 Eigene Grafik</button>
 </div>
-<div id="search-section">
-<div class="form-row">
-<input type="text" id="search-input" placeholder="Titel oder Serie suchen (z.B. Conni)...">
-<button type="button" id="search-btn">Suche</button>
+<!-- Suchfeld Bereich -->
+<div id="search-input-area">
+<div class="search-row">
+<input type="text" id="search-input" placeholder="Titel oder Serie eingeben (z.B. Conni)...">
+<button type="button" class="btn" id="search-btn">Suchen</button>
 </div>
-<div id="search-status">Datenbank wird geladen...</div>
-<div id="search-results"></div>
+<div class="status-text" id="db-status">Lade Datenbank...</div>
+<div class="results-grid" id="search-results"></div>
 </div>
-<div id="upload-section" style="display: none; text-align: center; padding: 20px; border: 2px dashed var(--border); border-radius: 10px; background: #f8fafc;">
-<p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">Lade ein eigenes Foto oder Artwork von deinem Gerät hoch:</p>
+<!-- Upload Bereich -->
+<div id="upload-input-area" style="display: none; text-align: center; padding: 25px; border: 2px dashed var(--border); border-radius: 12px; background: #f8fafc;">
+<p style="font-size: 13px; color: var(--text-muted); margin: 0 0 12px 0; font-weight: 500;">Lade ein eigenes Artwork oder Foto von deinem Gerät hoch:</p>
 <input type="file" id="custom-file-input" accept="image/*" style="display: none;">
-<button type="button" onclick="document.getElementById('custom-file-input').click()">🖼️ Bild auswählen</button>
+<button type="button" class="btn" onclick="document.getElementById('custom-file-input').click()">🖼️ Bilddatei auswählen</button>
 </div>
 </div>
-<!-- Sektion 2: Feintuning (Simpel & Fortgeschritten) -->
-<div class="panel" id="img-tool-panel" style="display: none; border: 2px solid var(--selected);">
-<div class="panel-header" style="border-bottom-color: #dbeafe;">
-<span class="panel-title" style="color: var(--selected);">2. Etikett anpassen</span>
-<button type="button" class="btn-outline" style="padding: 4px 8px; font-size: 12px;" onclick="deselectLabel()">✖ Schließen</button>
+<!-- SEKTION 2: FEINTUNING (WIRD NUR GEZEIGT, WENN EIN ETIKETT GEWÄHLT IST) -->
+<div class="card no-print" id="editor-card" style="display: none; border: 2px solid var(--selected);">
+<div class="card-title">
+<span style="color: var(--selected);">2. Etikett anpassen</span>
+<button type="button" class="btn btn-outline" style="padding: 4px 10px; font-size: 12px;" onclick="deselectLabel()">✖ Schließen</button>
 </div>
-<div class="mode-switch-box">
-<button class="mode-btn active" id="btn-mode-simple" onclick="setMode('simple')">⚡ Simpel (Schnell)</button>
-<button class="mode-btn" id="btn-mode-pro" onclick="setMode('pro')">🛠️ Fortgeschritten (Profi)</button>
+<div class="mode-switch">
+<button type="button" class="mode-btn active" id="btn-mode-simple" onclick="setEditorMode('simple')">⚡ Simpel (Schnell)</button>
+<button type="button" class="mode-btn" id="btn-mode-pro" onclick="setEditorMode('pro')">🛠️ Fortgeschritten (Profi)</button>
 </div>
-<div class="single-preview-box">
+<div class="editor-preview-container">
 <div class="tag-slot">
-<div class="coin-circle" id="editor-preview-circle" style="width: 43mm; height: 43mm;">
+<div class="coin-circle" id="editor-preview-circle" style="width: 44mm; height: 44mm;">
 <div class="coin-img-layer" id="editor-preview-img"></div>
 <div class="tag-info-text top" id="editor-preview-top"></div>
 <div class="tag-info-text bottom" id="editor-preview-bottom"></div>
 </div>
 </div>
 </div>
-<!-- Fortgeschrittene Regler -->
-<div id="pro-controls" style="display: none;">
-<div class="form-row" style="margin-bottom: 12px; align-items: center; justify-content: space-between;">
-<label style="font-size: 12px; font-weight: 600; color: var(--text-muted);">Hintergrundfarbe:</label>
-<input type="color" id="bg-color-picker" value="#ffffff" style="width: 50px; height: 32px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; background: none; padding: 0;">
-</div>
-<div class="control-grid">
-<div class="control-group">
-<label><span>Zoom</span> <span id="zoom-val">100%</span></label>
-<input type="range" id="zoom-slider" min="30" max="250" value="100">
+<!-- Erweiterte Pro-Regler -->
+<div class="pro-controls" id="pro-controls-box" style="display: none; margin-bottom: 14px;">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+<label style="font-size: 11px; font-weight: 700; color: var(--text-muted);">Hintergrundfarbe:</label>
+<input type="color" id="bg-color-picker" value="#ffffff" style="width: 45px; height: 30px; border: 1px solid var(--border); border-radius: 6px; cursor: pointer; background: none; padding: 0;">
 </div>
 <div class="control-group">
-<label><span>Rotation</span> <span id="rot-val">0°</span></label>
-<input type="range" id="rot-slider" min="-180" max="180" value="0">
+<label><span>Zoom</span> <span id="lbl-zoom">100%</span></label>
+<input type="range" id="slider-zoom" min="30" max="250" value="100">
+</div>
+<div class="control-group">
+<label><span>Rotation</span> <span id="lbl-rot">0°</span></label>
+<input type="range" id="slider-rot" min="-180" max="180" value="0">
 </div>
 <div class="control-group">
 <label><span>Verschiebung X (Links/Rechts)</span></label>
-<input type="range" id="pos-x-slider" min="-100" max="100" value="0">
+<input type="range" id="slider-posx" min="-100" max="100" value="0">
 </div>
 <div class="control-group">
 <label><span>Verschiebung Y (Oben/Unten)</span></label>
-<input type="range" id="pos-y-slider" min="-100" max="100" value="0">
+<input type="range" id="slider-posy" min="-100" max="100" value="0">
 </div>
 </div>
+<div style="display: flex; gap: 8px; justify-content: center;">
+<button type="button" class="btn btn-secondary" onclick="duplicateSelected()">➕ Duplizieren</button>
+<button type="button" class="btn btn-danger" onclick="removeSelected()">🗑️ Löschen</button>
 </div>
-<div class="tool-actions">
-<button type="button" class="btn-secondary" onclick="duplicateSelected()">➕ Duplizieren</button>
-<button type="button" class="btn-danger" onclick="removeSelected()">🗑️ Löschen</button>
 </div>
-</div>
-<!-- Sektion 3: Layout & Druck -->
-<div class="panel">
-<span class="panel-title" style="display:block; margin-bottom: 12px;">3. Format & Druck</span>
-<div class="form-group">
+<!-- SEKTION 3: FORMAT & DRUCK -->
+<div class="card no-print">
+<div class="card-title">3. Format & Druckoptionen</div>
+<div style="margin-bottom: 12px;">
 <select id="preset-select">
 <option value="43" selected>Münzkapsel Standard (43 mm, freies Raster)</option>
 <option value="40">Münzkapsel Klein (40 mm, freies Raster)</option>
-<option value="30">RFIDfriend / DIY Token (30 mm, freies Raster)</option>
+<option value="30">RFIDfriend Token (30 mm, freies Raster)</option>
 <option value="25">Micro Token (25 mm, freies Raster)</option>
-<option value="avery-40">Avery L3415-10 Zweckform (40mm, 24 Plätze)</option>
+<option value="avery-40">Avery Zweckform L3415-10 (40mm, fest 24 Plätze)</option>
 </select>
 </div>
-<div class="form-row" style="align-items: center; justify-content: space-between;">
-<div class="stats-badge" id="sheet-stats">0 Etiketten auf dem Bogen</div>
-<label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer; font-size: 13px;">
-<input type="checkbox" id="show-text-toggle" checked style="width: 16px; height: 16px;">
+<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 16px;">
+<div id="stats-badge" style="background: #f1f5f9; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; color: var(--text-main);">0 Etiketten auf dem Bogen</div>
+<label style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; cursor: pointer;">
+<input type="checkbox" id="toggle-text" checked style="width: 16px; height: 16px; accent-color: var(--primary);">
 Titel & Serie übernehmen
 </label>
 </div>
-<button type="button" class="full-width" onclick="openPrintModal()">🖨️ Bogen Drucken & Exportieren</button>
+<button type="button" class="btn btn-full" onclick="openPrintModal()">🖨️ Bogen Drucken & Exportieren</button>
 </div>
 </div>
-<!-- Live Druckvorschau -->
-<div class="preview-container">
-<div class="no-print" style="margin-bottom: 12px; font-weight: bold; color: var(--text-muted); text-align: center; font-size: 14px;">
-Live Druckvorschau <span style="font-weight:normal; font-size:12px; display:block; color:#94a3b8;">(Klicke auf ein Etikett auf dem Bogen, um es zu bearbeiten)</span>
+<!-- LIVE DRUCK VORSCHAU -->
+<div class="print-preview-wrapper">
+<div class="no-print" style="margin-bottom: 10px; font-weight: 700; color: #475569; font-size: 13px; text-align: center;">
+Live Druckvorschau <span style="font-weight:400; font-size:11px; display:block; color:#64748b;">(Klicke auf ein Etikett auf dem Bogen, um es im Editor anzupassen)</span>
 </div>
-<div class="print-sheet" id="print-sheet-preview">
+<div class="print-sheet" id="print-sheet">
 <div id="sheet-grid" class="grid-standard"></div>
 </div>
 </div>
-<!-- Footer & Disclaimer -->
-<div class="container no-print">
-<div class="disclaimer">
-<strong>Rechtlicher Hinweis & Open Source (MIT License):</strong> Dieses private Hobby-Projekt steht in keinerlei Verbindung zur Boxine GmbH. "tonies®" und "Toniebox®" sind eingetragene Marken der Boxine GmbH.
+<!-- FOOTER & DISCLAIMER -->
+<div class="app-container no-print">
+<div class="footer-box">
+<strong>Open Source & Rechtlicher Hinweis:</strong> Dieses Projekt steht unter <a href="https://opensource.org/licenses/MIT" target="_blank">MIT-Lizenz</a>.
+
+Inoffizielles Hobby-Projekt in keinerlei Verbindung zur Boxine GmbH. "tonies®" und "Toniebox®" sind Marken der Boxine GmbH.
 
 Passende NFC-Tags für deine eigene Toniebox erhältst du bei <a href="http://rfidfriend.com/" target="_blank">RFIDfriend.com</a>.
 
-Quellcode & Mitwirken auf <a href="https://github.com/" target="_blank">GitHub</a>.
+Mitwirken & Quellcode auf <a href="https://github.com/" target="_blank">GitHub</a>.
 </div>
 </div>
-<!-- Modal: Druck & Export -->
-<div class="modal-overlay" id="print-modal">
-<div class="modal-box">
-<div class="modal-header">Druck- & Exportoptionen</div>
-<p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">Wähle, wie dein fertiger Bogen ausgegeben werden soll:</p>
+<!-- MODAL: DRUCK & EXPORT -->
+<div class="modal-backdrop" id="modal-print">
+<div class="modal-content">
+<div class="modal-title">Druck- & Exportoptionen</div>
+<div class="modal-body">Wähle, wie dein vorbereiteter Etikettenbogen ausgegeben werden soll:</div>
+<div style="display: flex; flex-direction: column; gap: 8px;">
+<button type="button" class="btn btn-full" onclick="executePrint()">📄 Direkt Drucken (A4 / PDF)</button>
+<button type="button" class="btn btn-full btn-secondary" id="btn-png" onclick="exportPng()">🖼️ Als hochauflösendes PNG speichern</button>
+<button type="button" class="btn btn-full btn-outline" onclick="closePrintModal()">Abbrechen</button>
+</div>
+</div>
+</div>
+<!-- MODAL: BOGEN LEEREN -->
+<div class="modal-backdrop" id="modal-clear">
+<div class="modal-content">
+<div class="modal-title" style="color: #ef4444;">Bogen komplett leeren?</div>
+<div class="modal-body">Möchtest du wirklich alle Etiketten von deinem Bogen löschen?</div>
 <div class="modal-actions">
-<button type="button" onclick="executePrint()">📄 Direkt Drucken (A4 / PDF)</button>
-<button type="button" class="btn-secondary" id="btn-export-png" onclick="exportAsPng()">🖼️ Als hochauflösendes PNG speichern</button>
-<button type="button" class="btn-outline" onclick="closePrintModal()">Abbrechen</button>
-</div>
-</div>
-</div>
-<!-- Modal: Bogen leeren Bestätigung -->
-<div class="modal-overlay" id="clear-modal">
-<div class="modal-box" style="max-width: 380px; text-align: center;">
-<div class="modal-header" style="color: #ef4444;">Bogen komplett leeren?</div>
-<p style="font-size: 13px; color: var(--text-muted);">Möchtest du wirklich alle Etiketten löschen?</p>
-<div class="modal-actions" style="flex-direction: row; justify-content: center; margin-top: 15px; gap: 10px;">
-<button type="button" class="btn-outline" style="flex:1;" onclick="closeClearModal()">Abbrechen</button>
-<button type="button" class="btn-danger" style="flex:1; background: #ef4444; color: white;" onclick="executeClearSheet()">Ja, leeren</button>
+<button type="button" class="btn btn-outline" style="flex:1;" onclick="closeClearModal()">Abbrechen</button>
+<button type="button" class="btn btn-danger" style="flex:1;" onclick="executeClearSheet()">Ja, leeren</button>
 </div>
 </div>
 </div>
@@ -296,463 +343,443 @@ Quellcode & Mitwirken auf <a href="https://github.com/" target="_blank">GitHub</
 <script>
 const TONIES_JSON_URL = "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json";
 let tonieDb = [];
-let appState = {
+let state = {
 labels: [],
 selectedId: null,
 preset: '43',
 showText: true,
-searchType: 'tonie',
-mode: 'simple'
+source: 'tonie',
+editorMode: 'simple'
 };
-const elements = {
+const el = {
 searchInput: document.getElementById("search-input"),
 searchBtn: document.getElementById("search-btn"),
-tabBtns: document.querySelectorAll(".tab-btn"),
-searchSection: document.getElementById("search-section"),
-uploadSection: document.getElementById("upload-section"),
-customFileInput: document.getElementById("custom-file-input"),
 searchResults: document.getElementById("search-results"),
-statusMsg: document.getElementById("search-status"),
-imgToolPanel: document.getElementById("img-tool-panel"),
-proControls: document.getElementById("pro-controls"),
-zoomSlider: document.getElementById("zoom-slider"),
-rotSlider: document.getElementById("rot-slider"),
-posXSlider: document.getElementById("pos-x-slider"),
-posYSlider: document.getElementById("pos-y-slider"),
-bgColorPicker: document.getElementById("bg-color-picker"),
+dbStatus: document.getElementById("db-status"),
+uploadArea: document.getElementById("upload-input-area"),
+searchArea: document.getElementById("search-input-area"),
+customFile: document.getElementById("custom-file-input"),
+editorCard: document.getElementById("editor-card"),
+proControls: document.getElementById("pro-controls-box"),
 presetSelect: document.getElementById("preset-select"),
-showTextToggle: document.getElementById("show-text-toggle"),
+toggleText: document.getElementById("toggle-text"),
 sheetGrid: document.getElementById("sheet-grid"),
-sheetStats: document.getElementById("sheet-stats"),
-printModal: document.getElementById("print-modal"),
-clearModal: document.getElementById("clear-modal"),
-editorCircle: document.getElementById("editor-preview-circle"),
-editorImg: document.getElementById("editor-preview-img"),
-editorTop: document.getElementById("editor-preview-top"),
-editorBottom: document.getElementById("editor-preview-bottom")
+statsBadge: document.getElementById("stats-badge"),
+modalPrint: document.getElementById("modal-print"),
+modalClear: document.getElementById("modal-clear"),
+// Sliders
+zoom: document.getElementById("slider-zoom"),
+rot: document.getElementById("slider-rot"),
+posx: document.getElementById("slider-posx"),
+posy: document.getElementById("slider-posy"),
+bgColor: document.getElementById("bg-color-picker"),
+// Editor Preview
+edCircle: document.getElementById("editor-preview-circle"),
+edImg: document.getElementById("editor-preview-img"),
+edTop: document.getElementById("editor-preview-top"),
+edBottom: document.getElementById("editor-preview-bottom")
 };
-function promptClearSheet() { elements.clearModal.style.display = "flex"; }
-function closeClearModal() { elements.clearModal.style.display = "none"; }
-function executeClearSheet() {
-appState.labels = [];
-deselectLabel();
-closeClearModal();
-}
-function setMode(mode) {
-appState.mode = mode;
-document.getElementById("btn-mode-simple").className = ⁠mode-btn ${mode === 'simple' ? 'active' : ''}⁠;
-document.getElementById("btn-mode-pro").className = ⁠mode-btn ${mode === 'pro' ? 'active' : ''}⁠;
-elements.proControls.style.display = mode === 'pro' ? 'block' : 'none';
-}
-function loadState() {
-const saved = localStorage.getItem("tonieGeneratorV2State");
-if (saved) {
-try {
-const parsed = JSON.parse(saved);
-appState.labels = parsed.labels || [];
-appState.preset = parsed.preset || '43';
-appState.showText = parsed.showText !== undefined ? parsed.showText : true;
-appState.selectedId = null;
-elements.presetSelect.value = appState.preset;
-elements.showTextToggle.checked = appState.showText;
-} catch(e) {}
-}
-renderGrid();
-}
-function saveState() {
-localStorage.setItem("tonieGeneratorV2State", JSON.stringify({
-labels: appState.labels,
-preset: appState.preset,
-showText: appState.showText
-}));
-}
-// Datenbank laden mit präziser Rückmeldung
+// Datenbank laden
 fetch(TONIES_JSON_URL)
 .then(res => res.json())
 .then(data => {
 tonieDb = data;
-elements.statusMsg.textContent = ⁠${tonieDb.length} Tonies geladen! Suchbegriff eingeben.⁠;
+el.dbStatus.textContent = ⁠${tonieDb.length} Tonies bereit! Suchbegriff eingeben.⁠;
 })
-.catch(() => elements.statusMsg.textContent = "Fehler beim Laden der Datenbank.");
-// Tabs wechseln
-function switchSearchTab(type) {
-appState.searchType = type;
-elements.tabBtns.forEach(btn => {
-if(btn.dataset.type === type) {
-btn.classList.add('active');
-} else {
-btn.classList.remove('active');
+.catch(() => el.dbStatus.textContent = "Fehler beim Laden der Tonie-Datenbank.");
+// State speichern / laden
+function saveState() {
+localStorage.setItem("tonieGenV3State", JSON.stringify({
+labels: state.labels,
+preset: state.preset,
+showText: state.showText
+}));
 }
+function loadState() {
+const saved = localStorage.getItem("tonieGenV3State");
+if (saved) {
+try {
+const parsed = JSON.parse(saved);
+state.labels = parsed.labels || [];
+state.preset = parsed.preset || '43';
+state.showText = parsed.showText !== undefined ? parsed.showText : true;
+el.presetSelect.value = state.preset;
+el.toggleText.checked = state.showText;
+} catch(e) {}
+}
+renderGrid();
+}
+// Quellen Tabs umschalten
+function switchSource(source) {
+state.source = source;
+document.querySelectorAll(".source-tab").forEach(btn => {
+btn.classList.toggle("active", btn.dataset.source === source);
 });
-if (type === 'upload') {
-elements.searchSection.style.display = 'none';
-elements.uploadSection.style.display = 'block';
+if (source === 'upload') {
+el.searchArea.style.display = "none";
+el.uploadArea.style.display = "block";
 } else {
-elements.searchSection.style.display = 'block';
-elements.uploadSection.style.display = 'none';
-elements.searchInput.placeholder = type === 'album'
-? "Interpret oder Album suchen (z.B. Disney)..."
-: "Titel oder Serie suchen (z.B. Conni)...";
-elements.searchInput.focus();
-if(elements.searchInput.value.trim().length >= 2) doSearch();
+el.searchArea.style.display = "block";
+el.uploadArea.style.display = "none";
+el.searchInput.placeholder = source === 'album' ? "Interpret oder Album suchen (z.B. Disney)..." : "Titel oder Serie suchen (z.B. Conni)...";
+el.searchInput.focus();
+if(el.searchInput.value.trim().length >= 2) performSearch();
 }
+}
+// Editor Modus (Simpel / Pro)
+function setEditorMode(mode) {
+state.editorMode = mode;
+document.getElementById("btn-mode-simple").classList.toggle("active", mode === 'simple');
+document.getElementById("btn-mode-pro").classList.toggle("active", mode === 'pro');
+el.proControls.style.display = mode === 'pro' ? 'grid' : 'none';
 }
 // Eigene Grafik Upload
-elements.customFileInput.addEventListener('change', (e) => {
+el.customFile.addEventListener('change', (e) => {
 const file = e.target.files[0];
 if(!file) return;
 const reader = new FileReader();
-reader.onload = function(event) {
+reader.onload = (event) => {
 addLabel(event.target.result, "Eigene Grafik", file.name.replace(/.[^/.]+$/, ""));
-elements.customFileInput.value = "";
+el.customFile.value = "";
 };
 reader.readAsDataURL(file);
 });
-async function doSearch() {
-const q = elements.searchInput.value.trim().toLowerCase();
-if(!q) { elements.searchResults.innerHTML = ""; elements.statusMsg.textContent = "Bitte Suchbegriff eingeben."; return; }
-elements.searchResults.innerHTML = "";
-elements.statusMsg.textContent = "Suche läuft...";
-if (appState.searchType === "album") {
+// Suchlogik
+async function performSearch() {
+const q = el.searchInput.value.trim().toLowerCase();
+if(!q) { el.searchResults.innerHTML = ""; el.dbStatus.textContent = "Bitte Suchbegriff eingeben."; return; }
+el.searchResults.innerHTML = "";
+el.dbStatus.textContent = "Suche läuft...";
+if (state.source === 'album') {
 try {
 const res = await fetch(⁠https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=album&limit=12⁠);
 const data = await res.json();
-if(data.results.length === 0) { elements.statusMsg.textContent = "Keine Alben gefunden."; return; }
-elements.statusMsg.textContent = ⁠${data.results.length} Alben gefunden. Klicke zum Hinzufügen.⁠;
+if(data.results.length === 0) { el.dbStatus.textContent = "Keine Alben gefunden."; return; }
+el.dbStatus.textContent = ⁠${data.results.length} Alben gefunden. Klicke zum Hinzufügen.⁠;
 data.results.forEach(album => {
 const imgUrl = album.artworkUrl100.replace('100x100bb', '600x600bb');
-createResultCard(imgUrl, album.artistName, album.collectionName);
+createCard(imgUrl, album.artistName, album.collectionName);
 });
-} catch (err) { elements.statusMsg.textContent = "Netzwerkfehler."; }
+} catch(e) { el.dbStatus.textContent = "Netzwerkfehler."; }
 } else {
 if(tonieDb.length === 0) return;
 const matches = tonieDb
 .filter(item => {
-if(!item.pic) return false;
-if(item.pic.includes('placeholder') || item.pic.includes('default')) return false;
-const title = (item.title||"").toLowerCase();
-const series = (item.series||"").toLowerCase();
-return title.includes(q) || series.includes(q);
+if(!item.pic || item.pic.includes('placeholder') || item.pic.includes('default')) return false;
+return (item.title||"").toLowerCase().includes(q) || (item.series||"").toLowerCase().includes(q);
 })
-.sort((a, b) => (a.series || a.title || "").localeCompare(b.series || b.title || "", 'de'))
+.sort((a,b) => (a.series||a.title||"").localeCompare(b.series||b.title||"", 'de'))
 .slice(0, 16);
-if(matches.length === 0) { elements.statusMsg.textContent = "Keine Tonies gefunden."; return; }
-elements.statusMsg.textContent = ⁠${matches.length} Tonies gefunden. Klicke zum Hinzufügen.⁠;
+if(matches.length === 0) { el.dbStatus.textContent = "Keine Tonies gefunden."; return; }
+el.dbStatus.textContent = ⁠${matches.length} Tonies gefunden. Klicke zum Hinzufügen.⁠;
 matches.forEach(item => {
-createResultCard(item.pic, item.series || "", item.episodes || item.title || "");
+createCard(item.pic, item.series||"", item.episodes||item.title||"");
 });
 }
 }
-function createResultCard(imgUrl, seriesText, titleText) {
+function createCard(imgUrl, series, title) {
 const card = document.createElement("div");
-card.className = "result-card";
-const displayName = titleText || seriesText || "Ohne Titel";
-card.innerHTML = ⁠<div class="add-badge">+</div><img src="${imgUrl}"><div class="title">${displayName}</div>⁠;
+card.className = "result-item";
+const name = title || series || "Cover";
+card.innerHTML = ⁠<div class="add-badge">+</div><img src="${imgUrl}"><div class="title">${name}</div>⁠;
 card.onclick = () => {
-let finalSeries = seriesText;
-let finalTitle = titleText;
-if(!finalSeries && finalTitle) { finalSeries = finalTitle; finalTitle = ""; }
-addLabel(imgUrl, finalSeries, finalTitle);
+let fSeries = series, fTitle = title;
+if(!fSeries && fTitle) { fSeries = fTitle; fTitle = ""; }
+addLabel(imgUrl, fSeries, fTitle);
 };
-elements.searchResults.appendChild(card);
+el.searchResults.appendChild(card);
 }
+// Label Verwaltung
 function addLabel(imgUrl, series, title) {
-const isAvery = appState.preset === 'avery-40';
-if (isAvery && appState.labels.length >= 24) {
-alert("Ein Avery-Bogen hat maximal 24 Plätze.");
-return;
-}
-const newId = Date.now().toString() + Math.floor(Math.random()*1000);
-appState.labels.push({
-id: newId,
-imgUrl,
-series,
-title,
-zoom: 100,
-rot: 0,
-posX: 0,
-posY: 0,
-bgColor: '#ffffff'
-});
-selectLabel(newId);
+const isAvery = state.preset === 'avery-40';
+if(isAvery && state.labels.length >= 24) { alert("Avery-Bogen ist auf 24 Stück limitiert."); return; }
+const id = Date.now().toString() + Math.floor(Math.random()*1000);
+state.labels.push({ id, imgUrl, series, title, zoom: 100, rot: 0, posX: 0, posY: 0, bgColor: '#ffffff' });
+selectLabel(id);
 }
 function selectLabel(id) {
-appState.selectedId = id;
-const label = appState.labels.find(l => l.id === id);
-if(label) {
-elements.imgToolPanel.style.display = "block";
-elements.zoomSlider.value = label.zoom;
-elements.rotSlider.value = label.rot || 0;
-elements.posXSlider.value = label.posX;
-elements.posYSlider.value = label.posY;
-elements.bgColorPicker.value = label.bgColor || '#ffffff';
-document.getElementById("zoom-val").textContent = ⁠${label.zoom}%⁠;
-document.getElementById("rot-val").textContent = ⁠${label.rot || 0}°⁠;
+state.selectedId = id;
+const l = state.labels.find(item => item.id === id);
+if(l) {
+el.editorCard.style.display = "block";
+el.zoom.value = l.zoom;
+el.rot.value = l.rot || 0;
+el.posx.value = l.posX;
+el.posy.value = l.posY;
+el.bgColor.value = l.bgColor || '#ffffff';
+document.getElementById("lbl-zoom").textContent = ⁠${l.zoom}%⁠;
+document.getElementById("lbl-rot").textContent = ⁠${l.rot || 0}°⁠;
 updateEditorPreview();
-elements.imgToolPanel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+el.editorCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 renderGrid();
 }
 function deselectLabel() {
-appState.selectedId = null;
-elements.imgToolPanel.style.display = "none";
+state.selectedId = null;
+el.editorCard.style.display = "none";
 renderGrid();
 }
 function duplicateSelected() {
-const labelToCopy = appState.labels.find(l => l.id === appState.selectedId);
-if(labelToCopy) {
-const isAvery = appState.preset === 'avery-40';
-if (isAvery && appState.labels.length >= 24) {
-alert("Der Avery-Bogen hat sein Maximum von 24 Stück erreicht.");
-return;
-}
-const newId = Date.now().toString() + Math.floor(Math.random()*1000);
-appState.labels.push({ ...labelToCopy, id: newId });
-selectLabel(newId);
+const target = state.labels.find(l => l.id === state.selectedId);
+if(target) {
+if(state.preset === 'avery-40' && state.labels.length >= 24) { alert("Avery-Bogen voll."); return; }
+const id = Date.now().toString() + Math.floor(Math.random()*1000);
+state.labels.push({ ...target, id });
+selectLabel(id);
 }
 }
 function removeSelected() {
-appState.labels = appState.labels.filter(l => l.id !== appState.selectedId);
+state.labels = state.labels.filter(l => l.id !== state.selectedId);
 deselectLabel();
 }
-function updateSelectedLabelProps() {
-if(!appState.selectedId) return;
-const idx = appState.labels.findIndex(l => l.id === appState.selectedId);
+function updateProps() {
+if(!state.selectedId) return;
+const idx = state.labels.findIndex(l => l.id === state.selectedId);
 if(idx > -1) {
-appState.labels[idx].zoom = elements.zoomSlider.value;
-appState.labels[idx].rot = elements.rotSlider.value;
-appState.labels[idx].posX = elements.posXSlider.value;
-appState.labels[idx].posY = elements.posYSlider.value;
-appState.labels[idx].bgColor = elements.bgColorPicker.value;
-document.getElementById("zoom-val").textContent = ⁠${elements.zoomSlider.value}%⁠;
-document.getElementById("rot-val").textContent = ⁠${elements.rotSlider.value}°⁠;
+state.labels[idx].zoom = el.zoom.value;
+state.labels[idx].rot = el.rot.value;
+state.labels[idx].posX = el.posx.value;
+state.labels[idx].posY = el.posy.value;
+state.labels[idx].bgColor = el.bgColor.value;
+document.getElementById("lbl-zoom").textContent = ⁠${el.zoom.value}%⁠;
+document.getElementById("lbl-rot").textContent = ⁠${el.rot.value}°⁠;
 updateEditorPreview();
 renderGrid();
 }
 }
-elements.zoomSlider.oninput = updateSelectedLabelProps;
-elements.rotSlider.oninput = updateSelectedLabelProps;
-elements.posXSlider.oninput = updateSelectedLabelProps;
-elements.posYSlider.oninput = updateSelectedLabelProps;
-elements.bgColorPicker.oninput = updateSelectedLabelProps;
+el.zoom.oninput = updateProps;
+el.rot.oninput = updateProps;
+el.posx.oninput = updateProps;
+el.posy.oninput = updateProps;
+el.bgColor.oninput = updateProps;
 function updateEditorPreview() {
-const label = appState.labels.find(l => l.id === appState.selectedId);
-let diameter = parseInt(appState.preset) || 43;
-if(appState.preset === 'avery-40') diameter = 40;
-elements.editorCircle.style.width = ⁠${diameter}mm⁠;
-elements.editorCircle.style.height = ⁠${diameter}mm⁠;
-if (label) {
-elements.editorCircle.style.backgroundColor = label.bgColor || '#ffffff';
-elements.editorImg.style.backgroundImage = ⁠url('${label.imgUrl}')⁠;
-elements.editorImg.style.backgroundSize = ⁠${label.zoom}%⁠;
-elements.editorImg.style.backgroundPosition = ⁠calc(50% + ${label.posX}px) calc(50% + ${label.posY}px)⁠;
-elements.editorImg.style.transform = ⁠rotate(${label.rot || 0}deg)⁠;
-if (appState.showText) {
-elements.editorTop.textContent = label.series || "";
-elements.editorTop.style.display = label.series ? "block" : "none";
-elements.editorBottom.textContent = label.title || "";
-elements.editorBottom.style.display = label.title ? "block" : "none";
+const l = state.labels.find(item => item.id === state.selectedId);
+let diam = parseInt(state.preset) || 43;
+if(state.preset === 'avery-40') diam = 40;
+el.edCircle.style.width = ⁠${diam}mm⁠;
+el.edCircle.style.height = ⁠${diam}mm⁠;
+if(l) {
+el.edCircle.style.backgroundColor = l.bgColor || '#ffffff';
+el.edImg.style.backgroundImage = ⁠url('${l.imgUrl}')⁠;
+el.edImg.style.backgroundSize = ⁠${l.zoom}%⁠;
+el.edImg.style.backgroundPosition = ⁠calc(50% + ${l.posX}px) calc(50% + ${l.posY}px)⁠;
+el.edImg.style.transform = ⁠rotate(${l.rot || 0}deg)⁠;
+if(state.showText) {
+el.edTop.textContent = l.series || "";
+el.edTop.style.display = l.series ? "block" : "none";
+el.edBottom.textContent = l.title || "";
+el.edBottom.style.display = l.title ? "block" : "none";
 } else {
-elements.editorTop.style.display = "none";
-elements.editorBottom.style.display = "none";
+el.edTop.style.display = "none";
+el.edBottom.style.display = "none";
 }
 }
 }
+// Render Grid
 function renderGrid() {
-elements.sheetGrid.innerHTML = "";
+el.sheetGrid.innerHTML = "";
 saveState();
-appState.preset = elements.presetSelect.value;
-appState.showText = elements.showTextToggle.checked;
-const isAvery = appState.preset === "avery-40";
-let diameter = isAvery ? 40 : (parseInt(appState.preset) || 43);
-elements.sheetGrid.className = isAvery ? "grid-avery" : "grid-standard";
-elements.sheetStats.textContent = ⁠${appState.labels.length}${isAvery ? '/24' : ''} Etikett${appState.labels.length !== 1 ? 'en' : ''}⁠;
-if(isAvery && appState.labels.length >= 24) {
-elements.sheetStats.classList.add('full');
+state.preset = el.presetSelect.value;
+state.showText = el.toggleText.checked;
+const isAvery = state.preset === 'avery-40';
+let diam = isAvery ? 40 : (parseInt(state.preset) || 43);
+el.sheetGrid.className = isAvery ? "grid-avery" : "grid-standard";
+el.statsBadge.textContent = ⁠${state.labels.length}${isAvery?'/24':''} Etikett${state.labels.length!==1?'en':''} auf dem Bogen⁠;
+if(isAvery && state.labels.length >= 24) {
+el.statsBadge.style.background = "#fee2e2";
+el.statsBadge.style.color = "#ef4444";
 } else {
-elements.sheetStats.classList.remove('full');
+el.statsBadge.style.background = "#f1f5f9";
+el.statsBadge.style.color = "var(--text-main)";
 }
-if(appState.labels.length === 0 && !isAvery) {
-elements.sheetGrid.innerHTML = ⁠ <div style="width:100%; text-align:center; padding: 50px 20px; color: var(--text-muted); display:flex; flex-direction:column; align-items:center;"> <div style="font-size: 15px; font-weight: 500;">Dein Bogen ist noch leer.</div> <div style="font-size: 12px; margin-top: 4px;">Füge oben Cover hinzu, um sie hier anzuordnen.</div> </div>⁠;
+if(state.labels.length === 0 && !isAvery) {
+el.sheetGrid.innerHTML = ⁠<div style="width:100%; text-align:center; padding: 45px 20px; color: var(--text-muted); font-size: 13px; font-weight:500;">Dein Bogen ist noch leer. Füge oben Cover hinzu.</div>⁠;
 return;
 }
-const totalSlots = isAvery ? 24 : appState.labels.length;
-for(let i = 0; i < totalSlots; i++) {
-const label = appState.labels[i];
+const slots = isAvery ? 24 : state.labels.length;
+for(let i = 0; i < slots; i++) {
+const l = state.labels[i];
 const slot = document.createElement("div");
 slot.className = "tag-slot";
-const circle = document.createElement("div");
-circle.className = "coin-circle";
-circle.style.width = ⁠${diameter}mm⁠;
-circle.style.height = ⁠${diameter}mm⁠;
-if (label) {
-if(label.id === appState.selectedId) circle.classList.add("selected");
-circle.style.backgroundColor = label.bgColor || '#ffffff';
-slot.onclick = () => selectLabel(label.id);
-const imgLayer = document.createElement("div");
-imgLayer.className = "coin-img-layer";
-imgLayer.style.backgroundImage = ⁠url('${label.imgUrl}')⁠;
-imgLayer.style.backgroundSize = ⁠${label.zoom}%⁠;
-imgLayer.style.backgroundPosition = ⁠calc(50% + ${label.posX}px) calc(50% + ${label.posY}px)⁠;
-circle.appendChild(imgLayer);
-imgLayer.style.transform = ⁠rotate(${label.rot || 0}deg)⁠;
-if (appState.showText) {
-if(label.series) {
-const lblTop = document.createElement("div");
-lblTop.className = "tag-info-text top";
-lblTop.textContent = label.series;
-circle.appendChild(lblTop);
+const circ = document.createElement("div");
+circ.className = "coin-circle";
+circ.style.width = ⁠${diam}mm⁠;
+circ.style.height = ⁠${diam}mm⁠;
+if(l) {
+if(l.id === state.selectedId) circ.classList.add("selected");
+circ.style.backgroundColor = l.bgColor || '#ffffff';
+slot.onclick = () => selectLabel(l.id);
+const layer = document.createElement("div");
+layer.className = "coin-img-layer";
+layer.style.backgroundImage = ⁠url('${l.imgUrl}')⁠;
+layer.style.backgroundSize = ⁠${l.zoom}%⁠;
+layer.style.backgroundPosition = ⁠calc(50% + ${l.posX}px) calc(50% + ${l.posY}px)⁠;
+layer.style.transform = ⁠rotate(${l.rot || 0}deg)⁠;
+circ.appendChild(layer);
+if(state.showText) {
+if(l.series) {
+const t = document.createElement("div");
+t.className = "tag-info-text top";
+t.textContent = l.series;
+circ.appendChild(t);
 }
-if(label.title) {
-const lblBottom = document.createElement("div");
-lblBottom.className = "tag-info-text bottom";
-lblBottom.textContent = label.title;
-circle.appendChild(lblBottom);
+if(l.title) {
+const b = document.createElement("div");
+b.className = "tag-info-text bottom";
+b.textContent = l.title;
+circ.appendChild(b);
 }
 }
 } else {
-circle.classList.add("empty-slot");
+circ.classList.add("empty");
 }
-slot.appendChild(circle);
-elements.sheetGrid.appendChild(slot);
+slot.appendChild(circ);
+el.sheetGrid.appendChild(slot);
 }
-if (appState.selectedId) {
-updateEditorPreview();
+if(state.selectedId) updateEditorPreview();
 }
-}
-let searchTimeout = null;
-elements.searchInput.addEventListener("input", () => {
-if (elements.searchInput.value.trim().length >= 2) {
-elements.statusMsg.textContent = "Suche läuft...";
-clearTimeout(searchTimeout);
-searchTimeout = setTimeout(doSearch, 300);
+// Such Events
+let timeout = null;
+el.searchInput.addEventListener("input", () => {
+if(el.searchInput.value.trim().length >= 2) {
+el.dbStatus.textContent = "Suche läuft...";
+clearTimeout(timeout);
+timeout = setTimeout(performSearch, 300);
 } else {
-elements.searchResults.innerHTML = "";
-elements.statusMsg.textContent = ⁠${tonieDb.length} Tonies geladen! Suchbegriff eingeben.⁠;
+el.searchResults.innerHTML = "";
+el.dbStatus.textContent = ⁠${tonieDb.length} Tonies bereit! Suchbegriff eingeben.⁠;
 }
 });
-elements.searchBtn.onclick = () => { clearTimeout(searchTimeout); doSearch(); };
-elements.searchInput.onkeydown = e => { if (e.key === "Enter") { clearTimeout(searchTimeout); doSearch(); }};
-elements.presetSelect.onchange = renderGrid;
-elements.showTextToggle.onchange = renderGrid;
+el.searchBtn.onclick = () => { clearTimeout(timeout); performSearch(); };
+el.searchInput.onkeydown = e => { if(e.key === 'Enter') { clearTimeout(timeout); performSearch(); }};
+el.presetSelect.onchange = renderGrid;
+el.toggleText.onchange = renderGrid;
+// Modals & Export
 function openPrintModal() {
-if(appState.labels.length === 0) { alert("Bitte füge zuerst Etiketten hinzu."); return; }
-elements.printModal.style.display = "flex";
+if(state.labels.length === 0) { alert("Bitte füge zuerst Etiketten hinzu."); return; }
+el.modalPrint.style.display = "flex";
 }
-function closePrintModal() { elements.printModal.style.display = "none"; }
+function closePrintModal() { el.modalPrint.style.display = "none"; }
 function executePrint() {
 closePrintModal();
 deselectLabel();
 setTimeout(() => window.print(), 250);
 }
-async function loadImagesForExport() {
+function openClearModal() { el.modalClear.style.display = "flex"; }
+function closeClearModal() { el.modalClear.style.display = "none"; }
+function executeClearSheet() {
+state.labels = [];
+deselectLabel();
+closeClearModal();
+}
+async function loadCache() {
 const cache = {};
-for (const lbl of appState.labels) {
-if (!cache[lbl.imgUrl]) {
-cache[lbl.imgUrl] = await new Promise((resolve) => {
+for(const l of state.labels) {
+if(!cache[l.imgUrl]) {
+cache[l.imgUrl] = await new Promise(res => {
 const img = new Image();
 img.crossOrigin = "anonymous";
-img.onload = () => resolve(img);
-img.onerror = () => resolve(null);
-img.src = lbl.imgUrl;
+img.onload = () => res(img);
+img.onerror = () => res(null);
+img.src = l.imgUrl;
 });
 }
 }
 return cache;
 }
-async function exportAsPng() {
-const exportBtn = document.getElementById("btn-export-png");
-exportBtn.textContent = "⏳ Bogen wird generiert...";
-exportBtn.disabled = true;
+async function exportPng() {
+const btn = document.getElementById("btn-png");
+btn.textContent = "⏳ Generiere PNG...";
+btn.disabled = true;
 try {
-const isAvery = appState.preset === "avery-40";
-let diameterMm = isAvery ? 40 : (parseInt(appState.preset) || 43);
+const isAvery = state.preset === 'avery-40';
+const diamMm = isAvery ? 40 : (parseInt(state.preset) || 43);
 const canvas = document.getElementById("export-canvas");
-canvas.width = 2480; canvas.height = 3508; // DIN A4 @ 300 DPI
+canvas.width = 2480; canvas.height = 3508; // A4 @ 300 DPI
 const ctx = canvas.getContext("2d");
 ctx.fillStyle = "#ffffff";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
 const pxPerMm = 2480 / 210;
-const diameterPx = diameterMm * pxPerMm;
+const diamPx = diamMm * pxPerMm;
 let startX = 15 * pxPerMm, startY = 15 * pxPerMm, gapX = 8 * pxPerMm, gapY = 8 * pxPerMm;
-let cols = isAvery ? 4 : Math.floor((2480 - (2 * startX)) / (diameterPx + gapX));
+let cols = isAvery ? 4 : Math.floor((2480 - (2 * startX)) / (diamPx + gapX));
 if (isAvery) {
 startX = 9.5 * pxPerMm; startY = 13.5 * pxPerMm; gapX = 4 * pxPerMm; gapY = 4 * pxPerMm;
 }
-const imgCache = await loadImagesForExport();
-const totalSlots = isAvery ? 24 : appState.labels.length;
-for (let i = 0; i < totalSlots; i++) {
+const cache = await loadCache();
+const slots = isAvery ? 24 : state.labels.length;
+for(let i = 0; i < slots; i++) {
 const col = i % cols;
 const row = Math.floor(i / cols);
-const x = startX + col * (diameterPx + gapX);
-const y = startY + row * (diameterPx + gapY);
-const label = appState.labels[i];
-// Gestrichelter Kreis
+const x = startX + col * (diamPx + gapX);
+const y = startY + row * (diamPx + gapY);
+const l = state.labels[i];
+// Schnittkante
 ctx.save();
 ctx.beginPath();
 ctx.setLineDash([10, 10]);
 ctx.strokeStyle = "#94a3b8";
 ctx.lineWidth = 2;
-ctx.arc(x + diameterPx / 2, y + diameterPx / 2, diameterPx / 2, 0, Math.PI * 2);
+ctx.arc(x + diamPx / 2, y + diamPx / 2, diamPx / 2, 0, Math.PI * 2);
 ctx.stroke();
 ctx.restore();
-if (label) {
+if (l) {
 ctx.save();
 ctx.beginPath();
-ctx.arc(x + diameterPx / 2, y + diameterPx / 2, diameterPx / 2, 0, Math.PI * 2);
+ctx.arc(x + diamPx / 2, y + diamPx / 2, diamPx / 2, 0, Math.PI * 2);
 ctx.closePath();
 ctx.clip();
-ctx.fillStyle = label.bgColor || "#ffffff";
+ctx.fillStyle = l.bgColor || "#ffffff";
 ctx.fill();
-const loadedImg = imgCache[label.imgUrl];
-if (loadedImg) {
+const img = cache[l.imgUrl];
+if(img) {
 ctx.save();
-ctx.translate(x + diameterPx / 2, y + diameterPx / 2);
-if (label.rot) ctx.rotate((label.rot * Math.PI) / 180);
-const scale = (label.zoom / 100);
-const w = diameterPx * scale;
-const h = diameterPx * scale;
-const posX = (label.posX * (pxPerMm / 3.78));
-const posY = (label.posY * (pxPerMm / 3.78));
-ctx.drawImage(loadedImg, -w / 2 + posX, -h / 2 + posY, w, h);
+ctx.translate(x + diamPx / 2, y + diamPx / 2);
+if(l.rot) ctx.rotate((l.rot * Math.PI) / 180);
+const scl = l.zoom / 100;
+const w = diamPx * scl;
+const h = diamPx * scl;
+const px = l.posX * (pxPerMm / 3.78);
+const py = l.posY * (pxPerMm / 3.78);
+ctx.drawImage(img, -w / 2 + px, -h / 2 + py, w, h);
 ctx.restore();
 }
 ctx.restore();
-if (appState.showText) {
+if(state.showText) {
 ctx.save();
-ctx.font = ⁠bold ${Math.round(18 * (pxPerMm / 3.78))}px -apple-system, sans-serif⁠;
+ctx.font = ⁠bold ${Math.round(18 * (pxPerMm / 3.78))}px system-ui, sans-serif⁠;
 ctx.textAlign = "center";
 ctx.textBaseline = "middle";
-const boxWidth = diameterPx * 0.75;
-const boxX = x + (diameterPx - boxWidth) / 2;
-const boxHeight = 28;
-if (label.series) {
-const topBoxY = y + (4 * pxPerMm);
-ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-ctx.fillRect(boxX, topBoxY, boxWidth, boxHeight);
+const bw = diamPx * 0.72;
+const bx = x + (diamPx - bw) / 2;
+const bh = 28;
+if(l.series) {
+const ty = y + (4 * pxPerMm);
+ctx.fillStyle = "rgba(255,255,255,0.92)";
+ctx.fillRect(bx, ty, bw, bh);
 ctx.fillStyle = "#111";
-ctx.fillText(label.series, x + diameterPx / 2, topBoxY + (boxHeight/2), boxWidth * 0.9);
+ctx.fillText(l.series, x + diamPx / 2, ty + (bh/2), bw * 0.9);
 }
-if (label.title) {
-const btmBoxY = y + diameterpx - (4 * pxPerMm) - boxHeight;
-ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-ctx.fillRect(boxX, btmBoxY, boxWidth, boxHeight);
+if(l.title) {
+const by = y + diamPx - (4 * pxPerMm) - bh;
+ctx.fillStyle = "rgba(255,255,255,0.92)";
+ctx.fillRect(bx, by, bw, bh);
 ctx.fillStyle = "#111";
-ctx.fillText(label.title, x + diameterPx / 2, btmBoxY + (boxHeight/2), boxWidth * 0.9);
+ctx.fillText(l.title, x + diamPx / 2, by + (bh/2), bw * 0.9);
 }
 ctx.restore();
 }
 }
 }
 const link = document.createElement("a");
-link.download = ⁠tonie-cover-bogen.png⁠;
+link.download = "tonie-cover-bogen.png";
 link.href = canvas.toDataURL("image/png");
 link.click();
-} catch (e) {
-alert("Beim Exportieren ist ein Fehler aufgetreten.");
+} catch(e) {
+alert("Fehler beim Exportieren.");
 } finally {
-exportBtn.textContent = "🖼️ Als hochauflösendes PNG speichern";
-exportBtn.disabled = false;
+btn.textContent = "🖼️ Als hochauflösendes PNG speichern";
+btn.disabled = false;
 closePrintModal();
 }
 }
