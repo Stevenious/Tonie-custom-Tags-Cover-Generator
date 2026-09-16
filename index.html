@@ -54,11 +54,9 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       position: relative;
       flex-shrink: 0;
-      /* Origin für Skalierung exakt mittig oben setzen */
       transform-origin: top center; 
     }
     
-    /* Responsive Skalierung des A4 Bogens */
     @media screen and (max-width: 850px) {
       .print-sheet { transform: scale(0.40); margin-bottom: -178mm; }
     }
@@ -80,6 +78,17 @@
     }
     .coin-img-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-repeat: no-repeat; background-position: center; }
     .tag-info-text { position: absolute; bottom: 4mm; width: 100%; text-align: center; font-size: 7pt; font-family: monospace; font-weight: bold; background: rgba(255,255,255,0.85); padding: 2px 0; z-index: 2; }
+
+    /* Footer Disclaimer */
+    .disclaimer {
+      margin-top: 25px;
+      padding: 15px;
+      font-size: 11px;
+      color: #6b7280;
+      text-align: center;
+      line-height: 1.5;
+      border-top: 1px solid var(--border);
+    }
 
     /* Print Styles */
     @media print {
@@ -151,6 +160,10 @@
     </div>
     
     <button class="full-width" onclick="window.print()">🖨️ Jetzt Drucken (A4)</button>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Disclaimer:</strong> Dieses Projekt ist inoffiziell, ein rein privates Hobby-Projekt und steht in keinerlei Verbindung zur Boxine GmbH. "tonies®" und "Toniebox®" sind eingetragene Marken der Boxine GmbH. Alle Rechte an den verwendeten Bildern, Covern und Titeln liegen bei den jeweiligen Urhebern.
   </div>
 </div>
 
@@ -250,7 +263,6 @@
     const isAvery = elements.presetSelect.value === "avery-40";
     let diameter = isAvery ? 40 : parseInt(elements.presetSelect.value);
     
-    // UI Logik: Anzahl-Feld ausblenden bei Avery
     if(isAvery) {
       elements.tagCountWrap.style.display = "none";
     } else {
@@ -290,7 +302,6 @@
     }
   }
 
-  // Events
   elements.searchBtn.onclick = searchMotiv;
   elements.searchInput.onkeydown = e => { if (e.key === "Enter") searchMotiv(); };
   elements.searchType.onchange = () => { elements.searchInput.placeholder = elements.searchType.value === "album" ? "Interpret oder Album suchen..." : "Tonie Titel suchen..."; };
