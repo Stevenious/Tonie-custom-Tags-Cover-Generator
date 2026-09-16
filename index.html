@@ -91,7 +91,7 @@
       font-family: -apple-system, BlinkMacSystemFont, sans-serif;
       font-weight: 700;
       color: #111;
-      background: rgba(255, 255, 255, 0.8); /* Etwas transparenter, kein Schatten */
+      background: rgba(255, 255, 255, 0.8);
       padding: 2.5px 5px;
       border-radius: 6px;
       z-index: 2;
@@ -193,7 +193,6 @@
     <div class="form-row" style="align-items: center; justify-content: space-between;">
       <div id="tag-count-wrap" style="display: flex; align-items: center; gap: 10px;">
         <label style="font-weight: 600;">Anzahl:</label>
-        <!-- Die Anzahl ist jetzt immer sichtbar und anpassbar -->
         <input type="number" id="tag-count" value="4" min="1" max="24" style="width: 80px;">
       </div>
       <label style="display: flex; align-items: center; gap: 8px; font-weight: 600; cursor: pointer;">
@@ -258,7 +257,12 @@
 
   async function searchMotiv() {
     const q = elements.searchInput.value.trim().toLowerCase();
-    if(!q) return;
+    if(!q) {
+      elements.searchResults.innerHTML = "";
+      elements.statusMsg.textContent = "Bitte einen Suchbegriff eingeben.";
+      return;
+    }
+    
     elements.searchResults.innerHTML = "";
     elements.statusMsg.textContent = "Suche läuft...";
     
@@ -288,7 +292,6 @@
       
       matches.forEach(item => {
         if(item.pic) {
-          // Serie oben, Episodentitel (oder Fallback auf Titel) unten
           createResultCard(item.pic, item.series || "", item.episodes || item.title || "");
         }
       });
@@ -305,7 +308,6 @@
       currentSeries = seriesText;
       currentTitle = titleText;
       
-      // Wenn Serie leer ist aber Titel existiert (oder umgekehrt), verteilen wir es sinnvoll
       if(!currentSeries && currentTitle) {
          currentSeries = currentTitle;
          currentTitle = "";
@@ -326,7 +328,6 @@
     const isAvery = elements.presetSelect.value === "avery-40";
     let diameter = isAvery ? 40 : (parseInt(elements.presetSelect.value) || 43);
     
-    // Anzahl immer vom Input-Feld holen (sodass man auch auf Avery-Bögen gezielt weniger drucken kann)
     let count = parseInt(elements.tagCount.value) || 1;
     if(count > 24 && isAvery) { count = 24; elements.tagCount.value = 24; }
     
@@ -399,9 +400,40 @@
     }
   }
 
-  elements.searchBtn.onclick = searchMotiv;
-  elements.searchInput.onkeydown = e => { if (e.key === "Enter") searchMotiv(); };
-  elements.searchType.onchange = () => { elements.searchInput.placeholder = elements.searchType.value === "album" ? "Interpret oder Album suchen..." : "Tonie Titel suchen..."; };
+  // --- Live-Suche Logik ---
+  let searchTimeout = null;
+
+  function handleLiveSearch() {
+    const queryLength = elements.searchInput.value.trim().length;
+    
+    if (queryLength >= 3) {
+      elements.statusMsg.textContent = "Tippen... Suche startet gleich.";
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        searchMotiv();
+      }, 400); 
+    } 
+    else if (queryLength === 0) {
+      clearTimeout(searchTimeout);
+      elements.searchResults.innerHTML = "";
+      elements.statusMsg.textContent = "Datenbank bereit. Suchen Sie einen Titel.";
+    }
+  }
+
+  elements.searchInput.addEventListener("input", handleLiveSearch);
+
+  elements.searchBtn.onclick = () => { clearTimeout(searchTimeout); searchMotiv(); };
+  elements.searchInput.onkeydown = e => { 
+    if (e.key === "Enter") {
+      clearTimeout(searchTimeout);
+      searchMotiv();
+    }
+  };
+
+  elements.searchType.onchange = () => { 
+    elements.searchInput.placeholder = elements.searchType.value === "album" ? "Interpret oder Album suchen..." : "Tonie Titel suchen..."; 
+    if(elements.searchInput.value.trim().length >= 3) searchMotiv();
+  };
   
   elements.zoomSlider.oninput = e => { imgZoom = e.target.value; document.getElementById("zoom-val").textContent = `${imgZoom}%`; updateGrid(); };
   elements.posXSlider.oninput = e => { imgPosX = e.target.value; updateGrid(); };
