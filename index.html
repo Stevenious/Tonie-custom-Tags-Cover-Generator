@@ -20,7 +20,11 @@
     input[type="text"], select, input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; font-size: 15px; background: #fafafa; }
     button { padding: 10px 20px; background: var(--primary); color: #fff; border: none; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
     button:hover { background: #cc0510; }
-    button.full-width { width: 100%; font-size: 18px; padding: 15px; margin-top: 10px; }
+    button.btn-secondary { background: #4b5563; }
+    button.btn-secondary:hover { background: #374151; }
+    button.btn-outline { background: transparent; color: #4b5563; border: 1px solid var(--border); }
+    button.btn-outline:hover { background: #e5e7eb; }
+    button.full-width { width: 100%; font-size: 16px; padding: 14px; margin-top: 10px; }
 
     #search-status { font-size: 13px; color: #6b7280; margin-bottom: 10px; min-height: 20px; }
     #search-results { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; max-height: 250px; overflow-y: auto; padding-right: 5px; }
@@ -34,7 +38,6 @@
     .slider-group label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: #4b5563; }
     input[type="range"] { width: 100%; accent-color: var(--primary); }
 
-    /* Single Preview Box in Panel 2 */
     .single-preview-box { display: flex; justify-content: center; margin-bottom: 20px; padding: 15px; background: #f9fafb; border-radius: 8px; border: 1px solid #e5e7eb; }
 
     /* Print Preview Layout Fix */
@@ -82,7 +85,6 @@
     }
     .coin-img-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-repeat: no-repeat; background-position: center; }
     
-    /* Geteilter Text: Oben und Unten, ohne Schatten, flacher Look */
     .tag-info-text {
       position: absolute;
       width: 85%;
@@ -104,6 +106,28 @@
     .tag-info-text.top { top: 2mm; }
     .tag-info-text.bottom { bottom: 2mm; }
 
+    /* Dialog / Modal für Vorschau & Export */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(0,0,0,0.65);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+    }
+    .modal-box {
+      background: #fff;
+      width: 100%;
+      max-width: 520px;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    }
+    .modal-header { font-size: 18px; font-weight: 700; margin-bottom: 15px; }
+    .modal-actions { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+
     /* Footer Disclaimer */
     .disclaimer {
       margin-top: 25px;
@@ -124,7 +148,7 @@
         -webkit-print-color-adjust: exact !important; 
         print-color-adjust: exact !important; 
       }
-      .no-print { display: none !important; }
+      .no-print, .modal-overlay { display: none !important; }
       .preview-container { background: transparent; padding: 0; margin: 0; overflow: visible; display: block; }
       .print-sheet { transform: none !important; box-shadow: none; margin: 0; padding: 0; width: 210mm; height: 297mm; }
       @page { size: A4 portrait; margin: 0; }
@@ -138,7 +162,11 @@
   <h1>Tonie & Album Etiketten Generator</h1>
   
   <div class="panel">
-    <span class="panel-title">1. Cover suchen</span>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid var(--bg); padding-bottom: 8px;">
+      <span class="panel-title" style="border: none; margin: 0; padding: 0;">1. Cover suchen</span>
+      <button type="button" class="btn-outline" style="padding: 5px 10px; font-size: 12px;" onclick="resetAll()">🗑️ Seite leeren</button>
+    </div>
+    
     <div class="form-row" style="flex-wrap: nowrap; gap: 8px;">
       <select id="search-type" style="width: 140px; flex-shrink: 0;">
         <option value="tonie">Tonie-Figur</option>
@@ -201,7 +229,7 @@
       </label>
     </div>
     
-    <button type="button" class="full-width" onclick="window.print()">🖨️ Jetzt Drucken (A4)</button>
+    <button type="button" class="full-width" onclick="openPrintModal()">🖨️ Drucken & Exportieren</button>
   </div>
 </div>
 
@@ -218,6 +246,23 @@
   </div>
 </div>
 
+<!-- Modal: Auswahl vor dem Druck -->
+<div class="modal-overlay" id="print-modal">
+  <div class="modal-box">
+    <div class="modal-header">Druck- & Exportoptionen</div>
+    <p style="font-size: 14px; color: #4b5563; margin-top: 0;">Wähle die gewünschte Ausgabeform für deinen vorbereiteten Bogen:</p>
+    
+    <div class="modal-actions">
+      <button type="button" onclick="executePrint()">📄 Jetzt Drucken (A4 / PDF)</button>
+      <button type="button" class="btn-secondary" onclick="exportAsPng()">🖼️ Als PNG-Bild speichern</button>
+      <button type="button" class="btn-outline" onclick="closePrintModal()">Abbrechen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Verstecktes Canvas für sauberen PNG-Export -->
+<canvas id="export-canvas" style="display: none;"></canvas>
+
 <script>
   const TONIES_JSON_URL = "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json";
   let tonieDb = [];
@@ -225,6 +270,7 @@
   let currentSeries = "";
   let currentTitle = "";
   let imgZoom = 100, imgPosX = 0, imgPosY = 0;
+  let loadedImageObj = null;
 
   const elements = {
     searchType: document.getElementById("search-type"),
@@ -244,7 +290,8 @@
     livePreviewCircle: document.getElementById("live-preview-circle"),
     livePreviewImg: document.getElementById("live-preview-img"),
     livePreviewTextTop: document.getElementById("live-preview-text-top"),
-    livePreviewTextBottom: document.getElementById("live-preview-text-bottom")
+    livePreviewTextBottom: document.getElementById("live-preview-text-bottom"),
+    printModal: document.getElementById("print-modal")
   };
 
   fetch(TONIES_JSON_URL)
@@ -313,6 +360,10 @@
          currentTitle = "";
       }
 
+      loadedImageObj = new Image();
+      loadedImageObj.crossOrigin = "anonymous";
+      loadedImageObj.src = currentImgUrl;
+
       imgZoom = 100; imgPosX = 0; imgPosY = 0;
       elements.zoomSlider.value = 100; elements.posXSlider.value = 0; elements.posYSlider.value = 0;
       document.getElementById("zoom-val").textContent = "100%";
@@ -333,7 +384,7 @@
     
     elements.sheetGrid.className = isAvery ? "grid-avery" : "grid-standard";
 
-    // 1. Update Panel 2 Live Preview
+    // 1. Live Preview Panel 2
     if(currentImgUrl) {
       elements.livePreviewCircle.style.width = `${diameter}mm`;
       elements.livePreviewCircle.style.height = `${diameter}mm`;
@@ -361,7 +412,7 @@
       }
     }
 
-    // 2. Update Print Sheet Grid
+    // 2. A4 Bogen Grid
     for(let i = 0; i < count; i++) {
       const slot = document.createElement("div");
       slot.className = "tag-slot";
@@ -398,6 +449,138 @@
       slot.appendChild(circle);
       elements.sheetGrid.appendChild(slot);
     }
+  }
+
+  // --- Modal & Print & Export Logic ---
+  function openPrintModal() {
+    elements.printModal.style.display = "flex";
+  }
+
+  function closePrintModal() {
+    elements.printModal.style.display = "none";
+  }
+
+  function executePrint() {
+    closePrintModal();
+    setTimeout(() => {
+      window.print();
+    }, 250);
+  }
+
+  function resetAll() {
+    currentImgUrl = "";
+    currentSeries = "";
+    currentTitle = "";
+    loadedImageObj = null;
+    elements.searchInput.value = "";
+    elements.searchResults.innerHTML = "";
+    elements.imgToolPanel.style.display = "none";
+    elements.statusMsg.textContent = "Bereit. Suchen Sie einen Titel.";
+    elements.tagCount.value = "4";
+    elements.presetSelect.value = "43";
+    updateGrid();
+  }
+
+  function exportAsPng() {
+    const isAvery = elements.presetSelect.value === "avery-40";
+    const diameterMm = isAvery ? 40 : (parseInt(elements.presetSelect.value) || 43);
+    const count = parseInt(elements.tagCount.value) || 1;
+
+    // A4 Dimensionen bei 300 DPI: 2480 x 3508 Pixel
+    const canvas = document.getElementById("export-canvas");
+    canvas.width = 2480;
+    canvas.height = 3508;
+    const ctx = canvas.getContext("2d");
+
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    const pxPerMm = 2480 / 210;
+    const diameterPx = diameterMm * pxPerMm;
+
+    let startX = 15 * pxPerMm;
+    let startY = 15 * pxPerMm;
+    let gapX = 8 * pxPerMm;
+    let gapY = 8 * pxPerMm;
+    let cols = isAvery ? 4 : Math.floor((2480 - (2 * startX)) / (diameterPx + gapX));
+
+    if (isAvery) {
+      startX = 9.5 * pxPerMm;
+      startY = 13.5 * pxPerMm;
+      gapX = 4 * pxPerMm;
+      gapY = 4 * pxPerMm;
+    }
+
+    for (let i = 0; i < count; i++) {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const x = startX + col * (diameterPx + gapX);
+      const y = startY + row * (diameterPx + gapY);
+
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(x + diameterPx / 2, y + diameterPx / 2, diameterPx / 2, 0, Math.PI * 2);
+      ctx.closePath();
+      ctx.clip();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.fill();
+
+      if (loadedImageObj && loadedImageObj.complete) {
+        const scale = (imgZoom / 100);
+        const w = diameterPx * scale;
+        const h = diameterPx * scale;
+        const posX = (imgPosX * (pxPerMm / 3.78));
+        const posY = (imgPosY * (pxPerMm / 3.78));
+        const drawX = (x + diameterPx / 2 - w / 2) + posX;
+        const drawY = (y + diameterPx / 2 - h / 2) + posY;
+        ctx.drawImage(loadedImageObj, drawX, drawY, w, h);
+      }
+
+      ctx.restore();
+
+      // Kreislinie (Schnittkante gestrichelt)
+      ctx.save();
+      ctx.beginPath();
+      ctx.setLineDash([10, 10]);
+      ctx.strokeStyle = "#9ca3af";
+      ctx.lineWidth = 2;
+      ctx.arc(x + diameterPx / 2, y + diameterPx / 2, diameterPx / 2, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+
+      // Texte andrucken
+      if (elements.showTextToggle.checked) {
+        ctx.save();
+        ctx.font = `bold ${Math.round(22 * (pxPerMm / 3.78))}px -apple-system, sans-serif`;
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#111111";
+
+        if (currentSeries) {
+          const topBoxY = y + (2 * pxPerMm);
+          ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+          ctx.fillRect(x + (diameterPx * 0.1), topBoxY, diameterPx * 0.8, 30);
+          ctx.fillStyle = "#111";
+          ctx.fillText(currentSeries, x + diameterPx / 2, topBoxY + 22, diameterPx * 0.75);
+        }
+
+        if (currentTitle) {
+          const btmBoxY = y + diameterPx - (9 * pxPerMm);
+          ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+          ctx.fillRect(x + (diameterPx * 0.1), btmBoxY, diameterPx * 0.8, 30);
+          ctx.fillStyle = "#111";
+          ctx.fillText(currentTitle, x + diameterPx / 2, btmBoxY + 22, diameterPx * 0.75);
+        }
+        ctx.restore();
+      }
+    }
+
+    // Download auslösen
+    const link = document.createElement("a");
+    link.download = `tonie-cover-bogen.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+    closePrintModal();
   }
 
   // --- Live-Suche Logik ---
