@@ -3,24 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Tonie & Tag Cover Generator V4</title>
+<title>Tonie & Tag Cover Generator V5</title>
 <style>
 :root {
 --primary: #e30613;
 --primary-hover: #c5050f;
---bg: #0f172a;
+--bg: #f4f6f9;
 --card-bg: #ffffff;
---text-main: #0f172a;
+--text-main: #1e293b;
 --text-muted: #64748b;
---border: #e2e8f0;
---radius: 16px;
+--border: #cbd5e1;
+--radius: 14px;
 --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
 --selected: #2563eb;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body {
 font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-background: #f8fafc;
+background: var(--bg);
 color: var(--text-main);
 margin: 0;
 padding: 12px;
@@ -41,11 +41,11 @@ margin-bottom: 16px;
 box-shadow: var(--shadow);
 }
 .card-title { font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
-/* Source Tabs (Segmented Control) */
+/* Source Tabs */
 .source-tabs {
 display: grid;
 grid-template-columns: repeat(3, 1fr);
-background: #f1f5f9;
+background: #e2e8f0;
 padding: 4px;
 border-radius: 12px;
 gap: 4px;
@@ -112,7 +112,7 @@ gap: 6px;
 display: grid;
 grid-template-columns: repeat(auto-fill, minmax(105px, 1fr));
 gap: 10px;
-max-height: 240px;
+max-height: 250px;
 overflow-y: auto;
 margin-top: 12px;
 padding-right: 4px;
@@ -136,7 +136,7 @@ border-radius: 50%; font-size: 13px; font-weight: bold; display: none; align-ite
 }
 .result-item:hover .add-badge { display: flex; }
 /* Editor Card (Step 2) */
-.mode-switch { display: flex; background: #f1f5f9; padding: 3px; border-radius: 10px; margin-bottom: 14px; }
+.mode-switch { display: flex; background: #e2e8f0; padding: 3px; border-radius: 10px; margin-bottom: 14px; }
 .mode-btn { flex: 1; border: none; background: transparent; padding: 8px; font-size: 12px; font-weight: 700; color: var(--text-muted); border-radius: 8px; cursor: pointer; }
 .mode-btn.active { background: #fff; color: var(--text-main); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
 .editor-preview-container { display: flex; justify-content: center; padding: 15px; background: #f8fafc; border-radius: 12px; border: 1.5px dashed var(--border); margin-bottom: 14px; }
@@ -196,7 +196,7 @@ body { background: #fff; margin: 0; padding: 0; }
 <body>
 <div class="app-container">
 <header class="no-print">
-<h1>Tonie & Tag Cover Generator V4</h1>
+<h1>Tonie & Tag Cover Generator V5</h1>
 <div class="subtitle">Der elegante Designer für Münzkapseln, RFIDfriend Token & Avery Etiketten</div>
 </header>
 <!-- SEKTION 1: SUCHEN & HINZUFÜGEN -->
@@ -389,14 +389,14 @@ el.dbStatus.textContent = ⁠${tonieDb.length} Tonies bereit! Suchbegriff eingeb
 .catch(() => el.dbStatus.textContent = "Fehler beim Laden der Tonie-Datenbank.");
 // State speichern / laden
 function saveState() {
-localStorage.setItem("tonieGenV4State", JSON.stringify({
+localStorage.setItem("tonieGenV5State", JSON.stringify({
 labels: state.labels,
 preset: state.preset,
 showText: state.showText
 }));
 }
 function loadState() {
-const saved = localStorage.getItem("tonieGenV4State");
+const saved = localStorage.getItem("tonieGenV5State");
 if (saved) {
 try {
 const parsed = JSON.parse(saved);
@@ -775,7 +775,7 @@ const link = document.createElement("a");
 link.download = "tonie-cover-bogen.png";
 link.href = canvas.toDataURL("image/png");
 link.click();
-} catch(e) {
+}catch(e) {
 alert("Fehler beim Exportieren.");
 } finally {
 btn.textContent = "🖼️ Als hochauflösendes PNG speichern";
