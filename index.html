@@ -471,7 +471,7 @@ if (label) {
 elements.editorCircle.style.backgroundColor = label.bgColor || '#ffffff';
 elements.editorImg.style.backgroundImage = ⁠url('${label.imgUrl}')⁠;
 elements.editorImg.style.backgroundSize = ⁠${label.zoom}%⁠;
-elements.editorImg.style.backgroundPosition = ⁠calc(50% + ${label.posX}px) calc(50\% +${label.posY}px)⁠;
+elements.editorImg.style.backgroundPosition = ⁠calc(50% + ${label.posX}px) calc(50% + ${label.posY}px)⁠;
 if (appState.showText) {
 elements.editorTop.textContent = label.series || "";
 elements.editorTop.style.display = label.series ? "block" : "none";
@@ -518,7 +518,7 @@ const imgLayer = document.createElement("div");
 imgLayer.className = "coin-img-layer";
 imgLayer.style.backgroundImage = ⁠url('${label.imgUrl}')⁠;
 imgLayer.style.backgroundSize = ⁠${label.zoom}%⁠;
-imgLayer.style.backgroundPosition = ⁠calc(50% + ${label.posX}px) calc(50\% +${label.posY}px)⁠;
+imgLayer.style.backgroundPosition = ⁠calc(50% + ${label.posX}px) calc(50% + ${label.posY}px)⁠;
 circle.appendChild(imgLayer);
 if (appState.showText) {
 if(label.series) {
@@ -653,7 +653,7 @@ ctx.fillText(label.series, x + diameterPx / 2, topBoxY + (boxHeight/2), boxWidth
 }
 if(label.title) {
 const btmBoxY = y + diameterPx - (4 * pxPerMm) - boxHeight;
-ctx.fillStyle = "rgba(255, 255, 2`]helvetica";
+ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
 ctx.fillRect(boxX, btmBoxY, boxWidth, boxHeight);
 ctx.fillStyle = "#111";
 ctx.fillText(label.title, x + diameterPx / 2, btmBoxY + (boxHeight/2), boxWidth * 0.9);
