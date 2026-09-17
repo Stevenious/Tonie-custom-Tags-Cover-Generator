@@ -7,7 +7,7 @@
     <style>
         /* === VARIABLES & RESET === */
         :root {
-            --primary: #e30613; /* Tonie Red */
+            --primary: #e30613;
             --primary-hover: #b8050f;
             --bg-body: #f3f4f6;
             --bg-card: #ffffff;
@@ -20,28 +20,14 @@
             --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
         }
 
-        /* Strict Box Sizing to prevent mobile offset bugs */
         *, *::before, *::after { box-sizing: border-box; }
         
-        html, body {
-            width: 100%;
-            /* Removed max-width: 100vw; to prevent horizontal scroll issues on some mobile browsers */
-            overflow-x: hidden;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
+        html, body { width: 100%; overflow-x: hidden; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
         body { 
-            background-color: var(--bg-body); 
-            color: var(--text-main); 
-            line-height: 1.5; 
+            background-color: var(--bg-body); color: var(--text-main); line-height: 1.5; 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            padding: 16px; 
-            padding-bottom: 80px;
-            display: flex;
-            flex-direction: column;
-            align-items: center; 
+            padding: 16px; padding-bottom: 80px; display: flex; flex-direction: column; align-items: center; 
         }
 
         /* === LAYOUT & HEADER === */
@@ -50,43 +36,29 @@
         .support-btn:hover { background: #d97706; transform: translateY(-1px); }
 
         .header { text-align: center; margin-bottom: 28px; width: 100%; max-width: 1200px; display: flex; flex-direction: column; align-items: center; }
-        
-        /* NEW LOGO WRAPPER */
         .logo-wrapper { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;}
         .app-logo { width: 44px; height: 44px; flex-shrink: 0; }
-        
         .header h1 { color: var(--primary); font-size: 30px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; margin: 0; text-align: center; }
         .header p { color: var(--text-muted); font-size: 14px; margin: 8px 0 0 0; text-align: center; max-width: 600px; }
 
-        .app-layout { 
-            display: flex; /* Changed from grid to flex for better mobile handling */
-            flex-direction: column;
-            gap: 24px; 
-            width: 100%;
-            max-width: 1200px; 
-        }
+        .app-layout { display: flex; flex-direction: column; gap: 24px; width: 100%; max-width: 1200px; }
         @media(min-width: 1024px) { 
-            .app-layout { flex-direction: row; align-items: flex-start; } /* Side-by-side on desktop */
+            .app-layout { flex-direction: row; align-items: flex-start; }
             .column-1 { width: 400px; flex-shrink: 0; }
-            .column-2 { flex-grow: 1; min-width: 0; } /* min-width: 0 prevents flex child from overflowing */
+            .column-2 { flex-grow: 1; min-width: 0; }
             .top-bar { justify-content: flex-end; }
             .header h1 { font-size: 36px; }
             .app-logo { width: 52px; height: 52px; }
         }
 
-        .card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow); width: 100%; }
-        /* Added box-sizing just in case to ensure padding doesn't push width out */
-        .card { box-sizing: border-box; }
-        
+        .card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow); width: 100%; box-sizing: border-box; }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #f3f4f6; padding-bottom: 12px; }
         .card-header h2 { font-size: 18px; font-weight: 700; color: #111; margin: 0;}
 
         /* === BUTTONS & INPUTS === */
         input[type="text"], select { 
             width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: var(--radius-md); 
-            font-size: 16px; /* 16px stops iOS Auto-Zoom */
-            outline: none; background: #f9fafb; color: var(--text-main); font-weight: 500; transition: 0.2s; 
-            box-sizing: border-box; /* Crucial for width: 100% inputs */
+            font-size: 16px; outline: none; background: #f9fafb; color: var(--text-main); font-weight: 500; transition: 0.2s; box-sizing: border-box; 
         }
         input[type="text"]:focus, select:focus { border-color: var(--primary); background: #fff; }
         
@@ -98,7 +70,6 @@
         
         .btn-success { background: #10b981; color: white; }
         .btn-success:hover { background: #059669; }
-        
         .btn-batch { background: #fef3c7; color: #d97706; border: 1px solid #fde68a; }
         .btn-batch:hover { background: #fde68a; }
 
@@ -118,7 +89,7 @@
         .search-grid::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
         .search-grid::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
-        .search-item { border: 2px solid var(--border); border-radius: var(--radius-md); padding: 12px; text-align: center; cursor: pointer; transition: 0.2s; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; box-sizing: border-box; overflow: hidden; /* Prevent content from breaking card */ }
+        .search-item { border: 2px solid var(--border); border-radius: var(--radius-md); padding: 12px; text-align: center; cursor: pointer; transition: 0.2s; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; box-sizing: border-box; overflow: hidden; }
         .search-item:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .search-item img { width: 100%; max-width: 120px; aspect-ratio: 1; object-fit: contain; margin-bottom: 12px; border-radius: 8px; }
         .search-item span { display: block; font-size: 12px; font-weight: 600; line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; width: 100%; text-overflow: ellipsis; }
@@ -133,14 +104,14 @@
         
         .preview-container { flex: 0 0 auto; background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 32px; display: flex; justify-content: center; width: 100%; max-width: 320px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); box-sizing: border-box; }
         
-        .circle-canvas { width: 240px; height: 240px; border-radius: 50%; border: 2px dashed #cbd5e1; position: relative; display: flex; justify-content: center; align-items: center; background: #fff; overflow: hidden; box-shadow: var(--shadow); transition: 0.3s; flex-shrink: 0; max-width: 100%; } /* Added flex-shrink and max-width */
+        .circle-canvas { width: 240px; height: 240px; border-radius: 50%; border: 2px dashed #cbd5e1; position: relative; display: flex; justify-content: center; align-items: center; background: #fff; overflow: hidden; box-shadow: var(--shadow); transition: 0.3s; flex-shrink: 0; max-width: 100%; }
         .circle-canvas.empty { background: #f1f5f9; box-shadow: none; }
         .circle-canvas.empty::after { content: 'Wähle ein Motiv'; color: #94a3b8; font-weight: 700; font-size: 15px; }
         
         .bg-layer { position: absolute; top:0; left:0; width: 100%; height: 100%; background-repeat: no-repeat; background-position: center; pointer-events: none; transition: background-color 0.2s; }
         .svg-overlay { position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
 
-        .editor-controls { flex: 1; width: 100%; min-width: 0; /* Prevents flex blowout */ }
+        .editor-controls { flex: 1; width: 100%; min-width: 0; }
         
         .mode-switch { display: flex; background: #f3f4f6; border-radius: 10px; padding: 4px; margin-bottom: 20px; }
         .mode-btn { flex: 1; text-align: center; padding: 10px; font-size: 13px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: 0.2s;}
@@ -158,36 +129,9 @@
         input[type="color"]::-webkit-color-swatch { border: 2px solid var(--border); border-radius: 8px; }
 
         /* === SECTION 3: SHEET === */
-        /* SWIPE TO PAN & MOBILE ZOOM WRAPPER */
-        .sheet-scale-wrapper { 
-            width: 100%; 
-            overflow: hidden; 
-            background: #cbd5e1; 
-            border-radius: var(--radius-lg); 
-            padding: 20px; 
-            box-shadow: inset 0 2px 8px rgba(0,0,0,0.05); 
-            display: flex; 
-            justify-content: center; 
-            margin-top: 20px; 
-            box-sizing: border-box;
-        }
-
-        .a4-sheet { 
-            background: #fff; 
-            box-shadow: var(--shadow-lg); 
-            position: relative; 
-            width: 794px; 
-            height: 1123px; 
-            border-radius: 4px; 
-            flex-shrink: 0; 
-            transform-origin: top center;
-        }
-
-        /* The Magic Mobile Zoom Fix */
-        @media(max-width: 800px) {
-            .a4-sheet { zoom: 0.44; /* Fits perfectly on standard iPhone width */ }
-            .sheet-scale-wrapper { padding: 10px; }
-        }
+        .sheet-scale-wrapper { width: 100%; overflow: hidden; background: #cbd5e1; border-radius: var(--radius-lg); padding: 20px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.05); display: flex; justify-content: center; margin-top: 20px; box-sizing: border-box; }
+        .a4-sheet { background: #fff; box-shadow: var(--shadow-lg); position: relative; width: 794px; height: 1123px; border-radius: 4px; flex-shrink: 0; transform-origin: top center; }
+        @media(max-width: 800px) { .a4-sheet { zoom: 0.44; } .sheet-scale-wrapper { padding: 10px; } }
         
         .sheet-grid { display: flex; flex-wrap: wrap; gap: 30px; padding: 56px; align-content: flex-start; justify-content: flex-start; }
         .grid-avery { display: grid; grid-template-columns: repeat(4, 151px); grid-auto-rows: 151px; gap: 19px; justify-content: center; padding-top: 56px; }
@@ -209,7 +153,7 @@
         .hw-item { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); text-decoration: none; color: var(--text-main); transition: 0.2s; width: 100%; box-sizing: border-box; overflow: hidden; }
         .hw-item:hover { border-color: var(--primary); background: #fff; transform: translateY(-2px); box-shadow: var(--shadow);}
         .hw-item .icon { font-size: 24px; flex-shrink: 0; }
-        .hw-item div { min-width: 0; /* Prevents flex blowout in children */ }
+        .hw-item div { min-width: 0; }
         .hw-item div strong { display: block; font-size: 14px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
         .hw-item div span { font-size: 12px; color: var(--text-muted); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; display: block; }
 
@@ -220,52 +164,17 @@
         footer a:hover { color: var(--primary-hover); text-decoration: underline;}
         .community-links { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-top: 12px; }
 
-        /* === PRINT STYLES (BULLETPROOF V13.1 - THE NUCLEAR OPTION) === */
+        /* === PRINT STYLES (BULLETPROOF V13.1) === */
         @media print {
-            /* 1. Force strict A4 page, 0 margins to remove URL/Date headers from browser */
             @page { size: A4 portrait; margin: 0 !important; }
-            
-            /* 2. Hide absolutely everything using display:none to prevent empty pages */
             body * { display: none !important; }
-            
-            /* 3. Unhide ONLY the direct path to the sheet */
-            body, html { 
-                display: block !important; 
-                margin: 0 !important; padding: 0 !important; 
-                background: #fff !important; 
-                width: 210mm !important; height: 297mm !important; 
-                overflow: hidden !important; /* Kills the 2nd page bug */
-            }
-            
-            /* 4. Strip formatting from wrappers but keep them visible */
-            .app-layout, .print-section, #sheetWrapper {
-                display: block !important; 
-                position: static !important;
-                margin: 0 !important; padding: 0 !important; 
-                border: none !important; box-shadow: none !important; 
-                background: transparent !important; 
-                max-width: none !important; width: 210mm !important; height: auto !important;
-                transform: none !important;
-            }
-
-            /* 5. Unhide the specific Sheet and Grid */
+            body, html { display: block !important; margin: 0 !important; padding: 0 !important; background: #fff !important; width: 210mm !important; height: 297mm !important; overflow: hidden !important; }
+            .app-layout, .print-section, #sheetWrapper { display: block !important; position: static !important; margin: 0 !important; padding: 0 !important; border: none !important; box-shadow: none !important; background: transparent !important; max-width: none !important; width: 210mm !important; height: auto !important; transform: none !important; }
             #printSheet, #printSheet * { display: block !important; }
             .sheet-grid, .grid-avery { display: flex !important; }
             .grid-avery { display: grid !important; }
-            
-            /* 6. Position the sheet exactly at top left */
-            #printSheet {
-                position: absolute !important;
-                top: 0 !important; left: 0 !important;
-                width: 210mm !important; height: 297mm !important;
-                transform: scale(1) !important;
-                box-shadow: none !important; border-radius: 0 !important; margin: 0 !important;
-            }
-
-            /* 7. Hide specific UI elements inside the print section */
+            #printSheet { position: absolute !important; top: 0 !important; left: 0 !important; width: 210mm !important; height: 297mm !important; transform: scale(1) !important; box-shadow: none !important; border-radius: 0 !important; margin: 0 !important; }
             .card-header, label, select, .project-actions, p, button, .checkbox-label, div[style*="flex-direction: column;"] { display: none !important; }
-            
-            /* 8. Hide empty slots for cleaner print */
             .label-slot.empty { display: none !important; }
         }
     </style>
@@ -279,7 +188,6 @@
 
 <div class="header">
     <div class="logo-wrapper">
-        <!-- SVG App Logo -->
         <svg viewBox="0 0 100 100" class="app-logo">
             <circle cx="50" cy="50" r="45" fill="none" stroke="var(--primary)" stroke-width="4" stroke-dasharray="10 6" />
             <circle cx="50" cy="50" r="32" fill="var(--primary)" />
@@ -324,7 +232,10 @@
         <div class="card" id="editorCard">
             <div class="card-header">
                 <h2>Etikett gestalten</h2>
-                <button class="btn btn-secondary btn-sm hidden" id="btnCancel" onclick="resetEditor()">Abbrechen</button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-secondary btn-sm" id="btnShare" onclick="shareCurrentDesign()" title="Link zu diesem Design teilen">📤 Teilen</button>
+                    <button class="btn btn-secondary btn-sm hidden" id="btnCancel" onclick="resetEditor()">Abbrechen</button>
+                </div>
             </div>
 
             <div class="editor-layout">
@@ -337,7 +248,6 @@
                                 <textPath href="#pathTop" startOffset="50%" text-anchor="middle" dominant-baseline="auto" id="previewTextTop"></textPath>
                             </text>
                             
-                            <!-- SWEEP FLAG 0 (Sweep-Flag) for correct bottom rendering -->
                             <path id="pathBot" d="M 18,100 A 82,82 0 0,0 182,100" fill="none" stroke="none"/>
                             <text id="previewTextBotNode" font-family="-apple-system, sans-serif" font-weight="800" stroke="#fff" paint-order="stroke fill" letter-spacing="0.5px">
                                 <textPath href="#pathBot" startOffset="50%" text-anchor="middle" dominant-baseline="hanging" id="previewTextBot"></textPath>
@@ -435,9 +345,7 @@
                     <input type="checkbox" id="checkCutlines" checked> ✂️ Schnittmarken (gestrichelter Rand) beim PNG-Export zeichnen
                 </label>
                 <div style="display: flex; flex-direction: column; gap: 16px;">
-                    <!-- Primary Print Action -->
                     <button class="btn btn-success" onclick="window.print()" style="font-size: 18px; padding: 16px; background: var(--primary);">🖨️ Bogen Drucken (A4)</button>
-                    <!-- Secondary PNG Export -->
                     <button class="btn btn-secondary" onclick="exportPNG()">🖼️ Als 300 DPI PNG exportieren</button>
                 </div>
             </div>
@@ -472,7 +380,7 @@
 </div>
 
 <footer>
-    <p>Tonie Cover Generator • Version 13.1 (Community Release)<br>Open Source unter MIT-Lizenz.</p>
+    <p>Tonie Cover Generator • Version 14.0 (Community Release)<br>Open Source unter MIT-Lizenz.</p>
     <div class="community-links">
         <a href="https://github.com/toniebox-reverse-engineering" target="_blank">Team RevvoX</a>
         <a href="https://gt-blog.de/custom-tags-for-toniebox/" target="_blank">Gambrius Blog</a>
@@ -520,13 +428,16 @@
         sGrid: document.getElementById('sheetGrid')
     };
 
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
         loadCache();
-        fetchDB();
+        await fetchDB();
         setupSearch();
         setupUpload();
         resetEditor(); 
         renderSheet();
+        
+        // V14 Webhook / Custom URL handler
+        checkUrlParams();
     });
 
     // Helper Function for dynamic text scaling
@@ -585,6 +496,85 @@
             el.innerHTML = `<img src="${item.pic}" loading="lazy"><span>${item.series ? item.series + '<br>' : ''}${item.title||''}</span>`;
             el.onclick = () => loadEditor({ imgUrl: item.pic, series: item.series||'', title: item.title||'' }, state.editingIndex);
             DOM.grid.appendChild(el);
+        });
+    }
+    
+    // --- V14 Custom URL / Webhook Handler ---
+    function checkUrlParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        let incomingTitle = urlParams.get('title') || urlParams.get('t');
+        let incomingUid = urlParams.get('uid') || urlParams.get('id');
+        let incomingSeries = urlParams.get('series') || urlParams.get('s');
+
+        if (incomingTitle || incomingUid) {
+            // Priority 1: Search the DB for the title if provided
+            let searchTerm = incomingTitle || incomingUid; 
+            
+            // Try to find a match in the DB
+            const termLower = searchTerm.toLowerCase().trim();
+            const results = toniesDB.filter(t => (t.title && t.title.toLowerCase().includes(termLower)) || (t.series && t.series.toLowerCase().includes(termLower)));
+            
+            if (results.length > 0) {
+                // If found, load the first result into the editor
+                let data = { imgUrl: results[0].pic, series: results[0].series || incomingSeries || '', title: incomingTitle || results[0].title || '' };
+                loadEditor(data, state.editingIndex);
+                
+                // Show search results for context
+                DOM.searchInput.value = searchTerm;
+                DOM.status.textContent = `${results.length} Treffer für "${searchTerm}" (via URL)`;
+                renderSearch(results.slice(0, 40));
+            } else {
+                // Priority 2: If no DB match, just pre-fill the text fields and open the upload tab
+                switchSourceTab('upload');
+                let data = { imgUrl: '', series: incomingSeries || '', title: incomingTitle || '' };
+                loadEditor(data, state.editingIndex);
+            }
+            
+            // Clean up the URL so it doesn't stay there if they refresh
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    }
+    
+    // --- V14 Share Current Design (Web Share API) ---
+    async function shareCurrentDesign() {
+        if (!state.currentEdit) {
+            alert("Bitte wähle zuerst ein Motiv aus, bevor du es teilst.");
+            return;
+        }
+        
+        let titleParam = state.currentEdit.title ? encodeURIComponent(state.currentEdit.title) : '';
+        let seriesParam = state.currentEdit.series ? encodeURIComponent(state.currentEdit.series) : '';
+        
+        let shareUrl = `${window.location.origin}${window.location.pathname}`;
+        if (titleParam || seriesParam) {
+            shareUrl += `?`;
+            if (titleParam) shareUrl += `title=${titleParam}`;
+            if (titleParam && seriesParam) shareUrl += `&`;
+            if (seriesParam) shareUrl += `series=${seriesParam}`;
+        }
+
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: 'Tonie Tag Cover Design',
+                    text: `Sieh dir mein Cover-Design für "${state.currentEdit.title || state.currentEdit.series || 'einen Tonie'}" an!`,
+                    url: shareUrl,
+                });
+            } catch (err) {
+                console.log('Error sharing:', err);
+                fallbackShare(shareUrl);
+            }
+        } else {
+            fallbackShare(shareUrl);
+        }
+    }
+
+    function fallbackShare(url) {
+        // Fallback for browsers without Web Share API: Copy to clipboard
+        navigator.clipboard.writeText(url).then(() => {
+            alert("Link in die Zwischenablage kopiert:\n\n" + url);
+        }).catch(err => {
+            alert("Link zum Teilen (manuell kopieren):\n\n" + url);
         });
     }
 
@@ -646,7 +636,12 @@
         c.bg = DOM.eBg.value; c.textCol = DOM.eTextCol.value;
 
         DOM.vZoom.textContent = c.zoom + '%'; DOM.vRot.textContent = c.rot + '°';
-        DOM.pImage.style.backgroundImage = `url('${c.imgUrl}')`;
+        if (c.imgUrl) {
+            DOM.pImage.style.backgroundImage = `url('${c.imgUrl}')`;
+        } else {
+            DOM.pImage.style.backgroundImage = 'none';
+        }
+        
         DOM.pImage.style.backgroundColor = c.bg; DOM.pImage.style.backgroundSize = `${c.zoom}%`;
         DOM.pImage.style.backgroundPosition = `calc(50% + ${c.posX}px) calc(50% + ${c.posY}px)`;
         DOM.pImage.style.transform = `rotate(${c.rot}deg)`;
@@ -764,12 +759,14 @@
 
             if (data) {
                 slot.style.backgroundColor = data.bg;
-                const imgWrap = document.createElement('div');
-                imgWrap.style.position = 'absolute'; imgWrap.style.width = '100%'; imgWrap.style.height = '100%';
-                imgWrap.style.backgroundImage = `url('${data.imgUrl}')`; imgWrap.style.backgroundRepeat = 'no-repeat';
-                imgWrap.style.backgroundPosition = `calc(50% + ${data.posX * (specs.diamPx/240)}px) calc(50% + ${data.posY * (specs.diamPx/240)}px)`;
-                imgWrap.style.backgroundSize = `${data.zoom}%`; imgWrap.style.transform = `rotate(${data.rot}deg)`;
-                imgWrap.style.pointerEvents = 'none'; slot.appendChild(imgWrap);
+                if (data.imgUrl) {
+                    const imgWrap = document.createElement('div');
+                    imgWrap.style.position = 'absolute'; imgWrap.style.width = '100%'; imgWrap.style.height = '100%';
+                    imgWrap.style.backgroundImage = `url('${data.imgUrl}')`; imgWrap.style.backgroundRepeat = 'no-repeat';
+                    imgWrap.style.backgroundPosition = `calc(50% + ${data.posX * (specs.diamPx/240)}px) calc(50% + ${data.posY * (specs.diamPx/240)}px)`;
+                    imgWrap.style.backgroundSize = `${data.zoom}%`; imgWrap.style.transform = `rotate(${data.rot}deg)`;
+                    imgWrap.style.pointerEvents = 'none'; slot.appendChild(imgWrap);
+                }
 
                 if(data.series || data.title) {
                     const sTop = calcFontSize(data.series);
@@ -825,7 +822,7 @@
 
         const cache = {};
         for(let lbl of activeLabels) {
-            if(!cache[lbl.imgUrl]) {
+            if(lbl.imgUrl && !cache[lbl.imgUrl]) {
                 cache[lbl.imgUrl] = await new Promise(res => {
                     const img = new Image(); img.crossOrigin = 'anonymous';
                     img.onload = () => res(img); img.onerror = () => res(null); img.src = lbl.imgUrl;
@@ -848,12 +845,14 @@
 
             ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI*2); ctx.clip();
             ctx.fillStyle = lbl.bg; ctx.fill();
-            const img = cache[lbl.imgUrl];
-            if(img) {
-                ctx.save(); ctx.translate(cx, cy); ctx.rotate(lbl.rot * Math.PI / 180);
-                const scale = lbl.zoom / 100; const w = diamPx * scale;
-                ctx.drawImage(img, -w/2 + (lbl.posX * (diamPx / 240)), -w/2 + (lbl.posY * (diamPx / 240)), w, w);
-                ctx.restore();
+            if(lbl.imgUrl) {
+                const img = cache[lbl.imgUrl];
+                if(img) {
+                    ctx.save(); ctx.translate(cx, cy); ctx.rotate(lbl.rot * Math.PI / 180);
+                    const scale = lbl.zoom / 100; const w = diamPx * scale;
+                    ctx.drawImage(img, -w/2 + (lbl.posX * (diamPx / 240)), -w/2 + (lbl.posY * (diamPx / 240)), w, w);
+                    ctx.restore();
+                }
             }
             ctx.restore(); 
 
@@ -861,7 +860,6 @@
                 if(!text) return;
                 ctx.save(); 
                 
-                // Canvas Dynamic Font Sizing
                 const baseFSize = Math.round(19 * (pxPerMm/3.78)); 
                 let fSize = baseFSize;
                 const maxChars = 22;
