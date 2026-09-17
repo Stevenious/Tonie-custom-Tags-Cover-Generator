@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tonie & Tag Cover Generator V12</title>
+    <title>Tonie & Tag Cover Generator V12.2</title>
     <style>
         /* === VARIABLES & RESET === */
         :root {
@@ -28,10 +28,10 @@
             line-height: 1.5; 
             padding: 16px; 
             padding-bottom: 80px;
-            overflow-x: hidden; 
             display: flex;
             flex-direction: column;
             align-items: center; 
+            overflow-x: hidden; /* Prevent horizontal scroll on mobile */
         }
 
         /* === LAYOUT & CARDS === */
@@ -52,7 +52,7 @@
         }
         @media(min-width: 1024px) { 
             .app-layout { grid-template-columns: 380px 1fr; align-items: start; } 
-            .top-bar { justify-content: flex-end; } /* Am Desktop Button nach rechts */
+            .top-bar { justify-content: flex-end; }
         }
 
         .card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow); width: 100%; }
@@ -62,7 +62,8 @@
         /* === BUTTONS & INPUTS === */
         input[type="text"], select { 
             width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: var(--radius-md); 
-            font-size: 16px; outline: none; background: #f9fafb; color: var(--text-main); font-weight: 500; transition: 0.2s; 
+            font-size: 16px; /* 16px prevents iOS Auto-Zoom */
+            outline: none; background: #f9fafb; color: var(--text-main); font-weight: 500; transition: 0.2s; 
         }
         input[type="text"]:focus, select:focus { border-color: var(--primary); background: #fff; }
         
@@ -71,6 +72,8 @@
         .btn-secondary { background: #fff; color: var(--text-main); border: 2px solid var(--border); }
         .btn-secondary:hover { border-color: var(--text-muted); background: #f9fafb; }
         .btn-sm { padding: 8px 12px; font-size: 13px; width: auto; border-radius: 8px; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:hover { background: #059669; }
 
         label { display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; margin-top: 16px; }
         .checkbox-label { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; cursor: pointer; color: var(--text-main); font-size: 14px;}
@@ -110,7 +113,6 @@
         .bg-layer { position: absolute; top:0; left:0; width: 100%; height: 100%; background-repeat: no-repeat; background-position: center; pointer-events: none; transition: background-color 0.2s; }
         
         .svg-overlay { position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
-        .svg-overlay text { font-family: -apple-system, sans-serif; font-weight: 800; font-size: 16px; stroke: #fff; stroke-width: 4px; paint-order: stroke fill; letter-spacing: 0.5px; } 
 
         .editor-controls { flex: 1; width: 100%; }
         
@@ -166,15 +168,51 @@
         footer a:hover { color: var(--primary-hover); text-decoration: underline;}
         .community-links { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-top: 12px; }
 
-        /* === PRINT STYLES === */
+        /* === PRINT STYLES (BULLETPROOF FIX) === */
         @media print {
-            body { background: #fff; margin: 0; padding: 0; display: block;}
-            .top-bar, .header, .app-layout > *:not(.print-section), .print-section > *:not(.sheet-scale-wrapper), footer { display: none !important; }
-            .print-section { padding: 0; box-shadow: none; border-radius: 0; }
-            .sheet-scale-wrapper { background: transparent; padding: 0; box-shadow: none; display: block; border-radius: 0; margin: 0; overflow: visible;}
-            .a4-sheet { transform: scale(1) !important; box-shadow: none; width: 210mm !important; height: 297mm !important; border-radius: 0;}
-            .label-slot.empty { border-color: transparent; background: transparent; }
-            .label-slot.empty::after { display: none; }
+            /* Hide absolutely everything initially */
+            body * { visibility: hidden; }
+            body, html { margin: 0; padding: 0; background: #fff; width: 100%; height: 100%; overflow: visible !important; }
+            
+            /* Unhide ONLY the print sheet wrapper and its direct line of parents */
+            body, .app-layout, .print-section, #sheetWrapper, #printSheet, #printSheet * {
+                visibility: visible !important;
+            }
+
+            /* Strip formatting from all wrappers up to the sheet to prevent flex/grid clipping */
+            body, .app-layout, .print-section, #sheetWrapper {
+                display: block !important;
+                position: static !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                border: none !important;
+                background: transparent !important;
+                max-width: none !important;
+                height: auto !important;
+            }
+
+            /* Absolute positioning of the sheet forces it strictly top-left for the printer */
+            #printSheet {
+                position: absolute !important;
+                top: 0 !important;
+                left: 0 !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                transform: scale(1) !important;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                margin: 0 !important;
+            }
+
+            /* Hide empty slots completely for a cleaner print */
+            .label-slot.empty { display: none !important; }
+
+            /* Ensure headers, buttons, etc. take zero space physically */
+            .top-bar, .header, .card:not(.print-section), footer, .project-actions, select, label, .btn {
+                display: none !important;
+            }
+
             @page { size: A4 portrait; margin: 0; }
         }
     </style>
@@ -187,7 +225,7 @@
 </div>
 
 <div class="header">
-    <h1>Tonie & Tag Cover Generator V12</h1>
+    <h1>Tonie & Tag Cover Generator V12.2</h1>
     <p>Die Community Edition für Münzkapseln, RFIDfriend Token & Avery Bögen</p>
 </div>
 
@@ -232,9 +270,13 @@
                         <div id="previewImage" class="bg-layer"></div>
                         <svg class="svg-overlay" viewBox="0 0 200 200" id="previewSvg" style="display: none;">
                             <path id="pathTop" d="M 18,100 A 82,82 0 0,1 182,100" fill="none" stroke="none"/>
-                            <text><textPath href="#pathTop" startOffset="50%" text-anchor="middle" dominant-baseline="auto" id="previewTextTop"></textPath></text>
+                            <text id="previewTextTopNode" font-family="-apple-system, sans-serif" font-weight="800" stroke="#fff" paint-order="stroke fill" letter-spacing="0.5px">
+                                <textPath href="#pathTop" startOffset="50%" text-anchor="middle" dominant-baseline="auto" id="previewTextTop"></textPath>
+                            </text>
                             <path id="pathBot" d="M 18,100 A 82,82 0 0,0 182,100" fill="none" stroke="none"/>
-                            <text><textPath href="#pathBot" startOffset="50%" text-anchor="middle" dominant-baseline="hanging" id="previewTextBot"></textPath></text>
+                            <text id="previewTextBotNode" font-family="-apple-system, sans-serif" font-weight="800" stroke="#fff" paint-order="stroke fill" letter-spacing="0.5px">
+                                <textPath href="#pathBot" startOffset="50%" text-anchor="middle" dominant-baseline="hanging" id="previewTextBot"></textPath>
+                            </text>
                         </svg>
                     </div>
                 </div>
@@ -280,7 +322,7 @@
                     </div>
 
                     <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 24px;">
-                        <button class="btn" id="btnSave" onclick="saveToSheet()" style="background: #94a3b8; pointer-events: none;">Wähle zuerst ein Motiv</button>
+                        <button class="btn btn-success" id="btnSave" onclick="saveToSheet()" style="background: #94a3b8; pointer-events: none;">Wähle zuerst ein Motiv</button>
                         
                         <div style="display: flex; gap: 12px;">
                             <button class="btn btn-secondary hidden" id="btnBatch" onclick="fillEntireSheet()" style="flex:1;">✨ Bogen füllen</button>
@@ -328,7 +370,7 @@
                     <input type="checkbox" id="checkCutlines" checked> ✂️ Schnittmarken (gestrichelter Rand) beim Export zeichnen
                 </label>
                 <div style="display: flex; flex-direction: column; gap: 16px;">
-                    <button class="btn" onclick="window.print()" style="font-size: 18px; padding: 16px;">🖨️ Bogen Drucken (A4)</button>
+                    <button class="btn btn-success" onclick="window.print()" style="font-size: 18px; padding: 16px;">🖨️ Bogen Drucken (A4)</button>
                     <button class="btn btn-secondary" onclick="exportPNG()">🖼️ Als 300 DPI PNG exportieren</button>
                 </div>
             </div>
@@ -341,7 +383,6 @@
             </div>
             <p style="font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 16px;">Das perfekte Zubehör für deine selbstgemachten Tokens.</p>
             <div class="hardware-grid">
-                <!-- Clean Amazon Search Links without Ref Tags -->
                 <a href="https://www.amazon.de/s?k=Avery+Zweckform+L3415-10" target="_blank" rel="noopener noreferrer" class="hw-item">
                     <div class="icon">🏷️</div>
                     <div><strong>Avery L3415-10 Etiketten</strong><span>24 Stück pro Bogen (40mm)</span></div>
@@ -354,7 +395,8 @@
                     <div class="icon">🧲</div>
                     <div><strong>Neodym Magnete (10x3mm)</strong><span>Hält den Token auf der Box</span></div>
                 </a>
-                <a href="https://rfidfriend.com/" target="_blank" rel="noopener noreferrer" class="hw-item">
+                <!-- Link to RFIDfriend changed to http:// due to SSL errors on their end -->
+                <a href="http://rfidfriend.com/" target="_blank" rel="noopener noreferrer" class="hw-item">
                     <div class="icon">📡</div>
                     <div><strong>RFIDfriend SLIX-L Tags</strong><span>Beste NFC Tags für die Toniebox</span></div>
                 </a>
@@ -364,7 +406,7 @@
 </div>
 
 <footer>
-    <p>Tonie Cover Generator V12 (Community Edition) • Open Source unter MIT-Lizenz.</p>
+    <p>Tonie Cover Generator V12.2 (Final) • Open Source unter MIT-Lizenz.</p>
     <div class="community-links">
         <a href="https://github.com/toniebox-reverse-engineering" target="_blank">Team RevvoX</a>
         <a href="https://gt-blog.de/custom-tags-for-toniebox/" target="_blank">Gambrius Blog</a>
@@ -392,6 +434,8 @@
         pCircle: document.getElementById('previewCircle'),
         pImage: document.getElementById('previewImage'),
         pSvg: document.getElementById('previewSvg'),
+        pTextTopNode: document.getElementById('previewTextTopNode'),
+        pTextBotNode: document.getElementById('previewTextBotNode'),
         pTextTop: document.getElementById('previewTextTop'),
         pTextBot: document.getElementById('previewTextBot'),
         
@@ -419,6 +463,15 @@
         renderSheet();
     });
 
+    // Helper Function for dynamic text scaling
+    function calcFontSize(text) {
+        if (!text) return 16;
+        const maxCharsFor16px = 22;
+        if (text.length <= maxCharsFor16px) return 16;
+        let size = Math.floor(16 * (maxCharsFor16px / text.length));
+        return Math.max(9, size); // Minimum 9px size
+    }
+
     function loadCache() {
         try {
             const cache = JSON.parse(localStorage.getItem('TonieCacheV12'));
@@ -428,6 +481,7 @@
             }
         } catch(e) {}
     }
+    
     function saveCache() { localStorage.setItem('TonieCacheV12', JSON.stringify({ labels: state.labels, format: state.format })); }
 
     async function fetchDB() {
@@ -532,7 +586,18 @@
         DOM.pImage.style.transform = `rotate(${c.rot}deg)`;
 
         DOM.pTextTop.textContent = c.series; DOM.pTextBot.textContent = c.title;
-        DOM.pTextTop.parentElement.style.fill = c.textCol; DOM.pTextBot.parentElement.style.fill = c.textCol;
+        
+        // Dynamic Font Sizing for Preview
+        const sTop = calcFontSize(c.series);
+        const sBot = calcFontSize(c.title);
+        
+        DOM.pTextTopNode.setAttribute('font-size', sTop + 'px');
+        DOM.pTextTopNode.setAttribute('stroke-width', (sTop * 0.25) + 'px');
+        DOM.pTextTopNode.setAttribute('fill', c.textCol);
+
+        DOM.pTextBotNode.setAttribute('font-size', sBot + 'px');
+        DOM.pTextBotNode.setAttribute('stroke-width', (sBot * 0.25) + 'px');
+        DOM.pTextBotNode.setAttribute('fill', c.textCol);
     }
 
     function resetEditor() {
@@ -641,15 +706,21 @@
                 imgWrap.style.pointerEvents = 'none'; slot.appendChild(imgWrap);
 
                 if(data.series || data.title) {
+                    const sTop = calcFontSize(data.series);
+                    const sBot = calcFontSize(data.title);
+                    
                     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
                     svg.setAttribute('viewBox', '0 0 200 200');
                     svg.style.position = 'absolute'; svg.style.width = '100%'; svg.style.height = '100%'; svg.style.pointerEvents = 'none';
                     svg.innerHTML = `
-                        <style>text { font-family: -apple-system, sans-serif; font-weight: 800; font-size: 16px; stroke: #fff; stroke-width: 4px; paint-order: stroke fill; letter-spacing: 0.5px; fill: ${data.textCol || '#111'};}</style>
                         <path id="ptT${i}" d="M 18,100 A 82,82 0 0,1 182,100" fill="none"/>
-                        <text><textPath href="#ptT${i}" startOffset="50%" text-anchor="middle" dominant-baseline="auto">${data.series}</textPath></text>
+                        <text font-family="-apple-system, sans-serif" font-weight="800" font-size="${sTop}px" stroke="#fff" stroke-width="${sTop * 0.25}px" paint-order="stroke fill" letter-spacing="0.5px" fill="${data.textCol || '#111'}">
+                            <textPath href="#ptT${i}" startOffset="50%" text-anchor="middle" dominant-baseline="auto">${data.series}</textPath>
+                        </text>
                         <path id="ptB${i}" d="M 18,100 A 82,82 0 0,0 182,100" fill="none"/>
-                        <text><textPath href="#ptB${i}" startOffset="50%" text-anchor="middle" dominant-baseline="hanging">${data.title}</textPath></text>
+                        <text font-family="-apple-system, sans-serif" font-weight="800" font-size="${sBot}px" stroke="#fff" stroke-width="${sBot * 0.25}px" paint-order="stroke fill" letter-spacing="0.5px" fill="${data.textCol || '#111'}">
+                            <textPath href="#ptB${i}" startOffset="50%" text-anchor="middle" dominant-baseline="hanging">${data.title}</textPath>
+                        </text>
                     `;
                     slot.appendChild(svg);
                 }
@@ -722,7 +793,17 @@
 
             const drawArcText = (text, isTop) => {
                 if(!text) return;
-                ctx.save(); const fSize = Math.round(19 * (pxPerMm/3.78)); 
+                ctx.save(); 
+                
+                // Canvas Dynamic Font Sizing
+                const baseFSize = Math.round(19 * (pxPerMm/3.78)); 
+                let fSize = baseFSize;
+                const maxChars = 22;
+                if(text.length > maxChars) {
+                    fSize = Math.floor(baseFSize * (maxChars / text.length));
+                    fSize = Math.max(Math.round(baseFSize * 0.55), fSize);
+                }
+
                 ctx.font = `800 ${fSize}px sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = isTop ? "bottom" : "top"; 
                 ctx.fillStyle = lbl.textCol || "#111"; ctx.strokeStyle = "rgba(255,255,255,0.95)"; ctx.lineWidth = fSize * 0.25; ctx.lineJoin = "round";
                 const textRadius = radius * 0.82; 
