@@ -29,9 +29,11 @@
             padding: 16px; padding-bottom: 80px; display: flex; flex-direction: column; align-items: center; 
         }
 
-        .top-bar { width: 100%; max-width: 1200px; display: flex; justify-content: center; margin-bottom: 16px; margin-top: 8px;}
+        .top-bar { width: 100%; max-width: 1200px; display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 16px; margin-top: 8px;}
         .support-btn { background: #f59e0b; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3); transition: 0.2s;}
         .support-btn:hover { background: #d97706; transform: translateY(-1px); }
+        .help-btn { background: #e2e8f0; color: #334155; padding: 8px 14px; border-radius: 20px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .help-btn:hover { background: #cbd5e1; }
 
         .header { text-align: center; margin-bottom: 28px; width: 100%; max-width: 1200px; display: flex; flex-direction: column; align-items: center; }
         .logo-wrapper { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;}
@@ -44,7 +46,6 @@
             .app-layout { flex-direction: row; align-items: flex-start; }
             .column-1 { width: 400px; flex-shrink: 0; }
             .column-2 { flex-grow: 1; min-width: 0; }
-            .top-bar { justify-content: flex-end; }
             .header h1 { font-size: 36px; }
             .app-logo { width: 52px; height: 52px; }
         }
@@ -89,7 +90,7 @@
         .search-item { border: 2px solid var(--border); border-radius: var(--radius-md); padding: 12px; text-align: center; cursor: pointer; transition: 0.2s; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; box-sizing: border-box; overflow: hidden; position: relative; min-height: 160px;}
         .search-item:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .search-item.selected { border-color: var(--primary); background: #fef2f2; box-shadow: 0 0 0 2px var(--primary); }
-        .search-item img { width: 100%; max-width: 120px; aspect-ratio: 1; object-fit: contain; margin-bottom: 12px; border-radius: 8px; }
+        .search-item img { width: 100%; max-width: 120px; aspect-ratio: 1; object-fit: contain; margin-bottom: 12px; border-radius: 8px; background: #f8fafc; }
         .search-item span { display: block; font-size: 12px; font-weight: 600; line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; width: 100%; text-overflow: ellipsis; margin-bottom: 4px;}
 
         .upload-box { border: 2px dashed #cbd5e1; padding: 60px 20px; text-align: center; border-radius: var(--radius-md); background: #f8fafc; cursor: pointer; transition: 0.2s; display: block; width: 100%; box-sizing: border-box; }
@@ -115,6 +116,10 @@
         .mode-switch { display: flex; background: #f3f4f6; border-radius: 10px; padding: 4px; margin-bottom: 20px; }
         .mode-btn { flex: 1; text-align: center; padding: 10px; font-size: 13px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: 0.2s;}
         .mode-btn.active { background: #fff; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+        .preset-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; margin-bottom: 12px; }
+        .pill { background: #f1f5f9; border: 1px solid var(--border); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; cursor: pointer; color: var(--text-muted); transition: 0.2s; }
+        .pill:hover { background: #e2e8f0; color: var(--text-main); }
 
         .pro-panel { background: #f8fafc; border: 1px solid var(--border); padding: 20px; border-radius: var(--radius-md); margin-top: 20px; box-sizing: border-box; width: 100%; }
         .slider-row { margin-bottom: 16px; width: 100%; }
@@ -156,6 +161,14 @@
 
         .stamp-indicator { background: #fef2f2; border: 2px solid var(--primary); color: var(--primary); padding: 8px 12px; border-radius: var(--radius-md); font-size: 13px; font-weight: 700; text-align: center; margin-bottom: 12px; display: none; align-items: center; justify-content: space-between; }
 
+        /* MODAL STYLES */
+        .modal-overlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; justify-content: center; align-items: center; padding: 16px; opacity: 0; pointer-events: none; transition: 0.2s; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-card { background: #fff; border-radius: var(--radius-lg); padding: 24px; width: 100%; max-width: 500px; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .modal-header h3 { margin: 0; font-size: 20px; color: var(--primary); }
+        .modal-close { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); }
+
         .hidden { display: none !important; }
         
         footer { text-align: center; margin-top: 48px; font-size: 13px; color: var(--text-muted); width: 100%; max-width: 1200px; padding-bottom: 20px; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; }
@@ -180,7 +193,8 @@
 <body>
 
 <div class="top-bar">
-    <a href="https://www.paypal.com/donate/?business=stephan%40genial.ms&item_name=Tonie+Cover+Generator+Support&currency_code=EUR" class="support-btn" target="_blank" title="Spendiere dem Entwickler einen Kaffee">☕ Projekt unterstützen</a>
+    <button class="help-btn" onclick="openHelpModal()">❓ Hilfe & Tipps</button>
+    <a href="https://www.paypal.com/donate/?business=stephan%40genial.ms&item_name=Tonie+Cover+Generator+Support&currency_code=EUR" class="support-btn" target="_blank" title="Spendiere dem Entwickler einen Kaffee">☕ Spenden</a>
 </div>
 
 <div class="header">
@@ -195,6 +209,22 @@
     <p>Der elegante Designer für Münzkapseln, RFIDfriend Token & Avery Etiketten</p>
 </div>
 
+<!-- HELP MODAL -->
+<div class="modal-overlay" id="helpModal" onclick="if(event.target === this) closeHelpModal()">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>Druck- & Nutzungstipps</h3>
+            <button class="modal-close" onclick="closeHelpModal()">✕</button>
+        </div>
+        <ul style="padding-left: 20px; font-size: 14px; color: var(--text-main); line-height: 1.6;">
+            <li><strong>Druck-Skalierung:</strong> Stelle im Druckdialog unbedingt <strong>100% (Tatsächliche Größe)</strong> ein und aktiviere keine "Seitenanpassung", da sonst die Millimetermaße für Avery-Bögen verrutschen!</li>
+            <li><strong>Quick-Stamp (Stempeln):</strong> Mache einen Rechtsklick (oder halte auf dem Smartphone gedrückt) auf ein Motiv in der Datenbank, um es als "Stempel" zu aktivieren. Danach kannst du direkt leere Kreise auf dem Bogen antippen.</li>
+            <li><strong>Text-Presets:</strong> Nutze die Schnellstart-Buttons im Editor (z.B. "Hörspiel"), um eigene Bild-Uploads im Handumdrehen zu beschriften.</li>
+        </ul>
+        <button class="btn btn-success" onclick="closeHelpModal()" style="margin-top: 16px;">Alles klar!</button>
+    </div>
+</div>
+
 <div class="app-layout">
     
     <!-- COLUMN 1: SEARCH & UPLOAD -->
@@ -206,7 +236,10 @@
             </div>
 
             <div id="view-tonie">
-                <input type="text" id="searchInput" placeholder="Titel, Serie oder ID suchen..." autocomplete="off">
+                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                    <input type="text" id="searchInput" placeholder="Titel, Serie oder ID suchen..." autocomplete="off" style="flex:1;">
+                    <button class="btn btn-secondary" onclick="pickRandomTonie()" title="Zufälliger Tonie" style="width: 50px; flex-shrink: 0; font-size: 18px;">🎲</button>
+                </div>
                 <div class="status-text" id="statusText">Verbinde zur Datenbank...</div>
                 
                 <div id="stampBanner" class="stamp-indicator">
@@ -269,6 +302,11 @@
 
                     <label>Text Oben (z.B. Serie)</label>
                     <input type="text" id="editTop" placeholder="z.B. Die drei ???" oninput="updatePreview()">
+                    <div class="preset-pills">
+                        <div class="pill" onclick="setTopPreset('Hörspiel')">Hörspiel</div>
+                        <div class="pill" onclick="setTopPreset('Kinderlieder')">Kinderlieder</div>
+                        <div class="pill" onclick="setTopPreset('Mein Tonie')">Mein Tonie</div>
+                    </div>
                     
                     <label>Text Unten (z.B. Titel)</label>
                     <input type="text" id="editBot" placeholder="z.B. Der Superpapagei" oninput="updatePreview()">
@@ -336,7 +374,7 @@
                 <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importProject(event)">
             </div>
 
-            <p style="text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 16px;">Tipp: Klicke auf leere Kreise oder halte/ziehe Motive, um Etiketten gezielt zu platzieren.</p>
+            <p style="text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 16px;">Tipp: Tippe auf leere Kreise oder ziehe Motive per Drag & Drop, um Etiketten zu platzieren.</p>
 
             <div class="sheet-scale-wrapper" id="sheetWrapper">
                 <div class="a4-sheet" id="printSheet">
@@ -384,7 +422,7 @@
 </div>
 
 <footer>
-    <p>Tonie Cover Generator • Version 18.1<br>Open Source unter MIT-Lizenz.</p>
+    <p>Tonie Cover Generator • Version 18.2 (User-Centric Edition)<br>Open Source unter MIT-Lizenz.</p>
     <div class="community-links">
         <a href="https://github.com/toniebox-reverse-engineering" target="_blank">Team RevvoX</a>
         <a href="https://gt-blog.de/custom-tags-for-toniebox/" target="_blank">Gambrius Blog</a>
@@ -451,6 +489,16 @@
         checkUrlParams();
     });
 
+    function openHelpModal() { document.getElementById('helpModal').classList.add('active'); }
+    function closeHelpModal() { document.getElementById('helpModal').classList.remove('active'); }
+    function setTopPreset(val) { DOM.eTop.value = val; updatePreview(); }
+
+    function pickRandomTonie() {
+        if(toniesDB.length === 0) return;
+        const randomItem = toniesDB[Math.floor(Math.random() * toniesDB.length)];
+        loadEditor({ imgUrl: randomItem.pic, series: randomItem.series||'', title: randomItem.title||'', tonieId: randomItem.tonieId||'' }, state.editingIndex);
+    }
+
     function calcFontSize(text) {
         if (!text) return 16;
         const maxCharsFor16px = 22;
@@ -461,9 +509,8 @@
 
     function loadCache() {
         try {
-            const cache = JSON.parse(localStorage.getItem('TonieCacheV18'));
+            const cache = JSON.parse(localStorage.getItem('TonieCacheV18_2'));
             if (cache) {
-                // Safeguard against giant base64 payloads crashing storage limit
                 state.labels = (cache.labels || []).map(l => l ? {
                     ...l,
                     imgUrl: l.imgUrl && l.imgUrl.startsWith('data:') && l.imgUrl.length > 500000 ? '' : l.imgUrl
@@ -475,16 +522,15 @@
         } catch(e) {}
     }
     
-    fnSaveCache = function() { 
+    function fnSaveCache() { 
         try {
-            localStorage.setItem('TonieCacheV18', JSON.stringify({ 
+            localStorage.setItem('TonieCacheV18_2', JSON.stringify({ 
                 labels: state.labels, 
                 formatType: state.formatType,
                 formatDetail: state.formatDetail
             })); 
         } catch(e) {
-            // Storage quota exceeded fallback
-            console.warn("Storage quota exceeded. Clearing heavy payloads.");
+            console.warn("Storage quota exceeded.");
         }
     };
 
@@ -496,10 +542,10 @@
         if (type === 'free') {
             DOM.cutlinesRow.style.display = 'flex';
             const opts = [
-                { val: '43', label: 'Standard Münzkapseln (43 mm)' },
-                { val: '40', label: 'Kleine Münzkapseln (40 mm)' },
-                { val: '30', label: 'RFIDfriend Token (30 mm)' },
-                { val: '25', label: 'Micro DIY Token (25 mm)' }
+                { val: '43', label: 'Münzkapsel Standard (43 mm, Freies Raster)' },
+                { val: '40', label: 'Münzkapsel Klein (40 mm, Freies Raster)' },
+                { val: '30', label: 'RFIDfriend Token (30 mm, Freies Raster)' },
+                { val: '25', label: 'Micro DIY Token (25 mm, Freies Raster)' }
             ];
             opts.forEach(o => {
                 const opt = document.createElement('option');
@@ -514,9 +560,10 @@
         } else {
             DOM.cutlinesRow.style.display = 'none';
             const opts = [
-                { val: 'l3415', label: 'Avery L3415-10 (40 mm, 24 Stk / A4)' },
-                { val: 'avery30', label: 'Avery 6223-10 / Universal (30 mm)' },
-                { val: 'p3413', label: 'Avery P3413-25 / Große Token (45 mm)' }
+                { val: 'l3415', label: 'Avery Zweckform L3415-10 (40 mm, 24 Stk / A4)' },
+                { val: 'avery30', label: 'Avery Zweckform 6223-10 (30 mm)' },
+                { val: 'p3413', label: 'Avery Zweckform P3413-25 (45 mm für große Münzen)' },
+                { val: 'avery25', label: 'Avery Zweckform 25mm Klebepunkte' }
             ];
             opts.forEach(o => {
                 const opt = document.createElement('option');
@@ -869,6 +916,7 @@
             if (state.formatDetail === 'l3415') diamMm = 40;
             else if (state.formatDetail === 'avery30') diamMm = 30;
             else if (state.formatDetail === 'p3413') diamMm = 45;
+            else if (state.formatDetail === 'avery25') diamMm = 25;
         }
 
         const pxPerMm = 794 / 210; 
@@ -882,6 +930,7 @@
             if (state.formatDetail === 'l3415') maxSlots = 24;
             else if (state.formatDetail === 'avery30') maxSlots = 48;
             else if (state.formatDetail === 'p3413') maxSlots = 15;
+            else if (state.formatDetail === 'avery25') maxSlots = 54;
         }
         return { isAvery, diamPx, maxSlots };
     }
@@ -911,12 +960,22 @@
                     state.labels[i] = temp;
                     while(state.labels.length > 0 && state.labels[state.labels.length - 1] === null) state.labels.pop();
                     fnSaveCache(); renderSheet();
+                } else if (state.quickStampItem) {
+                    while (state.labels.length <= i) state.labels.push(null);
+                    state.labels[i] = { ...state.quickStampItem, zoom: 100, rot: 0, posX: 0, posY: 0, bg: '#ffffff', textCol: '#111111' };
+                    fnSaveCache(); renderSheet();
                 }
             };
 
-            slot.draggable = data !== null;
+            slot.draggable = true;
             slot.ondragstart = (e) => {
-                e.dataTransfer.setData('text/plain', i);
+                if (data) {
+                    e.dataTransfer.setData('text/plain', i);
+                } else if (state.quickStampItem) {
+                    e.dataTransfer.setData('text/plain', '');
+                } else {
+                    e.preventDefault();
+                }
             };
 
             if (data) {
@@ -992,6 +1051,7 @@
             if (state.formatDetail === 'l3415') diamMm = 40;
             else if (state.formatDetail === 'avery30') diamMm = 30;
             else if (state.formatDetail === 'p3413') diamMm = 45;
+            else if (state.formatDetail === 'avery25') diamMm = 25;
         }
 
         const pxPerMm = 2480 / 210;
@@ -1006,6 +1066,7 @@
             startX = 9.5 * pxPerMm; startY = 13.5 * pxPerMm; gapX = 11.5 * pxPerMm; gapY = 11.5 * pxPerMm; cols = 4;
             if (state.formatDetail === 'avery30') cols = 5;
             if (state.formatDetail === 'p3413') cols = 3;
+            if (state.formatDetail === 'avery25') cols = 6;
         }
 
         const cache = {};
