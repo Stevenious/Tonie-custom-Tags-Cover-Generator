@@ -1,12 +1,13 @@
 <div align="center">
-  
-# 🎧 Tonie & Tag Cover Generator V11 🚀
+
+# 🎧 Tonie & Tag Cover Generator 🚀
+### Version 13.1 (Community Release)
 
 **Der ultimative, webbasierte Designer für Münzkapseln, RFIDfriend Token & Avery Etiketten.**
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Online-success?style=for-the-badge&logo=netlify)](https://stevenious.github.io/Tonie-custom-Tags-Cover-Generator/)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Jetzt_starten-e30613?style=for-the-badge&logo=github)](https://stevenious.github.io/Tonie-custom-Tags-Cover-Generator/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](http://makeapullrequest.com)
+[![Mobile Ready](https://img.shields.io/badge/Mobile-Optimized-success.svg?style=for-the-badge&logo=apple)]()
 
 *Erstelle professionelle, perfekt ausgerichtete Aufkleber für deine selbstgemachten Kreativ-Tonies und NFC-Tags – direkt im Browser, ohne Installation, 100% kostenlos.*
 
@@ -20,21 +21,21 @@ Wer eigene NFC-Tags für die Toniebox bastelt, kennt das Problem: Das Erstellen 
 
 **Damit ist jetzt Schluss.** 
 
-Der **Tonie & Tag Cover Generator V11** löst all diese Probleme mit einer genial einfachen, responsiven Web-App. Egal ob auf dem Desktop oder dem Smartphone – wähle ein Motiv, passe es an und drucke es pixelgenau aus.
+Der **Tonie & Tag Cover Generator** löst all diese Probleme mit einer genial einfachen, responsiven Web-App. Egal ob auf dem Desktop oder bequem auf dem Sofa per Smartphone – wähle ein Motiv, passe es an und drucke es pixelgenau aus.
 
 ---
 
-## ✨ Features (Neu in V11 Master Edition)
+## ✨ Features der Version 13.1
 
-*   ⚡️ **Blitzschnelle Live-Suche:** Greift direkt auf die umfassende Tonie-Datenbank (inkl. Cover-Art) zu. Suchen, klicken, fertig.
-*   🎯 **Smart Grid & gezielte Bogen-Befüllung:** Hast du einen Avery-Bogen, bei dem die ersten 5 Etiketten schon fehlen? Kein Problem! Klicke einfach auf den 6. (leeren) Kreis im digitalen Vorschau-Bogen und platziere dein Cover exakt dort.
+*   📱 **Perfektes Mobile-Erlebnis:** Kein nerviges Wischen mehr! Der A4-Bogen skaliert auf dem Smartphone automatisch auf die perfekte Größe. Du hast den gesamten Bogen jederzeit im Blick.
+*   🖨️ **Bulletproof A4-Druck:** Eine speziell entwickelte Print-Engine blockiert iOS/Safari-Bugs (wie leere 2. Seiten oder aufgedruckte URLs). Du erhältst immer exakt **eine saubere A4-Seite**.
+*   🎯 **Smart Grid & gezielte Bogen-Befüllung:** Hast du einen Avery-Bogen, bei dem die ersten Etiketten schon fehlen? Klicke einfach auf einen leeren Kreis im digitalen Bogen und platziere dein Cover exakt dort!
+*   🪄 **Batch-Fill (Bogen füllen):** Ein Klick, und das aktuelle Motiv füllt alle restlichen leeren Plätze auf deinem Bogen. Perfekt für Serienproduktionen.
 *   🔄 **Perfekter Curved Text:** Titel und Seriennamen schmiegen sich mathematisch korrekt an den runden Rand deines Etiketts an – oben wie unten immer perfekt lesbar.
 *   🎛️ **Simpel- & Pro-Modus:** 
     *   *Simpel:* Motiv wählen und ab auf den Bogen.
-    *   *Pro:* Nutze stufenlosen Zoom, Rotation, X/Y-Verschiebung und wähle individuelle Hintergrundfarben für den perfekten Look.
-*   💾 **Auto-Save:** Die App speichert deinen Bogen lokal in deinem Browser. Versehentlich die Seite neu geladen? Dein Fortschritt ist noch da!
-*   📱 **100% Mobile Responsive:** Designt für die Nutzung auf dem Sofa. Die "Swipe-to-Pan"-Ansicht lässt dich den A4-Bogen auf dem Handy bequem hin- und herwischen.
-*   🖨️ **300 DPI Export:** Drucke direkt aus dem Browser oder exportiere den Bogen als hochauflösendes, verlustfreies PNG-Bild für den professionellen Druck.
+    *   *Pro:* Nutze stufenlosen Zoom, Rotation, X/Y-Verschiebung und wähle individuelle Hintergrund-/Textfarben.
+*   💾 **Auto-Save & Projekte (.json):** Die App speichert deinen Fortschritt automatisch im Browser. Alternativ kannst du deinen Bogen als `.json`-Datei speichern und später weiterbearbeiten.
 
 ---
 
@@ -42,52 +43,62 @@ Der **Tonie & Tag Cover Generator V11** löst all diese Probleme mit einer genia
 
 Das Tool unterstützt die gängigsten Größen der DIY-Community (einfach per Dropdown wechselbar):
 
-- **43 mm:** Standard Münzkapseln
-- **40 mm:** Kleine Münzkapseln
+- **43 mm:** Standard Münzkapseln (Freies Raster)
+- **40 mm:** Kleine Münzkapseln (Freies Raster)
 - **30 mm:** RFIDfriend Token
 - **25 mm:** Micro DIY Token
-- **Avery L3415-10:** Zweckform 40mm (24 Etiketten pro A4 Bogen)
+- **Avery L3415-10:** Zweckform 40mm (Exaktes Layout für 24 Etiketten pro A4 Bogen)
 
 ---
 
-## 🚀 Quick Start / Live Demo
+## 🚀 Quick Start
 
-Du musst nichts installieren oder herunterladen. Das Tool läuft komplett in deinem Browser.
+Du musst absolut nichts installieren. Das Tool läuft komplett lokal in deinem Browser (Zero-Backend, 100% Datenschutz).
 
 👉 **[Klicke hier, um den Generator direkt zu starten!](https://stevenious.github.io/Tonie-custom-Tags-Cover-Generator/)**
 
-### So funktioniert's:
+### So funktioniert's in 4 simplen Schritten:
 1. **Motiv wählen:** Suche in der Tonie-Datenbank oder lade eine eigene Grafik (JPG/PNG) hoch.
-2. **Anpassen:** Füge geschwungenen Text hinzu oder nutze den Pro-Modus für den Feinschliff.
-3. **Platzieren:** Klicke auf "Hinzufügen" oder wähle einen spezifischen leeren Slot auf dem Druckbogen.
-4. **Drucken:** Wähle dein Format und klicke auf Drucken (Tipp: Beim Drucken im Dialogfenster "Tatsächliche Größe" oder "Maßstab 100%" einstellen, keine Seitenanpassung!).
+2. **Anpassen:** Füge Text hinzu oder nutze den Pro-Modus für den Feinschliff.
+3. **Platzieren:** Klicke auf "Auf den Bogen legen" oder wähle einen spezifischen leeren Slot auf dem Vorschau-Bogen.
+4. **Drucken:** Klicke auf Drucken. *(Pro-Tipp: Beim Drucken im Dialogfenster immer "Tatsächliche Größe" oder "Skalierung 100%" einstellen!)*
 
 ---
 
-## 🛠️ Für Developer (Tech Stack)
+## 🛒 Hardware & Material-Tipps
 
-Dieses Projekt ist nach dem *KISS-Prinzip* (Keep It Simple, Stupid) gebaut.
-- **Zero Dependencies:** Reines Vanilla JavaScript, HTML5 und CSS3. Kein React, kein Vue, kein Build-Step, kein NPM.
-- **Single File Architecture:** Die gesamte Logik steckt in einer performanten `index.html`.
-- **Lokale Verarbeitung:** Keine Backend-Server, keine Datenbank-Abfragen auf eigene Server. Bilder werden lokal im Canvas (bzw. SVG) gerendert.
-- **Datenquelle:** Die Tonie-Daten werden live und asynchron aus der bekannten Reverse-Engineering JSON-Datenbank geladen.
+Empfohlenes Zubehör für den perfekten DIY-Tonie:
+
+*   🏷️ **Avery Zweckform L3415-10:** [Auf Amazon ansehen](https://www.amazon.de/s?k=Avery+Zweckform+L3415-10) (Perfekt für den 24er Bogen im Tool)
+*   🪙 **Münzkapseln (40mm):** [Auf Amazon ansehen](https://www.amazon.de/s?k=M%C3%BCnzkapseln+40mm) (Passend für die meisten 3D-Druck Sockel)
+*   🧲 **Neodym Magnete (10x3mm):** [Auf Amazon ansehen](https://www.amazon.de/s?k=Neodym+Magnete+10x3mm) (Für den perfekten Halt auf der Box)
+*   📡 **RFIDfriend SLIX-L Tags:** [rfidfriend.com](http://rfidfriend.com/) (Die besten NFC Tags für die Toniebox)
 
 ---
 
-## 🤝 Support & Community
+## ☕ Support the Project
 
-Dieses Projekt ist aus Leidenschaft für die Tonie-Community und DIY-Bastler entstanden. Es ist und bleibt kostenlos. Wenn dir das Tool geholfen hat, den perfekten Token für deine Kinder zu basteln, kannst du das Projekt wie folgt unterstützen:
+Dieses Projekt ist aus reiner Leidenschaft für die Tonie-Community und für alle DIY-Bastler entstanden. Es ist und bleibt kostenlos, werbefrei und Open Source. 
 
-1. ⭐ **Lass einen Stern da!** Klicke oben rechts auf "Star", um dem Projekt Reichweite zu geben.
-2. 🐛 **Feedback & Bugs:** Etwas funktioniert nicht? Öffne ein [Issue](https://github.com/Stevenious/Tonie-custom-Tags-Cover-Generator/issues).
-3. 🛠️ **Mitwirken:** Forke das Repo und erstelle einen Pull Request, wenn du coole neue Features programmiert hast.
+Wenn dir das Tool geholfen hat, den perfekten Token für deine Kinder zu basteln, und du mir eine kleine Freude machen möchtest:
 
-*Empfehlung für erstklassige, bedruckbare NFC-Tags:* Schau bei der Community von **[RFIDfriend](http://rfidfriend.com/)** vorbei!
+**[☕ Spendier mir einen Kaffee (PayPal)](https://www.paypal.com/donate/?business=stephan%40genial.ms&item_name=Tonie+Cover+Generator+Support&currency_code=EUR)**
+
+... oder hinterlasse oben rechts einfach einen ⭐ **Stern auf GitHub**! Das hilft anderen Eltern, das Projekt leichter zu finden.
+
+---
+
+## 🤝 Community & Credits
+
+Ein großes Dankeschön an die fantastische Community, die dieses Hobby so lebendig macht:
+*   [Team RevvoX](https://github.com/toniebox-reverse-engineering) für die JSON-Datenbank.
+*   [Gambrius Blog](https://gt-blog.de/custom-tags-for-toniebox/) für exzellente Tutorials.
+*   Die 3D-Druck Community auf MakerWorld.
 
 ---
 
 ## 📜 Lizenz
 
-Dieses Projekt ist Open Source und steht unter der [MIT Lizenz](LICENSE). 
+Dieses Projekt steht unter der [MIT Lizenz](LICENSE). Du kannst den Code frei verwenden, anpassen und teilen.
 
-*Disclaimer: Dieses Projekt steht in keiner Verbindung zur Boxine GmbH. "Tonie" und "Toniebox" sind eingetragene Marken der Boxine GmbH.*
+*Disclaimer: Dieses Projekt ist ein Community-Tool und steht in keinerlei rechtlicher oder geschäftlicher Verbindung zur Boxine GmbH. "Tonie", "Tonies" und "Toniebox" sind eingetragene Marken der Boxine GmbH.*
