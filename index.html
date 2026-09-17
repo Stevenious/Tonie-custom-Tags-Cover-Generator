@@ -1,1047 +1,1219 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Tonie & Tag Cover Generator (Community Edition)</title>
-<style>
-:root {
---primary: #e30613;
---primary-hover: #b8050f;
---bg-body: #f3f4f6;
---bg-card: #ffffff;
---text-main: #1f2937;
---text-muted: #6b7280;
---border: #e5e7eb;
---radius-lg: 20px;
---radius-md: 12px;
---shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
---shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
-}
-*, *::before, *::after { box-sizing: border-box; }
-html, body { width: 100vw; overflow-x: hidden; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body {
-background-color: var(--bg-body); color: var(--text-main); line-height: 1.5;
-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-padding: 16px; padding-bottom: 80px; display: flex; flex-direction: column; align-items: center;
-}
-.top-bar { width: 100%; max-width: 1200px; display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 16px; margin-top: 8px;}
-.support-btn { background: #f59e0b; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3); transition: 0.2s;}
-.support-btn:hover { background: #d97706; transform: translateY(-1px); }
-.help-btn { background: #e2e8f0; color: #334155; padding: 8px 14px; border-radius: 20px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; }
-.help-btn:hover { background: #cbd5e1; }
-.header { text-align: center; margin-bottom: 28px; width: 100%; max-width: 1200px; display: flex; flex-direction: column; align-items: center; }
-.logo-wrapper { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;}
-.app-logo { width: 40px; height: 40px; flex-shrink: 0; }
-.header h1 { color: var(--primary); font-size: 26px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; margin: 0; text-align: center; }
-.header p { color: var(--text-muted); font-size: 13px; margin: 6px 0 0 0; text-align: center; max-width: 600px; }
-.app-layout { display: flex; flex-direction: column; gap: 24px; width: 100%; max-width: 1200px; }
-@media(min-width: 1024px) {
-.app-layout { flex-direction: row; align-items: flex-start; }
-.column-1 { width: 400px; flex-shrink: 0; }
-.column-2 { flex-grow: 1; min-width: 0; }
-.header h1 { font-size: 32px; }
-.app-logo { width: 48px; height: 48px; }
-}
-.card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow); width: 100%; box-sizing: border-box; }
-.card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 2px solid #f3f4f6; padding-bottom: 10px; flex-wrap: wrap; gap: 10px;}
-.card-header h2 { font-size: 17px; font-weight: 700; color: #111; margin: 0;}
-input[type="text"], select, textarea {
-width: 100%; padding: 12px 14px; border: 2px solid var(--border); border-radius: var(--radius-md);
-font-size: 15px; outline: none; background: #f9fafb; color: var(--text-main); font-weight: 500; transition: 0.2s; box-sizing: border-box;
-}
-input[type="text"]:focus, select:focus, textarea:focus { border-color: var(--primary); background: #fff; }
-.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; font-size: 15px; font-weight: 700; color: #fff; background: var(--primary); border: none; border-radius: var(--radius-md); cursor: pointer; transition: 0.2s; box-sizing: border-box; }
-.btn:hover { background: var(--primary-hover); transform: translateY(-1px); }
-.btn-secondary { background: #fff; color: var(--text-main); border: 2px solid var(--border); }
-.btn-secondary:hover { border-color: var(--text-muted); background: #f9fafb; }
-.btn-sm { padding: 8px 12px; font-size: 13px; width: auto; border-radius: 8px; }
-.btn-success { background: #10b981; color: white; }
-.btn-success:hover { background: #059669; }
-.btn-batch { background: #fef3c7; color: #d97706; border: 1px solid #fde68a; }
-.btn-batch:hover { background: #fde68a; }
-.btn-action { background: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe; }
-.btn-action:hover { background: #c7d2fe; }
-label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; margin-top: 14px; }
-.checkbox-label { display: flex; align-items: center; justify-content: flex-start; gap: 8px; margin-top: 10px; cursor: pointer; color: var(--text-main); font-size: 13px;}
-.checkbox-label input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--primary);}
-.tabs { display: flex; background: #f3f4f6; padding: 4px; border-radius: 12px; margin-bottom: 16px; gap: 4px; }
-.tab { flex: 1; text-align: center; padding: 10px 6px; font-size: 12px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.tab.active { background: #fff; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-.status-text { font-size: 13px; color: var(--text-muted); text-align: center; margin: 12px 0; font-weight: 600; }
-.search-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-height: 440px; overflow-y: auto; padding-right: 4px; }
-.search-grid::-webkit-scrollbar { width: 6px; }
-.search-grid::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-.search-grid::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-.search-item { border: 2px solid var(--border); border-radius: var(--radius-md); padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; box-sizing: border-box; overflow: hidden; position: relative; min-height: 150px;}
-.search-item:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-.search-item.selected { border-color: var(--primary); background: #fef2f2; box-shadow: 0 0 0 2px var(--primary); }
-.search-item img { width: 100%; max-width: 100px; aspect-ratio: 1; object-fit: contain; margin-bottom: 8px; border-radius: 8px; background: #f8fafc; }
-.search-item span { display: block; font-size: 11px; font-weight: 600; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; width: 100%; text-overflow: ellipsis; margin-bottom: 2px;}
-.fav-star { position: absolute; top: 6px; right: 6px; font-size: 16px; background: rgba(255,255,255,0.85); border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 5; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-.fav-star:hover { transform: scale(1.1); }
-.fav-star.active { color: #f59e0b; }
-.upload-box { border: 2px dashed #cbd5e1; padding: 40px 16px; text-align: center; border-radius: var(--radius-md); background: #f8fafc; cursor: pointer; transition: 0.2s; display: block; width: 100%; box-sizing: border-box; }
-.upload-box:hover { border-color: var(--primary); background: #f1f5f9; }
-.upload-box input { display: none; }
-.editor-layout { display: flex; flex-direction: column; gap: 24px; align-items: center; width: 100%; }
-@media(min-width: 600px) { .editor-layout { flex-direction: row; align-items: flex-start; } }
-.preview-container { flex: 0 0 auto; background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px; display: flex; justify-content: center; width: 100%; max-width: 300px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); box-sizing: border-box; position: relative;}
-.editor-id-badge { position: absolute; top: 10px; right: 10px; font-size: 11px; font-family: monospace; background: #e2e8f0; color: #475569; padding: 3px 6px; border-radius: 10px; font-weight: 600; display: none;}
-.circle-canvas { width: 220px; height: 220px; border-radius: 50%; border: 2px dashed #cbd5e1; position: relative; display: flex; justify-content: center; align-items: center; background: #fff; overflow: hidden; box-shadow: var(--shadow); transition: 0.3s; flex-shrink: 0; max-width: 100%; }
-.circle-canvas.empty { background: #f1f5f9; box-shadow: none; }
-.circle-canvas.empty::after { content: 'Wähle ein Motiv'; color: #94a3b8; font-weight: 700; font-size: 14px; }
-.bg-layer { position: absolute; top:0; left:0; width: 100%; height: 100%; background-repeat: no-repeat; background-position: center; pointer-events: none; transition: background-color 0.2s; }
-.svg-overlay { position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
-.editor-controls { flex: 1; width: 100%; min-width: 0; }
-.mode-switch { display: flex; background: #f3f4f6; border-radius: 10px; padding: 4px; margin-bottom: 16px; }
-.mode-btn { flex: 1; text-align: center; padding: 8px; font-size: 12px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: 0.2s;}
-.mode-btn.active { background: #fff; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-.preset-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; margin-bottom: 10px; }
-.pill { background: #f1f5f9; border: 1px solid var(--border); padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; cursor: pointer; color: var(--text-muted); transition: 0.2s; }
-.pill:hover { background: #e2e8f0; color: var(--text-main); }
-.pro-panel { background: #f8fafc; border: 1px solid var(--border); padding: 16px; border-radius: var(--radius-md); margin-top: 16px; box-sizing: border-box; width: 100%; }
-.slider-row { margin-bottom: 14px; width: 100%; }
-.slider-row label { margin: 0 0 6px 0; display: flex; justify-content: space-between; font-size: 11px; }
-input[type="range"] { width: 100%; accent-color: var(--primary); cursor: pointer; height: 6px; background: #e5e7eb; border-radius: 4px; outline: none; -webkit-appearance: none; box-sizing: border-box;}
-input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--primary); cursor: pointer; }
-.color-row { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px; width: 100%; }
-input[type="color"] { width: 36px; height: 36px; border: none; border-radius: 8px; cursor: pointer; background: transparent; padding: 0;}
-input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-input[type="color"]::-webkit-color-swatch { border: 2px solid var(--border); border-radius: 8px; }
-.color-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
-.chip { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer; transition: 0.2s; }
-.chip:hover { transform: scale(1.15); }
-.sheet-scale-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; touch-action: pan-x; background: #cbd5e1; border-radius: var(--radius-lg); padding: 16px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.05); display: flex; justify-content: center; margin-top: 16px; box-sizing: border-box; }
-.a4-sheet { background: #fff; box-shadow: var(--shadow-lg); position: relative; width: 794px; height: 1123px; border-radius: 4px; flex-shrink: 0; transform-origin: top center; }
-@media(max-width: 800px) { .a4-sheet { zoom: 0.44; } .sheet-scale-wrapper { padding: 8px; } }
-.sheet-grid { display: flex; flex-wrap: wrap; gap: 24px; padding: 48px; align-content: flex-start; justify-content: flex-start; }
-.grid-avery { display: grid; grid-template-columns: repeat(4, 151px); grid-auto-rows: 151px; gap: 16px; justify-content: center; padding-top: 48px; }
-.label-slot { position: relative; border-radius: 50%; border: 2px dashed #cbd5e1; overflow: hidden; cursor: pointer; display: flex; justify-content: center; align-items: center; background: transparent; transition: all 0.2s ease; user-select: none; }
-.label-slot.empty { background: #f8fafc; }
-.label-slot.empty:hover { border-color: var(--primary); background: #fff; }
-.label-slot.empty::after { content: '+'; font-size: 28px; color: #94a3b8; font-weight: 300; transition: color 0.2s; }
-.label-slot.empty:hover::after { color: var(--primary); }
-.label-slot.filled { border-color: transparent; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-.label-slot.filled:hover { transform: scale(1.03); z-index: 5; box-shadow: 0 8px 16px rgba(0,0,0,0.15); }
-.label-slot.drag-over { border: 3px solid var(--primary) !important; background: #fef2f2 !important; transform: scale(1.05); }
-.project-actions { display: flex; gap: 10px; margin-top: 16px; justify-content: center; flex-wrap: wrap;}
-.hardware-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 14px; width: 100%; }
-@media(min-width: 600px) { .hardware-grid { grid-template-columns: 1fr 1fr; } }
-.hw-item { display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid var(--border); border-radius: var(--radius-md); text-decoration: none; color: var(--text-main); transition: 0.2s; width: 100%; box-sizing: border-box; overflow: hidden; }
-.hw-item:hover { border-color: var(--primary); background: #fff; transform: translateY(-2px); box-shadow: var(--shadow);}
-.hw-item .icon { font-size: 22px; flex-shrink: 0; }
-.hw-item div { min-width: 0; }
-.hw-item div strong { display: block; font-size: 13px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
-.hw-item div span { font-size: 11px; color: var(--text-muted); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; display: block; }
-.stamp-indicator { background: #fef2f2; border: 2px solid var(--primary); color: var(--primary); padding: 8px 12px; border-radius: var(--radius-md); font-size: 12px; font-weight: 700; text-align: center; margin-bottom: 10px; display: none; align-items: center; justify-content: space-between; }
-.modal-overlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; justify-content: center; align-items: center; padding: 16px; opacity: 0; pointer-events: none; transition: 0.2s; }
-.modal-overlay.active { opacity: 1; pointer-events: auto; }
-.modal-card { background: #fff; border-radius: var(--radius-lg); padding: 20px; width: 100%; max-width: 480px; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; }
-.modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
-.modal-header h3 { margin: 0; font-size: 18px; color: var(--primary); }
-.modal-close { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-muted); }
-.hidden { display: none !important; }
-footer { text-align: center; margin-top: 40px; font-size: 12px; color: var(--text-muted); width: 100%; max-width: 1200px; padding-bottom: 20px; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; }
-footer a { color: var(--primary); text-decoration: none; font-weight: 700; transition: 0.2s;}
-footer a:hover { color: var(--primary-hover); text-decoration: underline;}
-.community-links { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-top: 10px; }
-@media print {
-@page { size: A4 portrait; margin: 0 !important; }
-body * { display: none !important; }
-body, html { display: block !important; margin: 0 !important; padding: 0 !important; background: #fff !important; width: 210mm !important; height: 297mm !important; overflow: hidden !important; }
-.print-section, #sheetWrapper, #printSheet { display: block !important; position: absolute !important; top: 0 !important; left: 0 !important; width: 210mm !important; height: 297mm !important; margin: 0 !important; padding: 0 !important; border: none !important; box-shadow: none !important; background: #fff !important; transform: none !important; }
-#printSheet * { display: block !important; }
-.sheet-grid, .grid-avery { display: flex !important; }
-.grid-avery { display: grid !important; }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tonie & Tag Cover Generator (Community Edition)</title>
+    <style>
+        :root {
+            --primary: #e30613;
+            --primary-hover: #b8050f;
+            --bg-body: #f3f4f6;
+            --bg-card: #ffffff;
+            --text-main: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; }
+        html, body { width: 100vw; overflow-x: hidden; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        body { 
+            background-color: var(--bg-body); color: var(--text-main); line-height: 1.5; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            padding: 16px; padding-bottom: 80px; display: flex; flex-direction: column; align-items: center; 
+        }
+
+        .top-bar { width: 100%; max-width: 1200px; display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 16px; margin-top: 8px;}
+        .support-btn { background: #f59e0b; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3); transition: 0.2s;}
+        .support-btn:hover { background: #d97706; transform: translateY(-1px); }
+        .help-btn { background: #e2e8f0; color: #334155; padding: 8px 14px; border-radius: 20px; border: none; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: 0.2s; }
+        .help-btn:hover { background: #cbd5e1; }
+
+        .header { text-align: center; margin-bottom: 28px; width: 100%; max-width: 1200px; display: flex; flex-direction: column; align-items: center; }
+        .logo-wrapper { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;}
+        .app-logo { width: 40px; height: 40px; flex-shrink: 0; }
+        .header h1 { color: var(--primary); font-size: 26px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; margin: 0; text-align: center; }
+        .header p { color: var(--text-muted); font-size: 13px; margin: 6px 0 0 0; text-align: center; max-width: 600px; }
+
+        .app-layout { display: flex; flex-direction: column; gap: 24px; width: 100%; max-width: 1200px; }
+        @media(min-width: 1024px) { 
+            .app-layout { flex-direction: row; align-items: flex-start; }
+            .column-1 { width: 400px; flex-shrink: 0; }
+            .column-2 { flex-grow: 1; min-width: 0; }
+            .header h1 { font-size: 32px; }
+            .app-logo { width: 48px; height: 48px; }
+        }
+
+        .card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow); width: 100%; box-sizing: border-box; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 2px solid #f3f4f6; padding-bottom: 10px; flex-wrap: wrap; gap: 10px;}
+        .card-header h2 { font-size: 17px; font-weight: 700; color: #111; margin: 0;}
+
+        input[type="text"], select, textarea { 
+            width: 100%; padding: 12px 14px; border: 2px solid var(--border); border-radius: var(--radius-md); 
+            font-size: 15px; outline: none; background: #f9fafb; color: var(--text-main); font-weight: 500; transition: 0.2s; box-sizing: border-box; 
+        }
+        input[type="text"]:focus, select:focus, textarea:focus { border-color: var(--primary); background: #fff; }
+        
+        .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 12px; font-size: 15px; font-weight: 700; color: #fff; background: var(--primary); border: none; border-radius: var(--radius-md); cursor: pointer; transition: 0.2s; box-sizing: border-box; }
+        .btn:hover { background: var(--primary-hover); transform: translateY(-1px); }
+        .btn-secondary { background: #fff; color: var(--text-main); border: 2px solid var(--border); }
+        .btn-secondary:hover { border-color: var(--text-muted); background: #f9fafb; }
+        .btn-sm { padding: 8px 12px; font-size: 13px; width: auto; border-radius: 8px; }
+        .btn-success { background: #10b981; color: white; }
+        .btn-success:hover { background: #059669; }
+        .btn-batch { background: #fef3c7; color: #d97706; border: 1px solid #fde68a; }
+        .btn-batch:hover { background: #fde68a; }
+        .btn-action { background: #e0e7ff; color: #4338ca; border: 1px solid #c7d2fe; }
+        .btn-action:hover { background: #c7d2fe; }
+
+        label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; margin-top: 14px; }
+        .checkbox-label { display: flex; align-items: center; justify-content: flex-start; gap: 8px; margin-top: 10px; cursor: pointer; color: var(--text-main); font-size: 13px;}
+        .checkbox-label input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--primary);}
+
+        .tabs { display: flex; background: #f3f4f6; padding: 4px; border-radius: 12px; margin-bottom: 16px; gap: 4px; }
+        .tab { flex: 1; text-align: center; padding: 10px 6px; font-size: 12px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .tab.active { background: #fff; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+        .status-text { font-size: 13px; color: var(--text-muted); text-align: center; margin: 12px 0; font-weight: 600; }
+        .search-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; max-height: 440px; overflow-y: auto; padding-right: 4px; }
+        .search-grid::-webkit-scrollbar { width: 6px; }
+        .search-grid::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .search-grid::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
+        .search-item { border: 2px solid var(--border); border-radius: var(--radius-md); padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; box-sizing: border-box; overflow: hidden; position: relative; min-height: 150px;}
+        .search-item:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .search-item.selected { border-color: var(--primary); background: #fef2f2; box-shadow: 0 0 0 2px var(--primary); }
+        .search-item img { width: 100%; max-width: 100px; aspect-ratio: 1; object-fit: contain; margin-bottom: 8px; border-radius: 8px; background: #f8fafc; }
+        .search-item span { display: block; font-size: 11px; font-weight: 600; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; width: 100%; text-overflow: ellipsis; margin-bottom: 2px;}
+        
+        .fav-star { position: absolute; top: 6px; right: 6px; font-size: 16px; background: rgba(255,255,255,0.85); border-radius: 50%; width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 5; transition: 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .fav-star:hover { transform: scale(1.1); }
+        .fav-star.active { color: #f59e0b; }
+
+        .upload-box { border: 2px dashed #cbd5e1; padding: 40px 16px; text-align: center; border-radius: var(--radius-md); background: #f8fafc; cursor: pointer; transition: 0.2s; display: block; width: 100%; box-sizing: border-box; }
+        .upload-box:hover { border-color: var(--primary); background: #f1f5f9; }
+        .upload-box input { display: none; }
+
+        .editor-layout { display: flex; flex-direction: column; gap: 24px; align-items: center; width: 100%; }
+        @media(min-width: 600px) { .editor-layout { flex-direction: row; align-items: flex-start; } }
+        
+        .preview-container { flex: 0 0 auto; background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 24px; display: flex; justify-content: center; width: 100%; max-width: 300px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); box-sizing: border-box; position: relative;}
+        .editor-id-badge { position: absolute; top: 10px; right: 10px; font-size: 11px; font-family: monospace; background: #e2e8f0; color: #475569; padding: 3px 6px; border-radius: 10px; font-weight: 600; display: none;}
+
+        .circle-canvas { width: 220px; height: 220px; border-radius: 50%; border: 2px dashed #cbd5e1; position: relative; display: flex; justify-content: center; align-items: center; background: #fff; overflow: hidden; box-shadow: var(--shadow); transition: 0.3s; flex-shrink: 0; max-width: 100%; }
+        .circle-canvas.empty { background: #f1f5f9; box-shadow: none; }
+        .circle-canvas.empty::after { content: 'Wähle ein Motiv'; color: #94a3b8; font-weight: 700; font-size: 14px; }
+        
+        .bg-layer { position: absolute; top:0; left:0; width: 100%; height: 100%; background-repeat: no-repeat; background-position: center; pointer-events: none; transition: background-color 0.2s; }
+        .svg-overlay { position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
+
+        .editor-controls { flex: 1; width: 100%; min-width: 0; }
+        
+        .mode-switch { display: flex; background: #f3f4f6; border-radius: 10px; padding: 4px; margin-bottom: 16px; }
+        .mode-btn { flex: 1; text-align: center; padding: 8px; font-size: 12px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: 0.2s;}
+        .mode-btn.active { background: #fff; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+
+        .preset-pills { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; margin-bottom: 10px; }
+        .pill { background: #f1f5f9; border: 1px solid var(--border); padding: 3px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; cursor: pointer; color: var(--text-muted); transition: 0.2s; }
+        .pill:hover { background: #e2e8f0; color: var(--text-main); }
+
+        .pro-panel { background: #f8fafc; border: 1px solid var(--border); padding: 16px; border-radius: var(--radius-md); margin-top: 16px; box-sizing: border-box; width: 100%; }
+        .slider-row { margin-bottom: 14px; width: 100%; }
+        .slider-row label { margin: 0 0 6px 0; display: flex; justify-content: space-between; font-size: 11px; }
+        input[type="range"] { width: 100%; accent-color: var(--primary); cursor: pointer; height: 6px; background: #e5e7eb; border-radius: 4px; outline: none; -webkit-appearance: none; box-sizing: border-box;}
+        input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--primary); cursor: pointer; }
+
+        .color-row { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; border-top: 1px solid var(--border); padding-top: 14px; width: 100%; }
+        input[type="color"] { width: 36px; height: 36px; border: none; border-radius: 8px; cursor: pointer; background: transparent; padding: 0;}
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: 2px solid var(--border); border-radius: 8px; }
+
+        .color-chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+        .chip { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--border); cursor: pointer; transition: 0.2s; }
+        .chip:hover { transform: scale(1.15); }
+
+        .sheet-scale-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; touch-action: pan-x; background: #cbd5e1; border-radius: var(--radius-lg); padding: 16px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.05); display: flex; justify-content: center; margin-top: 16px; box-sizing: border-box; }
+        .a4-sheet { background: #fff; box-shadow: var(--shadow-lg); position: relative; width: 794px; height: 1123px; border-radius: 4px; flex-shrink: 0; transform-origin: top center; }
+        @media(max-width: 800px) { .a4-sheet { zoom: 0.44; } .sheet-scale-wrapper { padding: 8px; } }
+        
+        .sheet-grid { display: flex; flex-wrap: wrap; gap: 24px; padding: 48px; align-content: flex-start; justify-content: flex-start; }
+        .grid-avery { display: grid; grid-template-columns: repeat(4, 151px); grid-auto-rows: 151px; gap: 16px; justify-content: center; padding-top: 48px; }
+
+        .label-slot { position: relative; border-radius: 50%; border: 2px dashed #cbd5e1; overflow: hidden; cursor: pointer; display: flex; justify-content: center; align-items: center; background: transparent; transition: all 0.2s ease; user-select: none; }
+        .label-slot.empty { background: #f8fafc; }
+        .label-slot.empty:hover { border-color: var(--primary); background: #fff; }
+        .label-slot.empty::after { content: '+'; font-size: 28px; color: #94a3b8; font-weight: 300; transition: color 0.2s; }
+        .label-slot.empty:hover::after { color: var(--primary); }
+        .label-slot.filled { border-color: transparent; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .label-slot.filled:hover { transform: scale(1.03); z-index: 5; box-shadow: 0 8px 16px rgba(0,0,0,0.15); }
+        .label-slot.drag-over { border: 3px solid var(--primary) !important; background: #fef2f2 !important; transform: scale(1.05); }
+
+        .project-actions { display: flex; gap: 10px; margin-top: 16px; justify-content: center; flex-wrap: wrap;}
+        
+        .hardware-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 14px; width: 100%; }
+        @media(min-width: 600px) { .hardware-grid { grid-template-columns: 1fr 1fr; } }
+        .hw-item { display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid var(--border); border-radius: var(--radius-md); text-decoration: none; color: var(--text-main); transition: 0.2s; width: 100%; box-sizing: border-box; overflow: hidden; }
+        .hw-item:hover { border-color: var(--primary); background: #fff; transform: translateY(-2px); box-shadow: var(--shadow);}
+        .hw-item .icon { font-size: 22px; flex-shrink: 0; }
+        .hw-item div { min-width: 0; }
+        .hw-item div strong { display: block; font-size: 13px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
+        .hw-item div span { font-size: 11px; color: var(--text-muted); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; display: block; }
+
+        .stamp-indicator { background: #fef2f2; border: 2px solid var(--primary); color: var(--primary); padding: 8px 12px; border-radius: var(--radius-md); font-size: 12px; font-weight: 700; text-align: center; margin-bottom: 10px; display: none; align-items: center; justify-content: space-between; }
+
+        .modal-overlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background: rgba(0,0,0,0.5); z-index: 9999; display: flex; justify-content: center; align-items: center; padding: 16px; opacity: 0; pointer-events: none; transition: 0.2s; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
+        .modal-card { background: #fff; border-radius: var(--radius-lg); padding: 20px; width: 100%; max-width: 480px; box-shadow: var(--shadow-lg); max-height: 90vh; overflow-y: auto; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .modal-header h3 { margin: 0; font-size: 18px; color: var(--primary); }
+        .modal-close { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-muted); }
+
+        .hidden { display: none !important; }
+        
+        footer { text-align: center; margin-top: 40px; font-size: 12px; color: var(--text-muted); width: 100%; max-width: 1200px; padding-bottom: 20px; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; }
+        footer a { color: var(--primary); text-decoration: none; font-weight: 700; transition: 0.2s;}
+        footer a:hover { color: var(--primary-hover); text-decoration: underline;}
+        .community-links { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; margin-top: 10px; }
+
+        @media print {
+            @page { size: A4 portrait; margin: 0 !important; }
+            body * { display: none !important; }
+            body, html { display: block !important; margin: 0 !important; padding: 0 !important; background: #fff !important; width: 210mm !important; height: 297mm !important; overflow: hidden !important; }
+            .print-section, #sheetWrapper, #printSheet { display: block !important; position: absolute !important; top: 0 !important; left: 0 !important; width: 210mm !important; height: 297mm !important; margin: 0 !important; padding: 0 !important; border: none !important; box-shadow: none !important; background: #fff !important; transform: none !important; }
+            #printSheet * { display: block !important; }
+            .sheet-grid, .grid-avery { display: flex !important; }
+            .grid-avery { display: grid !important; }
+        }
+    </style>
 </head>
 <body>
+
 <div class="top-bar">
-<button class="help-btn" onclick="openHelpModal()">❓ Hilfe & Tipps</button>
-<a href="https://www.paypal.com/donate/?business=stephan%40genial.ms&item_name=Tonie+Cover+Generator+Support&currency_code=EUR" class="support-btn" target="_blank">☕ Spenden</a>
+    <button class="help-btn" onclick="openHelpModal()">❓ Hilfe & Tipps</button>
+    <a href="https://www.paypal.com/donate/?business=stephan%40genial.ms&item_name=Tonie+Cover+Generator+Support&currency_code=EUR" class="support-btn" target="_blank">☕ Spenden</a>
 </div>
+
 <div class="header">
-<div class="logo-wrapper">
-<svg viewBox="0 0 100 100" class="app-logo">
-<circle cx="50" cy="50" r="45" fill="none" stroke="var(--primary)" stroke-width="4" stroke-dasharray="10 6" />
-<circle cx="50" cy="50" r="30" fill="var(--primary)" />
-<path d="M43,33 L58,29 L58,55 A7,7 0 1,1 51,55 L51,39 L43,41 Z" fill="#fff" />
-</svg>
-<h1>Tonie & Tag Cover</h1>
+    <div class="logo-wrapper">
+        <svg viewBox="0 0 100 100" class="app-logo">
+            <circle cx="50" cy="50" r="45" fill="none" stroke="var(--primary)" stroke-width="4" stroke-dasharray="10 6" />
+            <circle cx="50" cy="50" r="30" fill="var(--primary)" />
+            <path d="M43,33 L58,29 L58,55 A7,7 0 1,1 51,55 L51,39 L43,41 Z" fill="#fff" />
+        </svg>
+        <h1>Tonie & Tag Cover</h1>
+    </div>
+    <p>Der elegante Designer für Münzkapseln, Flipper & RFIDfriend Token</p>
 </div>
-<p>Der elegante Designer für Münzkapseln, Flipper & RFIDfriend Token</p>
-</div>
+
 <!-- HELP MODAL -->
 <div class="modal-overlay" id="helpModal" onclick="if(event.target === this) closeHelpModal()">
-<div class="modal-card">
-<div class="modal-header">
-<h3>Nerd- & Druck-Hilfe</h3>
-<button class="modal-close" onclick="closeHelpModal()">✕</button>
+    <div class="modal-card">
+        <div class="modal-header">
+            <h3>Nerd- & Druck-Hilfe</h3>
+            <button class="modal-close" onclick="closeHelpModal()">✕</button>
+        </div>
+        <ul style="padding-left: 18px; font-size: 13px; color: var(--text-main); line-height: 1.5;">
+            <li><strong>Skalierung:</strong> Drucke im Browser-Dialog immer mit <strong>100% (Tatsächliche Größe)</strong>.</li>
+            <li><strong>Quick-Stamp:</strong> Klicke bei aktivem Motiv auf einen Bogen-Kreis zum blitzschnellen Stempeln.</li>
+        </ul>
+        <button class="btn btn-success" onclick="closeHelpModal()" style="margin-top: 14px; padding: 10px;">Alles klar!</button>
+    </div>
 </div>
-<ul style="padding-left: 18px; font-size: 13px; color: var(--text-main); line-height: 1.5;">
-<li><strong>Skalierung:</strong> Drucke im Browser-Dialog immer mit <strong>100% (Tatsächliche Größe)</strong>.</li>
-<li><strong>Quick-Stamp:</strong> Klicke bei aktivem Motiv auf einen Bogen-Kreis zum blitzschnellen Stempeln.</li>
-</ul>
-<button class="btn btn-success" onclick="closeHelpModal()" style="margin-top: 14px; padding: 10px;">Alles klar!</button>
-</div>
-</div>
+
 <div class="app-layout">
-<div class="column-1">
-<div class="card">
-<div class="tabs">
-<div class="tab active" id="tab-tonie" onclick="switchSourceTab('tonie')">Datenbank</div>
-<div class="tab" id="tab-favs" onclick="switchSourceTab('favs')">Favoriten</div>
-<div class="tab" id="tab-upload" onclick="switchSourceTab('upload')">Eigene</div>
+    
+    <div class="column-1">
+        <div class="card">
+            <div class="tabs">
+                <div class="tab active" id="tab-tonie" onclick="switchSourceTab('tonie')">Datenbank</div>
+                <div class="tab" id="tab-favs" onclick="switchSourceTab('favs')">Favoriten</div>
+                <div class="tab" id="tab-upload" onclick="switchSourceTab('upload')">Eigene</div>
+            </div>
+
+            <div id="view-tonie">
+                <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                    <input type="text" id="searchInput" placeholder="Titel, Serie oder ID..." autocomplete="off" style="flex:1;">
+                    <button class="btn btn-secondary" onclick="pickRandomTonie()" title="Zufälliger Tonie" style="width: 46px; flex-shrink: 0; font-size: 16px;">🎲</button>
+                </div>
+                <div class="status-text" id="statusText">Bereit!</div>
+                
+                <div id="stampBanner" class="stamp-indicator">
+                    <span>⚡ Klicke Bogen-Kreis zum Stempeln!</span>
+                    <button class="btn btn-secondary btn-sm" onclick="cancelQuickStamp()" style="padding: 2px 6px; font-size:10px;">Beenden</button>
+                </div>
+
+                <div class="search-grid" id="searchGrid"></div>
+            </div>
+
+            <div id="view-favs" class="hidden">
+                <div class="status-text" id="favsStatus">Deine Lieblings-Tonies</div>
+                <div class="search-grid" id="favsGrid"></div>
+            </div>
+
+            <div id="view-upload" class="hidden">
+                <label class="upload-box">
+                    <div style="font-size: 40px; margin-bottom: 12px;">📸</div>
+                    <div style="font-size: 16px; font-weight: 700; color: #111;">Bild auswählen</div>
+                    <div style="font-size: 13px; color: var(--text-muted); margin-top: 6px;">JPG oder PNG</div>
+                    <input type="file" id="customFileInput" accept="image/*">
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="column-2" style="display: flex; flex-direction: column; gap: 24px; width: 100%;">
+        
+        <!-- EDITOR -->
+        <div class="card" id="editorCard">
+            <div class="card-header">
+                <h2>Etikett gestalten</h2>
+                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                    <button class="btn btn-secondary btn-sm" id="btnShare" onclick="shareCurrentDesign()" title="Link teilen">📤 Teilen</button>
+                    <button class="btn btn-action btn-sm hidden" id="btnSendId" onclick="sendIdToApp()" title="ID senden">📲 ID senden</button>
+                    <button class="btn btn-secondary btn-sm hidden" id="btnCancel" onclick="resetEditor()">Abbrechen</button>
+                </div>
+            </div>
+
+            <div class="editor-layout">
+                <div class="preview-container">
+                    <div id="editorIdBadge" class="editor-id-badge" title="Tonie ID">ID: --</div>
+                    <div class="circle-canvas empty" id="previewCircle">
+                        <div id="previewImage" class="bg-layer"></div>
+                        <svg class="svg-overlay" viewBox="0 0 200 200" id="previewSvg" style="display: none;">
+                            <path id="pathTop" d="M 18,100 A 82,82 0 0,1 182,100" fill="none" stroke="none"/>
+                            <text id="previewTextTopNode" font-family="-apple-system, sans-serif" font-weight="800" stroke="#fff" paint-order="stroke fill" letter-spacing="0.5px">
+                                <textPath href="#pathTop" startOffset="50%" text-anchor="middle" dominant-baseline="auto" id="previewTextTop"></textPath>
+                            </text>
+                            
+                            <path id="pathBot" d="M 18,100 A 82,82 0 0,0 182,100" fill="none" stroke="none"/>
+                            <text id="previewTextBotNode" font-family="-apple-system, sans-serif" font-weight="800" stroke="#fff" paint-order="stroke fill" letter-spacing="0.5px">
+                                <textPath href="#pathBot" startOffset="50%" text-anchor="middle" dominant-baseline="hanging" id="previewTextBot"></textPath>
+                            </text>
+
+                            <path id="pathId" d="M 35,145 A 70,70 0 0,0 165,145" fill="none" stroke="none"/>
+                            <text id="previewTextIdNode" font-family="monospace" font-weight="700" fill="#64748b">
+                                <textPath href="#pathId" startOffset="50%" text-anchor="middle" id="previewTextId"></textPath>
+                            </text>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="editor-controls">
+                    <div class="mode-switch">
+                        <div class="mode-btn active" id="mode-simple" onclick="switchMode('simple')">Simpel</div>
+                        <div class="mode-btn" id="mode-pro" onclick="switchMode('pro')">Pro-Modus</div>
+                    </div>
+
+                    <label>Text Oben (z.B. Serie)</label>
+                    <input type="text" id="editTop" placeholder="z.B. Conni" oninput="updatePreview()">
+                    <div class="preset-pills">
+                        <div class="pill" onclick="setTopPreset('Hörspiel')">Hörspiel</div>
+                        <div class="pill" onclick="setTopPreset('Kinderlieder')">Kinderlieder</div>
+                        <div class="pill" onclick="setTopPreset('Mein Tonie')">Mein Tonie</div>
+                    </div>
+                    
+                    <label>Text Unten (z.B. Titel)</label>
+                    <input type="text" id="editBot" placeholder="z.B. Conni kommt in den Kindergarten" oninput="updatePreview()">
+
+                    <div id="proPanel" class="pro-panel hidden">
+                        <div class="slider-row">
+                            <label><span>🔍 Zoom</span> <span id="valZoom">100%</span></label>
+                            <input type="range" id="editZoom" min="20" max="250" value="100" oninput="updatePreview()">
+                        </div>
+                        <div class="slider-row">
+                            <label><span>🔄 Drehung</span> <span id="valRot">0°</span></label>
+                            <input type="range" id="editRot" min="-180" max="180" value="0" oninput="updatePreview()">
+                        </div>
+                        <div class="slider-row">
+                            <label><span>✂️ Bleed / Beschnitt</span> <span id="valBleed">0px</span></label>
+                            <input type="range" id="editBleed" min="0" max="15" value="0" oninput="updatePreview()">
+                        </div>
+
+                        <label class="checkbox-label" style="margin-top: 10px;">
+                            <input type="checkbox" id="checkPrintId" onchange="updatePreview()"> 🏷️ Tonie-ID ganz klein am Rand mitdrucken
+                        </label>
+
+                        <div class="color-row">
+                            <span style="font-size: 12px; font-weight: 700;">🎨 Hintergrundfarbe</span>
+                            <input type="color" id="editBg" value="#ffffff" oninput="updatePreview()">
+                        </div>
+                        <div class="color-chips">
+                            <div class="chip" style="background:#ffffff;" onclick="setBg('#ffffff')" title="Weiß"></div>
+                            <div class="chip" style="background:#e30613;" onclick="setBg('#e30613')" title="Rot"></div>
+                            <div class="chip" style="background:#8b5cf6;" onclick="setBg('#8b5cf6')" title="Beere"></div>
+                            <div class="chip" style="background:#38bdf8;" onclick="setBg('#38bdf8')" title="Hellblau"></div>
+                            <div class="chip" style="background:#10b981;" onclick="setBg('#10b981')" title="Mint"></div>
+                            <div class="chip" style="background:#334155;" onclick="setBg('#334155')" title="Anthrazit"></div>
+                        </div>
+
+                        <div class="color-row" style="border-top: none; padding-top: 6px;">
+                            <span style="font-size: 12px; font-weight: 700;">✍️ Textfarbe</span>
+                            <input type="color" id="editTextColor" value="#111111" oninput="updatePreview()">
+                        </div>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
+                        <button class="btn btn-success" id="btnSave" onclick="saveToSheet()" style="background: #94a3b8; pointer-events: none;">Wähle zuerst ein Motiv</button>
+                        
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-batch hidden" id="btnBatch" onclick="fillEntireSheet()" style="flex:1;">✨ Bogen füllen</button>
+                            <button class="btn btn-secondary hidden" id="btnDelete" onclick="deleteLabel()" style="color: #e30613; border-color: #fca5a5; flex:1;">🗑️ Löschen</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card print-section">
+            <div class="card-header">
+                <h2>Format & Druckbogen</h2>
+                <button class="btn btn-secondary btn-sm" onclick="clearSheet()" style="color: #e30613; border-color: #fca5a5;">Bogen leeren</button>
+            </div>
+            
+            <label>Art des Drucks</label>
+            <select id="formatTypeSelect" onchange="handleFormatTypeChange()">
+                <option value="free">✂️ Freies Raster (Mit Schnittmarken)</option>
+                <option value="avery">🏷️ Avery Zweckform (Vorgestanzte Bögen)</option>
+            </select>
+
+            <label style="margin-top: 10px;">Gewünschtes Format</label>
+            <select id="formatDetailSelect" onchange="handleFormatChange()">
+                <!-- Populated dynamically -->
+            </select>
+            
+            <div style="margin-top: 14px; background: #f8fafc; border: 1px solid var(--border); padding: 14px; border-radius: var(--radius-md);">
+                <label style="margin-top:0;">⚡ Flipper / Bulk ID Import (IDs kommasepariert)</label>
+                <div style="display: flex; gap: 8px; margin-top: 6px;">
+                    <input type="text" id="bulkInputIds" placeholder="z.B. 01-0012, 01-0030" style="flex:1; font-size:13px; padding:8px;">
+                    <button class="btn btn-action btn-sm" onclick="importBulkIds()" style="white-space:nowrap;">Bogen befüllen</button>
+                </div>
+            </div>
+
+            <div class="project-actions">
+                <button class="btn btn-secondary btn-sm" onclick="exportProject()">💾 Projekt speichern</button>
+                <button class="btn btn-secondary btn-sm" onclick="document.getElementById('importFile').click()">📂 Projekt laden</button>
+                <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importProject(event)">
+            </div>
+
+            <div class="sheet-scale-wrapper" id="sheetWrapper">
+                <div class="a4-sheet" id="printSheet">
+                    <div id="sheetGrid" class="sheet-grid"></div>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <label class="checkbox-label" style="margin-bottom: 12px;" id="cutlinesRow">
+                    <input type="checkbox" id="checkCutlines" checked> ✂️ Schnittmarken beim Export zeichnen
+                </label>
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <button class="btn btn-success" onclick="window.print()" style="font-size: 16px; padding: 14px; background: var(--primary);">🖨️ Bogen Drucken (A4)</button>
+                    <button class="btn btn-secondary" onclick="exportPNG()">🖼️ Als 300 DPI PNG exportieren</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- HARDWARE & LINKS CARD -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Material & Community</h2>
+            </div>
+            <div class="hardware-grid">
+                <a href="https://www.amazon.de/s?k=Avery+Zweckform" target="_blank" rel="noopener noreferrer" class="hw-item">
+                    <div class="icon">🏷️</div>
+                    <div><strong>Avery Zweckform</strong><span>Passende Bögen</span></div>
+                </a>
+                <a href="https://github.com/nortakales/flipper-zero-tonies" target="_blank" rel="noopener noreferrer" class="hw-item">
+                    <div class="icon">🐬</div>
+                    <div><strong>Flipper Zero Tonies</strong><span>Community Dumps</span></div>
+                </a>
+                <a href="https://www.amazon.de/s?k=M%C3%BCnzkapseln" target="_blank" rel="noopener noreferrer" class="hw-item">
+                    <div class="icon">🪙</div>
+                    <div><strong>Münzkapseln</strong><span>Für DIY Token</span></div>
+                </a>
+                <a href="http://rfidfriend.com/" target="_blank" rel="noopener noreferrer" class="hw-item">
+                    <div class="icon">📡</div>
+                    <div><strong>RFIDfriend Tags</strong><span>Beste NFC Tags</span></div>
+                </a>
+            </div>
+        </div>
+    </div>
 </div>
-<div id="view-tonie">
-<div style="display: flex; gap: 8px; margin-bottom: 8px;">
-<input type="text" id="searchInput" placeholder="Titel, Serie oder ID..." autocomplete="off" style="flex:1;">
-<button class="btn btn-secondary" onclick="pickRandomTonie()" title="Zufälliger Tonie" style="width: 46px; flex-shrink: 0; font-size: 16px;">🎲</button>
-</div>
-<div class="status-text" id="statusText">Lade Datenbank...</div>
-<div id="stampBanner" class="stamp-indicator">
-<span>⚡ Klicke Bogen-Kreis zum Stempeln!</span>
-<button class="btn btn-secondary btn-sm" onclick="cancelQuickStamp()" style="padding: 2px 6px; font-size:10px;">Beenden</button>
-</div>
-<div class="search-grid" id="searchGrid"></div>
-</div>
-<div id="view-favs" class="hidden">
-<div class="status-text" id="favsStatus">Deine Lieblings-Tonies</div>
-<div class="search-grid" id="favsGrid"></div>
-</div>
-<div id="view-upload" class="hidden">
-<label class="upload-box">
-<div style="font-size: 40px; margin-bottom: 12px;">📸</div>
-<div style="font-size: 16px; font-weight: 700; color: #111;">Bild auswählen</div>
-<div style="font-size: 13px; color: var(--text-muted); margin-top: 6px;">JPG oder PNG</div>
-<input type="file" id="customFileInput" accept="image/*">
-</label>
-</div>
-</div>
-</div>
-<div class="column-2" style="display: flex; flex-direction: column; gap: 24px; width: 100%;">
-<!-- EDITOR -->
-<div class="card" id="editorCard">
-<div class="card-header">
-<h2>Etikett gestalten</h2>
-<div style="display: flex; gap: 6px; flex-wrap: wrap;">
-<button class="btn btn-secondary btn-sm" id="btnShare" onclick="shareCurrentDesign()" title="Link teilen">📤 Teilen</button>
-<button class="btn btn-action btn-sm hidden" id="btnSendId" onclick="sendIdToApp()" title="ID senden">📲 ID senden</button>
-<button class="btn btn-secondary btn-sm hidden" id="btnCancel" onclick="resetEditor()">Abbrechen</button>
-</div>
-</div>
-<div class="editor-layout">
-<div class="preview-container">
-<div id="editorIdBadge" class="editor-id-badge" title="Tonie ID">ID: --</div>
-<div class="circle-canvas empty" id="previewCircle">
-<div id="previewImage" class="bg-layer"></div>
-<svg class="svg-overlay" viewBox="0 0 200 200" id="previewSvg" style="display: none;">
-<path id="pathTop" d="M 18,100 A 82,82 0 0,1 182,100" fill="none" stroke="none"/>
-<text id="previewTextTopNode" font-family="-apple-system, sans-serif" font-weight="800" stroke="#fff" paint-order="stroke fill" letter-spacing="0.5px">
-<textPath href="#pathTop" startOffset="50%" text-anchor="middle" dominant-baseline="auto" id="previewTextTop"></textPath>
-</text>
-<path id="pathBot" d="M 18,100 A 82,82 0 0,0 182,100" fill="none" stroke="none"/>
-<text id="previewTextBotNode" font-family="-apple-system, sans-serif" font-weight="800" stroke="#fff" paint-order="stroke fill" letter-spacing="0.5px">
-<textPath href="#pathBot" startOffset="50%" text-anchor="middle" dominant-baseline="hanging" id="previewTextBot"></textPath>
-</text>
-<path id="pathId" d="M 35,145 A 70,70 0 0,0 165,145" fill="none" stroke="none"/>
-<text id="previewTextIdNode" font-family="monospace" font-weight="700" fill="#64748b">
-<textPath href="#pathId" startOffset="50%" text-anchor="middle" id="previewTextId"></textPath>
-</text>
-</svg>
-</div>
-</div>
-<div class="editor-controls">
-<div class="mode-switch">
-<div class="mode-btn active" id="mode-simple" onclick="switchMode('simple')">Simpel</div>
-<div class="mode-btn" id="mode-pro" onclick="switchMode('pro')">Pro-Modus</div>
-</div>
-<label>Text Oben (z.B. Serie)</label>
-<input type="text" id="editTop" placeholder="z.B. Conni" oninput="updatePreview()">
-<div class="preset-pills">
-<div class="pill" onclick="setTopPreset('Hörspiel')">Hörspiel</div>
-<div class="pill" onclick="setTopPreset('Kinderlieder')">Kinderlieder</div>
-<div class="pill" onclick="setTopPreset('Mein Tonie')">Mein Tonie</div>
-</div>
-<label>Text Unten (z.B. Titel)</label>
-<input type="text" id="editBot" placeholder="z.B. Conni kommt in den Kindergarten" oninput="updatePreview()">
-<div id="proPanel" class="pro-panel hidden">
-<div class="slider-row">
-<label><span>🔍 Zoom</span> <span id="valZoom">100%</span></label>
-<input type="range" id="editZoom" min="20" max="250" value="100" oninput="updatePreview()">
-</div>
-<div class="slider-row">
-<label><span>🔄 Drehung</span> <span id="valRot">0°</span></label>
-<input type="range" id="editRot" min="-180" max="180" value="0" oninput="updatePreview()">
-</div>
-<div class="slider-row">
-<label><span>✂️ Bleed / Beschnitt</span> <span id="valBleed">0px</span></label>
-<input type="range" id="editBleed" min="0" max="15" value="0" oninput="updatePreview()">
-</div>
-<label class="checkbox-label" style="margin-top: 10px;">
-<input type="checkbox" id="checkPrintId" onchange="updatePreview()"> 🏷️ Tonie-ID ganz klein am Rand mitdrucken
-</label>
-<div class="color-row">
-<span style="font-size: 12px; font-weight: 700;">🎨 Hintergrundfarbe</span>
-<input type="color" id="editBg" value="#ffffff" oninput="updatePreview()">
-</div>
-<div class="color-chips">
-<div class="chip" style="background:#ffffff;" onclick="setBg('#ffffff')" title="Weiß"></div>
-<div class="chip" style="background:#e30613;" onclick="setBg('#e30613')" title="Rot"></div>
-<div class="chip" style="background:#8b5cf6;" onclick="setBg('#8b5cf6')" title="Beere"></div>
-<div class="chip" style="background:#38bdf8;" onclick="setBg('#38bdf8')" title="Hellblau"></div>
-<div class="chip" style="background:#10b981;" onclick="setBg('#10b981')" title="Mint"></div>
-<div class="chip" style="background:#334155;" onclick="setBg('#334155')" title="Anthrazit"></div>
-</div>
-<div class="color-row" style="border-top: none; padding-top: 6px;">
-<span style="font-size: 12px; font-weight: 700;">✍️ Textfarbe</span>
-<input type="color" id="editTextColor" value="#111111" oninput="updatePreview()">
-</div>
-</div>
-<div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;">
-<button class="btn btn-success" id="btnSave" onclick="saveToSheet()" style="background: #94a3b8; pointer-events: none;">Wähle zuerst ein Motiv</button>
-<div style="display: flex; gap: 10px;">
-<button class="btn btn-batch hidden" id="btnBatch" onclick="fillEntireSheet()" style="flex:1;">✨ Bogen füllen</button>
-<button class="btn btn-secondary hidden" id="btnDelete" onclick="deleteLabel()" style="color: #e30613; border-color: #fca5a5; flex:1;">🗑️ Löschen</button>
-</div>
-</div>
-</div>
-</div>
-</div>
-<!-- SHEET SECTION -->
-<div class="card print-section">
-<div class="card-header">
-<h2>Format & Druckbogen</h2>
-<button class="btn btn-secondary btn-sm" onclick="clearSheet()" style="color: #e30613; border-color: #fca5a5;">Bogen leeren</button>
-</div>
-<label>Art des Drucks</label>
-<select id="formatTypeSelect" onchange="handleFormatTypeChange()">
-<option value="free">✂️ Freies Raster (Mit Schnittmarken)</option>
-<option value="avery">🏷️ Avery Zweckform (Vorgestanzte Bögen)</option>
-</select>
-<label style="margin-top: 10px;">Gewünschtes Format</label>
-<select id="formatDetailSelect" onchange="handleFormatChange()">
-<!-- Populated dynamically -->
-</select>
-<div style="margin-top: 14px; background: #f8fafc; border: 1px solid var(--border); padding: 14px; border-radius: var(--radius-md);">
-<label style="margin-top:0;">⚡ Flipper / Bulk ID Import (IDs kommasepariert)</label>
-<div style="display: flex; gap: 8px; margin-top: 6px;">
-<input type="text" id="bulkInputIds" placeholder="z.B. 01-0012, 01-0030" style="flex:1; font-size:13px; padding:8px;">
-<button class="btn btn-action btn-sm" onclick="importBulkIds()" style="white-space:nowrap;">Bogen befüllen</button>
-</div>
-</div>
-<div class="project-actions">
-<button class="btn btn-secondary btn-sm" onclick="exportProject()">💾 Projekt speichern</button>
-<button class="btn btn-secondary btn-sm" onclick="document.getElementById('importFile').click()">📂 Projekt laden</button>
-<input type="file" id="importFile" accept=".json" style="display:none;" onchange="importProject(event)">
-</div>
-<div class="sheet-scale-wrapper" id="sheetWrapper">
-<div class="a4-sheet" id="printSheet">
-<div id="sheetGrid" class="sheet-grid"></div>
-</div>
-</div>
-<div style="margin-top: 20px;">
-<label class="checkbox-label" style="margin-bottom: 12px;" id="cutlinesRow">
-<input type="checkbox" id="checkCutlines" checked> ✂️ Schnittmarken beim Export zeichnen
-</label>
-<div style="display: flex; flex-direction: column; gap: 12px;">
-<button class="btn btn-success" onclick="window.print()" style="font-size: 16px; padding: 14px; background: var(--primary);">🖨️ Bogen Drucken (A4)</button>
-<button class="btn btn-secondary" onclick="exportPNG()">🖼️ Als 300 DPI PNG exportieren</button>
-</div>
-</div>
-</div>
-<!-- HARDWARE & LINKS CARD -->
-<div class="card">
-<div class="card-header">
-<h2>Material & Community</h2>
-</div>
-<div class="hardware-grid">
-<a href="https://www.amazon.de/s?k=Avery+Zweckform" target="_blank" rel="noopener noreferrer" class="hw-item">
-<div class="icon">🏷️</div>
-<div><strong>Avery Zweckform</strong><span>Passende Bögen</span></div>
-</a>
-<a href="https://github.com/nortakales/flipper-zero-tonies" target="_blank" rel="noopener noreferrer" class="hw-item">
-<div class="icon">🐬</div>
-<div><strong>Flipper Zero Tonies</strong><span>Community Dumps</span></div>
-</a>
-<a href="https://www.amazon.de/s?k=M%C3%BCnzkapseln" target="_blank" rel="noopener noreferrer" class="hw-item">
-<div class="icon">🪙</div>
-<div><strong>Münzkapseln</strong><span>Für DIY Token</span></div>
-</a>
-<a href="http://rfidfriend.com/" target="_blank" rel="noopener noreferrer" class="hw-item">
-<div class="icon">📡</div>
-<div><strong>RFIDfriend Tags</strong><span>Beste NFC Tags</span></div>
-</a>
-</div>
-</div>
-</div>
-</div>
+
 <footer>
-<p>Tonie Cover Generator • Version 20.4 (Lean & Clean Edition)
-Open Source unter MIT-Lizenz.</p>
-<div class="community-links">
-<a href="https://github.com/toniebox-reverse-engineering" target="_blank">Team RevvoX</a>
-<a href="https://github.com/nortakales/flipper-zero-tonies" target="_blank">Flipper Repo</a>
-<a href="http://rfidfriend.com/" target="_blank">RFIDfriend</a>
-</div>
+    <p>Tonie Cover Generator • Version 20.5 (Instant Database Render)<br>Open Source unter MIT-Lizenz.</p>
+    <div class="community-links">
+        <a href="https://github.com/toniebox-reverse-engineering" target="_blank">Team RevvoX</a>
+        <a href="https://github.com/nortakales/flipper-zero-tonies" target="_blank">Flipper Repo</a>
+        <a href="http://rfidfriend.com/" target="_blank">RFIDfriend</a>
+    </div>
 </footer>
+
 <canvas id="exportCanvas" style="display: none;"></canvas>
+
 <script>
-let toniesDB = [];
-let favorites = [];
-let state = {
-labels: [],
-currentEdit: null,
-editingIndex: null,
-formatType: 'free',
-formatDetail: '43',
-quickStampItem: null
-};
-const DOM = {
-searchInput: document.getElementById('searchInput'),
-status: document.getElementById('statusText'),
-grid: document.getElementById('searchGrid'),
-favsGrid: document.getElementById('favsGrid'),
-fileInput: document.getElementById('customFileInput'),
-stampBanner: document.getElementById('stampBanner'),
-pCircle: document.getElementById('previewCircle'),
-pImage: document.getElementById('previewImage'),
-pSvg: document.getElementById('previewSvg'),
-pTextTopNode: document.getElementById('previewTextTopNode'),
-pTextBotNode: document.getElementById('previewTextBotNode'),
-pTextIdNode: document.getElementById('previewTextIdNode'),
-pTextTop: document.getElementById('previewTextTop'),
-pTextBot: document.getElementById('previewTextBot'),
-pTextId: document.getElementById('previewTextId'),
-eTop: document.getElementById('editTop'), eBot: document.getElementById('editBot'),
-eZoom: document.getElementById('editZoom'), eRot: document.getElementById('editRot'),
-eBleed: document.getElementById('editBleed'), checkPrintId: document.getElementById('checkPrintId'),
-eBg: document.getElementById('editBg'), eTextCol: document.getElementById('editTextColor'),
-vZoom: document.getElementById('valZoom'), vRot: document.getElementById('valRot'), vBleed: document.getElementById('valBleed'),
-btnSave: document.getElementById('btnSave'),
-btnBatch: document.getElementById('btnBatch'),
-btnDel: document.getElementById('btnDelete'),
-btnCan: document.getElementById('btnCancel'),
-btnSendId: document.getElementById('btnSendId'),
-editorIdBadge: document.getElementById('editorIdBadge'),
-formatTypeSelect: document.getElementById('formatTypeSelect'),
-formatDetailSelect: document.getElementById('formatDetailSelect'),
-cutlinesRow: document.getElementById('cutlinesRow'),
-sGrid: document.getElementById('sheetGrid')
-};
-const FALLBACK_DB = [
-{ title: "Conni kommt in den Kindergarten", series: "Conni", tonieId: "01-0010", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0010.png" },
-{ title: "Bibi Blocksberg - Hexen gibt es doch", series: "Bibi Blocksberg", tonieId: "01-0012", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0012.png" },
-{ title: "Janosch - Oh, wie schön ist Panama", series: "Janosch", tonieId: "01-0001", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0001.png" },
-{ title: "Die Olchis auf Geburtstagsreise", series: "Die Olchis", tonieId: "01-0020", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0020.png" }
-];
-window.addEventListener('DOMContentLoaded', async () => {
-loadCache();
-updateDetailDropdownOptions();
-await fetchDB();
-setupSearch();
-setupUpload();
-resetEditor();
-renderSheet();
-checkUrlParams();
-});
-function openHelpModal() { document.getElementById('helpModal').classList.add('active'); }
-function closeHelpModal() { document.getElementById('helpModal').classList.remove('active'); }
-function setTopPreset(val) { DOM.eTop.value = val; updatePreview(); }
-function setBg(color) { DOM.eBg.value = color; updatePreview(); }
-function pickRandomTonie() {
-if(toniesDB.length === 0) return;
-const randomItem = toniesDB[Math.floor(Math.random() * toniesDB.length)];
-loadEditor({ imgUrl: randomItem.pic, series: randomItem.series||'', title: randomItem.title||'', tonieId: randomItem.tonieId||'' }, state.editingIndex);
-}
-function calcFontSize(text, isTagId = false) {
-if (!text) return 16;
-if (isTagId) return 6; // Tiny for Tag ID
-const maxCharsFor16px = 22;
-if (text.length <= maxCharsFor16px) return 16;
-let size = Math.floor(16 * (maxCharsFor16px / text.length));
-return Math.max(8, size);
-}
-function loadCache() {
-try {
-const cache = JSON.parse(localStorage.getItem('TonieCacheV20.4'));
-if (cache) {
-state.labels = (cache.labels || []).map(l => l ? { ...l } : null);
-if(cache.formatType) state.formatType = cache.formatType;
-if(cache.formatDetail) state.formatDetail = cache.formatDetail;
-if(cache.favorites) favorites = cache.favorites;
-DOM.formatTypeSelect.value = state.formatType;
-}
-} catch(e) {}
-}
-function fnSaveCache() {
-try {
-localStorage.setItem('TonieCacheV20.4', JSON.stringify({
-labels: state.labels,
-formatType: state.formatType,
-formatDetail: state.formatDetail,
-favorites: favorites
-}));
-} catch(e) {}
-};
-function checkUrlParams() {
-const params = new URLSearchParams(window.location.search);
-const title = params.get('title');
-const series = params.get('series');
-const id = params.get('id');
-if (title || series || id) {
-setTimeout(() => {
-const found = toniesDB.find(t =>
-(id && t.tonieId === id) ||
-(title && t.title && t.title.toLowerCase().includes(title.toLowerCase()))
-);
-if (found) {
-loadEditor({ imgUrl: found.pic, series: found.series || series || '', title: found.title || title || '', tonieId: found.tonieId || id || '' }, null);
-} else if (title || series) {
-loadEditor({ imgUrl: '', series: series || '', title: title || '', tonieId: id || '' }, null);
-}
-}, 600);
-}
-}
-function toggleFavorite(e, item) {
-e.stopPropagation();
-const index = favorites.findIndex(f => f.pic === item.pic);
-if (index > -1) favorites.splice(index, 1);
-else favorites.push(item);
-fnSaveCache();
-renderSearch(toniesDB.slice(0, 12));
-renderFavorites();
-}
-function updateDetailDropdownOptions() {
-const type = DOM.formatTypeSelect.value;
-state.formatType = type;
-DOM.formatDetailSelect.innerHTML = '';
-if (type === 'free') {
-DOM.cutlinesRow.style.display = 'flex';
-const opts = [
-{ val: '43', label: 'Münzkapsel Standard (43 mm)' },
-{ val: '40', label: 'Münzkapsel Klein (40 mm)' },
-{ val: '30', label: 'RFIDfriend Token (30 mm)' },
-{ val: '25', label: 'Micro DIY Token (25 mm)' }
-];
-opts.forEach(o => {
-const opt = document.createElement('option');
-opt.value = o.val; opt.textContent = o.label;
-if(state.formatDetail === o.val) opt.selected = true;
-DOM.formatDetailSelect.appendChild(opt);
-});
-if(!opts.some(o => o.val === state.formatDetail)) state.formatDetail = '43';
-} else {
-DOM.cutlinesRow.style.display = 'none';
-const opts = [
-{ val: 'l3415', label: 'Avery Zweckform L3415-10 (40 mm)' },
-{ val: '6223', label: 'Avery Zweckform 6223-10 (30 mm)' },
-{ val: 'p3413', label: 'Avery Zweckform P3413-25 (45 mm)' },
-{ val: 'p3414', label: 'Avery Zweckform P3414-50 (25 mm)' }
-];
-opts.forEach(o => {
-const opt = document.createElement('option');
-opt.value = o.val; opt.textContent = o.label;
-if(state.formatDetail === o.val) opt.selected = true;
-DOM.formatDetailSelect.appendChild(opt);
-});
-if(!opts.some(o => o.val === state.formatDetail)) state.formatDetail = 'l3415';
-}
-fnSaveCache();
-}
-function handleFormatTypeChange() {
-updateDetailDropdownOptions();
-renderSheet();
-}
-function handleFormatChange() {
-state.formatDetail = DOM.formatDetailSelect.value;
-fnSaveCache();
-renderSheet();
-}
-async function fetchDB() {
-DOM.status.textContent = "Lade Datenbank...";
-try {
-const controller = new AbortController();
-const timeoutId = setTimeout(() => controller.abort(), 4000);
-let res = await fetch('https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json', { signal: controller.signal });
-clearTimeout(timeoutId);
-if(!res.ok) throw new Error('Network response was not ok');
-const data = await res.json();
-toniesDB = data.filter(t => t.pic && !t.pic.includes('placeholder')).map(t => ({
-...t,
-tonieId: t.model || t.audioId || ''
-}));
-DOM.status.textContent = ⁠${toniesDB.length} Tonies bereit!⁠;
-DOM.status.style.color = "#10b981";
-renderSearch(toniesDB.slice(0, 12));
-renderFavorites();
-} catch (e) {
-console.warn('Fallback triggered due to network or timeout:', e);
-toniesDB = FALLBACK_DB;
-DOM.status.textContent = ⁠${toniesDB.length} Tonies (Offline-Modus)⁠;
-DOM.status.style.color = '#f59e0b';
-renderSearch(toniesDB);
-renderFavorites();
-}
-}
-function setupSearch() {
-let timer;
-DOM.searchInput.addEventListener('input', (e) => {
-clearTimeout(timer);
-const term = e.target.value.toLowerCase().trim();
-timer = setTimeout(() => {
-if (term.length < 2) { renderSearch(toniesDB.slice(0, 12)); return; }
-const results = toniesDB.filter(t =>
-(t.title && t.title.toLowerCase().includes(term)) ||
-(t.series && t.series.toLowerCase().includes(term)) ||
-(t.tonieId && t.tonieId.toLowerCase().includes(term))
-).slice(0, 30);
-DOM.status.textContent = ⁠${results.length} Treffer⁠;
-renderSearch(results);
-}, 300);
-});
-}
-function renderSearch(items) {
-DOM.grid.innerHTML = items.length === 0 ? '<div style="grid-column: 1/-1; text-align:center; padding:16px;">Nichts gefunden.</div>' : '';
-items.forEach(item => {
-const el = document.createElement('div'); el.className = 'search-item';
-if (state.quickStampItem && state.quickStampItem.imgUrl === item.pic) el.classList.add('selected');
-const isFav = favorites.some(f => f.pic === item.pic);
-el.innerHTML = ⁠<div class="fav-star ${isFav ? 'active' : ''}" onclick="toggleFavorite(event, ${escapeItem(item)})" title="Favorit">★</div> <img src="${item.pic}" loading="lazy"> <span>${item.series ? item.series + '<br>' : ''}${item.title||''}</span>⁠;
-el.onclick = () => loadEditor({ imgUrl: item.pic, series: item.series||'', title: item.title||'', tonieId: item.tonieId||'' }, state.editingIndex);
-el.oncontextmenu = (ev) => { ev.preventDefault(); activateQuickStamp({ imgUrl: item.pic, series: item.series||'', title: item.title||'', tonieId: item.tonieId||'' }); };
-DOM.grid.appendChild(el);
-});
-}
-function escapeItem(item) {
-return JSON.stringify(item).replace(/"/g, '"');
-}
-function renderFavorites() {
-DOM.favsGrid.innerHTML = favorites.length === 0 ? '<div style="grid-column: 1/-1; text-align:center; padding:16px; color:var(--text-muted);">Keine Favoriten.</div>' : '';
-favorites.forEach(item => {
-const el = document.createElement('div'); el.className = 'search-item';
-el.innerHTML = ⁠<div class="fav-star active" onclick="toggleFavorite(event, ${escapeItem(item)})">★</div> <img src="${item.pic}" loading="lazy"> <span>${item.series ? item.series + '<br>' : ''}${item.title||''}</span>⁠;
-el.onclick = () => loadEditor({ imgUrl: item.pic, series: item.series||'', title: item.title||'', tonieId: item.tonieId||'' }, state.editingIndex);
-DOM.favsGrid.appendChild(el);
-});
-}
-function activateQuickStamp(item) {
-state.quickStampItem = item;
-DOM.stampBanner.style.display = 'flex';
-renderSearch(toniesDB.slice(0, 12));
-}
-function cancelQuickStamp() {
-state.quickStampItem = null;
-DOM.stampBanner.style.display = 'none';
-renderSearch(toniesDB.slice(0, 12));
-}
-function importBulkIds() {
-const raw = document.getElementById('bulkInputIds').value;
-if(!raw) return alert('Bitte IDs eingeben.');
-const ids = raw.split(/[\s,]+/).filter(id => id.trim().length > 0);
-let addedCount = 0;
-ids.forEach(id => {
-const found = toniesDB.find(t => t.tonieId && t.tonieId.toLowerCase() === id.toLowerCase());
-if(found) {
-const firstEmpty = state.labels.findIndex(l => l === null);
-let cleanTitle = found.title || '';
-let cleanSeries = found.series || '';
-if (cleanTitle.toLowerCase().startsWith(cleanSeries.toLowerCase() + ' - ')) {
-cleanTitle = cleanTitle.substring(cleanSeries.length + 3);
-}
-const itemData = {
-imgUrl: found.pic,
-series: cleanSeries,
-title: cleanTitle,
-tonieId: found.tonieId || '',
-zoom: 100, rot: 0, bleed: 0, printId: false, bg: '#ffffff', textCol: '#111111'
-};
-if(firstEmpty !== -1) state.labels[firstEmpty] = itemData;
-else state.labels.push(itemData);
-addedCount++;
-}
-});
-fnSaveCache(); renderSheet();
-alert(⁠${addedCount} von ${ids.length} Tonies platziert!⁠);
-document.getElementById('bulkInputIds').value = '';
-}
-function switchSourceTab(tab) {
-document.getElementById('tab-tonie').classList.remove('active');
-document.getElementById('tab-favs').classList.remove('active');
-document.getElementById('tab-upload').classList.remove('active');
-document.getElementById('view-tonie').classList.add('hidden');
-document.getElementById('view-favs').classList.add('hidden');
-document.getElementById('view-upload').classList.add('hidden');
-document.getElementById(⁠tab-${tab}⁠).classList.add('active');
-document.getElementById(⁠view-${tab}⁠).classList.remove('hidden');
-if(tab === 'favs') renderFavorites();
-}
-function setupUpload() {
-DOM.fileInput.addEventListener('change', (e) => {
-const file = e.target.files[0]; if (!file) return;
-const reader = new FileReader();
-reader.onload = (evt) => {
-loadEditor({ imgUrl: evt.target.result, series: 'Eigener', title: file.name.split('.')[0], tonieId: '' }, state.editingIndex);
-};
-reader.readAsDataURL(file); DOM.fileInput.value = '';
-});
-}
-function switchMode(mode) {
-document.getElementById('mode-simple').classList.remove('active'); document.getElementById('mode-pro').classList.remove('active');
-document.getElementById(⁠mode-${mode}⁠).classList.add('active');
-mode === 'pro' ? document.getElementById('proPanel').classList.remove('hidden') : document.getElementById('proPanel').classList.add('hidden');
-}
-function loadEditor(data, index = null) {
-let cleanSeries = data.series || '';
-let cleanTitle = data.title || '';
-if (cleanTitle.toLowerCase().startsWith(cleanSeries.toLowerCase() + ' - ')) {
-cleanTitle = cleanTitle.substring(cleanSeries.length + 3);
-}
-state.currentEdit = {
-imgUrl: data.imgUrl, series: cleanSeries, title: cleanTitle, tonieId: data.tonieId || '',
-zoom: data.zoom || 100, rot: data.rot || 0, bleed: data.bleed || 0,
-printId: data.printId || false, bg: data.bg || '#ffffff', textCol: data.textCol || '#111111'
-};
-state.editingIndex = index;
-DOM.eTop.value = state.currentEdit.series; DOM.eBot.value = state.currentEdit.title;
-DOM.eZoom.value = state.currentEdit.zoom; DOM.eRot.value = state.currentEdit.rot;
-DOM.eBleed.value = state.currentEdit.bleed; DOM.checkPrintId.checked = state.currentEdit.printId;
-DOM.eBg.value = state.currentEdit.bg; DOM.eTextCol.value = state.currentEdit.textCol;
-DOM.btnSave.style.pointerEvents = 'auto';
-if (state.currentEdit.tonieId) {
-DOM.editorIdBadge.style.display = 'block';
-DOM.editorIdBadge.textContent = ⁠ID: ${state.currentEdit.tonieId}⁠;
-DOM.btnSendId.classList.remove('hidden');
-} else {
-DOM.editorIdBadge.style.display = 'none';
-DOM.btnSendId.classList.add('hidden');
-}
-if (index !== null && state.labels[index]) {
-DOM.btnSave.textContent = '💾 Ändern'; DOM.btnSave.style.background = '#3b82f6';
-DOM.btnDel.classList.remove('hidden'); DOM.btnCan.classList.remove('hidden'); DOM.btnBatch.classList.add('hidden');
-} else {
-DOM.btnSave.textContent = index !== null ? ⁠➕ An Pos ${index+1}⁠ : '➕ Auf den Bogen';
-DOM.btnSave.style.background = '#10b981';
-DOM.btnDel.classList.add('hidden'); DOM.btnCan.classList.remove('hidden'); DOM.btnBatch.classList.add('hidden');
-}
-DOM.pCircle.classList.remove('empty'); DOM.pSvg.style.display = 'block';
-updatePreview();
-document.getElementById('editorCard').scrollIntoView({behavior: 'smooth', block: 'start'});
-}
-function updatePreview() {
-if (!state.currentEdit) return; const c = state.currentEdit;
-c.series = DOM.eTop.value; c.title = DOM.eBot.value;
-c.zoom = parseInt(DOM.eZoom.value); c.rot = parseInt(DOM.eRot.value);
-c.bleed = parseInt(DOM.eBleed.value); c.printId = DOM.checkPrintId.checked;
-c.bg = DOM.eBg.value; c.textCol = DOM.eTextCol.value;
-DOM.vZoom.textContent = c.zoom + '%'; DOM.vRot.textContent = c.rot + '°'; DOM.vBleed.textContent = c.bleed + 'px';
-if (c.imgUrl) DOM.pImage.style.backgroundImage = ⁠url('${c.imgUrl}')⁠;
-else DOM.pImage.style.backgroundImage = 'none';
-DOM.pImage.style.backgroundColor = c.bg; DOM.pImage.style.backgroundSize = ⁠${c.zoom}%⁠;
-DOM.pImage.style.transform = ⁠rotate(${c.rot}deg)⁠;
-DOM.pCircle.style.padding = ⁠${c.bleed}px⁠;
-DOM.pTextTop.textContent = c.series;
-DOM.pTextBot.textContent = c.title;
-DOM.pTextId.textContent = c.tonieId ? ⁠ID: ${c.tonieId}⁠ : '';
-const sTop = calcFontSize(c.series);
-const sBot = calcFontSize(c.title);
-const sId = 6;
-DOM.pTextTopNode.setAttribute('font-size', sTop + 'px');
-DOM.pTextTopNode.setAttribute('stroke-width', (sTop * 0.25) + 'px');
-DOM.pTextTopNode.setAttribute('fill', c.textCol);
-DOM.pTextBotNode.setAttribute('font-size', sBot + 'px');
-DOM.pTextBotNode.setAttribute('stroke-width', (sBot * 0.25) + 'px');
-DOM.pTextBotNode.setAttribute('fill', c.textCol);
-DOM.pTextIdNode.setAttribute('font-size', sId + 'px');
-}
-function resetEditor() {
-state.currentEdit = null; state.editingIndex = null;
-DOM.pCircle.classList.add('empty'); DOM.pImage.style.backgroundImage = 'none'; DOM.pImage.style.backgroundColor = 'transparent';
-DOM.pCircle.style.padding = '0px';
-DOM.pSvg.style.display = 'none'; DOM.eTop.value = ''; DOM.eBot.value = '';
-DOM.editorIdBadge.style.display = 'none'; DOM.btnSendId.classList.add('hidden');
-DOM.btnSave.textContent = 'Wähle zuerst ein Motiv'; DOM.btnSave.style.background = '#94a3b8'; DOM.btnSave.style.pointerEvents = 'none';
-DOM.btnDel.classList.add('hidden'); DOM.btnCan.classList.add('hidden'); DOM.btnBatch.classList.add('hidden');
-renderSheet();
-}
-function saveToSheet() {
-if (!state.currentEdit) return;
-if (state.editingIndex !== null) state.labels[state.editingIndex] = { ...state.currentEdit };
-else {
-const firstEmpty = state.labels.findIndex(l => l === null);
-if (firstEmpty !== -1) state.labels[firstEmpty] = { ...state.currentEdit };
-else state.labels.push({ ...state.currentEdit });
-}
-fnSaveCache(); renderSheet(); resetEditor();
-document.querySelector('.print-section').scrollIntoView({behavior: 'smooth', block: 'start'});
-}
-function fillEntireSheet() {
-if (!state.currentEdit) return;
-const specs = getGridSpecs(); let count = 0;
-while (state.labels.length < specs.maxSlots) state.labels.push(null);
-for(let i=0; i<specs.maxSlots; i++) {
-if (!state.labels[i]) { state.labels[i] = { ...state.currentEdit }; count++; }
-}
-if(count > 0) { fnSaveCache(); renderSheet(); resetEditor(); alert(⁠${count} Etiketten hinzugefügt!⁠); }
-else alert('Bogen ist voll.');
-}
-function deleteLabel() {
-if (state.editingIndex !== null) {
-state.labels[state.editingIndex] = null;
-while(state.labels.length > 0 && state.labels[state.labels.length - 1] === null) state.labels.pop();
-fnSaveCache(); renderSheet(); resetEditor();
-}
-}
-function clearSheet() {
-if(confirm('Bist du sicher?')) { state.labels = []; fnSaveCache(); renderSheet(); resetEditor(); }
-}
-function exportProject() {
-const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({
-labels: state.labels, formatType: state.formatType, formatDetail: state.formatDetail
-}));
-const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", "tonie_projekt.json");
-dl.click();
-}
-function importProject(e) {
-const file = e.target.files[0]; if(!file) return;
-const reader = new FileReader();
-reader.onload = (evt) => {
-try {
-const data = JSON.parse(evt.target.result);
-if(data.labels) state.labels = data.labels;
-if(data.formatType) { state.formatType = data.formatType; DOM.formatTypeSelect.value = state.formatType; updateDetailDropdownOptions(); }
-if(data.formatDetail) { state.formatDetail = data.formatDetail; DOM.formatDetailSelect.value = data.formatDetail; }
-fnSaveCache(); renderSheet(); alert("Projekt geladen!");
-} catch(err) { alert('Fehler.'); }
-e.target.value = '';
-};
-reader.readAsText(file);
-}
-function getGridSpecs() {
-const isAvery = state.formatType === 'avery';
-let diamMm = 43; let maxSlots = 24;
-if (state.formatType === 'free') diamMm = parseInt(state.formatDetail);
-else {
-if (state.formatDetail === 'l3415') diamMm = 40;
-else if (state.formatDetail === '6223') diamMm = 30;
-else if (state.formatDetail === 'p3413') diamMm = 45;
-else if (state.formatDetail === 'p3414') diamMm = 25;
-}
-const pxPerMm = 794 / 210; const diamPx = diamMm * pxPerMm;
-if (!isAvery) {
-const cols = Math.floor((794 - 112 + 30) / (diamPx + 30));
-const rows = Math.floor((1123 - 112 + 30) / (diamPx + 30));
-maxSlots = Math.max(1, cols * rows);
-} else {
-if (state.formatDetail === 'l3415') maxSlots = 24;
-else if (state.formatDetail === '6223') maxSlots = 48;
-else if (state.formatDetail === 'p3413') maxSlots = 15;
-else if (state.formatDetail === 'p3414') maxSlots = 54;
-}
-return { isAvery, diamPx, maxSlots };
-}
-function renderSheet() {
-DOM.sGrid.innerHTML = ''; const specs = getGridSpecs();
-DOM.sGrid.className = specs.isAvery ? 'grid-avery' : 'sheet-grid';
-let renderArray = [...state.labels];
-while (renderArray.length < specs.maxSlots) renderArray.push(null);
-if (renderArray.length > specs.maxSlots) renderArray = renderArray.slice(0, specs.maxSlots);
-renderArray.forEach((data, i) => {
-const slot = document.createElement('div');
-slot.className = ⁠label-slot ${data ? 'filled' : 'empty'}⁠;
-slot.style.width = ⁠${specs.diamPx}px⁠; slot.style.height = ⁠${specs.diamPx}px⁠;
-slot.ondragover = (e) => { e.preventDefault(); slot.classList.add('drag-over'); };
-slot.ondragleave = () => { slot.classList.remove('drag-over'); };
-slot.ondrop = (e) => {
-e.preventDefault(); slot.classList.remove('drag-over');
-const draggedIdx = e.dataTransfer.getData('text/plain');
-if (draggedIdx !== "") {
-const idx = parseInt(draggedIdx);
-const temp = state.labels[idx]; state.labels[idx] = state.labels[i]; state.labels[i] = temp;
-while(state.labels.length > 0 && state.labels[state.labels.length - 1] === null) state.labels.pop();
-fnSaveCache(); renderSheet();
-} else if (state.quickStampItem) {
-while (state.labels.length <= i) state.labels.push(null);
-state.labels[i] = { ...state.quickStampItem, zoom: 100, rot: 0, bleed: 0, printId: false, bg: '#ffffff', textCol: '#111111' };
-fnSaveCache(); renderSheet();
-}
-};
-slot.draggable = true;
-slot.ondragstart = (e) => {
-if (data) e.dataTransfer.setData('text/plain', i);
-else if (state.quickStampItem) e.dataTransfer.setData('text/plain', '');
-else e.preventDefault();
-};
-if (data) {
-slot.style.backgroundColor = data.bg;
-if (data.imgUrl) {
-const imgWrap = document.createElement('div');
-imgWrap.style.position = 'absolute'; imgWrap.style.width = '100%'; imgWrap.style.height = '100%';
-imgWrap.style.backgroundImage = ⁠url('${data.imgUrl}')⁠; imgWrap.style.backgroundRepeat = 'no-repeat';
-imgWrap.style.backgroundPosition = 'center';
-imgWrap.style.backgroundSize = ⁠${data.zoom}%⁠; imgWrap.style.transform = ⁠rotate(${data.rot}deg)⁠;
-imgWrap.style.pointerEvents = 'none'; slot.appendChild(imgWrap);
-}
-if(data.series || data.title) {
-const sTop = calcFontSize(data.series);
-const sBot = calcFontSize(data.title);
-const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-svg.setAttribute('viewBox', '0 0 200 200');
-svg.style.position = 'absolute'; svg.style.width = '100%'; svg.style.height = '100%'; svg.style.pointerEvents = 'none';
-let svgContent = ⁠<path id="ptT${i}" d="M 18,100 A 82,82 0 0,1 182,100" fill="none"/> <text font-family="-apple-system, sans-serif" font-weight="800" font-size="${sTop}px" stroke="#fff" stroke-width="${sTop * 0.25}px" paint-order="stroke fill" letter-spacing="0.5px" fill="${data.textCol || '#111'}"> <textPath href="#ptT${i}" startOffset="50%" text-anchor="middle" dominant-baseline="auto">${data.series}</textPath> </text> <path id="ptB${i}" d="M 18,100 A 82,82 0 0,0 182,100" fill="none"/> <text font-family="-apple-system, sans-serif" font-weight="800" font-size="${sBot}px" stroke="#fff" stroke-width="${sBot * 0.25}px" paint-order="stroke fill" letter-spacing="0.5px" fill="${data.textCol || '#111'}"> <textPath href="#ptB${i}" startOffset="50%" text-anchor="middle" dominant-baseline="hanging">${data.title}</textPath> </text>⁠;
-if (data.printId && data.tonieId) {
-svgContent += ⁠<path id="ptId${i}" d="M 35,145 A 70,70 0 0,0 165,145" fill="none"/> <text font-family="monospace" font-weight="700" font-size="6px" fill="#64748b"> <textPath href="#ptId${i}" startOffset="50%" text-anchor="middle">ID: ${data.tonieId}</textPath> </text>⁠;
-}
-svg.innerHTML = svgContent;
-slot.appendChild(svg);
-}
-slot.onclick = () => {
-if (state.quickStampItem) {
-while (state.labels.length <= i) state.labels.push(null);
-state.labels[i] = { ...state.quickStampItem, zoom: 100, rot: 0, bleed: 0, printId: false, bg: '#ffffff', textCol: '#111111' };
-fnSaveCache(); renderSheet();
-} else loadEditor(data, i);
-};
-} else {
-slot.onclick = () => {
-if (state.quickStampItem) {
-while (state.labels.length <= i) state.labels.push(null);
-state.labels[i] = { ...state.quickStampItem, zoom: 100, rot: 0, bleed: 0, printId: false, bg: '#ffffff', textCol: '#111111' };
-fnSaveCache(); renderSheet();
-} else {
-state.editingIndex = i;
-document.querySelectorAll('.label-slot').forEach(s => s.style.borderColor = ''); slot.style.borderColor = 'var(--primary)';
-document.querySelector('.app-layout').scrollIntoView({behavior: 'smooth', block: 'start'}); DOM.searchInput.focus();
-}
-};
-}
-DOM.sGrid.appendChild(slot);
-});
-}
-async function exportPNG() {
-const activeLabels = state.labels.filter(l => l !== null);
-if(activeLabels.length === 0) return alert('Bogen ist leer!');
-const drawCutlines = state.formatType === 'free' && document.getElementById('checkCutlines').checked;
-const canvas = document.getElementById('exportCanvas');
-canvas.width = 2480; canvas.height = 3508;
-const ctx = canvas.getContext('2d');
-ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-const isAvery = state.formatType === 'avery';
-let diamMm = 43;
-if (state.formatType === 'free') diamMm = parseInt(state.formatDetail);
-else {
-if (state.formatDetail === 'l3415') diamMm = 40;
-else if (state.formatDetail === '6223') diamMm = 30;
-else if (state.formatDetail === 'p3413') diamMm = 45;
-else if (state.formatDetail === 'p3414') diamMm = 25;
-}
-const pxPerMm = 2480 / 210; const diamPx = diamMm * pxPerMm; const radius = diamPx / 2;
-let startX = 56 * (794/210) * (2480/794); let startY = startX;
-let gapX = 30 * (794/210) * (2480/794); let gapY = gapX;
-let cols = Math.floor((2480 - (startX*2))/(diamPx+gapX)) + 1;
-if(isAvery) {
-startX = 9.5 * pxPerMm; startY = 13.5 * pxPerMm; gapX = 11.5 * pxPerMm; gapY = 11.5 * pxPerMm; cols = 4;
-if (state.formatDetail === '6223') cols = 5;
-if (state.formatDetail === 'p3413') cols = 3;
-if (state.formatDetail === 'p3414') cols = 6;
-}
-const cache = {};
-for(let lbl of activeLabels) {
-if(lbl.imgUrl && !cache[lbl.imgUrl]) {
-cache[lbl.imgUrl] = await new Promise(res => {
-const img = new Image(); img.crossOrigin = 'anonymous';
-img.onload = () => res(img); img.onerror = () => res(null); img.src = lbl.imgUrl;
-});
-}
-}
-const specs = getGridSpecs();
-for(let i=0; i < state.labels.length; i++) {
-const lbl = state.labels[i];
-if (!lbl) continue; if (i >= specs.maxSlots) break;
-const cx = startX + (i % cols) * (diamPx + gapX) + radius;
-const cy = startY + Math.floor(i / cols) * (diamPx + gapY) + radius;
-if(drawCutlines) {
-ctx.save(); ctx.beginPath(); ctx.setLineDash([15,15]); ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=3;
-ctx.arc(cx, cy, radius, 0, Math.PI*2); ctx.stroke(); ctx.restore();
-}
-ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI*2); ctx.clip();
-ctx.fillStyle = lbl.bg; ctx.fill();
-if(lbl.imgUrl) {
-const img = cache[lbl.imgUrl];
-if(img) {
-ctx.save(); ctx.translate(cx, cy); ctx.rotate(lbl.rot * Math.PI / 180);
-const scale = lbl.zoom / 100; const w = diamPx * scale;
-ctx.drawImage(img, -w/2, -w/2, w, w);
-ctx.restore();
-}
-}
-ctx.restore();
-const drawArcText = (text, isTop, isTiny = false) => {
-if(!text) return;
-ctx.save();
-const baseFSize = isTiny ? Math.round(7 * (pxPerMm/3.78)) : Math.round(19 * (pxPerMm/3.78));
-let fSize = baseFSize;
-const maxChars = isTiny ? 15 : 22;
-if(text.length > maxChars) {
-fSize = Math.floor(baseFSize * (maxChars / text.length));
-fSize = Math.max(Math.round(baseFSize * 0.5), fSize);
-}
-ctx.font = isTiny ? ⁠700 ${fSize}px monospace⁠ : ⁠800 ${fSize}px sans-serif⁠;
-ctx.textAlign = "center"; ctx.textBaseline = isTop ? "bottom" : "top";
-ctx.fillStyle = isTiny ? "#64748b" : (lbl.textCol || "#111");
-if(!isTiny) {
-ctx.strokeStyle = "rgba(255,255,255,0.95)"; ctx.lineWidth = fSize * 0.25; ctx.lineJoin = "round";
-}
-const textRadius = isTiny ? radius * 0.70 : radius * 0.82;
-const totalAngle = (ctx.measureText(text).width + (text.length * 5)) / textRadius;
-let currentAngle = isTop ? (-Math.PI/2 - totalAngle/2) : (Math.PI/2 - totalAngle/2);
-for(let char of text) {
-const charAngle = (ctx.measureText(char).width + 5) / textRadius;
-const drawAngle = currentAngle + charAngle / 2;
-ctx.save(); ctx.translate(cx + Math.cos(drawAngle) * textRadius, cy + Math.sin(drawAngle) * textRadius);
-let rotation = drawAngle + Math.PI / 2; if(!isTop) rotation += Math.PI;
-ctx.rotate(rotation);
-if(!isTiny) ctx.strokeText(char, 0, 0);
-ctx.fillText(char, 0, 0); ctx.restore();
-currentAngle += charAngle;
-}
-ctx.restore();
-};
-drawArcText(lbl.series, true);
-drawArcText(lbl.title, false);
-if (lbl.printId && lbl.tonieId) {
-drawArcText(⁠ID: ${lbl.tonieId}⁠, false, true);
-}
-}
-const link = document.createElement('a'); link.download = 'Tonie-Bogen.png';
-link.href = canvas.toDataURL('image/png'); link.click();
-}
-function shareCurrentDesign() {
-if (!state.currentEdit) { alert("Bitte wähle zuerst ein Motiv aus."); return; }
-let titleParam = state.currentEdit.title ? encodeURIComponent(state.currentEdit.title) : '';
-let seriesParam = state.currentEdit.series ? encodeURIComponent(state.currentEdit.series) : '';
-let idParam = state.currentEdit.tonieId ? encodeURIComponent(state.currentEdit.tonieId) : '';
-let shareUrl = ⁠${window.location.origin}${window.location.pathname}⁠;
-const params = [];
-if (titleParam) params.push(⁠title=${titleParam}⁠);
-if (seriesParam) params.push(⁠series=${seriesParam}⁠);
-if (idParam) params.push(⁠id=${idParam}⁠);
-if (params.length > 0) shareUrl += ⁠?${params.join('&')}⁠;
-if (navigator.share) {
-navigator.share({ title: 'Tonie Tag Cover', url: shareUrl }).catch(() => copyToClipboard(shareUrl));
-} else copyToClipboard(shareUrl);
-}
-function sendIdToApp() {
-if (!state.currentEdit || !state.currentEdit.tonieId) { alert("Keine ID vorhanden."); return; }
-const id = state.currentEdit.tonieId;
-if (navigator.share) navigator.share({ title: 'Tonie ID', text: id }).catch(() => copyToClipboard(id));
-else copyToClipboard(id);
-}
-function copyToClipboard(text) {
-navigator.clipboard.writeText(text).then(() => alert("Kopiert:\n\n" + text));
-}
+    const FALLBACK_DB = [
+        { title: "Conni kommt in den Kindergarten", series: "Conni", tonieId: "01-0010", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0010.png" },
+        { title: "Bibi Blocksberg - Hexen gibt es doch", series: "Bibi Blocksberg", tonieId: "01-0012", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0012.png" },
+        { title: "Janosch - Oh, wie schön ist Panama", series: "Janosch", tonieId: "01-0001", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0001.png" },
+        { title: "Die Olchis auf Geburtstagsreise", series: "Die Olchis", tonieId: "01-0020", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0020.png" },
+        { title: "Bibi und Tina - Das Konzert", series: "Bibi & Tina", tonieId: "01-0005", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0005.png" },
+        { title: "Die drei ??? Kids - Panik im Paradies", series: "Die drei ???", tonieId: "01-0030", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0030.png" }
+    ];
+
+    let toniesDB = [...FALLBACK_DB];
+    let favorites = [];
+    let state = {
+        labels: [], 
+        currentEdit: null,
+        editingIndex: null, 
+        formatType: 'free', 
+        formatDetail: '43',
+        quickStampItem: null
+    };
+
+    const DOM = {
+        searchInput: document.getElementById('searchInput'),
+        status: document.getElementById('statusText'),
+        grid: document.getElementById('searchGrid'),
+        favsGrid: document.getElementById('favsGrid'),
+        fileInput: document.getElementById('customFileInput'),
+        stampBanner: document.getElementById('stampBanner'),
+        
+        pCircle: document.getElementById('previewCircle'),
+        pImage: document.getElementById('previewImage'),
+        pSvg: document.getElementById('previewSvg'),
+        pTextTopNode: document.getElementById('previewTextTopNode'),
+        pTextBotNode: document.getElementById('previewTextBotNode'),
+        pTextIdNode: document.getElementById('previewTextIdNode'),
+        pTextTop: document.getElementById('previewTextTop'),
+        pTextBot: document.getElementById('previewTextBot'),
+        pTextId: document.getElementById('previewTextId'),
+        
+        eTop: document.getElementById('editTop'), eBot: document.getElementById('editBot'),
+        eZoom: document.getElementById('editZoom'), eRot: document.getElementById('editRot'),
+        eBleed: document.getElementById('editBleed'), checkPrintId: document.getElementById('checkPrintId'),
+        eBg: document.getElementById('editBg'), eTextCol: document.getElementById('editTextColor'),
+        vZoom: document.getElementById('valZoom'), vRot: document.getElementById('valRot'), vBleed: document.getElementById('valBleed'),
+        
+        btnSave: document.getElementById('btnSave'),
+        btnBatch: document.getElementById('btnBatch'),
+        btnDel: document.getElementById('btnDelete'),
+        btnCan: document.getElementById('btnCancel'),
+        
+        btnSendId: document.getElementById('btnSendId'),
+        editorIdBadge: document.getElementById('editorIdBadge'),
+        
+        formatTypeSelect: document.getElementById('formatTypeSelect'),
+        formatDetailSelect: document.getElementById('formatDetailSelect'),
+        cutlinesRow: document.getElementById('cutlinesRow'),
+        sGrid: document.getElementById('sheetGrid')
+    };
+
+    window.addEventListener('DOMContentLoaded', () => {
+        loadCache();
+        updateDetailDropdownOptions();
+        
+        // Render instantly using fallback so UI is never blocked
+        DOM.status.textContent = `${toniesDB.length} Tonies bereit (Instant-Modus)`;
+        DOM.status.style.color = "#10b981";
+        renderSearch(toniesDB);
+        renderFavorites();
+        setupSearch();
+        setupUpload();
+        resetEditor(); 
+        renderSheet();
+        checkUrlParams();
+
+        // Fetch full DB silently in background
+        fetchFullDBInBackground();
+    });
+
+    async function fetchFullDBInBackground() {
+        try {
+            const res = await fetch('https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json');
+            if(!res.ok) return;
+            const data = await res.json();
+            const parsed = data.filter(t => t.pic && !t.pic.includes('placeholder')).map(t => ({
+                ...t,
+                tonieId: t.model || t.audioId || '' 
+            }));
+            if(parsed.length > 0) {
+                toniesDB = parsed;
+                DOM.status.textContent = `${toniesDB.length} Tonies geladen!`;
+                renderSearch(toniesDB.slice(0, 30));
+            }
+        } catch(e) {
+            console.warn("Background fetch skipped, using instant DB.");
+        }
+    }
+
+    function openHelpModal() { document.getElementById('helpModal').classList.add('active'); }
+    function closeHelpModal() { document.getElementById('helpModal').classList.remove('active'); }
+    function setTopPreset(val) { DOM.eTop.value = val; updatePreview(); }
+    function setBg(color) { DOM.eBg.value = color; updatePreview(); }
+
+    function pickRandomTonie() {
+        if(toniesDB.length === 0) return;
+        const randomItem = toniesDB[Math.floor(Math.random() * toniesDB.length)];
+        loadEditor({ imgUrl: randomItem.pic, series: randomItem.series||'', title: randomItem.title||'', tonieId: randomItem.tonieId||'' }, state.editingIndex);
+    }
+
+    function calcFontSize(text, isTagId = false) {
+        if (!text) return 16;
+        if (isTagId) return 6;
+        const maxCharsFor16px = 22;
+        if (text.length <= maxCharsFor16px) return 16;
+        let size = Math.floor(16 * (maxCharsFor16px / text.length));
+        return Math.max(8, size);
+    }
+
+    function loadCache() {
+        try {
+            const cache = JSON.parse(localStorage.getItem('TonieCacheV20.5'));
+            if (cache) {
+                state.labels = (cache.labels || []).map(l => l ? { ...l } : null);
+                if(cache.formatType) state.formatType = cache.formatType;
+                if(cache.formatDetail) state.formatDetail = cache.formatDetail;
+                if(cache.favorites) favorites = cache.favorites;
+                DOM.formatTypeSelect.value = state.formatType;
+            }
+        } catch(e) {}
+    }
+    
+    function fnSaveCache() { 
+        try {
+            localStorage.setItem('TonieCacheV20.5', JSON.stringify({ 
+                labels: state.labels, 
+                formatType: state.formatType,
+                formatDetail: state.formatDetail,
+                favorites: favorites
+            })); 
+        } catch(e) {}
+    };
+
+    function checkUrlParams() {
+        const params = new URLSearchParams(window.location.search);
+        const title = params.get('title');
+        const series = params.get('series');
+        const id = params.get('id');
+        if (title || series || id) {
+            setTimeout(() => {
+                const found = toniesDB.find(t => 
+                    (id && t.tonieId === id) || 
+                    (title && t.title && t.title.toLowerCase().includes(title.toLowerCase()))
+                );
+                if (found) {
+                    loadEditor({ imgUrl: found.pic, series: found.series || series || '', title: found.title || title || '', tonieId: found.tonieId || id || '' }, null);
+                } else if (title || series) {
+                    loadEditor({ imgUrl: '', series: series || '', title: title || '', tonieId: id || '' }, null);
+                }
+            }, 300);
+        }
+    }
+
+    function toggleFavorite(e, item) {
+        e.stopPropagation();
+        const index = favorites.findIndex(f => f.pic === item.pic);
+        if (index > -1) favorites.splice(index, 1);
+        else favorites.push(item);
+        fnSaveCache();
+        renderSearch(toniesDB.slice(0, 30));
+        renderFavorites();
+    }
+
+    function updateDetailDropdownOptions() {
+        const type = DOM.formatTypeSelect.value;
+        state.formatType = type;
+        DOM.formatDetailSelect.innerHTML = '';
+
+        if (type === 'free') {
+            DOM.cutlinesRow.style.display = 'flex';
+            const opts = [
+                { val: '43', label: 'Münzkapsel Standard (43 mm)' },
+                { val: '40', label: 'Münzkapsel Klein (40 mm)' },
+                { val: '30', label: 'RFIDfriend Token (30 mm)' },
+                { val: '25', label: 'Micro DIY Token (25 mm)' }
+            ];
+            opts.forEach(o => {
+                const opt = document.createElement('option');
+                opt.value = o.val; opt.textContent = o.label;
+                if(state.formatDetail === o.val) opt.selected = true;
+                DOM.formatDetailSelect.appendChild(opt);
+            });
+            if(!opts.some(o => o.val === state.formatDetail)) state.formatDetail = '43';
+        } else {
+            DOM.cutlinesRow.style.display = 'none';
+            const opts = [
+                { val: 'l3415', label: 'Avery Zweckform L3415-10 (40 mm)' },
+                { val: '6223', label: 'Avery Zweckform 6223-10 (30 mm)' },
+                { val: 'p3413', label: 'Avery Zweckform P3413-25 (45 mm)' },
+                { val: 'p3414', label: 'Avery Zweckform P3414-50 (25 mm)' }
+            ];
+            opts.forEach(o => {
+                const opt = document.createElement('option');
+                opt.value = o.val; opt.textContent = o.label;
+                if(state.formatDetail === o.val) opt.selected = true;
+                DOM.formatDetailSelect.appendChild(opt);
+            });
+            if(!opts.some(o => o.val === state.formatDetail)) state.formatDetail = 'l3415';
+        }
+        fnSaveCache();
+    }
+
+    function handleFormatTypeChange() {
+        updateDetailDropdownOptions();
+        renderSheet();
+    }
+
+    function handleFormatChange() {
+        state.formatDetail = DOM.formatDetailSelect.value;
+        fnSaveCache();
+        renderSheet();
+    }
+
+    function setupSearch() {
+        let timer;
+        DOM.searchInput.addEventListener('input', (e) => {
+            clearTimeout(timer);
+            const term = e.target.value.toLowerCase().trim();
+            timer = setTimeout(() => {
+                if (term.length === 0) { renderSearch(toniesDB.slice(0, 30)); return; }
+                const results = toniesDB.filter(t => 
+                    (t.title && t.title.toLowerCase().includes(term)) || 
+                    (t.series && t.series.toLowerCase().includes(term)) ||
+                    (t.tonieId && t.tonieId.toLowerCase().includes(term))
+                ).slice(0, 40);
+                DOM.status.textContent = `${results.length} Treffer`;
+                renderSearch(results);
+            }, 150);
+        });
+    }
+
+    function renderSearch(items) {
+        DOM.grid.innerHTML = items.length === 0 ? '<div style="grid-column: 1/-1; text-align:center; padding:16px;">Nichts gefunden.</div>' : '';
+        items.forEach(item => {
+            const el = document.createElement('div'); el.className = 'search-item';
+            if (state.quickStampItem && state.quickStampItem.imgUrl === item.pic) el.classList.add('selected');
+            const isFav = favorites.some(f => f.pic === item.pic);
+            
+            el.innerHTML = `
+                <div class="fav-star ${isFav ? 'active' : ''}" onclick="toggleFavorite(event, ${escapeItem(item)})" title="Favorit">★</div>
+                <img src="${item.pic}" loading="lazy">
+                <span>${item.series ? item.series + '<br>' : ''}${item.title||''}</span>
+            `;
+            el.onclick = () => loadEditor({ imgUrl: item.pic, series: item.series||'', title: item.title||'', tonieId: item.tonieId||'' }, state.editingIndex);
+            el.oncontextmenu = (ev) => { ev.preventDefault(); activateQuickStamp({ imgUrl: item.pic, series: item.series||'', title: item.title||'', tonieId: item.tonieId||'' }); };
+            DOM.grid.appendChild(el);
+        });
+    }
+
+    function escapeItem(item) {
+        return JSON.stringify(item).replace(/"/g, '&quot;');
+    }
+
+    function renderFavorites() {
+        DOM.favsGrid.innerHTML = favorites.length === 0 ? '<div style="grid-column: 1/-1; text-align:center; padding:16px; color:var(--text-muted);">Keine Favoriten.</div>' : '';
+        favorites.forEach(item => {
+            const el = document.createElement('div'); el.className = 'search-item';
+            el.innerHTML = `
+                <div class="fav-star active" onclick="toggleFavorite(event, ${escapeItem(item)})">★</div>
+                <img src="${item.pic}" loading="lazy">
+                <span>${item.series ? item.series + '<br>' : ''}${item.title||''}</span>
+            `;
+            el.onclick = () => loadEditor({ imgUrl: item.pic, series: item.series||'', title: item.title||'', tonieId: item.tonieId||'' }, state.editingIndex);
+            DOM.favsGrid.appendChild(el);
+        });
+    }
+
+    function activateQuickStamp(item) {
+        state.quickStampItem = item;
+        DOM.stampBanner.style.display = 'flex';
+        renderSearch(toniesDB.slice(0, 30));
+    }
+
+    function cancelQuickStamp() {
+        state.quickStampItem = null;
+        DOM.stampBanner.style.display = 'none';
+        renderSearch(toniesDB.slice(0, 30));
+    }
+
+    function importBulkIds() {
+        const raw = document.getElementById('bulkInputIds').value;
+        if(!raw) return alert('Bitte IDs eingeben.');
+        const ids = raw.split(/[\s,]+/).filter(id => id.trim().length > 0);
+        let addedCount = 0;
+        
+        ids.forEach(id => {
+            const found = toniesDB.find(t => t.tonieId && t.tonieId.toLowerCase() === id.toLowerCase());
+            if(found) {
+                const firstEmpty = state.labels.findIndex(l => l === null);
+                let cleanTitle = found.title || '';
+                let cleanSeries = found.series || '';
+                if (cleanTitle.toLowerCase().startsWith(cleanSeries.toLowerCase() + ' - ')) {
+                    cleanTitle = cleanTitle.substring(cleanSeries.length + 3);
+                }
+                const itemData = {
+                    imgUrl: found.pic,
+                    series: cleanSeries,
+                    title: cleanTitle,
+                    tonieId: found.tonieId || '',
+                    zoom: 100, rot: 0, bleed: 0, printId: false, bg: '#ffffff', textCol: '#111111'
+                };
+                if(firstEmpty !== -1) state.labels[firstEmpty] = itemData;
+                else state.labels.push(itemData);
+                addedCount++;
+            }
+        });
+        fnSaveCache(); renderSheet();
+        alert(`${addedCount} von ${ids.length} Tonies platziert!`);
+        document.getElementById('bulkInputIds').value = '';
+    }
+
+    function switchSourceTab(tab) {
+        document.getElementById('tab-tonie').classList.remove('active'); 
+        document.getElementById('tab-favs').classList.remove('active'); 
+        document.getElementById('tab-upload').classList.remove('active');
+        document.getElementById('view-tonie').classList.add('hidden'); 
+        document.getElementById('view-favs').classList.add('hidden'); 
+        document.getElementById('view-upload').classList.add('hidden');
+        
+        document.getElementById(`tab-${tab}`).classList.add('active'); 
+        document.getElementById(`view-${tab}`).classList.remove('hidden');
+        if(tab === 'favs') renderFavorites();
+    }
+
+    function setupUpload() {
+        DOM.fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0]; if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                loadEditor({ imgUrl: evt.target.result, series: 'Eigener', title: file.name.split('.')[0], tonieId: '' }, state.editingIndex);
+            };
+            reader.readAsDataURL(file); DOM.fileInput.value = '';
+        });
+    }
+
+    function switchMode(mode) {
+        document.getElementById('mode-simple').classList.remove('active'); document.getElementById('mode-pro').classList.remove('active');
+        document.getElementById(`mode-${mode}`).classList.add('active');
+        mode === 'pro' ? document.getElementById('proPanel').classList.remove('hidden') : document.getElementById('proPanel').classList.add('hidden');
+    }
+
+    function loadEditor(data, index = null) {
+        let cleanSeries = data.series || '';
+        let cleanTitle = data.title || '';
+        if (cleanTitle.toLowerCase().startsWith(cleanSeries.toLowerCase() + ' - ')) {
+            cleanTitle = cleanTitle.substring(cleanSeries.length + 3);
+        }
+
+        state.currentEdit = {
+            imgUrl: data.imgUrl, series: cleanSeries, title: cleanTitle, tonieId: data.tonieId || '',
+            zoom: data.zoom || 100, rot: data.rot || 0, bleed: data.bleed || 0, 
+            printId: data.printId || false, bg: data.bg || '#ffffff', textCol: data.textCol || '#111111'
+        };
+        state.editingIndex = index;
+
+        DOM.eTop.value = state.currentEdit.series; DOM.eBot.value = state.currentEdit.title;
+        DOM.eZoom.value = state.currentEdit.zoom; DOM.eRot.value = state.currentEdit.rot;
+        DOM.eBleed.value = state.currentEdit.bleed; DOM.checkPrintId.checked = state.currentEdit.printId;
+        DOM.eBg.value = state.currentEdit.bg; DOM.eTextCol.value = state.currentEdit.textCol;
+
+        DOM.btnSave.style.pointerEvents = 'auto';
+        if (state.currentEdit.tonieId) {
+            DOM.editorIdBadge.style.display = 'block';
+            DOM.editorIdBadge.textContent = `ID: ${state.currentEdit.tonieId}`;
+            DOM.btnSendId.classList.remove('hidden');
+        } else {
+            DOM.editorIdBadge.style.display = 'none';
+            DOM.btnSendId.classList.add('hidden');
+        }
+        
+        if (index !== null && state.labels[index]) {
+            DOM.btnSave.textContent = '💾 Ändern'; DOM.btnSave.style.background = '#3b82f6'; 
+            DOM.btnDel.classList.remove('hidden'); DOM.btnCan.classList.remove('hidden'); DOM.btnBatch.classList.add('hidden');
+        } else {
+            DOM.btnSave.textContent = index !== null ? `➕ An Pos ${index+1}` : '➕ Auf den Bogen';
+            DOM.btnSave.style.background = '#10b981'; 
+            DOM.btnDel.classList.add('hidden'); DOM.btnCan.classList.remove('hidden'); DOM.btnBatch.classList.add('hidden');
+        }
+
+        DOM.pCircle.classList.remove('empty'); DOM.pSvg.style.display = 'block';
+        updatePreview();
+        document.getElementById('editorCard').scrollIntoView({behavior: 'smooth', block: 'start'});
+    }
+
+    function updatePreview() {
+        if (!state.currentEdit) return; const c = state.currentEdit;
+        c.series = DOM.eTop.value; c.title = DOM.eBot.value;
+        c.zoom = parseInt(DOM.eZoom.value); c.rot = parseInt(DOM.eRot.value);
+        c.bleed = parseInt(DOM.eBleed.value); c.printId = DOM.checkPrintId.checked;
+        c.bg = DOM.eBg.value; c.textCol = DOM.eTextCol.value;
+
+        DOM.vZoom.textContent = c.zoom + '%'; DOM.vRot.textContent = c.rot + '°'; DOM.vBleed.textContent = c.bleed + 'px';
+        
+        if (c.imgUrl) DOM.pImage.style.backgroundImage = `url('${c.imgUrl}')`;
+        else DOM.pImage.style.backgroundImage = 'none';
+        
+        DOM.pImage.style.backgroundColor = c.bg; DOM.pImage.style.backgroundSize = `${c.zoom}%`;
+        DOM.pImage.style.transform = `rotate(${c.rot}deg)`;
+        DOM.pCircle.style.padding = `${c.bleed}px`;
+
+        DOM.pTextTop.textContent = c.series; 
+        DOM.pTextBot.textContent = c.title;
+        DOM.pTextId.textContent = c.tonieId ? `ID: ${c.tonieId}` : '';
+        
+        const sTop = calcFontSize(c.series);
+        const sBot = calcFontSize(c.title);
+        const sId = 6;
+        
+        DOM.pTextTopNode.setAttribute('font-size', sTop + 'px');
+        DOM.pTextTopNode.setAttribute('stroke-width', (sTop * 0.25) + 'px');
+        DOM.pTextTopNode.setAttribute('fill', c.textCol);
+
+        DOM.pTextBotNode.setAttribute('font-size', sBot + 'px');
+        DOM.pTextBotNode.setAttribute('stroke-width', (sBot * 0.25) + 'px');
+        DOM.pTextBotNode.setAttribute('fill', c.textCol);
+
+        DOM.pTextIdNode.setAttribute('font-size', sId + 'px');
+    }
+
+    function resetEditor() {
+        state.currentEdit = null; state.editingIndex = null;
+        DOM.pCircle.classList.add('empty'); DOM.pImage.style.backgroundImage = 'none'; DOM.pImage.style.backgroundColor = 'transparent';
+        DOM.pCircle.style.padding = '0px';
+        DOM.pSvg.style.display = 'none'; DOM.eTop.value = ''; DOM.eBot.value = '';
+        DOM.editorIdBadge.style.display = 'none'; DOM.btnSendId.classList.add('hidden');
+        DOM.btnSave.textContent = 'Wähle zuerst ein Motiv'; DOM.btnSave.style.background = '#94a3b8'; DOM.btnSave.style.pointerEvents = 'none';
+        DOM.btnDel.classList.add('hidden'); DOM.btnCan.classList.add('hidden'); DOM.btnBatch.classList.add('hidden');
+        renderSheet();
+    }
+
+    function saveToSheet() {
+        if (!state.currentEdit) return;
+        if (state.editingIndex !== null) state.labels[state.editingIndex] = { ...state.currentEdit };
+        else {
+            const firstEmpty = state.labels.findIndex(l => l === null);
+            if (firstEmpty !== -1) state.labels[firstEmpty] = { ...state.currentEdit };
+            else state.labels.push({ ...state.currentEdit }); 
+        }
+        fnSaveCache(); renderSheet(); resetEditor();
+        document.querySelector('.print-section').scrollIntoView({behavior: 'smooth', block: 'start'});
+    }
+    
+    function fillEntireSheet() {
+        if (!state.currentEdit) return;
+        const specs = getGridSpecs(); let count = 0;
+        while (state.labels.length < specs.maxSlots) state.labels.push(null);
+        for(let i=0; i<specs.maxSlots; i++) {
+            if (!state.labels[i]) { state.labels[i] = { ...state.currentEdit }; count++; }
+        }
+        if(count > 0) { fnSaveCache(); renderSheet(); resetEditor(); alert(`${count} Etiketten hinzugefügt!`); } 
+        else alert('Bogen ist voll.');
+    }
+
+    function deleteLabel() {
+        if (state.editingIndex !== null) {
+            state.labels[state.editingIndex] = null;
+            while(state.labels.length > 0 && state.labels[state.labels.length - 1] === null) state.labels.pop();
+            fnSaveCache(); renderSheet(); resetEditor();
+        }
+    }
+
+    function clearSheet() {
+        if(confirm('Bist du sicher?')) { state.labels = []; fnSaveCache(); renderSheet(); resetEditor(); }
+    }
+
+    function exportProject() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ 
+            labels: state.labels, formatType: state.formatType, formatDetail: state.formatDetail
+        }));
+        const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", "tonie_projekt.json");
+        dl.click();
+    }
+
+    function importProject(e) {
+        const file = e.target.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+            try {
+                const data = JSON.parse(evt.target.result);
+                if(data.labels) state.labels = data.labels;
+                if(data.formatType) { state.formatType = data.formatType; DOM.formatTypeSelect.value = state.formatType; updateDetailDropdownOptions(); }
+                if(data.formatDetail) { state.formatDetail = data.formatDetail; DOM.formatDetailSelect.value = data.formatDetail; }
+                fnSaveCache(); renderSheet(); alert("Projekt geladen!");
+            } catch(err) { alert('Fehler.'); }
+            e.target.value = ''; 
+        };
+        reader.readAsText(file);
+    }
+
+    function getGridSpecs() {
+        const isAvery = state.formatType === 'avery';
+        let diamMm = 43; let maxSlots = 24;
+        if (state.formatType === 'free') diamMm = parseInt(state.formatDetail);
+        else {
+            if (state.formatDetail === 'l3415') diamMm = 40;
+            else if (state.formatDetail === '6223') diamMm = 30;
+            else if (state.formatDetail === 'p3413') diamMm = 45;
+            else if (state.formatDetail === 'p3414') diamMm = 25;
+        }
+        const pxPerMm = 794 / 210; const diamPx = diamMm * pxPerMm;
+        if (!isAvery) {
+            const cols = Math.floor((794 - 112 + 30) / (diamPx + 30));
+            const rows = Math.floor((1123 - 112 + 30) / (diamPx + 30));
+            maxSlots = Math.max(1, cols * rows);
+        } else {
+            if (state.formatDetail === 'l3415') maxSlots = 24;
+            else if (state.formatDetail === '6223') maxSlots = 48;
+            else if (state.formatDetail === 'p3413') maxSlots = 15;
+            else if (state.formatDetail === 'p3414') maxSlots = 54;
+        }
+        return { isAvery, diamPx, maxSlots };
+    }
+
+    function renderSheet() {
+        DOM.sGrid.innerHTML = ''; const specs = getGridSpecs();
+        DOM.sGrid.className = specs.isAvery ? 'grid-avery' : 'sheet-grid';
+        let renderArray = [...state.labels];
+        while (renderArray.length < specs.maxSlots) renderArray.push(null);
+        if (renderArray.length > specs.maxSlots) renderArray = renderArray.slice(0, specs.maxSlots);
+
+        renderArray.forEach((data, i) => {
+            const slot = document.createElement('div');
+            slot.className = `label-slot ${data ? 'filled' : 'empty'}`;
+            slot.style.width = `${specs.diamPx}px`; slot.style.height = `${specs.diamPx}px`;
+
+            slot.ondragover = (e) => { e.preventDefault(); slot.classList.add('drag-over'); };
+            slot.ondragleave = () => { slot.classList.remove('drag-over'); };
+            slot.ondrop = (e) => {
+                e.preventDefault(); slot.classList.remove('drag-over');
+                const draggedIdx = e.dataTransfer.getData('text/plain');
+                if (draggedIdx !== "") {
+                    const idx = parseInt(draggedIdx);
+                    const temp = state.labels[idx]; state.labels[idx] = state.labels[i]; state.labels[i] = temp;
+                    while(state.labels.length > 0 && state.labels[state.labels.length - 1] === null) state.labels.pop();
+                    fnSaveCache(); renderSheet();
+                } else if (state.quickStampItem) {
+                    while (state.labels.length <= i) state.labels.push(null);
+                    state.labels[i] = { ...state.quickStampItem, zoom: 100, rot: 0, bleed: 0, printId: false, bg: '#ffffff', textCol: '#111111' };
+                    fnSaveCache(); renderSheet();
+                }
+            };
+
+            slot.draggable = true;
+            slot.ondragstart = (e) => {
+                if (data) e.dataTransfer.setData('text/plain', i);
+                else if (state.quickStampItem) e.dataTransfer.setData('text/plain', '');
+                else e.preventDefault();
+            };
+
+            if (data) {
+                slot.style.backgroundColor = data.bg;
+                if (data.imgUrl) {
+                    const imgWrap = document.createElement('div');
+                    imgWrap.style.position = 'absolute'; imgWrap.style.width = '100%'; imgWrap.style.height = '100%';
+                    imgWrap.style.backgroundImage = `url('${data.imgUrl}')`; imgWrap.style.backgroundRepeat = 'no-repeat';
+                    imgWrap.style.backgroundPosition = 'center';
+                    imgWrap.style.backgroundSize = `${data.zoom}%`; imgWrap.style.transform = `rotate(${data.rot}deg)`;
+                    imgWrap.style.pointerEvents = 'none'; slot.appendChild(imgWrap);
+                }
+
+                if(data.series || data.title) {
+                    const sTop = calcFontSize(data.series);
+                    const sBot = calcFontSize(data.title);
+                    
+                    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                    svg.setAttribute('viewBox', '0 0 200 200');
+                    svg.style.position = 'absolute'; svg.style.width = '100%'; svg.style.height = '100%'; svg.style.pointerEvents = 'none';
+                    
+                    let svgContent = `
+                        <path id="ptT${i}" d="M 18,100 A 82,82 0 0,1 182,100" fill="none"/>
+                        <text font-family="-apple-system, sans-serif" font-weight="800" font-size="${sTop}px" stroke="#fff" stroke-width="${sTop * 0.25}px" paint-order="stroke fill" letter-spacing="0.5px" fill="${data.textCol || '#111'}">
+                            <textPath href="#ptT${i}" startOffset="50%" text-anchor="middle" dominant-baseline="auto">${data.series}</textPath>
+                        </text>
+                        <path id="ptB${i}" d="M 18,100 A 82,82 0 0,0 182,100" fill="none"/>
+                        <text font-family="-apple-system, sans-serif" font-weight="800" font-size="${sBot}px" stroke="#fff" stroke-width="${sBot * 0.25}px" paint-order="stroke fill" letter-spacing="0.5px" fill="${data.textCol || '#111'}">
+                            <textPath href="#ptB${i}" startOffset="50%" text-anchor="middle" dominant-baseline="hanging">${data.title}</textPath>
+                        </text>
+                    `;
+
+                    if (data.printId && data.tonieId) {
+                        svgContent += `
+                            <path id="ptId${i}" d="M 35,145 A 70,70 0 0,0 165,145" fill="none"/>
+                            <text font-family="monospace" font-weight="700" font-size="6px" fill="#64748b">
+                                <textPath href="#ptId${i}" startOffset="50%" text-anchor="middle">ID: ${data.tonieId}</textPath>
+                            </text>
+                        `;
+                    }
+                    svg.innerHTML = svgContent;
+                    slot.appendChild(svg);
+                }
+                slot.onclick = () => {
+                    if (state.quickStampItem) {
+                        while (state.labels.length <= i) state.labels.push(null);
+                        state.labels[i] = { ...state.quickStampItem, zoom: 100, rot: 0, bleed: 0, printId: false, bg: '#ffffff', textCol: '#111111' };
+                        fnSaveCache(); renderSheet();
+                    } else loadEditor(data, i);
+                };
+            } else {
+                slot.onclick = () => {
+                    if (state.quickStampItem) {
+                        while (state.labels.length <= i) state.labels.push(null);
+                        state.labels[i] = { ...state.quickStampItem, zoom: 100, rot: 0, bleed: 0, printId: false, bg: '#ffffff', textCol: '#111111' };
+                        fnSaveCache(); renderSheet();
+                    } else {
+                        state.editingIndex = i;
+                        document.querySelectorAll('.label-slot').forEach(s => s.style.borderColor = ''); slot.style.borderColor = 'var(--primary)';
+                        document.querySelector('.app-layout').scrollIntoView({behavior: 'smooth', block: 'start'}); DOM.searchInput.focus();
+                    }
+                };
+            }
+            DOM.sGrid.appendChild(slot);
+        });
+    }
+
+    async function exportPNG() {
+        const activeLabels = state.labels.filter(l => l !== null);
+        if(activeLabels.length === 0) return alert('Bogen ist leer!');
+        const drawCutlines = state.formatType === 'free' && document.getElementById('checkCutlines').checked;
+        const canvas = document.getElementById('exportCanvas');
+        canvas.width = 2480; canvas.height = 3508; 
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        const isAvery = state.formatType === 'avery';
+        let diamMm = 43;
+        if (state.formatType === 'free') diamMm = parseInt(state.formatDetail);
+        else {
+            if (state.formatDetail === 'l3415') diamMm = 40;
+            else if (state.formatDetail === '6223') diamMm = 30;
+            else if (state.formatDetail === 'p3413') diamMm = 45;
+            else if (state.formatDetail === 'p3414') diamMm = 25;
+        }
+
+        const pxPerMm = 2480 / 210; const diamPx = diamMm * pxPerMm; const radius = diamPx / 2;
+        let startX = 56 * (794/210) * (2480/794); let startY = startX;
+        let gapX = 30 * (794/210) * (2480/794); let gapY = gapX;
+        let cols = Math.floor((2480 - (startX*2))/(diamPx+gapX)) + 1; 
+        
+        if(isAvery) {
+            startX = 9.5 * pxPerMm; startY = 13.5 * pxPerMm; gapX = 11.5 * pxPerMm; gapY = 11.5 * pxPerMm; cols = 4;
+            if (state.formatDetail === '6223') cols = 5;
+            if (state.formatDetail === 'p3413') cols = 3;
+            if (state.formatDetail === 'p3414') cols = 6;
+        }
+
+        const cache = {};
+        for(let lbl of activeLabels) {
+            if(lbl.imgUrl && !cache[lbl.imgUrl]) {
+                cache[lbl.imgUrl] = await new Promise(res => {
+                    const img = new Image(); img.crossOrigin = 'anonymous';
+                    img.onload = () => res(img); img.onerror = () => res(null); img.src = lbl.imgUrl;
+                });
+            }
+        }
+
+        const specs = getGridSpecs();
+        for(let i=0; i < state.labels.length; i++) {
+            const lbl = state.labels[i];
+            if (!lbl) continue; if (i >= specs.maxSlots) break;
+            const cx = startX + (i % cols) * (diamPx + gapX) + radius;
+            const cy = startY + Math.floor(i / cols) * (diamPx + gapY) + radius;
+
+            if(drawCutlines) {
+                ctx.save(); ctx.beginPath(); ctx.setLineDash([15,15]); ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=3;
+                ctx.arc(cx, cy, radius, 0, Math.PI*2); ctx.stroke(); ctx.restore();
+            }
+
+            ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI*2); ctx.clip();
+            ctx.fillStyle = lbl.bg; ctx.fill();
+            if(lbl.imgUrl) {
+                const img = cache[lbl.imgUrl];
+                if(img) {
+                    ctx.save(); ctx.translate(cx, cy); ctx.rotate(lbl.rot * Math.PI / 180);
+                    const scale = lbl.zoom / 100; const w = diamPx * scale;
+                    ctx.drawImage(img, -w/2, -w/2, w, w);
+                    ctx.restore();
+                }
+            }
+            ctx.restore(); 
+
+            const drawArcText = (text, isTop, isTiny = false) => {
+                if(!text) return;
+                ctx.save(); 
+                const baseFSize = isTiny ? Math.round(7 * (pxPerMm/3.78)) : Math.round(19 * (pxPerMm/3.78)); 
+                let fSize = baseFSize;
+                const maxChars = isTiny ? 15 : 22;
+                if(text.length > maxChars) {
+                    fSize = Math.floor(baseFSize * (maxChars / text.length));
+                    fSize = Math.max(Math.round(baseFSize * 0.5), fSize);
+                }
+
+                ctx.font = isTiny ? `700 ${fSize}px monospace` : `800 ${fSize}px sans-serif`; 
+                ctx.textAlign = "center"; ctx.textBaseline = isTop ? "bottom" : "top"; 
+                ctx.fillStyle = isTiny ? "#64748b" : (lbl.textCol || "#111"); 
+                if(!isTiny) {
+                    ctx.strokeStyle = "rgba(255,255,255,0.95)"; ctx.lineWidth = fSize * 0.25; ctx.lineJoin = "round";
+                }
+                const textRadius = isTiny ? radius * 0.70 : radius * 0.82; 
+                const totalAngle = (ctx.measureText(text).width + (text.length * 5)) / textRadius; 
+                let currentAngle = isTop ? (-Math.PI/2 - totalAngle/2) : (Math.PI/2 - totalAngle/2);
+                
+                for(let char of text) {
+                    const charAngle = (ctx.measureText(char).width + 5) / textRadius;
+                    const drawAngle = currentAngle + charAngle / 2;
+                    ctx.save(); ctx.translate(cx + Math.cos(drawAngle) * textRadius, cy + Math.sin(drawAngle) * textRadius);
+                    let rotation = drawAngle + Math.PI / 2; if(!isTop) rotation += Math.PI; 
+                    ctx.rotate(rotation);
+                    if(!isTiny) ctx.strokeText(char, 0, 0);
+                    ctx.fillText(char, 0, 0); ctx.restore();
+                    currentAngle += charAngle;
+                }
+                ctx.restore();
+            };
+
+            drawArcText(lbl.series, true); 
+            drawArcText(lbl.title, false);
+            if (lbl.printId && lbl.tonieId) {
+                drawArcText(`ID: ${lbl.tonieId}`, false, true);
+            }
+        }
+        const link = document.createElement('a'); link.download = 'Tonie-Bogen.png';
+        link.href = canvas.toDataURL('image/png'); link.click();
+    }
+
+    function shareCurrentDesign() {
+        if (!state.currentEdit) { alert("Bitte wähle zuerst ein Motiv aus."); return; }
+        let titleParam = state.currentEdit.title ? encodeURIComponent(state.currentEdit.title) : '';
+        let seriesParam = state.currentEdit.series ? encodeURIComponent(state.currentEdit.series) : '';
+        let idParam = state.currentEdit.tonieId ? encodeURIComponent(state.currentEdit.tonieId) : '';
+        let shareUrl = `${window.location.origin}${window.location.pathname}`;
+        const params = [];
+        if (titleParam) params.push(`title=${titleParam}`);
+        if (seriesParam) params.push(`series=${seriesParam}`);
+        if (idParam) params.push(`id=${idParam}`);
+        if (params.length > 0) shareUrl += `?${params.join('&')}`;
+
+        if (navigator.share) {
+            navigator.share({ title: 'Tonie Tag Cover', url: shareUrl }).catch(() => copyToClipboard(shareUrl));
+        } else copyToClipboard(shareUrl);
+    }
+
+    function sendIdToApp() {
+        if (!state.currentEdit || !state.currentEdit.tonieId) { alert("Keine ID vorhanden."); return; }
+        const id = state.currentEdit.tonieId;
+        if (navigator.share) navigator.share({ title: 'Tonie ID', text: id }).catch(() => copyToClipboard(id));
+        else copyToClipboard(id);
+    }
+
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => alert("Kopiert:\n\n" + text));
+    }
 </script>
 </body>
 </html>
