@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Tonie & Tag Cover Hub (Master V22.2)</title>
+<title>Tonie & Tag Cover Hub (Master V22.2.1)</title>
 <style>
 :root {
 --primary: #f43f5e;
@@ -21,7 +21,7 @@
 }
 [data-theme="light"] {
 --bg-body: #f1f5f9;
---bg-card: rgba(255, 255, 255, 0.9);
+--bg-card: rgba(255, 255, 255, 0.95);
 --text-main: #0f172a;
 --text-muted: #64748b;
 --border: rgba(203, 213, 225, 0.9);
@@ -37,14 +37,15 @@ font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, A
 padding: 16px; padding-bottom: 90px; display: flex; flex-direction: column; align-items: center;
 min-height: 100vh; transition: background 0.3s, color 0.3s;
 }
-.top-bar { width: 100%; max-width: 1200px; display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-bottom: 12px; margin-top: 4px;}
+.top-bar { width: 100%; max-width: 1200px; display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-bottom: 8px; margin-top: 2px;}
 .top-btn { background: rgba(51, 65, 85, 0.6); color: #cbd5e1; padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; backdrop-filter: blur(8px); transition: 0.2s; text-decoration: none;}
+[data-theme="light"] .top-btn { background: rgba(226, 232, 240, 0.8); color: #334155; }
 .top-btn:hover { background: #475569; color: #fff; }
 .support-btn { color: #f59e0b; border-color: rgba(245, 158, 11, 0.4); }
 .support-btn:hover { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
 .header { text-align: center; margin-bottom: 24px; width: 100%; max-width: 1200px; display: flex; flex-direction: column; align-items: center; }
 .logo-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; position: relative;}
-.app-logo { width: 92px; height: 92px; flex-shrink: 0; filter: drop-shadow(0 6px 20px var(--primary-glow)); }
+.app-logo { width: 104px; height: 104px; flex-shrink: 0; filter: drop-shadow(0 6px 20px var(--primary-glow)); }
 .header h1 { color: var(--text-main); font-size: 26px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2; margin: 0; text-align: center; }
 .header h1 span { display: block; background: linear-gradient(135deg, var(--primary), #fb7185); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 28px; margin-top: 2px;}
 .header p { color: var(--text-muted); font-size: 13px; margin: 8px 0 0 0; text-align: center; max-width: 600px; font-weight: 500; padding: 0 16px; }
@@ -55,7 +56,7 @@ min-height: 100vh; transition: background 0.3s, color 0.3s;
 .column-2 { flex-grow: 1; min-width: 0; }
 .header h1 { font-size: 32px; }
 .header h1 span { font-size: 34px; }
-.app-logo { width: 104px; height: 104px; }
+.app-logo { width: 116px; height: 116px; }
 }
 .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow); width: 100%; box-sizing: border-box; backdrop-filter: blur(12px); transition: background 0.3s, border 0.3s; }
 .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 12px; flex-wrap: wrap; gap: 10px;}
@@ -69,6 +70,7 @@ input[type="text"]:focus, select:focus, textarea:focus { border-color: var(--pri
 .btn:hover { background: var(--primary-hover); transform: translateY(-1px); }
 .btn-secondary { background: var(--border); color: var(--text-main); border: 1px solid var(--border); box-shadow: none; }
 .btn-secondary:hover { background: #475569; color: #fff; }
+[data-theme="light"] .btn-secondary:hover { background: #cbd5e1; color: #0f172a; }
 .btn-sm { padding: 8px 12px; font-size: 13px; width: auto; border-radius: 8px; }
 .btn-success { background: #10b981; color: white; box-shadow: 0 4px 14px rgba(16, 185, 129, 0.3); }
 .btn-success:hover { background: #059669; }
