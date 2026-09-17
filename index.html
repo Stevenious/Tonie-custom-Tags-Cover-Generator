@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Tonie & Tag Cover Generator</title>
     <style>
-        /* === VARIABLES & RESET === */
         :root {
             --primary: #e30613;
             --primary-hover: #b8050f;
@@ -22,7 +21,7 @@
 
         *, *::before, *::after { box-sizing: border-box; }
         
-        html, body { width: 100%; overflow-x: hidden; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        html, body { width: 100vw; overflow-x: hidden; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
         body { 
             background-color: var(--bg-body); color: var(--text-main); line-height: 1.5; 
@@ -30,7 +29,6 @@
             padding: 16px; padding-bottom: 80px; display: flex; flex-direction: column; align-items: center; 
         }
 
-        /* === LAYOUT & HEADER === */
         .top-bar { width: 100%; max-width: 1200px; display: flex; justify-content: center; margin-bottom: 16px; margin-top: 8px;}
         .support-btn { background: #f59e0b; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3); transition: 0.2s;}
         .support-btn:hover { background: #d97706; transform: translateY(-1px); }
@@ -55,7 +53,6 @@
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #f3f4f6; padding-bottom: 12px; flex-wrap: wrap; gap: 12px;}
         .card-header h2 { font-size: 18px; font-weight: 700; color: #111; margin: 0;}
 
-        /* === BUTTONS & INPUTS === */
         input[type="text"], select { 
             width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: var(--radius-md); 
             font-size: 16px; outline: none; background: #f9fafb; color: var(--text-main); font-weight: 500; transition: 0.2s; box-sizing: border-box; 
@@ -79,12 +76,10 @@
         .checkbox-label { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; cursor: pointer; color: var(--text-main); font-size: 14px;}
         .checkbox-label input { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary);}
 
-        /* === TABS === */
         .tabs { display: flex; background: #f3f4f6; padding: 4px; border-radius: 12px; margin-bottom: 20px; }
         .tab { flex: 1; text-align: center; padding: 12px 10px; font-size: 14px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: 0.2s; }
         .tab.active { background: #fff; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
-        /* === SECTION 1: SEARCH === */
         .status-text { font-size: 14px; color: var(--text-muted); text-align: center; margin: 16px 0; font-weight: 600; }
         .search-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-height: 500px; overflow-y: auto; padding-right: 4px; }
         .search-grid::-webkit-scrollbar { width: 6px; }
@@ -93,6 +88,7 @@
 
         .search-item { border: 2px solid var(--border); border-radius: var(--radius-md); padding: 12px; text-align: center; cursor: pointer; transition: 0.2s; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 100%; box-sizing: border-box; overflow: hidden; position: relative;}
         .search-item:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .search-item.selected { border-color: var(--primary); background: #fef2f2; box-shadow: 0 0 0 2px var(--primary); }
         .search-item img { width: 100%; max-width: 120px; aspect-ratio: 1; object-fit: contain; margin-bottom: 12px; border-radius: 8px; }
         .search-item span { display: block; font-size: 12px; font-weight: 600; line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; width: 100%; text-overflow: ellipsis; margin-bottom: 4px;}
 
@@ -100,7 +96,6 @@
         .upload-box:hover { border-color: var(--primary); background: #f1f5f9; }
         .upload-box input { display: none; }
 
-        /* === SECTION 2: EDITOR === */
         .editor-layout { display: flex; flex-direction: column; gap: 32px; align-items: center; width: 100%; }
         @media(min-width: 600px) { .editor-layout { flex-direction: row; align-items: flex-start; } }
         
@@ -132,7 +127,6 @@
         input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
         input[type="color"]::-webkit-color-swatch { border: 2px solid var(--border); border-radius: 8px; }
 
-        /* === SECTION 3: SHEET === */
         .sheet-scale-wrapper { width: 100%; overflow: hidden; background: #cbd5e1; border-radius: var(--radius-lg); padding: 20px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.05); display: flex; justify-content: center; margin-top: 20px; box-sizing: border-box; }
         .a4-sheet { background: #fff; box-shadow: var(--shadow-lg); position: relative; width: 794px; height: 1123px; border-radius: 4px; flex-shrink: 0; transform-origin: top center; }
         @media(max-width: 800px) { .a4-sheet { zoom: 0.44; } .sheet-scale-wrapper { padding: 10px; } }
@@ -140,18 +134,17 @@
         .sheet-grid { display: flex; flex-wrap: wrap; gap: 30px; padding: 56px; align-content: flex-start; justify-content: flex-start; }
         .grid-avery { display: grid; grid-template-columns: repeat(4, 151px); grid-auto-rows: 151px; gap: 19px; justify-content: center; padding-top: 56px; }
 
-        .label-slot { position: relative; border-radius: 50%; border: 2px dashed #cbd5e1; overflow: hidden; cursor: pointer; display: flex; justify-content: center; align-items: center; background: transparent; transition: all 0.2s ease; }
+        .label-slot { position: relative; border-radius: 50%; border: 2px dashed #cbd5e1; overflow: hidden; cursor: pointer; display: flex; justify-content: center; align-items: center; background: transparent; transition: all 0.2s ease; user-select: none; }
         .label-slot.empty { background: #f8fafc; }
         .label-slot.empty:hover { border-color: var(--primary); background: #fff; }
         .label-slot.empty::after { content: '+'; font-size: 32px; color: #94a3b8; font-weight: 300; transition: color 0.2s; }
         .label-slot.empty:hover::after { color: var(--primary); }
         .label-slot.filled { border-color: transparent; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         .label-slot.filled:hover { transform: scale(1.03); z-index: 5; box-shadow: 0 8px 16px rgba(0,0,0,0.15); }
-        .label-slot.filled:hover::before { content: '✏️ Bearbeiten'; position: absolute; z-index: 20; background: rgba(0,0,0,0.75); color: #fff; font-size: 14px; padding: 8px 14px; border-radius: 20px; font-weight: 600; backdrop-filter: blur(4px); }
+        .label-slot.drag-over { border: 3px solid var(--primary) !important; background: #fef2f2 !important; transform: scale(1.05); }
 
         .project-actions { display: flex; gap: 12px; margin-top: 20px; justify-content: center; flex-wrap: wrap;}
         
-        /* === HARDWARE RECOMMENDATIONS === */
         .hardware-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 16px; width: 100%; }
         @media(min-width: 600px) { .hardware-grid { grid-template-columns: 1fr 1fr; } }
         .hw-item { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); text-decoration: none; color: var(--text-main); transition: 0.2s; width: 100%; box-sizing: border-box; overflow: hidden; }
@@ -161,6 +154,8 @@
         .hw-item div strong { display: block; font-size: 14px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
         .hw-item div span { font-size: 12px; color: var(--text-muted); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; display: block; }
 
+        .stamp-indicator { background: #fef2f2; border: 2px solid var(--primary); color: var(--primary); padding: 8px 12px; border-radius: var(--radius-md); font-size: 13px; font-weight: 700; text-align: center; margin-bottom: 12px; display: none; align-items: center; justify-content: space-between; }
+
         .hidden { display: none !important; }
         
         footer { text-align: center; margin-top: 48px; font-size: 13px; color: var(--text-muted); width: 100%; max-width: 1200px; padding-bottom: 20px; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; }
@@ -168,7 +163,6 @@
         footer a:hover { color: var(--primary-hover); text-decoration: underline;}
         .community-links { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-top: 12px; }
 
-        /* === PRINT STYLES (BULLETPROOF V13.1) === */
         @media print {
             @page { size: A4 portrait; margin: 0 !important; }
             body * { display: none !important; }
@@ -185,7 +179,6 @@
 </head>
 <body>
 
-<!-- Support Top Bar -->
 <div class="top-bar">
     <a href="https://www.paypal.com/donate/?business=stephan%40genial.ms&item_name=Tonie+Cover+Generator+Support&currency_code=EUR" class="support-btn" target="_blank" title="Spendiere dem Entwickler einen Kaffee">☕ Projekt unterstützen</a>
 </div>
@@ -215,6 +208,12 @@
             <div id="view-tonie">
                 <input type="text" id="searchInput" placeholder="Titel, Serie oder ID suchen..." autocomplete="off">
                 <div class="status-text" id="statusText">Verbinde zur Datenbank...</div>
+                
+                <div id="stampBanner" class="stamp-indicator">
+                    <span>⚡ Klicke einen Bogen-Kreis zum Stempeln!</span>
+                    <button class="btn btn-secondary btn-sm" onclick="cancelQuickStamp()" style="padding: 2px 8px; font-size:11px;">Beenden</button>
+                </div>
+
                 <div class="search-grid" id="searchGrid"></div>
             </div>
 
@@ -238,7 +237,6 @@
                 <h2>Etikett gestalten</h2>
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                     <button class="btn btn-secondary btn-sm" id="btnShare" onclick="shareCurrentDesign()" title="Link zu diesem Design teilen">📤 Teilen</button>
-                    <!-- NEW: Send ID to App Button -->
                     <button class="btn btn-action btn-sm hidden" id="btnSendId" onclick="sendIdToApp()" title="ID an Schreib-App übergeben">📲 ID senden</button>
                     <button class="btn btn-secondary btn-sm hidden" id="btnCancel" onclick="resetEditor()">Abbrechen</button>
                 </div>
@@ -246,7 +244,6 @@
 
             <div class="editor-layout">
                 <div class="preview-container">
-                    <!-- NEW: Display Tonie ID in Editor -->
                     <div id="editorIdBadge" class="editor-id-badge" title="Tonie ID">ID: --</div>
                     <div class="circle-canvas empty" id="previewCircle">
                         <div id="previewImage" class="bg-layer"></div>
@@ -276,7 +273,6 @@
                     <label>Text Unten (z.B. Titel)</label>
                     <input type="text" id="editBot" placeholder="z.B. Der Superpapagei" oninput="updatePreview()">
 
-                    <!-- Pro Panel -->
                     <div id="proPanel" class="pro-panel hidden">
                         <div class="slider-row">
                             <label><span>🔍 Zoom</span> <span id="valZoom">100%</span></label>
@@ -323,23 +319,24 @@
                 <button class="btn btn-secondary btn-sm" onclick="clearSheet()" style="color: #e30613; border-color: #fca5a5;">Bogen leeren</button>
             </div>
             
-            <label>Gewünschtes Etiketten-Format</label>
-            <select id="formatSelect" onchange="handleFormatChange()">
-                <option value="43">Münzkapsel Standard (43 mm)</option>
-                <option value="40">Münzkapsel Klein (40 mm)</option>
-                <option value="30">RFIDfriend Token (30 mm)</option>
-                <option value="25">Micro DIY Token (25 mm)</option>
-                <option value="avery-40">Avery Zweckform L3415-10 (40mm, 24 Stk)</option>
+            <label>Art des Drucks</label>
+            <select id="formatTypeSelect" onchange="handleFormatTypeChange()">
+                <option value="free">✂️ Freies Raster (Zum Ausschneiden mit Schnittmarken)</option>
+                <option value="avery">🏷️ Avery Zweckform (Vorgestanzte Etikettenbögen)</option>
+            </select>
+
+            <label style="margin-top: 12px;">Gewünschtes Format / Produkt</label>
+            <select id="formatDetailSelect" onchange="handleFormatChange()">
+                <!-- Populated dynamically -->
             </select>
             
-            <!-- Project Management -->
             <div class="project-actions">
                 <button class="btn btn-secondary btn-sm" onclick="exportProject()">💾 Projekt speichern (.json)</button>
                 <button class="btn btn-secondary btn-sm" onclick="document.getElementById('importFile').click()">📂 Projekt laden</button>
                 <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importProject(event)">
             </div>
 
-            <p style="text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 16px;">Tipp: Wische auf dem Bogen, um alles zu sehen. Klicke auf leere Kreise zum Befüllen.</p>
+            <p style="text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 16px;">Tipp: Klicke auf leere Kreise oder halte/ziehe Motive, um Etiketten gezielt zu platzieren.</p>
 
             <div class="sheet-scale-wrapper" id="sheetWrapper">
                 <div class="a4-sheet" id="printSheet">
@@ -347,9 +344,8 @@
                 </div>
             </div>
 
-            <!-- Export -->
             <div style="margin-top: 24px;">
-                <label class="checkbox-label" style="margin-bottom: 16px;">
+                <label class="checkbox-label" style="margin-bottom: 16px;" id="cutlinesRow">
                     <input type="checkbox" id="checkCutlines" checked> ✂️ Schnittmarken (gestrichelter Rand) beim PNG-Export zeichnen
                 </label>
                 <div style="display: flex; flex-direction: column; gap: 16px;">
@@ -366,13 +362,13 @@
             </div>
             <p style="font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 16px;">Empfohlenes Zubehör für deine selbstgemachten Tokens.</p>
             <div class="hardware-grid">
-                <a href="https://www.amazon.de/s?k=Avery+Zweckform+L3415-10" target="_blank" rel="noopener noreferrer" class="hw-item">
+                <a href="https://www.amazon.de/s?k=Avery+Zweckform" target="_blank" rel="noopener noreferrer" class="hw-item">
                     <div class="icon">🏷️</div>
-                    <div><strong>Avery L3415-10 Etiketten</strong><span>24 Stück pro Bogen (40mm)</span></div>
+                    <div><strong>Avery Zweckform Etiketten</strong><span>Passende Bögen für 25mm - 45mm</span></div>
                 </a>
-                <a href="https://www.amazon.de/s?k=M%C3%BCnzkapseln+40mm" target="_blank" rel="noopener noreferrer" class="hw-item">
+                <a href="https://www.amazon.de/s?k=M%C3%BCnzkapseln" target="_blank" rel="noopener noreferrer" class="hw-item">
                     <div class="icon">🪙</div>
-                    <div><strong>Münzkapseln (40mm)</strong><span>Perfekt für 3D-Druck Sockel</span></div>
+                    <div><strong>Münzkapseln (25-45mm)</strong><span>Perfekt für 3D-Druck Sockel</span></div>
                 </a>
                 <a href="https://www.amazon.de/s?k=Neodym+Magnete+10x3mm" target="_blank" rel="noopener noreferrer" class="hw-item">
                     <div class="icon">🧲</div>
@@ -388,7 +384,7 @@
 </div>
 
 <footer>
-    <p>Tonie Cover Generator • Version 15.1<br>Open Source unter MIT-Lizenz.</p>
+    <p>Tonie Cover Generator • Version 18.0<br>Open Source unter MIT-Lizenz.</p>
     <div class="community-links">
         <a href="https://github.com/toniebox-reverse-engineering" target="_blank">Team RevvoX</a>
         <a href="https://gt-blog.de/custom-tags-for-toniebox/" target="_blank">Gambrius Blog</a>
@@ -404,7 +400,9 @@
         labels: [], 
         currentEdit: null,
         editingIndex: null, 
-        format: '43'
+        formatType: 'free', 
+        formatDetail: '43',
+        quickStampItem: null
     };
 
     const DOM = {
@@ -412,6 +410,7 @@
         status: document.getElementById('statusText'),
         grid: document.getElementById('searchGrid'),
         fileInput: document.getElementById('customFileInput'),
+        stampBanner: document.getElementById('stampBanner'),
         
         pCircle: document.getElementById('previewCircle'),
         pImage: document.getElementById('previewImage'),
@@ -435,18 +434,20 @@
         btnSendId: document.getElementById('btnSendId'),
         editorIdBadge: document.getElementById('editorIdBadge'),
         
-        fSelect: document.getElementById('formatSelect'),
+        formatTypeSelect: document.getElementById('formatTypeSelect'),
+        formatDetailSelect: document.getElementById('formatDetailSelect'),
+        cutlinesRow: document.getElementById('cutlinesRow'),
         sGrid: document.getElementById('sheetGrid')
     };
 
     window.addEventListener('DOMContentLoaded', async () => {
         loadCache();
+        updateDetailDropdownOptions();
         await fetchDB();
         setupSearch();
         setupUpload();
         resetEditor(); 
         renderSheet();
-        
         checkUrlParams();
     });
 
@@ -460,15 +461,78 @@
 
     function loadCache() {
         try {
-            const cache = JSON.parse(localStorage.getItem('TonieCacheV12'));
+            const cache = JSON.parse(localStorage.getItem('TonieCacheV18'));
             if (cache) {
                 state.labels = cache.labels || [];
-                if(cache.format) { state.format = cache.format; DOM.fSelect.value = cache.format; }
+                if(cache.formatType) state.formatType = cache.formatType;
+                if(cache.formatDetail) state.formatDetail = cache.formatDetail;
+                DOM.formatTypeSelect.value = state.formatType;
             }
         } catch(e) {}
     }
     
-    function saveCache() { localStorage.setItem('TonieCacheV12', JSON.stringify({ labels: state.labels, format: state.format })); }
+    fnSaveCache = function() { 
+        localStorage.setItem('TonieCacheV18', JSON.stringify({ 
+            labels: state.labels, 
+            formatType: state.formatType,
+            formatDetail: state.formatDetail
+        })); 
+    };
+
+    function updateDetailDropdownOptions() {
+        const type = DOM.formatTypeSelect.value;
+        state.formatType = type;
+        DOM.formatDetailSelect.innerHTML = '';
+
+        if (type === 'free') {
+            DOM.cutlinesRow.style.display = 'flex';
+            const opts = [
+                { val: '43', label: 'Standard Münzkapseln (43 mm)' },
+                { val: '40', label: 'Kleine Münzkapseln (40 mm)' },
+                { val: '30', label: 'RFIDfriend Token (30 mm)' },
+                { val: '25', label: 'Micro DIY Token (25 mm)' }
+            ];
+            opts.forEach(o => {
+                const opt = document.createElement('option');
+                opt.value = o.val; opt.textContent = o.label;
+                if(state.formatDetail === o.val) opt.selected = true;
+                DOM.formatDetailSelect.appendChild(opt);
+            });
+            if(!opts.some(o => o.val === state.formatDetail)) {
+                state.formatDetail = '43';
+                DOM.formatDetailSelect.value = '43';
+            }
+        } else {
+            DOM.cutlinesRow.style.display = 'none';
+            const opts = [
+                { val: 'l3415', label: 'Avery L3415-10 (40 mm, 24 Stk / A4)' },
+                { val: 'avery30', label: 'Avery 6223-10 / Universal (30 mm)' },
+                { val: 'p3413', label: 'Avery P3413-25 / Große Token (45 mm)' }
+            ];
+            opts.forEach(o => {
+                const opt = document.createElement('option');
+                opt.value = o.val; opt.textContent = o.label;
+                if(state.formatDetail === o.val) opt.selected = true;
+                DOM.formatDetailSelect.appendChild(opt);
+            });
+            if(!opts.some(o => o.val === state.formatDetail)) {
+                state.formatDetail = 'l3415';
+                DOM.formatDetailSelect.value = 'l3415';
+            }
+        }
+        fnSaveCache();
+    }
+
+    function handleFormatTypeChange() {
+        updateDetailDropdownOptions();
+        renderSheet();
+    }
+
+    function handleFormatChange() {
+        state.formatDetail = DOM.formatDetailSelect.value;
+        fnSaveCache();
+        renderSheet();
+    }
 
     async function fetchDB() {
         DOM.status.textContent = "Lade Tonie-Datenbank...";
@@ -509,11 +573,34 @@
         DOM.grid.innerHTML = items.length === 0 ? '<div style="grid-column: 1/-1; text-align:center; padding:20px;">Nichts gefunden.</div>' : '';
         items.forEach(item => {
             const el = document.createElement('div'); el.className = 'search-item';
-            // V15.1: Cleaned up UI, ID is hidden from search cards but available in Editor
+            if (state.quickStampItem && state.quickStampItem.imgUrl === item.pic) el.classList.add('selected');
+            
             el.innerHTML = `<img src="${item.pic}" loading="lazy"><span>${item.series ? item.series + '<br>' : ''}${item.title||''}</span>`;
-            el.onclick = () => loadEditor({ imgUrl: item.pic, series: item.series||'', title: item.title||'', tonieId: item.tonieId||'' }, state.editingIndex);
+            
+            // Context menu or quick stamp on long press / shift click
+            el.onclick = () => {
+                loadEditor({ imgUrl: item.pic, series: item.series||'', title: item.title||'', tonieId: item.tonieId||'' }, state.editingIndex);
+            };
+            
+            el.oncontextmenu = (ev) => {
+                ev.preventDefault();
+                activateQuickStamp({ imgUrl: item.pic, series: item.series||'', title: item.title||'', tonieId: item.tonieId||'' });
+            };
+
             DOM.grid.appendChild(el);
         });
+    }
+
+    function activateQuickStamp(item) {
+        state.quickStampItem = item;
+        DOM.stampBanner.style.display = 'flex';
+        renderSearch(toniesDB.slice(0, 12));
+    }
+
+    function cancelQuickStamp() {
+        state.quickStampItem = null;
+        DOM.stampBanner.style.display = 'none';
+        renderSearch(toniesDB.slice(0, 12));
     }
     
     function checkUrlParams() {
@@ -529,7 +616,6 @@
             const checkDbReady = setInterval(() => {
                 if (toniesDB.length > 0) {
                     clearInterval(checkDbReady);
-                    
                     const results = toniesDB.filter(t => 
                         (t.title && t.title.toLowerCase().includes(termLower)) || 
                         (t.series && t.series.toLowerCase().includes(termLower)) ||
@@ -547,7 +633,6 @@
                         let data = { imgUrl: '', series: incomingSeries || '', title: incomingTitle || '' };
                         loadEditor(data, state.editingIndex);
                     }
-                    
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
             }, 100);
@@ -555,11 +640,7 @@
     }
     
     async function shareCurrentDesign() {
-        if (!state.currentEdit) {
-            alert("Bitte wähle zuerst ein Motiv aus, bevor du es teilst.");
-            return;
-        }
-        
+        if (!state.currentEdit) { alert("Bitte wähle zuerst ein Motiv aus."); return; }
         let titleParam = state.currentEdit.title ? encodeURIComponent(state.currentEdit.title) : '';
         let seriesParam = state.currentEdit.series ? encodeURIComponent(state.currentEdit.series) : '';
         let idParam = state.currentEdit.tonieId ? encodeURIComponent(state.currentEdit.tonieId) : '';
@@ -569,24 +650,12 @@
         if (titleParam) params.push(`title=${titleParam}`);
         if (seriesParam) params.push(`series=${seriesParam}`);
         if (idParam) params.push(`id=${idParam}`);
-        
-        if (params.length > 0) {
-            shareUrl += `?${params.join('&')}`;
-        }
+        if (params.length > 0) shareUrl += `?${params.join('&')}`;
 
         if (navigator.share) {
-            try {
-                await navigator.share({
-                    title: 'Tonie Tag Cover Design',
-                    text: `Sieh dir mein Cover-Design für "${state.currentEdit.title || state.currentEdit.series || 'einen Tonie'}" an!`,
-                    url: shareUrl,
-                });
-            } catch (err) {
-                fallbackShare(shareUrl);
-            }
-        } else {
-            fallbackShare(shareUrl);
-        }
+            try { await navigator.share({ title: 'Tonie Tag Cover Design', url: shareUrl }); } 
+            catch (err) { copyToClipboard(shareUrl); }
+        } else { copyToClipboard(shareUrl); }
     }
 
     function sendIdToApp() {
@@ -595,32 +664,14 @@
             return;
         }
         const id = state.currentEdit.tonieId;
-        
         if (navigator.share) {
-            navigator.share({
-                title: 'Tonie ID Export',
-                text: id
-            }).catch(err => {
-                copyIdToClipboard(id);
-            });
-        } else {
-            copyIdToClipboard(id);
-        }
+            navigator.share({ title: 'Tonie ID', text: id }).catch(() => copyToClipboard(id));
+        } else { copyToClipboard(id); }
     }
 
-    function copyIdToClipboard(id) {
-        navigator.clipboard.writeText(id).then(() => {
-            alert(`Tonie-ID (${id}) wurde in die Zwischenablage kopiert. Du kannst sie nun in deiner Schreib-App einfügen.`);
-        }).catch(err => {
-            alert(`Tonie-ID: ${id}\n\nBitte manuell kopieren.`);
-        });
-    }
-
-    function fallbackShare(url) {
-        navigator.clipboard.writeText(url).then(() => {
-            alert("Link in die Zwischenablage kopiert:\n\n" + url);
-        }).catch(err => {
-            alert("Link zum Teilen (manuell kopieren):\n\n" + url);
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(() => {
+            alert("In Zwischenablage kopiert:\n\n" + text);
         });
     }
 
@@ -675,7 +726,7 @@
         } else {
             DOM.btnSave.textContent = index !== null ? `➕ An Position ${index+1} einfügen` : '➕ Auf den Bogen legen';
             DOM.btnSave.style.background = '#10b981'; 
-            DOM.btnDel.classList.add('hidden'); DOM.btnCan.classList.remove('hidden'); DOM.btnBatch.classList.remove('hidden');
+            DOM.btnDel.classList.add('hidden'); DOM.btnCan.classList.remove('hidden'); DOM.btnBatch.classList.add('hidden');
         }
 
         DOM.pCircle.classList.remove('empty'); DOM.pSvg.style.display = 'block';
@@ -691,11 +742,8 @@
         c.bg = DOM.eBg.value; c.textCol = DOM.eTextCol.value;
 
         DOM.vZoom.textContent = c.zoom + '%'; DOM.vRot.textContent = c.rot + '°';
-        if (c.imgUrl) {
-            DOM.pImage.style.backgroundImage = `url('${c.imgUrl}')`;
-        } else {
-            DOM.pImage.style.backgroundImage = 'none';
-        }
+        if (c.imgUrl) { DOM.pImage.style.backgroundImage = `url('${c.imgUrl}')`; } 
+        else { DOM.pImage.style.backgroundImage = 'none'; }
         
         DOM.pImage.style.backgroundColor = c.bg; DOM.pImage.style.backgroundSize = `${c.zoom}%`;
         DOM.pImage.style.backgroundPosition = `calc(50% + ${c.posX}px) calc(50% + ${c.posY}px)`;
@@ -725,8 +773,6 @@
         renderSheet();
     }
 
-    function handleFormatChange() { state.format = DOM.fSelect.value; saveCache(); renderSheet(); }
-
     function saveToSheet() {
         if (!state.currentEdit) return;
         if (state.editingIndex !== null) { state.labels[state.editingIndex] = { ...state.currentEdit }; } 
@@ -735,20 +781,18 @@
             if (firstEmpty !== -1) state.labels[firstEmpty] = { ...state.currentEdit };
             else state.labels.push({ ...state.currentEdit }); 
         }
-        saveCache(); renderSheet(); resetEditor();
+        fnSaveCache(); renderSheet(); resetEditor();
         document.querySelector('.print-section').scrollIntoView({behavior: 'smooth', block: 'start'});
     }
     
     function fillEntireSheet() {
         if (!state.currentEdit) return;
         const specs = getGridSpecs(); let count = 0;
-        
         while (state.labels.length < specs.maxSlots) state.labels.push(null);
-        
         for(let i=0; i<specs.maxSlots; i++) {
             if (!state.labels[i]) { state.labels[i] = { ...state.currentEdit }; count++; }
         }
-        if(count > 0) { saveCache(); renderSheet(); resetEditor(); alert(`${count} Etiketten wurden hinzugefügt!`); } 
+        if(count > 0) { fnSaveCache(); renderSheet(); resetEditor(); alert(`${count} Etiketten wurden hinzugefügt!`); } 
         else alert('Der Bogen ist bereits voll.');
     }
 
@@ -756,29 +800,42 @@
         if (state.editingIndex !== null) {
             state.labels[state.editingIndex] = null;
             while(state.labels.length > 0 && state.labels[state.labels.length - 1] === null) state.labels.pop();
-            saveCache(); renderSheet(); resetEditor();
+            fnSaveCache(); renderSheet(); resetEditor();
         }
     }
 
     function clearSheet() {
-        if(confirm('Bist du sicher, dass du den Bogen leeren möchtest?')) { state.labels = []; saveCache(); renderSheet(); resetEditor(); }
+        if(confirm('Bist du sicher, dass du den Bogen leeren möchtest?')) { state.labels = []; fnSaveCache(); renderSheet(); resetEditor(); }
     }
 
     function exportProject() {
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ labels: state.labels, format: state.format }));
-        const dlAnchorElem = document.createElement('a');
-        dlAnchorElem.setAttribute("href", dataStr); dlAnchorElem.setAttribute("download", "tonie_bogen_projekt.json");
-        dlAnchorElem.click();
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ 
+            labels: state.labels, 
+            formatType: state.formatType,
+            formatDetail: state.formatDetail
+        }));
+        const dl = document.createElement('a');
+        dl.setAttribute("href", dataStr); dl.setAttribute("download", "tonie_bogen_projekt.json");
+        dl.click();
     }
+
     function importProject(e) {
         const file = e.target.files[0]; if(!file) return;
         const reader = new FileReader();
         reader.onload = (evt) => {
             try {
                 const data = JSON.parse(evt.target.result);
-                if(data.labels) { state.labels = data.labels; }
-                if(data.format) { state.format = data.format; DOM.fSelect.value = data.format; }
-                saveCache(); renderSheet(); alert("Projekt erfolgreich geladen!");
+                if(data.labels) state.labels = data.labels;
+                if(data.formatType) {
+                    state.formatType = data.formatType;
+                    DOM.formatTypeSelect.value = state.formatType;
+                    updateDetailDropdownOptions();
+                }
+                if(data.formatDetail) {
+                    state.formatDetail = data.formatDetail;
+                    DOM.formatDetailSelect.value = state.formatDetail;
+                }
+                fnSaveCache(); renderSheet(); alert("Projekt erfolgreich geladen!");
             } catch(err) { alert('Fehler beim Laden der Projektdatei.'); }
             e.target.value = ''; 
         };
@@ -786,14 +843,29 @@
     }
 
     function getGridSpecs() {
-        const isAvery = state.format === 'avery-40';
+        const isAvery = state.formatType === 'avery';
+        let diamMm = 43;
+        let maxSlots = 24;
+
+        if (state.formatType === 'free') {
+            diamMm = parseInt(state.formatDetail);
+        } else {
+            if (state.formatDetail === 'l3415') diamMm = 40;
+            else if (state.formatDetail === 'avery30') diamMm = 30;
+            else if (state.formatDetail === 'p3413') diamMm = 45;
+        }
+
         const pxPerMm = 794 / 210; 
-        const diamPx = (isAvery ? 40 : parseInt(state.format)) * pxPerMm;
-        let maxSlots = 24; 
+        const diamPx = diamMm * pxPerMm;
+
         if (!isAvery) {
             const cols = Math.floor((794 - 112 + 30) / (diamPx + 30));
             const rows = Math.floor((1123 - 112 + 30) / (diamPx + 30));
-            maxSlots = cols * rows;
+            maxSlots = Math.max(1, cols * rows);
+        } else {
+            if (state.formatDetail === 'l3415') maxSlots = 24;
+            else if (state.formatDetail === 'avery30') maxSlots = 48;
+            else if (state.formatDetail === 'p3413') maxSlots = 15;
         }
         return { isAvery, diamPx, maxSlots };
     }
@@ -810,6 +882,27 @@
             const slot = document.createElement('div');
             slot.className = `label-slot ${data ? 'filled' : 'empty'}`;
             slot.style.width = `${specs.diamPx}px`; slot.style.height = `${specs.diamPx}px`;
+
+            // Drag and Drop & Quick Stamp Support
+            slot.ondragover = (e) => { e.preventDefault(); slot.classList.add('drag-over'); };
+            slot.ondragleave = () => { slot.classList.remove('drag-over'); };
+            slot.ondrop = (e) => {
+                e.preventDefault(); slot.classList.remove('drag-over');
+                const draggedIdx = e.dataTransfer.getData('text/plain');
+                if (draggedIdx !== "") {
+                    const idx = parseInt(draggedIdx);
+                    const temp = state.labels[idx];
+                    state.labels[idx] = state.labels[i];
+                    state.labels[i] = temp;
+                    while(state.labels.length > 0 && state.labels[state.labels.length - 1] === null) state.labels.pop();
+                    fnSaveCache(); renderSheet();
+                }
+            };
+
+            slot.draggable = data !== null;
+            slot.ondragstart = (e) => {
+                e.dataTransfer.setData('text/plain', i);
+            };
 
             if (data) {
                 slot.style.backgroundColor = data.bg;
@@ -841,12 +934,26 @@
                     `;
                     slot.appendChild(svg);
                 }
-                slot.onclick = () => loadEditor(data, i);
+                slot.onclick = () => {
+                    if (state.quickStampItem) {
+                        while (state.labels.length <= i) state.labels.push(null);
+                        state.labels[i] = { ...state.quickStampItem, zoom: 100, rot: 0, posX: 0, posY: 0, bg: '#ffffff', textCol: '#111111' };
+                        fnSaveCache(); renderSheet();
+                    } else {
+                        loadEditor(data, i);
+                    }
+                };
             } else {
                 slot.onclick = () => {
-                    state.editingIndex = i;
-                    document.querySelectorAll('.label-slot').forEach(s => s.style.borderColor = ''); slot.style.borderColor = 'var(--primary)';
-                    document.querySelector('.app-layout').scrollIntoView({behavior: 'smooth', block: 'start'}); DOM.searchInput.focus();
+                    if (state.quickStampItem) {
+                        while (state.labels.length <= i) state.labels.push(null);
+                        state.labels[i] = { ...state.quickStampItem, zoom: 100, rot: 0, posX: 0, posY: 0, bg: '#ffffff', textCol: '#111111' };
+                        fnSaveCache(); renderSheet();
+                    } else {
+                        state.editingIndex = i;
+                        document.querySelectorAll('.label-slot').forEach(s => s.style.borderColor = ''); slot.style.borderColor = 'var(--primary)';
+                        document.querySelector('.app-layout').scrollIntoView({behavior: 'smooth', block: 'start'}); DOM.searchInput.focus();
+                    }
                 };
             }
             DOM.sGrid.appendChild(slot);
@@ -857,22 +964,34 @@
         const activeLabels = state.labels.filter(l => l !== null);
         if(activeLabels.length === 0) return alert('Der Bogen ist leer!');
         
-        const drawCutlines = document.getElementById('checkCutlines').checked;
+        const drawCutlines = state.formatType === 'free' && document.getElementById('checkCutlines').checked;
         const canvas = document.getElementById('exportCanvas');
         canvas.width = 2480; canvas.height = 3508; 
         const ctx = canvas.getContext('2d');
         ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        const isAvery = state.format === 'avery-40';
+        const isAvery = state.formatType === 'avery';
+        let diamMm = 43;
+        if (state.formatType === 'free') diamMm = parseInt(state.formatDetail);
+        else {
+            if (state.formatDetail === 'l3415') diamMm = 40;
+            else if (state.formatDetail === 'avery30') diamMm = 30;
+            else if (state.formatDetail === 'p3413') diamMm = 45;
+        }
+
         const pxPerMm = 2480 / 210;
-        const diamPx = (isAvery ? 40 : parseInt(state.format)) * pxPerMm;
+        const diamPx = diamMm * pxPerMm;
         const radius = diamPx / 2;
         
         let startX = 56 * (794/210) * (2480/794); let startY = startX;
         let gapX = 30 * (794/210) * (2480/794); let gapY = gapX;
         let cols = Math.floor((2480 - (startX*2))/(diamPx+gapX)) + 1; 
         
-        if(isAvery) { startX = 9.5 * pxPerMm; startY = 13.5 * pxPerMm; gapX = 11.5 * pxPerMm; gapY = 11.5 * pxPerMm; cols = 4; }
+        if(isAvery) {
+            startX = 9.5 * pxPerMm; startY = 13.5 * pxPerMm; gapX = 11.5 * pxPerMm; gapY = 11.5 * pxPerMm; cols = 4;
+            if (state.formatDetail === 'avery30') cols = 5;
+            if (state.formatDetail === 'p3413') cols = 3;
+        }
 
         const cache = {};
         for(let lbl of activeLabels) {
@@ -884,10 +1003,11 @@
             }
         }
 
+        const specs = getGridSpecs();
         for(let i=0; i < state.labels.length; i++) {
             const lbl = state.labels[i];
             if (!lbl) continue; 
-            if (isAvery && i >= 24) break;
+            if (i >= specs.maxSlots) break;
             
             const cx = startX + (i % cols) * (diamPx + gapX) + radius;
             const cy = startY + Math.floor(i / cols) * (diamPx + gapY) + radius;
@@ -913,7 +1033,6 @@
             const drawArcText = (text, isTop) => {
                 if(!text) return;
                 ctx.save(); 
-                
                 const baseFSize = Math.round(19 * (pxPerMm/3.78)); 
                 let fSize = baseFSize;
                 const maxChars = 22;
