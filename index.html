@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tonie & Tag Cover Generator</title>
+    <title>Tonie & Tag Cover Generator V12</title>
     <style>
         /* === VARIABLES & RESET === */
         :root {
@@ -27,14 +27,18 @@
             color: var(--text-main); 
             line-height: 1.5; 
             padding: 16px; 
-            padding-bottom: 80px; /* Space for mobile browser bar */
+            padding-bottom: 80px;
             overflow-x: hidden; 
             display: flex;
             flex-direction: column;
-            align-items: center; /* Center everything */
+            align-items: center; 
         }
 
         /* === LAYOUT & CARDS === */
+        .top-bar { width: 100%; max-width: 1200px; display: flex; justify-content: flex-end; margin-bottom: 8px; }
+        .support-btn { background: #f59e0b; color: white; padding: 6px 12px; border-radius: 20px; text-decoration: none; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3); transition: 0.2s;}
+        .support-btn:hover { background: #d97706; transform: translateY(-1px); }
+
         .header { text-align: center; margin-bottom: 24px; padding-top: 10px; width: 100%; max-width: 1200px; }
         .header h1 { color: var(--primary); font-size: 28px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2; }
         .header p { color: var(--text-muted); font-size: 14px; margin-top: 8px; }
@@ -55,7 +59,6 @@
         .card-header h2 { font-size: 18px; font-weight: 700; color: #111; }
 
         /* === BUTTONS & INPUTS === */
-        /* font-size 16px prevents iOS Auto-Zoom */
         input[type="text"], select { 
             width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: var(--radius-md); 
             font-size: 16px; outline: none; background: #f9fafb; color: var(--text-main); font-weight: 500; transition: 0.2s; 
@@ -69,20 +72,20 @@
         .btn-sm { padding: 8px 12px; font-size: 13px; width: auto; border-radius: 8px; }
 
         label { display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; margin-top: 16px; }
+        .checkbox-label { display: flex; align-items: center; gap: 8px; margin-top: 12px; cursor: pointer; color: var(--text-main); font-size: 14px;}
+        .checkbox-label input { width: 18px; height: 18px; cursor: pointer; accent-color: var(--primary);}
 
         /* === TABS === */
         .tabs { display: flex; background: #f3f4f6; padding: 4px; border-radius: 12px; margin-bottom: 20px; }
         .tab { flex: 1; text-align: center; padding: 12px 10px; font-size: 14px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: 0.2s; }
         .tab.active { background: #fff; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
-        /* === SECTION 1: SEARCH & UPLOAD === */
+        /* === SECTION 1: SEARCH === */
         .status-text { font-size: 14px; color: var(--text-muted); text-align: center; margin: 16px 0; font-weight: 600; }
         .search-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-height: 450px; overflow-y: auto; padding-right: 8px; }
-        /* Custom Scrollbar for Search */
         .search-grid::-webkit-scrollbar { width: 6px; }
         .search-grid::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
         .search-grid::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .search-grid::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
         .search-item { border: 2px solid var(--border); border-radius: var(--radius-md); padding: 12px; text-align: center; cursor: pointer; transition: 0.2s; background: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center;}
         .search-item:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
@@ -99,21 +102,17 @@
         
         .preview-container { flex: 0 0 auto; background: #f8fafc; border: 1px solid var(--border); border-radius: var(--radius-md); padding: 32px; display: flex; justify-content: center; width: 100%; max-width: 320px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.02); }
         
-        /* The main Editor Circle */
         .circle-canvas { width: 240px; height: 240px; border-radius: 50%; border: 2px dashed #cbd5e1; position: relative; display: flex; justify-content: center; align-items: center; background: #fff; overflow: hidden; box-shadow: var(--shadow); transition: 0.3s; }
         .circle-canvas.empty { background: #f1f5f9; box-shadow: none; }
         .circle-canvas.empty::after { content: 'Wähle ein Motiv'; color: #94a3b8; font-weight: 700; font-size: 15px; }
         
-        /* background-repeat: no-repeat prevents cloning when zoomed out */
         .bg-layer { position: absolute; top:0; left:0; width: 100%; height: 100%; background-repeat: no-repeat; background-position: center; pointer-events: none; transition: background-color 0.2s; }
         
-        /* Perfect Curved Text SVG */
         .svg-overlay { position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
-        .svg-overlay text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-weight: 800; font-size: 16px; fill: #111; stroke: #fff; stroke-width: 4px; paint-order: stroke fill; letter-spacing: 0.5px; }
+        .svg-overlay text { font-family: -apple-system, sans-serif; font-weight: 800; font-size: 16px; stroke: #fff; stroke-width: 4px; paint-order: stroke fill; letter-spacing: 0.5px; } /* Fill color set via JS */
 
         .editor-controls { flex: 1; width: 100%; }
         
-        /* Simple / Pro Switch */
         .mode-switch { display: flex; background: #f3f4f6; border-radius: 10px; padding: 4px; margin-bottom: 20px; }
         .mode-btn { flex: 1; text-align: center; padding: 10px; font-size: 13px; font-weight: 700; color: var(--text-muted); cursor: pointer; border-radius: 8px; transition: 0.2s;}
         .mode-btn.active { background: #fff; color: var(--primary); box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
@@ -124,124 +123,72 @@
         input[type="range"] { width: 100%; accent-color: var(--primary); cursor: pointer; height: 6px; background: #e5e7eb; border-radius: 4px; outline: none; -webkit-appearance: none;}
         input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--primary); cursor: pointer; }
 
-        
-        .color-row { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 16px; }
-        input[type="color"] { width: 44px; height: 44px; border: none; border-radius: 8px; cursor: pointer; background: transparent; padding: 0;}
+        .color-row { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; border-top: 1px solid var(--border); padding-top: 16px; }
+        input[type="color"] { width: 40px; height: 40px; border: none; border-radius: 8px; cursor: pointer; background: transparent; padding: 0;}
         input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
         input[type="color"]::-webkit-color-swatch { border: 2px solid var(--border); border-radius: 8px; }
 
-        /* === SECTION 3: DYNAMIC A4 SHEET (MOBILE FIX & VISUAL SLOTS) === */
-        /* Wrapper allows scaling without horizontal scroll */
-        .sheet-scale-wrapper {
-            width: 100%;
-            overflow: hidden;
-            background: #cbd5e1;
-            border-radius: var(--radius-lg);
-            padding: 20px 10px;
-            box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
-            display: flex;
-            justify-content: center;
-            margin-top: 20px;
-        }
+        /* === SECTION 3: SHEET === */
+        .sheet-scale-wrapper { width: 100%; overflow-x: auto; background: #cbd5e1; border-radius: var(--radius-lg); padding: 20px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.05); display: flex; justify-content: flex-start; margin-top: 20px; }
+        /* Centering the sheet when screen is large enough */
+        @media(min-width: 850px) { .sheet-scale-wrapper { justify-content: center; overflow-x: hidden; } }
 
-        /* The Sheet - scaled via JS */
-        .a4-sheet { 
-            background: #fff; 
-            box-shadow: var(--shadow-lg); 
-            position: relative; 
-            width: 794px; 
-            height: 1123px; 
-            transform-origin: top center;
-            border-radius: 4px;
-        }
+        .a4-sheet { background: #fff; box-shadow: var(--shadow-lg); position: relative; width: 794px; height: 1123px; border-radius: 4px; flex-shrink: 0; transform-origin: top left;}
+        @media(min-width: 850px) { .a4-sheet { transform-origin: top center; } }
         
         .sheet-grid { display: flex; flex-wrap: wrap; gap: 30px; padding: 56px; align-content: flex-start; justify-content: flex-start; }
         .grid-avery { display: grid; grid-template-columns: repeat(4, 151px); grid-auto-rows: 151px; gap: 19px; justify-content: center; padding-top: 56px; }
 
-        /* Single Label Slot - Now always visible as dashed circle when empty */
-        .label-slot { 
-            position: relative; 
-            border-radius: 50%; 
-            border: 2px dashed #cbd5e1; 
-            overflow: hidden; 
-            cursor: pointer; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            background: transparent; 
-            transition: all 0.2s ease; 
-        }
-        
-        /* Empty Slot Styling */
-        .label-slot.empty {
-             background: #f8fafc;
-        }
-        .label-slot.empty:hover {
-            border-color: var(--primary);
-            background: #fff;
-        }
-        .label-slot.empty::after { 
-            content: '+'; 
-            font-size: 32px; 
-            color: #94a3b8; 
-            font-weight: 300; 
-            transition: color 0.2s;
-        }
-        .label-slot.empty:hover::after {
-            color: var(--primary);
-        }
+        .label-slot { position: relative; border-radius: 50%; border: 2px dashed #cbd5e1; overflow: hidden; cursor: pointer; display: flex; justify-content: center; align-items: center; background: transparent; transition: all 0.2s ease; }
+        .label-slot.empty { background: #f8fafc; }
+        .label-slot.empty:hover { border-color: var(--primary); background: #fff; }
+        .label-slot.empty::after { content: '+'; font-size: 32px; color: #94a3b8; font-weight: 300; transition: color 0.2s; }
+        .label-slot.empty:hover::after { color: var(--primary); }
+        .label-slot.filled { border-color: transparent; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .label-slot.filled:hover { transform: scale(1.03); z-index: 5; box-shadow: 0 8px 16px rgba(0,0,0,0.15); }
+        .label-slot.filled:hover::before { content: '✏️ Bearbeiten'; position: absolute; z-index: 20; background: rgba(0,0,0,0.75); color: #fff; font-size: 14px; padding: 8px 14px; border-radius: 20px; font-weight: 600; backdrop-filter: blur(4px); }
 
-        /* Filled Slot Styling */
-        .label-slot.filled {
-             border-style: solid;
-             border-color: transparent; /* Hide border when filled, rely on bg */
-             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .label-slot.filled:hover { 
-            transform: scale(1.03); 
-            z-index: 5; 
-            box-shadow: 0 8px 16px rgba(0,0,0,0.15); 
-        }
-        .label-slot.filled:hover::before { 
-            content: '✏️ Bearbeiten'; 
-            position: absolute; 
-            z-index: 20; 
-            background: rgba(0,0,0,0.75); 
-            color: #fff; 
-            font-size: 14px; 
-            padding: 8px 14px; 
-            border-radius: 20px; 
-            font-weight: 600;
-            backdrop-filter: blur(4px);
-        }
+        .project-actions { display: flex; gap: 12px; margin-top: 20px; justify-content: center;}
+        
+        /* === HARDWARE RECOMMENDATIONS === */
+        .hardware-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 16px; }
+        @media(min-width: 600px) { .hardware-grid { grid-template-columns: 1fr 1fr; } }
+        .hw-item { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--border); border-radius: var(--radius-md); text-decoration: none; color: var(--text-main); transition: 0.2s;}
+        .hw-item:hover { border-color: var(--primary); background: #fff; transform: translateY(-2px); box-shadow: var(--shadow);}
+        .hw-item .icon { font-size: 24px; }
+        .hw-item div strong { display: block; font-size: 14px; }
+        .hw-item div span { font-size: 12px; color: var(--text-muted); }
 
         .hidden { display: none !important; }
         
-        footer { text-align: center; margin-top: 48px; font-size: 14px; color: var(--text-muted); width: 100%; max-width: 1200px; }
+        footer { text-align: center; margin-top: 48px; font-size: 13px; color: var(--text-muted); width: 100%; max-width: 1200px; padding-bottom: 20px;}
         footer a { color: var(--primary); text-decoration: none; font-weight: 700; transition: 0.2s;}
         footer a:hover { color: var(--primary-hover); text-decoration: underline;}
+        .community-links { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-top: 12px; }
 
-        /* === PRINT STYLES (Native A4) === */
+        /* === PRINT STYLES === */
         @media print {
             body { background: #fff; margin: 0; padding: 0; display: block;}
-            .header, .app-layout > *:not(.print-section), .print-section > *:not(.sheet-scale-wrapper), footer { display: none !important; }
+            .top-bar, .header, .app-layout > *:not(.print-section), .print-section > *:not(.sheet-scale-wrapper), footer { display: none !important; }
             .print-section { padding: 0; box-shadow: none; border-radius: 0; }
             .sheet-scale-wrapper { background: transparent; padding: 0; box-shadow: none; display: block; border-radius: 0; margin: 0; overflow: visible;}
             .a4-sheet { transform: scale(1) !important; box-shadow: none; width: 210mm !important; height: 297mm !important; border-radius: 0;}
-            
-            /* Hide empty slots when printing to save ink */
             .label-slot.empty { border-color: transparent; background: transparent; }
             .label-slot.empty::after { display: none; }
-            
             @page { size: A4 portrait; margin: 0; }
         }
     </style>
 </head>
 <body>
 
+<!-- Support Top Bar -->
+<div class="top-bar">
+    <a href="#" class="support-btn" target="_blank" title="Spendiere dem Entwickler einen Kaffee">☕ Projekt unterstützen</a>
+</div>
+
 <div class="header">
-    <h1>Tonie Cover Generator V11</h1>
-    <p>Der elegante Designer für Münzkapseln, RFIDfriend & Avery Etiketten</p>
+    <h1>Tonie & Tag Cover Generator V12</h1>
+    <p>Die Community Edition für Münzkapseln, RFIDfriend Token & Avery Bögen</p>
 </div>
 
 <div class="app-layout">
@@ -253,14 +200,12 @@
             <div class="tab" id="tab-upload" onclick="switchSourceTab('upload')">📁 Eigene Grafik</div>
         </div>
 
-        <!-- Tonie Search -->
         <div id="view-tonie">
             <input type="text" id="searchInput" placeholder="Titel oder Serie suchen (z.B. Conni)..." autocomplete="off">
             <div class="status-text" id="statusText">Verbinde zur Datenbank...</div>
             <div class="search-grid" id="searchGrid"></div>
         </div>
 
-        <!-- Upload -->
         <div id="view-upload" class="hidden">
             <label class="upload-box">
                 <div style="font-size: 48px; margin-bottom: 16px;">📸</div>
@@ -271,7 +216,7 @@
         </div>
     </div>
 
-    <!-- COLUMN 2: EDITOR & PRINT -->
+    <!-- COLUMN 2: EDITOR, SHEET & HARDWARE -->
     <div style="display: flex; flex-direction: column; gap: 24px; width: 100%;">
         
         <!-- EDITOR -->
@@ -282,26 +227,18 @@
             </div>
 
             <div class="editor-layout">
-                <!-- Large Preview -->
                 <div class="preview-container">
                     <div class="circle-canvas empty" id="previewCircle">
-                        <!-- BG Layer with no-repeat -->
                         <div id="previewImage" class="bg-layer"></div>
-                        
-                        <!-- SVG Text Overlay -->
                         <svg class="svg-overlay" viewBox="0 0 200 200" id="previewSvg" style="display: none;">
-                            <!-- Top Text -->
                             <path id="pathTop" d="M 18,100 A 82,82 0 0,1 182,100" fill="none" stroke="none"/>
                             <text><textPath href="#pathTop" startOffset="50%" text-anchor="middle" dominant-baseline="auto" id="previewTextTop"></textPath></text>
-                            
-                            <!-- Bottom Text (Sweep 0, Hanging) -->
                             <path id="pathBot" d="M 18,100 A 82,82 0 0,0 182,100" fill="none" stroke="none"/>
                             <text><textPath href="#pathBot" startOffset="50%" text-anchor="middle" dominant-baseline="hanging" id="previewTextBot"></textPath></text>
                         </svg>
                     </div>
                 </div>
 
-                <!-- Controls -->
                 <div class="editor-controls">
                     <div class="mode-switch">
                         <div class="mode-btn active" id="mode-simple" onclick="switchMode('simple')">Simpel</div>
@@ -314,7 +251,7 @@
                     <label>Text Unten (z.B. Titel)</label>
                     <input type="text" id="editBot" placeholder="z.B. Der Superpapagei" oninput="updatePreview()">
 
-                    <!-- Pro Settings -->
+                    <!-- Pro Panel -->
                     <div id="proPanel" class="pro-panel hidden">
                         <div class="slider-row">
                             <label><span>🔍 Zoom</span> <span id="valZoom">100%</span></label>
@@ -336,20 +273,28 @@
                             <span style="font-size: 13px; font-weight: 700; color: var(--text-main);">🎨 Hintergrundfarbe</span>
                             <input type="color" id="editBg" value="#ffffff" oninput="updatePreview()">
                         </div>
+                        <div class="color-row" style="border-top: none; padding-top: 8px;">
+                            <span style="font-size: 13px; font-weight: 700; color: var(--text-main);">✍️ Textfarbe</span>
+                            <input type="color" id="editTextColor" value="#111111" oninput="updatePreview()">
+                        </div>
                     </div>
 
-                    <div style="display: flex; gap: 12px; margin-top: 24px;">
-                        <button class="btn" id="btnSave" onclick="saveToSheet()" style="background: #94a3b8; pointer-events: none;">Wähle zuerst ein Motiv (Links)</button>
-                        <button class="btn btn-secondary hidden" id="btnDelete" onclick="deleteLabel()" style="color: #e30613; border-color: #fca5a5;">🗑️ Löschen</button>
+                    <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 24px;">
+                        <button class="btn" id="btnSave" onclick="saveToSheet()" style="background: #94a3b8; pointer-events: none;">Wähle zuerst ein Motiv</button>
+                        
+                        <div style="display: flex; gap: 12px;">
+                            <button class="btn btn-secondary hidden" id="btnBatch" onclick="fillEntireSheet()" style="flex:1;">✨ Bogen füllen</button>
+                            <button class="btn btn-secondary hidden" id="btnDelete" onclick="deleteLabel()" style="color: #e30613; border-color: #fca5a5; flex:1;">🗑️ Löschen</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- SHEET & PRINT -->
+        <!-- SHEET SECTION -->
         <div class="card print-section">
             <div class="card-header">
-                <h2>Format & Druck</h2>
+                <h2>Format & Druckbogen</h2>
                 <button class="btn btn-secondary btn-sm" onclick="clearSheet()" style="color: #e30613; border-color: #fca5a5;">Bogen leeren</button>
             </div>
             
@@ -361,49 +306,79 @@
                 <option value="25">Micro DIY Token (25 mm)</option>
                 <option value="avery-40">Avery Zweckform L3415-10 (40mm, 24 Stk)</option>
             </select>
+            
+            <!-- Project Management -->
+            <div class="project-actions">
+                <button class="btn btn-secondary btn-sm" onclick="exportProject()">💾 Projekt speichern (.json)</button>
+                <button class="btn btn-secondary btn-sm" onclick="document.getElementById('importFile').click()">📂 Projekt laden</button>
+                <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importProject(event)">
+            </div>
 
             <p style="text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 16px;">Tipp: Klicke auf einen freien Kreis auf dem Bogen, um ihn gezielt zu befüllen.</p>
 
-            <!-- Mobile Scaling Wrapper -->
             <div class="sheet-scale-wrapper" id="sheetWrapper">
                 <div class="a4-sheet" id="printSheet">
                     <div id="sheetGrid" class="sheet-grid"></div>
                 </div>
             </div>
 
-            <!-- Export Actions -->
-            <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 32px;">
-                <!-- Primary Action -->
-                <button class="btn" onclick="window.print()" style="font-size: 18px; padding: 16px;">🖨️ Direkt im Browser drucken</button>
-                <!-- Secondary Action -->
-                <button class="btn btn-secondary" onclick="exportPNG()">🖼️ Als hochauflösendes PNG speichern</button>
+            <!-- Export -->
+            <div style="margin-top: 24px;">
+                <label class="checkbox-label" style="justify-content: center; margin-bottom: 16px;">
+                    <input type="checkbox" id="checkCutlines" checked> ✂️ Schnittmarken (gestrichelter Rand) beim Export zeichnen
+                </label>
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <button class="btn" onclick="window.print()" style="font-size: 18px; padding: 16px;">🖨️ Bogen Drucken (A4)</button>
+                    <button class="btn btn-secondary" onclick="exportPNG()">🖼️ Als 300 DPI PNG exportieren</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- HARDWARE & LINKS CARD -->
+        <div class="card">
+            <div class="card-header">
+                <h2>Hardware & Empfehlungen</h2>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted);">Unterstütze dieses kostenlose Projekt, indem du dein Bastel-Material über unsere Affiliate-Links bestellst.</p>
+            <div class="hardware-grid">
+                <a href="#" target="_blank" class="hw-item">
+                    <div class="icon">🏷️</div>
+                    <div><strong>Avery L3415-10 Etiketten</strong><span>24 Stück pro Bogen (40mm)</span></div>
+                </a>
+                <a href="#" target="_blank" class="hw-item">
+                    <div class="icon">🪙</div>
+                    <div><strong>Münzkapseln (40mm)</strong><span>Perfekt für 3D-Druck Sockel</span></div>
+                </a>
+                <a href="#" target="_blank" class="hw-item">
+                    <div class="icon">🧲</div>
+                    <div><strong>Neodym Magnete (10x3mm)</strong><span>Hält den Token auf der Box</span></div>
+                </a>
+                <a href="http://rfidfriend.com/" target="_blank" class="hw-item">
+                    <div class="icon">📡</div>
+                    <div><strong>RFIDfriend SLIX-L Tags</strong><span>Beste NFC Tags für die Toniebox</span></div>
+                </a>
             </div>
         </div>
     </div>
 </div>
 
 <footer>
-    <p>Tonie Cover Generator V11 • Open Source unter MIT-Lizenz.</p>
-    <p style="margin-top: 4px;">Premium NFC-Tags auf <a href="http://rfidfriend.com/" target="_blank">RFIDfriend.com</a> | Code by <a href="https://github.com/Stevenious/Tonie-custom-Tags-Cover-Generator" target="_blank">Stevenious</a></p>
+    <p>Tonie Cover Generator V12 (Community Edition) • Open Source unter MIT-Lizenz.</p>
+    <div class="community-links">
+        <a href="https://github.com/toniebox-reverse-engineering" target="_blank">Team RevvoX</a>
+        <a href="https://gt-blog.de/custom-tags-for-toniebox/" target="_blank">Gambrius Blog</a>
+        <a href="https://makerworld.com/en/search/models?keyword=toniebox+coin" target="_blank">3D-Modelle</a>
+    </div>
 </footer>
 
-<!-- Hidden Canvas for PNG Export -->
 <canvas id="exportCanvas" style="display: none;"></canvas>
 
 <script>
-    /**
-     * TONIE COVER GENERATOR V11 (REFINED MASTER EDITION)
-     * - Fix: Centered layout for mobile.
-     * - Fix: Renders ALL empty slots visually so users can pick specific positions.
-     * - Fix: Clear distinction between Print (Primary) and PNG Export (Secondary).
-     * - Core: Robust Async Fetching, iOS Zoom Fix, Auto-Save LocalStorage.
-     */
-
     let toniesDB = [];
     let state = {
-        labels: [], // Array of objects or null (for empty slots)
+        labels: [], 
         currentEdit: null,
-        editingIndex: null, // Which slot on the sheet are we currently editing?
+        editingIndex: null, 
         format: '43'
     };
 
@@ -419,28 +394,21 @@
         pTextTop: document.getElementById('previewTextTop'),
         pTextBot: document.getElementById('previewTextBot'),
         
-        eTop: document.getElementById('editTop'),
-        eBot: document.getElementById('editBot'),
-        eZoom: document.getElementById('editZoom'),
-        eRot: document.getElementById('editRot'),
-        eX: document.getElementById('editX'),
-        eY: document.getElementById('editY'),
-        eBg: document.getElementById('editBg'),
-        vZoom: document.getElementById('valZoom'),
-        vRot: document.getElementById('valRot'),
+        eTop: document.getElementById('editTop'), eBot: document.getElementById('editBot'),
+        eZoom: document.getElementById('editZoom'), eRot: document.getElementById('editRot'),
+        eX: document.getElementById('editX'), eY: document.getElementById('editY'),
+        eBg: document.getElementById('editBg'), eTextCol: document.getElementById('editTextColor'),
+        vZoom: document.getElementById('valZoom'), vRot: document.getElementById('valRot'),
         
         btnSave: document.getElementById('btnSave'),
+        btnBatch: document.getElementById('btnBatch'),
         btnDel: document.getElementById('btnDelete'),
         btnCan: document.getElementById('btnCancel'),
         
         fSelect: document.getElementById('formatSelect'),
-        sGrid: document.getElementById('sheetGrid'),
-        
-        wrapper: document.getElementById('sheetWrapper'),
-        sheet: document.getElementById('printSheet')
+        sGrid: document.getElementById('sheetGrid')
     };
 
-    // --- 1. INITIALIZATION & CACHE ---
     window.addEventListener('DOMContentLoaded', () => {
         loadCache();
         fetchDB();
@@ -448,57 +416,30 @@
         setupUpload();
         resetEditor(); 
         renderSheet();
-        scaleSheetForMobile(); 
-        window.addEventListener('resize', scaleSheetForMobile); 
     });
 
     function loadCache() {
         try {
-            const cache = JSON.parse(localStorage.getItem('TonieCacheV11'));
+            const cache = JSON.parse(localStorage.getItem('TonieCacheV12'));
             if (cache) {
                 state.labels = cache.labels || [];
-                if(cache.format) {
-                    state.format = cache.format;
-                    DOM.fSelect.value = cache.format;
-                }
+                if(cache.format) { state.format = cache.format; DOM.fSelect.value = cache.format; }
             }
-        } catch(e) { console.error("Cache load failed", e); }
+        } catch(e) {}
     }
+    function saveCache() { localStorage.setItem('TonieCacheV12', JSON.stringify({ labels: state.labels, format: state.format })); }
 
-    function saveCache() {
-        localStorage.setItem('TonieCacheV11', JSON.stringify({ labels: state.labels, format: state.format }));
-    }
-
-    // --- 2. DYNAMIC MOBILE SCALING ---
-    function scaleSheetForMobile() {
-        if (!DOM.wrapper || !DOM.sheet) return;
-        const targetWidth = DOM.wrapper.clientWidth - 20; 
-        const originalWidth = 794; 
-        
-        if (targetWidth < originalWidth) {
-            const scale = targetWidth / originalWidth;
-            DOM.sheet.style.transform = `scale(${scale})`;
-            DOM.wrapper.style.height = `${(1123 * scale) + 40}px`; 
-        } else {
-            DOM.sheet.style.transform = `scale(1)`;
-            DOM.wrapper.style.height = `1163px`; 
-        }
-    }
-
-    // --- 3. DATABASE & SEARCH ---
     async function fetchDB() {
         DOM.status.textContent = "Lade Tonie-Datenbank...";
         try {
             const res = await fetch('https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json');
-            if (!res.ok) throw new Error('Netzwerk-Fehler');
             const data = await res.json();
             toniesDB = data.filter(t => t.pic && !t.pic.includes('placeholder'));
             DOM.status.textContent = `${toniesDB.length} Tonies bereit!`;
             DOM.status.style.color = "#10b981";
             renderSearch(toniesDB.slice(0, 12));
         } catch (e) {
-            DOM.status.textContent = 'Fehler beim Laden der Datenbank.';
-            DOM.status.style.color = '#e30613';
+            DOM.status.textContent = 'Fehler beim Laden. Offline Modus.'; DOM.status.style.color = '#e30613';
         }
     }
 
@@ -508,289 +449,202 @@
             clearTimeout(timer);
             const term = e.target.value.toLowerCase().trim();
             timer = setTimeout(() => {
-                if (term.length < 2) {
-                    renderSearch(toniesDB.slice(0, 12));
-                    DOM.status.textContent = `${toniesDB.length} Tonies bereit.`;
-                    DOM.status.style.color = "#10b981";
-                    return;
-                }
-                const results = toniesDB.filter(t => 
-                    (t.title && t.title.toLowerCase().includes(term)) || 
-                    (t.series && t.series.toLowerCase().includes(term))
-                ).slice(0, 40);
+                if (term.length < 2) { renderSearch(toniesDB.slice(0, 12)); return; }
+                const results = toniesDB.filter(t => (t.title && t.title.toLowerCase().includes(term)) || (t.series && t.series.toLowerCase().includes(term))).slice(0, 40);
                 DOM.status.textContent = `${results.length} Treffer für "${term}"`;
-                DOM.status.style.color = "#6b7280";
                 renderSearch(results);
             }, 300);
         });
     }
 
     function renderSearch(items) {
-        DOM.grid.innerHTML = items.length === 0 ? '<div style="grid-column: 1/-1; text-align:center; padding:20px; color: #6b7280;">Keine Treffer gefunden.</div>' : '';
+        DOM.grid.innerHTML = items.length === 0 ? '<div style="grid-column: 1/-1; text-align:center; padding:20px;">Nichts gefunden.</div>' : '';
         items.forEach(item => {
-            const el = document.createElement('div');
-            el.className = 'search-item';
-            const s = item.series || '';
-            const t = item.title || item.episodes || '';
-            el.innerHTML = `<img src="${item.pic}" loading="lazy"><span>${s ? s + '<br>' : ''}${t}</span>`;
-            
-            el.onclick = () => {
-                // If we aren't targeting a specific slot, just load it for a new addition
-                if (state.editingIndex === null) {
-                    loadEditor({ imgUrl: item.pic, series: s, title: t });
-                } else {
-                     // We clicked an empty slot previously, now fill it with this search result
-                    loadEditor({ imgUrl: item.pic, series: s, title: t }, state.editingIndex);
-                }
-            };
+            const el = document.createElement('div'); el.className = 'search-item';
+            el.innerHTML = `<img src="${item.pic}" loading="lazy"><span>${item.series ? item.series + '<br>' : ''}${item.title||''}</span>`;
+            el.onclick = () => loadEditor({ imgUrl: item.pic, series: item.series||'', title: item.title||'' }, state.editingIndex);
             DOM.grid.appendChild(el);
         });
     }
 
     function switchSourceTab(tab) {
-        document.getElementById('tab-tonie').classList.remove('active');
-        document.getElementById('tab-upload').classList.remove('active');
-        document.getElementById('view-tonie').classList.add('hidden');
-        document.getElementById('view-upload').classList.add('hidden');
-        document.getElementById(`tab-${tab}`).classList.add('active');
-        document.getElementById(`view-${tab}`).classList.remove('hidden');
+        document.getElementById('tab-tonie').classList.remove('active'); document.getElementById('tab-upload').classList.remove('active');
+        document.getElementById('view-tonie').classList.add('hidden'); document.getElementById('view-upload').classList.add('hidden');
+        document.getElementById(`tab-${tab}`).classList.add('active'); document.getElementById(`view-${tab}`).classList.remove('hidden');
     }
 
     function setupUpload() {
         DOM.fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
+            const file = e.target.files[0]; if (!file) return;
             const reader = new FileReader();
-            reader.onload = (evt) => {
-                 if (state.editingIndex === null) {
-                    loadEditor({ imgUrl: evt.target.result, series: 'Eigene Grafik', title: file.name.split('.')[0] });
-                } else {
-                    loadEditor({ imgUrl: evt.target.result, series: 'Eigene Grafik', title: file.name.split('.')[0] }, state.editingIndex);
-                }
-                DOM.fileInput.value = ''; 
-            };
-            reader.readAsDataURL(file);
+            reader.onload = (evt) => loadEditor({ imgUrl: evt.target.result, series: 'Eigene Grafik', title: file.name.split('.')[0] }, state.editingIndex);
+            reader.readAsDataURL(file); DOM.fileInput.value = '';
         });
     }
 
-    // --- 4. EDITOR LOGIC ---
     function switchMode(mode) {
-        document.getElementById('mode-simple').classList.remove('active');
-        document.getElementById('mode-pro').classList.remove('active');
+        document.getElementById('mode-simple').classList.remove('active'); document.getElementById('mode-pro').classList.remove('active');
         document.getElementById(`mode-${mode}`).classList.add('active');
         mode === 'pro' ? document.getElementById('proPanel').classList.remove('hidden') : document.getElementById('proPanel').classList.add('hidden');
     }
 
-    // Index is passed if we are editing an existing slot or filling a specific empty slot
     function loadEditor(data, index = null) {
         state.currentEdit = {
-            imgUrl: data.imgUrl, 
-            series: data.series || '', 
-            title: data.title || '',
-            zoom: data.zoom || 100, 
-            rot: data.rot || 0, 
-            posX: data.posX || 0, 
-            posY: data.posY || 0, 
-            bg: data.bg || '#ffffff'
+            imgUrl: data.imgUrl, series: data.series || '', title: data.title || '',
+            zoom: data.zoom || 100, rot: data.rot || 0, posX: data.posX || 0, posY: data.posY || 0, 
+            bg: data.bg || '#ffffff', textCol: data.textCol || '#111111'
         };
         state.editingIndex = index;
 
-        DOM.eTop.value = state.currentEdit.series;
-        DOM.eBot.value = state.currentEdit.title;
-        DOM.eZoom.value = state.currentEdit.zoom;
-        DOM.eRot.value = state.currentEdit.rot;
-        DOM.eX.value = state.currentEdit.posX;
-        DOM.eY.value = state.currentEdit.posY;
-        DOM.eBg.value = state.currentEdit.bg;
+        DOM.eTop.value = state.currentEdit.series; DOM.eBot.value = state.currentEdit.title;
+        DOM.eZoom.value = state.currentEdit.zoom; DOM.eRot.value = state.currentEdit.rot;
+        DOM.eX.value = state.currentEdit.posX; DOM.eY.value = state.currentEdit.posY;
+        DOM.eBg.value = state.currentEdit.bg; DOM.eTextCol.value = state.currentEdit.textCol;
 
         DOM.btnSave.style.pointerEvents = 'auto';
-
+        
         if (index !== null && state.labels[index]) {
-            // Editing an EXISTING filled slot
-            DOM.btnSave.textContent = '💾 Änderungen speichern';
-            DOM.btnSave.style.background = '#3b82f6'; 
-            DOM.btnDel.classList.remove('hidden');
-            DOM.btnCan.classList.remove('hidden');
+            DOM.btnSave.textContent = '💾 Änderungen speichern'; DOM.btnSave.style.background = '#3b82f6'; 
+            DOM.btnDel.classList.remove('hidden'); DOM.btnCan.classList.remove('hidden'); DOM.btnBatch.classList.add('hidden');
         } else {
-            // New addition (or filling an empty slot)
             DOM.btnSave.textContent = index !== null ? `➕ An Position ${index+1} einfügen` : '➕ Auf den Bogen legen';
             DOM.btnSave.style.background = '#10b981'; 
-            DOM.btnDel.classList.add('hidden');
-            DOM.btnCan.classList.remove('hidden'); // Allow cancel to un-target the slot
+            DOM.btnDel.classList.add('hidden'); DOM.btnCan.classList.remove('hidden'); DOM.btnBatch.classList.remove('hidden');
         }
 
-        DOM.pCircle.classList.remove('empty');
-        DOM.pSvg.style.display = 'block';
+        DOM.pCircle.classList.remove('empty'); DOM.pSvg.style.display = 'block';
         updatePreview();
-        
-        // Scroll to editor smoothly
         document.getElementById('editorCard').scrollIntoView({behavior: 'smooth', block: 'start'});
     }
 
     function updatePreview() {
-        if (!state.currentEdit) return;
-        const c = state.currentEdit;
+        if (!state.currentEdit) return; const c = state.currentEdit;
         c.series = DOM.eTop.value; c.title = DOM.eBot.value;
         c.zoom = parseInt(DOM.eZoom.value); c.rot = parseInt(DOM.eRot.value);
         c.posX = parseInt(DOM.eX.value); c.posY = parseInt(DOM.eY.value);
-        c.bg = DOM.eBg.value;
+        c.bg = DOM.eBg.value; c.textCol = DOM.eTextCol.value;
 
         DOM.vZoom.textContent = c.zoom + '%'; DOM.vRot.textContent = c.rot + '°';
-        
         DOM.pImage.style.backgroundImage = `url('${c.imgUrl}')`;
-        DOM.pImage.style.backgroundColor = c.bg;
-        DOM.pImage.style.backgroundSize = `${c.zoom}%`;
+        DOM.pImage.style.backgroundColor = c.bg; DOM.pImage.style.backgroundSize = `${c.zoom}%`;
         DOM.pImage.style.backgroundPosition = `calc(50% + ${c.posX}px) calc(50% + ${c.posY}px)`;
         DOM.pImage.style.transform = `rotate(${c.rot}deg)`;
 
-        DOM.pTextTop.textContent = c.series;
-        DOM.pTextBot.textContent = c.title;
+        DOM.pTextTop.textContent = c.series; DOM.pTextBot.textContent = c.title;
+        DOM.pTextTop.parentElement.style.fill = c.textCol; DOM.pTextBot.parentElement.style.fill = c.textCol;
     }
 
     function resetEditor() {
-        state.currentEdit = null; 
-        state.editingIndex = null;
-        
-        DOM.pCircle.classList.add('empty');
-        DOM.pImage.style.backgroundImage = 'none';
-        DOM.pImage.style.backgroundColor = 'transparent';
-        DOM.pSvg.style.display = 'none';
-        DOM.eTop.value = ''; DOM.eBot.value = '';
-        
-        DOM.btnSave.textContent = 'Wähle zuerst ein Motiv (Links)';
-        DOM.btnSave.style.background = '#94a3b8';
-        DOM.btnSave.style.pointerEvents = 'none';
-        DOM.btnDel.classList.add('hidden');
-        DOM.btnCan.classList.add('hidden');
-        
-        // Ensure array is padded correctly if we cancelled filling an empty slot
+        state.currentEdit = null; state.editingIndex = null;
+        DOM.pCircle.classList.add('empty'); DOM.pImage.style.backgroundImage = 'none'; DOM.pImage.style.backgroundColor = 'transparent';
+        DOM.pSvg.style.display = 'none'; DOM.eTop.value = ''; DOM.eBot.value = '';
+        DOM.btnSave.textContent = 'Wähle zuerst ein Motiv'; DOM.btnSave.style.background = '#94a3b8'; DOM.btnSave.style.pointerEvents = 'none';
+        DOM.btnDel.classList.add('hidden'); DOM.btnCan.classList.add('hidden'); DOM.btnBatch.classList.add('hidden');
         renderSheet();
     }
 
-    // --- 5. SHEET & RENDER LOGIC ---
-    function handleFormatChange() {
-        // If format changes, we might need to adjust array size (e.g. Avery max 24)
-        state.format = DOM.fSelect.value;
-        if (state.format === 'avery-40' && state.labels.length > 24) {
-            state.labels = state.labels.slice(0, 24);
-        }
-        saveCache();
-        renderSheet();
-    }
+    function handleFormatChange() { state.format = DOM.fSelect.value; saveCache(); renderSheet(); }
 
     function saveToSheet() {
         if (!state.currentEdit) return;
-        
-        if (state.editingIndex !== null) {
-            // Replace or fill specific slot
-            state.labels[state.editingIndex] = { ...state.currentEdit }; 
-        } else {
-            // Find first empty slot or push to end
+        if (state.editingIndex !== null) { state.labels[state.editingIndex] = { ...state.currentEdit }; } 
+        else {
             const firstEmpty = state.labels.findIndex(l => l === null);
-            if (firstEmpty !== -1) {
-                state.labels[firstEmpty] = { ...state.currentEdit };
-            } else {
-                state.labels.push({ ...state.currentEdit }); 
-            }
+            if (firstEmpty !== -1) state.labels[firstEmpty] = { ...state.currentEdit };
+            else state.labels.push({ ...state.currentEdit }); 
         }
-        
-        saveCache();
-        renderSheet();
-        resetEditor();
+        saveCache(); renderSheet(); resetEditor();
         document.querySelector('.print-section').scrollIntoView({behavior: 'smooth', block: 'start'});
+    }
+    
+    function fillEntireSheet() {
+        if (!state.currentEdit) return;
+        const specs = getGridSpecs(); let count = 0;
+        // Pad array if needed
+        while (state.labels.length < specs.maxSlots) state.labels.push(null);
+        
+        for(let i=0; i<specs.maxSlots; i++) {
+            if (!state.labels[i]) { state.labels[i] = { ...state.currentEdit }; count++; }
+        }
+        if(count > 0) { saveCache(); renderSheet(); resetEditor(); alert(`${count} Etiketten wurden hinzugefügt!`); } 
+        else alert('Der Bogen ist bereits voll.');
     }
 
     function deleteLabel() {
         if (state.editingIndex !== null) {
-            // Instead of splicing and shifting everything, set to null to preserve grid positions
             state.labels[state.editingIndex] = null;
-            
-            // Clean up trailing nulls to shrink array if needed
-            while(state.labels.length > 0 && state.labels[state.labels.length - 1] === null) {
-                state.labels.pop();
-            }
-            
-            saveCache(); 
-            renderSheet(); 
-            resetEditor();
+            while(state.labels.length > 0 && state.labels[state.labels.length - 1] === null) state.labels.pop();
+            saveCache(); renderSheet(); resetEditor();
         }
     }
 
     function clearSheet() {
-        if(confirm('Bist du sicher, dass du den gesamten Bogen leeren möchtest?')) {
-            state.labels = []; 
-            saveCache(); 
-            renderSheet(); 
-            resetEditor();
-        }
+        if(confirm('Bist du sicher, dass du den Bogen leeren möchtest?')) { state.labels = []; saveCache(); renderSheet(); resetEditor(); }
+    }
+
+    // --- JSON PROJECT EXPORT / IMPORT ---
+    function exportProject() {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ labels: state.labels, format: state.format }));
+        const dlAnchorElem = document.createElement('a');
+        dlAnchorElem.setAttribute("href", dataStr); dlAnchorElem.setAttribute("download", "tonie_bogen_projekt.json");
+        dlAnchorElem.click();
+    }
+    function importProject(e) {
+        const file = e.target.files[0]; if(!file) return;
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+            try {
+                const data = JSON.parse(evt.target.result);
+                if(data.labels) { state.labels = data.labels; }
+                if(data.format) { state.format = data.format; DOM.fSelect.value = data.format; }
+                saveCache(); renderSheet(); alert("Projekt erfolgreich geladen!");
+            } catch(err) { alert('Fehler beim Laden der Projektdatei.'); }
+            e.target.value = ''; // Reset input
+        };
+        reader.readAsText(file);
     }
 
     function getGridSpecs() {
         const isAvery = state.format === 'avery-40';
-        const pxPerMm = 794 / 210; // ~3.78px per mm
-        const diamMm = isAvery ? 40 : parseInt(state.format);
-        const diamPx = diamMm * pxPerMm;
-        
-        // Calculate max slots for a standard sheet to render empty circles
+        const pxPerMm = 794 / 210; 
+        const diamPx = (isAvery ? 40 : parseInt(state.format)) * pxPerMm;
         let maxSlots = 24; 
         if (!isAvery) {
-            // Rough estimation for visual grid based on diameter
-            // Grid container padding 56px, gap 30px, width 794
-            const availWidth = 794 - 112; 
-            const cols = Math.floor((availWidth + 30) / (diamPx + 30));
-            // Height 1123, padding 56 top/bottom
-            const availHeight = 1123 - 112;
-            const rows = Math.floor((availHeight + 30) / (diamPx + 30));
+            const cols = Math.floor((794 - 112 + 30) / (diamPx + 30));
+            const rows = Math.floor((1123 - 112 + 30) / (diamPx + 30));
             maxSlots = cols * rows;
         }
-        
         return { isAvery, diamPx, maxSlots };
     }
 
     function renderSheet() {
-        DOM.sGrid.innerHTML = '';
-        const specs = getGridSpecs();
-        
+        DOM.sGrid.innerHTML = ''; const specs = getGridSpecs();
         DOM.sGrid.className = specs.isAvery ? 'grid-avery' : 'sheet-grid';
 
-        // Pad the labels array with nulls up to maxSlots so we render empty circles
         let renderArray = [...state.labels];
-        while (renderArray.length < specs.maxSlots) {
-            renderArray.push(null);
-        }
-        // Truncate if somehow exceeded (e.g., switched from small coins to Avery)
-        if (renderArray.length > specs.maxSlots) {
-            renderArray = renderArray.slice(0, specs.maxSlots);
-        }
+        while (renderArray.length < specs.maxSlots) renderArray.push(null);
+        if (renderArray.length > specs.maxSlots) renderArray = renderArray.slice(0, specs.maxSlots);
 
         renderArray.forEach((data, i) => {
             const slot = document.createElement('div');
             slot.className = `label-slot ${data ? 'filled' : 'empty'}`;
-            slot.style.width = `${specs.diamPx}px`;
-            slot.style.height = `${specs.diamPx}px`;
+            slot.style.width = `${specs.diamPx}px`; slot.style.height = `${specs.diamPx}px`;
 
             if (data) {
                 slot.style.backgroundColor = data.bg;
-                
                 const imgWrap = document.createElement('div');
-                imgWrap.style.position = 'absolute';
-                imgWrap.style.width = '100%'; imgWrap.style.height = '100%';
-                imgWrap.style.backgroundImage = `url('${data.imgUrl}')`;
-                imgWrap.style.backgroundRepeat = 'no-repeat';
-                // Map editor pixel offsets to sheet display scale
+                imgWrap.style.position = 'absolute'; imgWrap.style.width = '100%'; imgWrap.style.height = '100%';
+                imgWrap.style.backgroundImage = `url('${data.imgUrl}')`; imgWrap.style.backgroundRepeat = 'no-repeat';
                 imgWrap.style.backgroundPosition = `calc(50% + ${data.posX * (specs.diamPx/240)}px) calc(50% + ${data.posY * (specs.diamPx/240)}px)`;
-                imgWrap.style.backgroundSize = `${data.zoom}%`;
-                imgWrap.style.transform = `rotate(${data.rot}deg)`;
-                imgWrap.style.pointerEvents = 'none';
-                slot.appendChild(imgWrap);
+                imgWrap.style.backgroundSize = `${data.zoom}%`; imgWrap.style.transform = `rotate(${data.rot}deg)`;
+                imgWrap.style.pointerEvents = 'none'; slot.appendChild(imgWrap);
 
                 if(data.series || data.title) {
                     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
                     svg.setAttribute('viewBox', '0 0 200 200');
-                    svg.style.position = 'absolute'; svg.style.width = '100%'; svg.style.height = '100%';
-                    svg.style.pointerEvents = 'none';
+                    svg.style.position = 'absolute'; svg.style.width = '100%'; svg.style.height = '100%'; svg.style.pointerEvents = 'none';
                     svg.innerHTML = `
-                        <style>text { font-family: -apple-system, sans-serif; font-weight: 800; font-size: 16px; fill: #111; stroke: #fff; stroke-width: 4px; paint-order: stroke fill; letter-spacing: 0.5px; }</style>
+                        <style>text { font-family: -apple-system, sans-serif; font-weight: 800; font-size: 16px; stroke: #fff; stroke-width: 4px; paint-order: stroke fill; letter-spacing: 0.5px; fill: ${data.textCol || '#111'};}</style>
                         <path id="ptT${i}" d="M 18,100 A 82,82 0 0,1 182,100" fill="none"/>
                         <text><textPath href="#ptT${i}" startOffset="50%" text-anchor="middle" dominant-baseline="auto">${data.series}</textPath></text>
                         <path id="ptB${i}" d="M 18,100 A 82,82 0 0,0 182,100" fill="none"/>
@@ -798,147 +652,98 @@
                     `;
                     slot.appendChild(svg);
                 }
-                
                 slot.onclick = () => loadEditor(data, i);
-                
             } else {
-                // Clicking an empty slot primes it to receive the next search result
                 slot.onclick = () => {
                     state.editingIndex = i;
-                    
-                    // Visual feedback that this slot is targeted
-                    document.querySelectorAll('.label-slot').forEach(s => s.style.borderColor = '');
-                    slot.style.borderColor = 'var(--primary)';
-                    
-                    // Scroll to search to pick an image
-                    document.querySelector('.app-layout').scrollIntoView({behavior: 'smooth', block: 'start'});
-                    DOM.searchInput.focus();
+                    document.querySelectorAll('.label-slot').forEach(s => s.style.borderColor = ''); slot.style.borderColor = 'var(--primary)';
+                    document.querySelector('.app-layout').scrollIntoView({behavior: 'smooth', block: 'start'}); DOM.searchInput.focus();
                 };
             }
-            
             DOM.sGrid.appendChild(slot);
         });
     }
 
-    // --- 6. HIGH-RES PNG EXPORT (300 DPI) ---
     async function exportPNG() {
-        // Filter out nulls for export check
         const activeLabels = state.labels.filter(l => l !== null);
         if(activeLabels.length === 0) return alert('Der Bogen ist leer!');
         
+        const drawCutlines = document.getElementById('checkCutlines').checked;
         const canvas = document.getElementById('exportCanvas');
-        canvas.width = 2480; canvas.height = 3508; // DIN A4 @ 300 DPI
+        canvas.width = 2480; canvas.height = 3508; 
         const ctx = canvas.getContext('2d');
-        
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         const isAvery = state.format === 'avery-40';
         const pxPerMm = 2480 / 210;
         const diamPx = (isAvery ? 40 : parseInt(state.format)) * pxPerMm;
         const radius = diamPx / 2;
         
-        // Grid Calculation matching HTML visual grid
-        let startX = 56 * (794/210) * (2480/794); // Convert HTML padding to 300DPI
-        let startY = 56 * (794/210) * (2480/794);
-        let gapX = 30 * (794/210) * (2480/794);
-        let gapY = 30 * (794/210) * (2480/794);
-        let cols = Math.floor((2480 - (startX*2))/(diamPx+gapX)) + 1; // +1 heuristic adjustment
+        let startX = 56 * (794/210) * (2480/794); let startY = startX;
+        let gapX = 30 * (794/210) * (2480/794); let gapY = gapX;
+        let cols = Math.floor((2480 - (startX*2))/(diamPx+gapX)) + 1; 
         
-        if(isAvery) { 
-            // Exact Avery L3415-10 measurements
-            startX = 9.5 * pxPerMm; startY = 13.5 * pxPerMm; 
-            gapX = 11.5 * pxPerMm; gapY = 11.5 * pxPerMm; 
-            cols = 4; 
-        }
+        if(isAvery) { startX = 9.5 * pxPerMm; startY = 13.5 * pxPerMm; gapX = 11.5 * pxPerMm; gapY = 11.5 * pxPerMm; cols = 4; }
 
-        // Cache images
         const cache = {};
         for(let lbl of activeLabels) {
             if(!cache[lbl.imgUrl]) {
                 cache[lbl.imgUrl] = await new Promise(res => {
                     const img = new Image(); img.crossOrigin = 'anonymous';
-                    img.onload = () => res(img); img.onerror = () => res(null);
-                    img.src = lbl.imgUrl;
+                    img.onload = () => res(img); img.onerror = () => res(null); img.src = lbl.imgUrl;
                 });
             }
         }
 
-        // Draw
         for(let i=0; i < state.labels.length; i++) {
             const lbl = state.labels[i];
-            if (!lbl) continue; // Skip empty slots in print
+            if (!lbl) continue; 
             if (isAvery && i >= 24) break;
             
             const cx = startX + (i % cols) * (diamPx + gapX) + radius;
             const cy = startY + Math.floor(i / cols) * (diamPx + gapY) + radius;
 
-            // Cut Line
-            ctx.save(); ctx.beginPath(); ctx.setLineDash([15,15]); ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=3;
-            ctx.arc(cx, cy, radius, 0, Math.PI*2); ctx.stroke(); ctx.restore();
+            if(drawCutlines) {
+                ctx.save(); ctx.beginPath(); ctx.setLineDash([15,15]); ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=3;
+                ctx.arc(cx, cy, radius, 0, Math.PI*2); ctx.stroke(); ctx.restore();
+            }
 
-            // Mask
             ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI*2); ctx.clip();
-            
-            // BG & Image
             ctx.fillStyle = lbl.bg; ctx.fill();
             const img = cache[lbl.imgUrl];
             if(img) {
-                ctx.save(); 
-                ctx.translate(cx, cy); 
-                ctx.rotate(lbl.rot * Math.PI / 180);
-                const scale = lbl.zoom / 100;
-                const w = diamPx * scale;
-                const oX = lbl.posX * (diamPx / 240); 
-                const oY = lbl.posY * (diamPx / 240);
-                ctx.drawImage(img, -w/2 + oX, -w/2 + oY, w, w);
+                ctx.save(); ctx.translate(cx, cy); ctx.rotate(lbl.rot * Math.PI / 180);
+                const scale = lbl.zoom / 100; const w = diamPx * scale;
+                ctx.drawImage(img, -w/2 + (lbl.posX * (diamPx / 240)), -w/2 + (lbl.posY * (diamPx / 240)), w, w);
                 ctx.restore();
             }
-            ctx.restore(); // Close Mask
+            ctx.restore(); 
 
-            // Curved Text rendering
             const drawArcText = (text, isTop) => {
                 if(!text) return;
-                ctx.save();
-                const fSize = Math.round(19 * (pxPerMm/3.78)); // Scaled font size
-                ctx.font = `800 ${fSize}px sans-serif`;
-                ctx.textAlign = "center";
-                ctx.textBaseline = isTop ? "bottom" : "top"; 
-                
-                ctx.fillStyle = "#111"; ctx.strokeStyle = "rgba(255,255,255,0.95)";
-                ctx.lineWidth = fSize * 0.25; ctx.lineJoin = "round";
-                
+                ctx.save(); const fSize = Math.round(19 * (pxPerMm/3.78)); 
+                ctx.font = `800 ${fSize}px sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = isTop ? "bottom" : "top"; 
+                ctx.fillStyle = lbl.textCol || "#111"; ctx.strokeStyle = "rgba(255,255,255,0.95)"; ctx.lineWidth = fSize * 0.25; ctx.lineJoin = "round";
                 const textRadius = radius * 0.82; 
                 const totalAngle = (ctx.measureText(text).width + (text.length * 5)) / textRadius; 
                 let currentAngle = isTop ? (-Math.PI/2 - totalAngle/2) : (Math.PI/2 - totalAngle/2);
                 
                 for(let char of text) {
-                    const cWidth = ctx.measureText(char).width;
-                    const charAngle = (cWidth + 5) / textRadius;
+                    const charAngle = (ctx.measureText(char).width + 5) / textRadius;
                     const drawAngle = currentAngle + charAngle / 2;
-                    
-                    ctx.save();
-                    ctx.translate(cx + Math.cos(drawAngle) * textRadius, cy + Math.sin(drawAngle) * textRadius);
-                    
-                    let rotation = drawAngle + Math.PI / 2;
-                    if(!isTop) rotation += Math.PI; 
-                    
+                    ctx.save(); ctx.translate(cx + Math.cos(drawAngle) * textRadius, cy + Math.sin(drawAngle) * textRadius);
+                    let rotation = drawAngle + Math.PI / 2; if(!isTop) rotation += Math.PI; 
                     ctx.rotate(rotation);
-                    ctx.strokeText(char, 0, 0); ctx.fillText(char, 0, 0);
-                    ctx.restore();
+                    ctx.strokeText(char, 0, 0); ctx.fillText(char, 0, 0); ctx.restore();
                     currentAngle += charAngle;
                 }
                 ctx.restore();
             };
 
-            drawArcText(lbl.series, true);
-            drawArcText(lbl.title, false);
+            drawArcText(lbl.series, true); drawArcText(lbl.title, false);
         }
-
-        const link = document.createElement('a');
-        link.download = 'Tonie-Etiketten.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
+        const link = document.createElement('a'); link.download = 'Tonie-Bogen.png';
+        link.href = canvas.toDataURL('image/png'); link.click();
     }
 </script>
 </body>
