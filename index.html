@@ -95,7 +95,6 @@
         .search-item:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .search-item img { width: 100%; max-width: 120px; aspect-ratio: 1; object-fit: contain; margin-bottom: 12px; border-radius: 8px; }
         .search-item span { display: block; font-size: 12px; font-weight: 600; line-height: 1.4; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; width: 100%; text-overflow: ellipsis; margin-bottom: 4px;}
-        .search-item .item-id { font-size: 10px; color: var(--text-muted); font-family: monospace; background: #f1f5f9; padding: 2px 6px; border-radius: 4px; display: inline-block;}
 
         .upload-box { border: 2px dashed #cbd5e1; padding: 60px 20px; text-align: center; border-radius: var(--radius-md); background: #f8fafc; cursor: pointer; transition: 0.2s; display: block; width: 100%; box-sizing: border-box; }
         .upload-box:hover { border-color: var(--primary); background: #f1f5f9; }
@@ -214,7 +213,7 @@
             </div>
 
             <div id="view-tonie">
-                <input type="text" id="searchInput" placeholder="Titel oder Serie suchen (z.B. Conni)..." autocomplete="off">
+                <input type="text" id="searchInput" placeholder="Titel, Serie oder ID suchen..." autocomplete="off">
                 <div class="status-text" id="statusText">Verbinde zur Datenbank...</div>
                 <div class="search-grid" id="searchGrid"></div>
             </div>
@@ -248,7 +247,7 @@
             <div class="editor-layout">
                 <div class="preview-container">
                     <!-- NEW: Display Tonie ID in Editor -->
-                    <div id="editorIdBadge" class="editor-id-badge">ID: --</div>
+                    <div id="editorIdBadge" class="editor-id-badge" title="Tonie ID">ID: --</div>
                     <div class="circle-canvas empty" id="previewCircle">
                         <div id="previewImage" class="bg-layer"></div>
                         <svg class="svg-overlay" viewBox="0 0 200 200" id="previewSvg" style="display: none;">
@@ -389,7 +388,7 @@
 </div>
 
 <footer>
-    <p>Tonie Cover Generator • Version 15.0 (Connectivity Update)<br>Open Source unter MIT-Lizenz.</p>
+    <p>Tonie Cover Generator • Version 15.1<br>Open Source unter MIT-Lizenz.</p>
     <div class="community-links">
         <a href="https://github.com/toniebox-reverse-engineering" target="_blank">Team RevvoX</a>
         <a href="https://gt-blog.de/custom-tags-for-toniebox/" target="_blank">Gambrius Blog</a>
@@ -476,7 +475,6 @@
         try {
             const res = await fetch('https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json');
             const data = await res.json();
-            // V15: Capture the 'model' property as 'tonieId' for handoff
             toniesDB = data.filter(t => t.pic && !t.pic.includes('placeholder')).map(t => ({
                 ...t,
                 tonieId: t.model || '' 
@@ -496,7 +494,6 @@
             const term = e.target.value.toLowerCase().trim();
             timer = setTimeout(() => {
                 if (term.length < 2) { renderSearch(toniesDB.slice(0, 12)); return; }
-                // Search by title, series, OR ID
                 const results = toniesDB.filter(t => 
                     (t.title && t.title.toLowerCase().includes(term)) || 
                     (t.series && t.series.toLowerCase().includes(term)) ||
@@ -512,10 +509,8 @@
         DOM.grid.innerHTML = items.length === 0 ? '<div style="grid-column: 1/-1; text-align:center; padding:20px;">Nichts gefunden.</div>' : '';
         items.forEach(item => {
             const el = document.createElement('div'); el.className = 'search-item';
-            // V15: Display ID in search results if available
-            const idHtml = item.tonieId ? `<span class="item-id">${item.tonieId}</span>` : '';
-            el.innerHTML = `<img src="${item.pic}" loading="lazy"><span>${item.series ? item.series + '<br>' : ''}${item.title||''}</span>${idHtml}`;
-            // V15: Pass ID to editor
+            // V15.1: Cleaned up UI, ID is hidden from search cards but available in Editor
+            el.innerHTML = `<img src="${item.pic}" loading="lazy"><span>${item.series ? item.series + '<br>' : ''}${item.title||''}</span>`;
             el.onclick = () => loadEditor({ imgUrl: item.pic, series: item.series||'', title: item.title||'', tonieId: item.tonieId||'' }, state.editingIndex);
             DOM.grid.appendChild(el);
         });
@@ -531,7 +526,6 @@
             let searchTerm = incomingTitle || incomingUid; 
             const termLower = searchTerm.toLowerCase().trim();
             
-            // Wait for DB to be loaded before trying to match
             const checkDbReady = setInterval(() => {
                 if (toniesDB.length > 0) {
                     clearInterval(checkDbReady);
@@ -574,7 +568,7 @@
         const params = [];
         if (titleParam) params.push(`title=${titleParam}`);
         if (seriesParam) params.push(`series=${seriesParam}`);
-        if (idParam) params.push(`id=${idParam}`); // Included for backwards compatibility if needed later
+        if (idParam) params.push(`id=${idParam}`);
         
         if (params.length > 0) {
             shareUrl += `?${params.join('&')}`;
@@ -595,7 +589,6 @@
         }
     }
 
-    // --- V15 NEW: Send ID to External App (Handoff) ---
     function sendIdToApp() {
         if (!state.currentEdit || !state.currentEdit.tonieId) {
             alert("Für dieses Motiv ist keine offizielle Tonie-ID in der Datenbank hinterlegt.");
@@ -603,7 +596,6 @@
         }
         const id = state.currentEdit.tonieId;
         
-        // Option 1: Native Share Sheet focusing on the text string (Best for passing to Shortcuts/Notes)
         if (navigator.share) {
             navigator.share({
                 title: 'Tonie ID Export',
@@ -612,7 +604,6 @@
                 copyIdToClipboard(id);
             });
         } else {
-            // Option 2: Fallback to Clipboard
             copyIdToClipboard(id);
         }
     }
@@ -669,7 +660,6 @@
 
         DOM.btnSave.style.pointerEvents = 'auto';
         
-        // V15 UI Updates for ID
         if (state.currentEdit.tonieId) {
             DOM.editorIdBadge.style.display = 'block';
             DOM.editorIdBadge.textContent = `ID: ${state.currentEdit.tonieId}`;
@@ -774,7 +764,6 @@
         if(confirm('Bist du sicher, dass du den Bogen leeren möchtest?')) { state.labels = []; saveCache(); renderSheet(); resetEditor(); }
     }
 
-    // --- JSON PROJECT EXPORT / IMPORT ---
     function exportProject() {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ labels: state.labels, format: state.format }));
         const dlAnchorElem = document.createElement('a');
