@@ -114,7 +114,7 @@ input[type="color"]::-webkit-color-swatch { border: 2px solid var(--border); bor
 .chip:hover { transform: scale(1.15); }
 .sheet-scale-wrapper { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; touch-action: pan-x; background: #cbd5e1; border-radius: var(--radius-lg); padding: 16px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.05); display: flex; justify-content: center; margin-top: 16px; box-sizing: border-box; }
 .a4-sheet { background: #fff; box-shadow: var(--shadow-lg); position: relative; width: 794px; height: 1123px; border-radius: 4px; flex-shrink: 0; transform-origin: top center; }
-@media(max-width: 800px) { .a4-sheet { zoom: 0.42; } .sheet-scale-wrapper { padding: 8px; } }
+@media(max-width: 800px) { .a4-sheet { zoom: 0.44; } .sheet-scale-wrapper { padding: 8px; } }
 .sheet-grid { display: flex; flex-wrap: wrap; gap: 24px; padding: 48px; align-content: flex-start; justify-content: flex-start; }
 .grid-avery { display: grid; grid-template-columns: repeat(4, 151px); grid-auto-rows: 151px; gap: 16px; justify-content: center; padding-top: 48px; }
 .label-slot { position: relative; border-radius: 50%; border: 2px dashed #cbd5e1; overflow: hidden; cursor: pointer; display: flex; justify-content: center; align-items: center; background: transparent; transition: all 0.2s ease; user-select: none; }
@@ -246,6 +246,10 @@ body, html { display: block !important; margin: 0 !important; padding: 0 !import
 <text id="previewTextBotNode" font-family="-apple-system, sans-serif" font-weight="800" stroke="#fff" paint-order="stroke fill" letter-spacing="0.5px">
 <textPath href="#pathBot" startOffset="50%" text-anchor="middle" dominant-baseline="hanging" id="previewTextBot"></textPath>
 </text>
+<path id="pathId" d="M 35,145 A 70,70 0 0,0 165,145" fill="none" stroke="none"/>
+<text id="previewTextIdNode" font-family="monospace" font-weight="700" fill="#64748b">
+<textPath href="#pathId" startOffset="50%" text-anchor="middle" id="previewTextId"></textPath>
+</text>
 </svg>
 </div>
 </div>
@@ -375,7 +379,7 @@ body, html { display: block !important; margin: 0 !important; padding: 0 !import
 </div>
 </div>
 <footer>
-<p>Tonie Cover Generator • Version 20.3 (Lean & Clean Edition)
+<p>Tonie Cover Generator • Version 20.4 (Lean & Clean Edition)
 Open Source unter MIT-Lizenz.</p>
 <div class="community-links">
 <a href="https://github.com/toniebox-reverse-engineering" target="_blank">Team RevvoX</a>
@@ -407,8 +411,10 @@ pImage: document.getElementById('previewImage'),
 pSvg: document.getElementById('previewSvg'),
 pTextTopNode: document.getElementById('previewTextTopNode'),
 pTextBotNode: document.getElementById('previewTextBotNode'),
+pTextIdNode: document.getElementById('previewTextIdNode'),
 pTextTop: document.getElementById('previewTextTop'),
 pTextBot: document.getElementById('previewTextBot'),
+pTextId: document.getElementById('previewTextId'),
 eTop: document.getElementById('editTop'), eBot: document.getElementById('editBot'),
 eZoom: document.getElementById('editZoom'), eRot: document.getElementById('editRot'),
 eBleed: document.getElementById('editBleed'), checkPrintId: document.getElementById('checkPrintId'),
@@ -425,6 +431,12 @@ formatDetailSelect: document.getElementById('formatDetailSelect'),
 cutlinesRow: document.getElementById('cutlinesRow'),
 sGrid: document.getElementById('sheetGrid')
 };
+const FALLBACK_DB = [
+{ title: "Conni kommt in den Kindergarten", series: "Conni", tonieId: "01-0010", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0010.png" },
+{ title: "Bibi Blocksberg - Hexen gibt es doch", series: "Bibi Blocksberg", tonieId: "01-0012", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0012.png" },
+{ title: "Janosch - Oh, wie schön ist Panama", series: "Janosch", tonieId: "01-0001", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0001.png" },
+{ title: "Die Olchis auf Geburtstagsreise", series: "Die Olchis", tonieId: "01-0020", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0020.png" }
+];
 window.addEventListener('DOMContentLoaded', async () => {
 loadCache();
 updateDetailDropdownOptions();
@@ -454,7 +466,7 @@ return Math.max(8, size);
 }
 function loadCache() {
 try {
-const cache = JSON.parse(localStorage.getItem('TonieCacheV20.3'));
+const cache = JSON.parse(localStorage.getItem('TonieCacheV20.4'));
 if (cache) {
 state.labels = (cache.labels || []).map(l => l ? { ...l } : null);
 if(cache.formatType) state.formatType = cache.formatType;
@@ -466,7 +478,7 @@ DOM.formatTypeSelect.value = state.formatType;
 }
 function fnSaveCache() {
 try {
-localStorage.setItem('TonieCacheV20.3', JSON.stringify({
+localStorage.setItem('TonieCacheV20.4', JSON.stringify({
 labels: state.labels,
 formatType: state.formatType,
 formatDetail: state.formatDetail,
@@ -525,9 +537,9 @@ if(!opts.some(o => o.val === state.formatDetail)) state.formatDetail = '43';
 DOM.cutlinesRow.style.display = 'none';
 const opts = [
 { val: 'l3415', label: 'Avery Zweckform L3415-10 (40 mm)' },
-{ val: 'avery30', label: 'Avery Zweckform 6223-10 (30 mm)' },
+{ val: '6223', label: 'Avery Zweckform 6223-10 (30 mm)' },
 { val: 'p3413', label: 'Avery Zweckform P3413-25 (45 mm)' },
-{ val: 'avery25', label: 'Avery Zweckform P3414-50 (25 mm)' }
+{ val: 'p3414', label: 'Avery Zweckform P3414-50 (25 mm)' }
 ];
 opts.forEach(o => {
 const opt = document.createElement('option');
@@ -551,18 +563,27 @@ renderSheet();
 async function fetchDB() {
 DOM.status.textContent = "Lade Datenbank...";
 try {
-const res = await fetch('https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json');
+const controller = new AbortController();
+const timeoutId = setTimeout(() => controller.abort(), 4000);
+let res = await fetch('https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json', { signal: controller.signal });
+clearTimeout(timeoutId);
+if(!res.ok) throw new Error('Network response was not ok');
 const data = await res.json();
 toniesDB = data.filter(t => t.pic && !t.pic.includes('placeholder')).map(t => ({
 ...t,
-tonieId: t.model || ''
+tonieId: t.model || t.audioId || ''
 }));
 DOM.status.textContent = ⁠${toniesDB.length} Tonies bereit!⁠;
 DOM.status.style.color = "#10b981";
 renderSearch(toniesDB.slice(0, 12));
 renderFavorites();
 } catch (e) {
-DOM.status.textContent = 'Fehler beim Laden. Offline Modus.'; DOM.status.style.color = '#e30613';
+console.warn('Fallback triggered due to network or timeout:', e);
+toniesDB = FALLBACK_DB;
+DOM.status.textContent = ⁠${toniesDB.length} Tonies (Offline-Modus)⁠;
+DOM.status.style.color = '#f59e0b';
+renderSearch(toniesDB);
+renderFavorites();
 }
 }
 function setupSearch() {
@@ -723,14 +744,17 @@ DOM.pImage.style.transform = ⁠rotate(${c.rot}deg)⁠;
 DOM.pCircle.style.padding = ⁠${c.bleed}px⁠;
 DOM.pTextTop.textContent = c.series;
 DOM.pTextBot.textContent = c.title;
+DOM.pTextId.textContent = c.tonieId ? ⁠ID: ${c.tonieId}⁠ : '';
 const sTop = calcFontSize(c.series);
 const sBot = calcFontSize(c.title);
+const sId = 6;
 DOM.pTextTopNode.setAttribute('font-size', sTop + 'px');
 DOM.pTextTopNode.setAttribute('stroke-width', (sTop * 0.25) + 'px');
 DOM.pTextTopNode.setAttribute('fill', c.textCol);
 DOM.pTextBotNode.setAttribute('font-size', sBot + 'px');
 DOM.pTextBotNode.setAttribute('stroke-width', (sBot * 0.25) + 'px');
 DOM.pTextBotNode.setAttribute('fill', c.textCol);
+DOM.pTextIdNode.setAttribute('font-size', sId + 'px');
 }
 function resetEditor() {
 state.currentEdit = null; state.editingIndex = null;
@@ -801,9 +825,9 @@ let diamMm = 43; let maxSlots = 24;
 if (state.formatType === 'free') diamMm = parseInt(state.formatDetail);
 else {
 if (state.formatDetail === 'l3415') diamMm = 40;
-else if (state.formatDetail === 'avery30') diamMm = 30;
+else if (state.formatDetail === '6223') diamMm = 30;
 else if (state.formatDetail === 'p3413') diamMm = 45;
-else if (state.formatDetail === 'avery25') diamMm = 25;
+else if (state.formatDetail === 'p3414') diamMm = 25;
 }
 const pxPerMm = 794 / 210; const diamPx = diamMm * pxPerMm;
 if (!isAvery) {
@@ -812,9 +836,9 @@ const rows = Math.floor((1123 - 112 + 30) / (diamPx + 30));
 maxSlots = Math.max(1, cols * rows);
 } else {
 if (state.formatDetail === 'l3415') maxSlots = 24;
-else if (state.formatDetail === 'avery30') maxSlots = 48;
+else if (state.formatDetail === '6223') maxSlots = 48;
 else if (state.formatDetail === 'p3413') maxSlots = 15;
-else if (state.formatDetail === 'avery25') maxSlots = 54;
+else if (state.formatDetail === 'p3414') maxSlots = 54;
 }
 return { isAvery, diamPx, maxSlots };
 }
@@ -868,8 +892,7 @@ svg.setAttribute('viewBox', '0 0 200 200');
 svg.style.position = 'absolute'; svg.style.width = '100%'; svg.style.height = '100%'; svg.style.pointerEvents = 'none';
 let svgContent = ⁠<path id="ptT${i}" d="M 18,100 A 82,82 0 0,1 182,100" fill="none"/> <text font-family="-apple-system, sans-serif" font-weight="800" font-size="${sTop}px" stroke="#fff" stroke-width="${sTop * 0.25}px" paint-order="stroke fill" letter-spacing="0.5px" fill="${data.textCol || '#111'}"> <textPath href="#ptT${i}" startOffset="50%" text-anchor="middle" dominant-baseline="auto">${data.series}</textPath> </text> <path id="ptB${i}" d="M 18,100 A 82,82 0 0,0 182,100" fill="none"/> <text font-family="-apple-system, sans-serif" font-weight="800" font-size="${sBot}px" stroke="#fff" stroke-width="${sBot * 0.25}px" paint-order="stroke fill" letter-spacing="0.5px" fill="${data.textCol || '#111'}"> <textPath href="#ptB${i}" startOffset="50%" text-anchor="middle" dominant-baseline="hanging">${data.title}</textPath> </text>⁠;
 if (data.printId && data.tonieId) {
-const sId = calcFontSize(data.tonieId, true);
-svgContent += ⁠<path id="ptId${i}" d="M 35,145 A 70,70 0 0,0 165,145" fill="none"/> <text font-family="monospace" font-weight="700" font-size="${sId}px" fill="#64748b"> <textPath href="#ptId${i}" startOffset="50%" text-anchor="middle">ID: ${data.tonieId}</textPath> </text>⁠;
+svgContent += ⁠<path id="ptId${i}" d="M 35,145 A 70,70 0 0,0 165,145" fill="none"/> <text font-family="monospace" font-weight="700" font-size="6px" fill="#64748b"> <textPath href="#ptId${i}" startOffset="50%" text-anchor="middle">ID: ${data.tonieId}</textPath> </text>⁠;
 }
 svg.innerHTML = svgContent;
 slot.appendChild(svg);
@@ -910,9 +933,9 @@ let diamMm = 43;
 if (state.formatType === 'free') diamMm = parseInt(state.formatDetail);
 else {
 if (state.formatDetail === 'l3415') diamMm = 40;
-else if (state.formatDetail === 'avery30') diamMm = 30;
+else if (state.formatDetail === '6223') diamMm = 30;
 else if (state.formatDetail === 'p3413') diamMm = 45;
-else if (state.formatDetail === 'avery25') diamMm = 25;
+else if (state.formatDetail === 'p3414') diamMm = 25;
 }
 const pxPerMm = 2480 / 210; const diamPx = diamMm * pxPerMm; const radius = diamPx / 2;
 let startX = 56 * (794/210) * (2480/794); let startY = startX;
@@ -920,9 +943,9 @@ let gapX = 30 * (794/210) * (2480/794); let gapY = gapX;
 let cols = Math.floor((2480 - (startX*2))/(diamPx+gapX)) + 1;
 if(isAvery) {
 startX = 9.5 * pxPerMm; startY = 13.5 * pxPerMm; gapX = 11.5 * pxPerMm; gapY = 11.5 * pxPerMm; cols = 4;
-if (state.formatDetail === 'avery30') cols = 5;
+if (state.formatDetail === '6223') cols = 5;
 if (state.formatDetail === 'p3413') cols = 3;
-if (state.formatDetail === 'avery25') cols = 6;
+if (state.formatDetail === 'p3414') cols = 6;
 }
 const cache = {};
 for(let lbl of activeLabels) {
