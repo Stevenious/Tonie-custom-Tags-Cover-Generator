@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tonie & Tag Cover Generator V12.2</title>
+    <title>Tonie & Tag Cover Generator V12.3</title>
     <style>
         /* === VARIABLES & RESET === */
         :root {
@@ -31,7 +31,7 @@
             display: flex;
             flex-direction: column;
             align-items: center; 
-            overflow-x: hidden; /* Prevent horizontal scroll on mobile */
+            overflow-x: hidden; 
         }
 
         /* === LAYOUT & CARDS === */
@@ -62,7 +62,7 @@
         /* === BUTTONS & INPUTS === */
         input[type="text"], select { 
             width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: var(--radius-md); 
-            font-size: 16px; /* 16px prevents iOS Auto-Zoom */
+            font-size: 16px; 
             outline: none; background: #f9fafb; color: var(--text-main); font-weight: 500; transition: 0.2s; 
         }
         input[type="text"]:focus, select:focus { border-color: var(--primary); background: #fff; }
@@ -168,52 +168,53 @@
         footer a:hover { color: var(--primary-hover); text-decoration: underline;}
         .community-links { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-top: 12px; }
 
-        /* === PRINT STYLES (BULLETPROOF FIX) === */
+        /* === PRINT STYLES (BULLETPROOF V12.3) === */
         @media print {
-            /* Hide absolutely everything initially */
-            body * { visibility: hidden; }
-            body, html { margin: 0; padding: 0; background: #fff; width: 100%; height: 100%; overflow: visible !important; }
+            /* 1. Force strict A4 page, 0 margins to remove URL/Date headers from browser */
+            @page { size: A4 portrait; margin: 0 !important; }
             
-            /* Unhide ONLY the print sheet wrapper and its direct line of parents */
-            body, .app-layout, .print-section, #sheetWrapper, #printSheet, #printSheet * {
-                visibility: visible !important;
+            /* 2. Hide absolutely everything using display:none to prevent empty pages */
+            body * { display: none !important; }
+            
+            /* 3. Unhide ONLY the direct path to the sheet */
+            body, html { 
+                display: block !important; 
+                margin: 0 !important; padding: 0 !important; 
+                background: #fff !important; 
+                width: 210mm !important; height: 297mm !important; 
+                overflow: hidden !important; /* Kills the 2nd page bug */
             }
-
-            /* Strip formatting from all wrappers up to the sheet to prevent flex/grid clipping */
-            body, .app-layout, .print-section, #sheetWrapper {
-                display: block !important;
+            
+            /* 4. Strip formatting from wrappers but keep them visible */
+            .app-layout, .print-section, #sheetWrapper {
+                display: block !important; 
                 position: static !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                box-shadow: none !important;
-                border: none !important;
-                background: transparent !important;
-                max-width: none !important;
-                height: auto !important;
+                margin: 0 !important; padding: 0 !important; 
+                border: none !important; box-shadow: none !important; 
+                background: transparent !important; 
+                max-width: none !important; width: 210mm !important; height: auto !important;
+                transform: none !important;
             }
 
-            /* Absolute positioning of the sheet forces it strictly top-left for the printer */
+            /* 5. Unhide the specific Sheet and Grid */
+            #printSheet, #printSheet * { display: block !important; }
+            .sheet-grid, .grid-avery { display: flex !important; }
+            .grid-avery { display: grid !important; }
+            
+            /* 6. Position the sheet exactly at top left */
             #printSheet {
                 position: absolute !important;
-                top: 0 !important;
-                left: 0 !important;
-                width: 210mm !important;
-                height: 297mm !important;
+                top: 0 !important; left: 0 !important;
+                width: 210mm !important; height: 297mm !important;
                 transform: scale(1) !important;
-                box-shadow: none !important;
-                border-radius: 0 !important;
-                margin: 0 !important;
+                box-shadow: none !important; border-radius: 0 !important; margin: 0 !important;
             }
 
-            /* Hide empty slots completely for a cleaner print */
+            /* 7. Hide specific UI elements inside the print section */
+            .card-header, label, select, .project-actions, p, button, .checkbox-label { display: none !important; }
+            
+            /* 8. Hide empty slots for cleaner print */
             .label-slot.empty { display: none !important; }
-
-            /* Ensure headers, buttons, etc. take zero space physically */
-            .top-bar, .header, .card:not(.print-section), footer, .project-actions, select, label, .btn {
-                display: none !important;
-            }
-
-            @page { size: A4 portrait; margin: 0; }
         }
     </style>
 </head>
@@ -225,7 +226,7 @@
 </div>
 
 <div class="header">
-    <h1>Tonie & Tag Cover Generator V12.2</h1>
+    <h1>Tonie & Tag Cover Generator V12.3</h1>
     <p>Die Community Edition für Münzkapseln, RFIDfriend Token & Avery Bögen</p>
 </div>
 
@@ -367,7 +368,7 @@
             <!-- Export -->
             <div style="margin-top: 24px;">
                 <label class="checkbox-label" style="margin-bottom: 16px;">
-                    <input type="checkbox" id="checkCutlines" checked> ✂️ Schnittmarken (gestrichelter Rand) beim Export zeichnen
+                    <input type="checkbox" id="checkCutlines" checked> ✂️ Schnittmarken (gestrichelter Rand) beim PNG-Export zeichnen
                 </label>
                 <div style="display: flex; flex-direction: column; gap: 16px;">
                     <button class="btn btn-success" onclick="window.print()" style="font-size: 18px; padding: 16px;">🖨️ Bogen Drucken (A4)</button>
@@ -395,7 +396,6 @@
                     <div class="icon">🧲</div>
                     <div><strong>Neodym Magnete (10x3mm)</strong><span>Hält den Token auf der Box</span></div>
                 </a>
-                <!-- Link to RFIDfriend changed to http:// due to SSL errors on their end -->
                 <a href="http://rfidfriend.com/" target="_blank" rel="noopener noreferrer" class="hw-item">
                     <div class="icon">📡</div>
                     <div><strong>RFIDfriend SLIX-L Tags</strong><span>Beste NFC Tags für die Toniebox</span></div>
@@ -406,7 +406,7 @@
 </div>
 
 <footer>
-    <p>Tonie Cover Generator V12.2 (Final) • Open Source unter MIT-Lizenz.</p>
+    <p>Tonie Cover Generator V12.3 (Final) • Open Source unter MIT-Lizenz.</p>
     <div class="community-links">
         <a href="https://github.com/toniebox-reverse-engineering" target="_blank">Team RevvoX</a>
         <a href="https://gt-blog.de/custom-tags-for-toniebox/" target="_blank">Gambrius Blog</a>
