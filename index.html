@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Tonie & Tag Cover Hub (Master V22.2.1)</title>
+<title>Tonie & Tag Cover Hub (Master V22.3)</title>
 <style>
 :root {
 --primary: #f43f5e;
@@ -231,27 +231,28 @@ page-break-inside: avoid !important;
 </div>
 <div class="header">
 <div class="logo-wrapper">
-<svg viewBox="0 0 140 140" class="app-logo">
+<!-- Professional High-End Community Brand Graphic -->
+<svg viewBox="0 0 160 160" class="app-logo">
 <defs>
-<linearGradient id="tonieBrandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+<linearGradient id="brandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
 <stop offset="0%" stop-color="#f43f5e" />
-<stop offset="100%" stop-color="#9f1239" />
+<stop offset="100%" stop-color="#be123c" />
 </linearGradient>
-<filter id="brandGlow" x="-20%" y="-20%" width="140%" height="140%">
-<feGaussianBlur stdDeviation="6" result="blur" />
+<filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+<feGaussianBlur stdDeviation="5" result="blur" />
 <feComposite in="SourceGraphic" in2="blur" operator="over" />
 </filter>
 </defs>
-<!-- Outer perforated round sticker punch ring representing Avery / coin capsules -->
-<circle cx="70" cy="70" r="62" fill="none" stroke="rgba(244, 63, 94, 0.4)" stroke-width="4" stroke-dasharray="8 6" />
-<!-- Inner glowing NFC Tag base disc -->
-<circle cx="70" cy="70" r="48" fill="url(#tonieBrandGrad)" filter="url(#brandGlow)" />
-<!-- Stylized Tonie Audio Figure & Magnetic Base Silhouette -->
-<path d="M58,40 C58,33 82,33 82,40 L82,54 C88,58 92,65 89,74 C85,83 78,88 70,88 C62,88 55,83 51,74 C48,65 52,58 58,54 Z" fill="#ffffff" />
-<circle cx="70" cy="47" r="5" fill="#9f1239" />
-<!-- RFID / NFC Signal waves representing Tag writing & Flipper dumps -->
-<path d="M38,102 Q70,118 102,102" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" />
-<path d="M46,112 Q70,126 94,112" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-dasharray="3 3" />
+<!-- Sticker Punch Perforated Outer Ring -->
+<circle cx="80" cy="80" r="70" fill="none" stroke="rgba(244, 63, 94, 0.45)" stroke-width="3.5" stroke-dasharray="6 5" />
+<!-- Inner RFID / NFC Tag Base Disc -->
+<circle cx="80" cy="80" r="54" fill="url(#brandGrad)" filter="url(#glow)" />
+<!-- Tonie Figure Silhouette -->
+<path d="M66,44 C66,36 94,36 94,44 L94,60 C101,64 106,72 103,82 C99,92 90,98 80,98 C70,98 61,92 57,82 C54,72 59,64 66,60 Z" fill="#ffffff" />
+<circle cx="80" cy="52" r="5" fill="#881337" />
+<!-- NFC Radio Waves & Tag Symbol -->
+<path d="M42,114 Q80,134 118,114" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" />
+<path d="M52,125 Q80,141 108,125" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round" stroke-dasharray="2 3" />
 </svg>
 <h1>
 Tonie & Tag
@@ -332,7 +333,6 @@ Tonie & Tag
 <text id="previewTextTopNode" font-family="-apple-system, sans-serif" font-weight="800" stroke="var(--bg-card)" stroke-width="4px" paint-order="stroke fill" letter-spacing="0.5px">
 <textPath href="#pathTop" startOffset="50%" text-anchor="middle" dominant-baseline="auto" id="previewTextTop"></textPath>
 </text>
-<!-- Clean bottom ID badge line with high contrast stroke -->
 <text x="100" y="186" font-family="monospace" font-weight="700" font-size="8px" fill="var(--text-main)" text-anchor="middle" id="previewTextId" stroke="var(--bg-card)" stroke-width="4px" paint-order="stroke fill"></text>
 </svg>
 </div>
