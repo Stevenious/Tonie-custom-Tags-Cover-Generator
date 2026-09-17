@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tonie & Tag Cover Generator V12.3</title>
+    <title>Tonie & Tag Cover Generator</title>
     <style>
         /* === VARIABLES & RESET === */
         :root {
@@ -20,28 +20,43 @@
             --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+        /* Strict Box Sizing to prevent mobile offset bugs */
+        *, *::before, *::after { box-sizing: border-box; }
         
+        html, body {
+            width: 100%;
+            max-width: 100vw;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body { 
             background-color: var(--bg-body); 
             color: var(--text-main); 
             line-height: 1.5; 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             padding: 16px; 
             padding-bottom: 80px;
             display: flex;
             flex-direction: column;
             align-items: center; 
-            overflow-x: hidden; 
         }
 
-        /* === LAYOUT & CARDS === */
-        .top-bar { width: 100%; max-width: 1200px; display: flex; justify-content: center; margin-bottom: 12px; margin-top: 8px;}
+        /* === LAYOUT & HEADER === */
+        .top-bar { width: 100%; max-width: 1200px; display: flex; justify-content: center; margin-bottom: 16px; margin-top: 8px;}
         .support-btn { background: #f59e0b; color: white; padding: 8px 16px; border-radius: 20px; text-decoration: none; font-size: 13px; font-weight: 700; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3); transition: 0.2s;}
         .support-btn:hover { background: #d97706; transform: translateY(-1px); }
 
-        .header { text-align: center; margin-bottom: 24px; width: 100%; max-width: 1200px; display: flex; flex-direction: column; align-items: center; }
-        .header h1 { color: var(--primary); font-size: 28px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.2; text-align: center; }
-        .header p { color: var(--text-muted); font-size: 14px; margin-top: 8px; text-align: center; max-width: 600px; }
+        .header { text-align: center; margin-bottom: 28px; width: 100%; max-width: 1200px; display: flex; flex-direction: column; align-items: center; }
+        
+        /* NEW LOGO WRAPPER */
+        .logo-wrapper { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 8px;}
+        .app-logo { width: 44px; height: 44px; flex-shrink: 0; }
+        
+        .header h1 { color: var(--primary); font-size: 30px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; margin: 0; text-align: center; }
+        .header p { color: var(--text-muted); font-size: 14px; margin: 8px 0 0 0; text-align: center; max-width: 600px; }
 
         .app-layout { 
             display: grid; 
@@ -51,18 +66,20 @@
             max-width: 1200px; 
         }
         @media(min-width: 1024px) { 
-            .app-layout { grid-template-columns: 380px 1fr; align-items: start; } 
+            .app-layout { grid-template-columns: 400px 1fr; align-items: start; } 
             .top-bar { justify-content: flex-end; }
+            .header h1 { font-size: 36px; }
+            .app-logo { width: 52px; height: 52px; }
         }
 
         .card { background: var(--bg-card); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow); width: 100%; }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #f3f4f6; padding-bottom: 12px; }
-        .card-header h2 { font-size: 18px; font-weight: 700; color: #111; }
+        .card-header h2 { font-size: 18px; font-weight: 700; color: #111; margin: 0;}
 
         /* === BUTTONS & INPUTS === */
         input[type="text"], select { 
             width: 100%; padding: 14px 16px; border: 2px solid var(--border); border-radius: var(--radius-md); 
-            font-size: 16px; 
+            font-size: 16px; /* 16px stops iOS Auto-Zoom */
             outline: none; background: #f9fafb; color: var(--text-main); font-weight: 500; transition: 0.2s; 
         }
         input[type="text"]:focus, select:focus { border-color: var(--primary); background: #fff; }
@@ -72,8 +89,12 @@
         .btn-secondary { background: #fff; color: var(--text-main); border: 2px solid var(--border); }
         .btn-secondary:hover { border-color: var(--text-muted); background: #f9fafb; }
         .btn-sm { padding: 8px 12px; font-size: 13px; width: auto; border-radius: 8px; }
+        
         .btn-success { background: #10b981; color: white; }
         .btn-success:hover { background: #059669; }
+        
+        .btn-batch { background: #fef3c7; color: #d97706; border: 1px solid #fde68a; }
+        .btn-batch:hover { background: #fde68a; }
 
         label { display: block; font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; margin-top: 16px; }
         .checkbox-label { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 12px; cursor: pointer; color: var(--text-main); font-size: 14px;}
@@ -86,7 +107,7 @@
 
         /* === SECTION 1: SEARCH === */
         .status-text { font-size: 14px; color: var(--text-muted); text-align: center; margin: 16px 0; font-weight: 600; }
-        .search-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-height: 450px; overflow-y: auto; padding-right: 8px; }
+        .search-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; max-height: 500px; overflow-y: auto; padding-right: 4px; }
         .search-grid::-webkit-scrollbar { width: 6px; }
         .search-grid::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
         .search-grid::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
@@ -111,7 +132,6 @@
         .circle-canvas.empty::after { content: 'Wähle ein Motiv'; color: #94a3b8; font-weight: 700; font-size: 15px; }
         
         .bg-layer { position: absolute; top:0; left:0; width: 100%; height: 100%; background-repeat: no-repeat; background-position: center; pointer-events: none; transition: background-color 0.2s; }
-        
         .svg-overlay { position: absolute; top:0; left:0; width: 100%; height: 100%; z-index: 10; pointer-events: none; }
 
         .editor-controls { flex: 1; width: 100%; }
@@ -132,7 +152,19 @@
         input[type="color"]::-webkit-color-swatch { border: 2px solid var(--border); border-radius: 8px; }
 
         /* === SECTION 3: SHEET === */
-        .sheet-scale-wrapper { width: 100%; overflow-x: auto; background: #cbd5e1; border-radius: var(--radius-lg); padding: 20px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.05); display: flex; justify-content: flex-start; margin-top: 20px; }
+        /* SWIPE TO PAN MOBILE WRAPPER */
+        .sheet-scale-wrapper { 
+            width: 100%; 
+            overflow-x: auto; 
+            background: #cbd5e1; 
+            border-radius: var(--radius-lg); 
+            padding: 20px; 
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.05); 
+            display: flex; 
+            justify-content: flex-start; 
+            margin-top: 20px; 
+            -webkit-overflow-scrolling: touch; /* Smooth iOS scroll */
+        }
         @media(min-width: 850px) { .sheet-scale-wrapper { justify-content: center; overflow-x: hidden; } }
 
         .a4-sheet { background: #fff; box-shadow: var(--shadow-lg); position: relative; width: 794px; height: 1123px; border-radius: 4px; flex-shrink: 0; transform-origin: top left;}
@@ -150,7 +182,7 @@
         .label-slot.filled:hover { transform: scale(1.03); z-index: 5; box-shadow: 0 8px 16px rgba(0,0,0,0.15); }
         .label-slot.filled:hover::before { content: '✏️ Bearbeiten'; position: absolute; z-index: 20; background: rgba(0,0,0,0.75); color: #fff; font-size: 14px; padding: 8px 14px; border-radius: 20px; font-weight: 600; backdrop-filter: blur(4px); }
 
-        .project-actions { display: flex; gap: 12px; margin-top: 20px; justify-content: center;}
+        .project-actions { display: flex; gap: 12px; margin-top: 20px; justify-content: center; flex-wrap: wrap;}
         
         /* === HARDWARE RECOMMENDATIONS === */
         .hardware-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-top: 16px; }
@@ -226,8 +258,16 @@
 </div>
 
 <div class="header">
-    <h1>Tonie & Tag Cover Generator V12.3</h1>
-    <p>Die Community Edition für Münzkapseln, RFIDfriend Token & Avery Bögen</p>
+    <div class="logo-wrapper">
+        <!-- SVG App Logo -->
+        <svg viewBox="0 0 100 100" class="app-logo">
+            <circle cx="50" cy="50" r="45" fill="none" stroke="var(--primary)" stroke-width="4" stroke-dasharray="10 6" />
+            <circle cx="50" cy="50" r="32" fill="var(--primary)" />
+            <path d="M43,33 L58,29 L58,55 A7,7 0 1,1 51,55 L51,39 L43,41 Z" fill="#fff" />
+        </svg>
+        <h1>Tonie & Tag Cover</h1>
+    </div>
+    <p>Der elegante Designer für Münzkapseln, RFIDfriend Token & Avery Etiketten</p>
 </div>
 
 <div class="app-layout">
@@ -274,6 +314,8 @@
                             <text id="previewTextTopNode" font-family="-apple-system, sans-serif" font-weight="800" stroke="#fff" paint-order="stroke fill" letter-spacing="0.5px">
                                 <textPath href="#pathTop" startOffset="50%" text-anchor="middle" dominant-baseline="auto" id="previewTextTop"></textPath>
                             </text>
+                            
+                            <!-- SWEEP FLAG 0 (Sweep-Flag) for correct bottom rendering -->
                             <path id="pathBot" d="M 18,100 A 82,82 0 0,0 182,100" fill="none" stroke="none"/>
                             <text id="previewTextBotNode" font-family="-apple-system, sans-serif" font-weight="800" stroke="#fff" paint-order="stroke fill" letter-spacing="0.5px">
                                 <textPath href="#pathBot" startOffset="50%" text-anchor="middle" dominant-baseline="hanging" id="previewTextBot"></textPath>
@@ -326,7 +368,7 @@
                         <button class="btn btn-success" id="btnSave" onclick="saveToSheet()" style="background: #94a3b8; pointer-events: none;">Wähle zuerst ein Motiv</button>
                         
                         <div style="display: flex; gap: 12px;">
-                            <button class="btn btn-secondary hidden" id="btnBatch" onclick="fillEntireSheet()" style="flex:1;">✨ Bogen füllen</button>
+                            <button class="btn btn-batch hidden" id="btnBatch" onclick="fillEntireSheet()" style="flex:1;">✨ Bogen füllen</button>
                             <button class="btn btn-secondary hidden" id="btnDelete" onclick="deleteLabel()" style="color: #e30613; border-color: #fca5a5; flex:1;">🗑️ Löschen</button>
                         </div>
                     </div>
@@ -357,7 +399,7 @@
                 <input type="file" id="importFile" accept=".json" style="display:none;" onchange="importProject(event)">
             </div>
 
-            <p style="text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 16px;">Tipp: Wische auf dem Bogen, um alles zu sehen. Klicke auf leere Kreise zum Befüllen.</p>
+            <p style="text-align: center; font-size: 12px; color: var(--text-muted); margin-top: 16px;">Tipp: Wische auf dem Bogen nach links/rechts, um alles zu sehen.</p>
 
             <div class="sheet-scale-wrapper" id="sheetWrapper">
                 <div class="a4-sheet" id="printSheet">
@@ -371,7 +413,9 @@
                     <input type="checkbox" id="checkCutlines" checked> ✂️ Schnittmarken (gestrichelter Rand) beim PNG-Export zeichnen
                 </label>
                 <div style="display: flex; flex-direction: column; gap: 16px;">
-                    <button class="btn btn-success" onclick="window.print()" style="font-size: 18px; padding: 16px;">🖨️ Bogen Drucken (A4)</button>
+                    <!-- Primary Print Action -->
+                    <button class="btn btn-success" onclick="window.print()" style="font-size: 18px; padding: 16px; background: var(--primary);">🖨️ Bogen Drucken (A4)</button>
+                    <!-- Secondary PNG Export -->
                     <button class="btn btn-secondary" onclick="exportPNG()">🖼️ Als 300 DPI PNG exportieren</button>
                 </div>
             </div>
@@ -380,9 +424,9 @@
         <!-- HARDWARE & LINKS CARD -->
         <div class="card">
             <div class="card-header">
-                <h2>Hardware & Empfehlungen</h2>
+                <h2>Material & Zubehör</h2>
             </div>
-            <p style="font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 16px;">Das perfekte Zubehör für deine selbstgemachten Tokens.</p>
+            <p style="font-size: 13px; color: var(--text-muted); text-align: center; margin-bottom: 16px;">Empfohlenes Zubehör für deine selbstgemachten Tokens.</p>
             <div class="hardware-grid">
                 <a href="https://www.amazon.de/s?k=Avery+Zweckform+L3415-10" target="_blank" rel="noopener noreferrer" class="hw-item">
                     <div class="icon">🏷️</div>
@@ -406,7 +450,7 @@
 </div>
 
 <footer>
-    <p>Tonie Cover Generator V12.3 (Final) • Open Source unter MIT-Lizenz.</p>
+    <p>Tonie Cover Generator • Version 13.0 (Community Release)<br>Open Source unter MIT-Lizenz.</p>
     <div class="community-links">
         <a href="https://github.com/toniebox-reverse-engineering" target="_blank">Team RevvoX</a>
         <a href="https://gt-blog.de/custom-tags-for-toniebox/" target="_blank">Gambrius Blog</a>
