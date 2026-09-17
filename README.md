@@ -1,7 +1,7 @@
 <div align="center">
 
 # 🎧 Tonie & Tag Cover Generator 🚀
-### Version 13.1 (Community Release)
+### Version 15.0 (The Connectivity Update)
 
 **Der ultimative, webbasierte Designer für Münzkapseln, RFIDfriend Token & Avery Etiketten.**
 
@@ -17,25 +17,41 @@
 
 ## 🌟 Warum dieses Tool ein Game-Changer ist
 
-Wer eigene NFC-Tags für die Toniebox bastelt, kennt das Problem: Das Erstellen passender Etiketten in Word oder Grafikprogrammen ist fummelig, Abstände stimmen nicht beim Drucken, und angebrochene Etikettenbögen landen im Müll, weil man sie nicht gezielt bedrucken kann.
+Wer eigene NFC-Tags für die Toniebox bastelt, kennt das Problem: Das Erstellen passender Etiketten in Word oder Grafikprogrammen ist fummelig, Abstände stimmen nicht beim Drucken, und angebrochene Etikettenbögen landen im Müll. 
+
+Gleichzeitig fehlte bisher eine nahtlose Verbindung zwischen der Suche nach dem richtigen Motiv und dem eigentlichen *Beschreiben* des NFC-Tags.
 
 **Damit ist jetzt Schluss.** 
 
-Der **Tonie & Tag Cover Generator** löst all diese Probleme mit einer genial einfachen, responsiven Web-App. Egal ob auf dem Desktop oder bequem auf dem Sofa per Smartphone – wähle ein Motiv, passe es an und drucke es pixelgenau aus.
+Der **Tonie & Tag Cover Generator** löst all diese Probleme mit einer genial einfachen Web-App. Wähle ein Motiv, drucke es pixelgenau aus und **übergib die Tonie-ID mit einem Klick direkt an deine NFC-Schreib-App!**
 
 ---
 
-## ✨ Features der Version 13.1
+## ✨ Features (Version 15.0)
 
+*   🔗 **NEU: NFC-App Handoff (ID Export):** Zu jedem offiziellen Tonie wird nun die spezifische ID (z.B. `01-0012`) aus der Datenbank geladen. Mit dem Button "📲 ID senden" kannst du diese ID direkt an iOS-Kurzbefehle (Shortcuts) oder andere NFC-Schreib-Apps übergeben.
+*   🔍 **ID-Suche:** Du kennst die ID deines Wunsch-Tonies? Tippe sie einfach in die Suchleiste ein!
 *   📱 **Perfektes Mobile-Erlebnis:** Kein nerviges Wischen mehr! Der A4-Bogen skaliert auf dem Smartphone automatisch auf die perfekte Größe. Du hast den gesamten Bogen jederzeit im Blick.
 *   🖨️ **Bulletproof A4-Druck:** Eine speziell entwickelte Print-Engine blockiert iOS/Safari-Bugs (wie leere 2. Seiten oder aufgedruckte URLs). Du erhältst immer exakt **eine saubere A4-Seite**.
 *   🎯 **Smart Grid & gezielte Bogen-Befüllung:** Hast du einen Avery-Bogen, bei dem die ersten Etiketten schon fehlen? Klicke einfach auf einen leeren Kreis im digitalen Bogen und platziere dein Cover exakt dort!
 *   🪄 **Batch-Fill (Bogen füllen):** Ein Klick, und das aktuelle Motiv füllt alle restlichen leeren Plätze auf deinem Bogen. Perfekt für Serienproduktionen.
 *   🔄 **Perfekter Curved Text:** Titel und Seriennamen schmiegen sich mathematisch korrekt an den runden Rand deines Etiketts an – oben wie unten immer perfekt lesbar.
-*   🎛️ **Simpel- & Pro-Modus:** 
-    *   *Simpel:* Motiv wählen und ab auf den Bogen.
-    *   *Pro:* Nutze stufenlosen Zoom, Rotation, X/Y-Verschiebung und wähle individuelle Hintergrund-/Textfarben.
 *   💾 **Auto-Save & Projekte (.json):** Die App speichert deinen Fortschritt automatisch im Browser. Alternativ kannst du deinen Bogen als `.json`-Datei speichern und später weiterbearbeiten.
+
+---
+
+## 🚀 Quick Start & Workflow
+
+Du musst absolut nichts installieren. Das Tool läuft komplett lokal in deinem Browser (Zero-Backend, 100% Datenschutz).
+
+👉 **[Klicke hier, um den Generator direkt zu starten!](https://stevenious.github.io/Tonie-custom-Tags-Cover-Generator/)**
+
+### Der perfekte Workflow:
+1. **Suchen:** Suche in der Tonie-Datenbank (nach Name, Serie oder ID) oder lade eine eigene Grafik (JPG/PNG) hoch.
+2. **Tag beschreiben:** Klicke im Editor auf **"📲 ID senden"**, um die Tonie-ID in die Zwischenablage zu kopieren oder per Share-Sheet an deinen NFC-Writer zu übergeben. Beschreibe deinen Tag.
+3. **Anpassen:** Füge Text hinzu oder nutze den Pro-Modus (Zoom, Rotation) für den Feinschliff.
+4. **Platzieren:** Klicke auf "Auf den Bogen legen" oder wähle einen spezifischen leeren Slot auf dem Vorschau-Bogen.
+5. **Drucken:** Klicke auf Drucken. *(Pro-Tipp: Beim Drucken im Dialogfenster immer "Tatsächliche Größe" oder "Skalierung 100%" einstellen!)*
 
 ---
 
@@ -48,20 +64,6 @@ Das Tool unterstützt die gängigsten Größen der DIY-Community (einfach per Dr
 - **30 mm:** RFIDfriend Token
 - **25 mm:** Micro DIY Token
 - **Avery L3415-10:** Zweckform 40mm (Exaktes Layout für 24 Etiketten pro A4 Bogen)
-
----
-
-## 🚀 Quick Start
-
-Du musst absolut nichts installieren. Das Tool läuft komplett lokal in deinem Browser (Zero-Backend, 100% Datenschutz).
-
-👉 **[Klicke hier, um den Generator direkt zu starten!](https://stevenious.github.io/Tonie-custom-Tags-Cover-Generator/)**
-
-### So funktioniert's in 4 simplen Schritten:
-1. **Motiv wählen:** Suche in der Tonie-Datenbank oder lade eine eigene Grafik (JPG/PNG) hoch.
-2. **Anpassen:** Füge Text hinzu oder nutze den Pro-Modus für den Feinschliff.
-3. **Platzieren:** Klicke auf "Auf den Bogen legen" oder wähle einen spezifischen leeren Slot auf dem Vorschau-Bogen.
-4. **Drucken:** Klicke auf Drucken. *(Pro-Tipp: Beim Drucken im Dialogfenster immer "Tatsächliche Größe" oder "Skalierung 100%" einstellen!)*
 
 ---
 
