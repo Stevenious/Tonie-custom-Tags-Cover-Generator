@@ -3,14 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Tonie & Tag Cover HUB V11</title>
-<!-- 
-V11.0 Unified Master Suite
-- Decoupled, instant zero-latency search engine with robust offline fallback
-- Fully synchronized Avery & Free Raster format picker (including 43mm Münzkapseln)
-- Interactive 3-step workflow with Simpel & Pro modes
-- Bulletproof 1-page A4 print & slot manager
--->
+<title>Tonie & Tag Cover HUB V11.1</title>
 <style>
 :root, [data-theme="light"] {
 --brand-red: #A31E33;
@@ -278,7 +271,7 @@ var favs = localStorage.getItem('hub_favs_v10');
 if (favs) this.favorites = JSON.parse(favs);
 if (!Array.isArray(this.favorites)) this.favorites = [];
 } catch(e) { this.favorites = []; }
-// IMMER SOFORT DIE OFFLINE-DATEN LADEN
+// IMMEDIATE OFFLINE DATA LOAD
 this.db = this.offlineDb.slice();
 this.updateFavCounter();
 this.updateSizeDropdown();
@@ -472,7 +465,7 @@ idElement = '<text font-family="monospace" font-weight="700" font-size="9" fill=
 return '<svg viewBox="0 0 160 160" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
 '<defs>' +
 '<clipPath id="circleClip"><circle cx="80" cy="80" r="80" /></clipPath>' +
-'<path id="topC" d="M 18 80 A 62 62 0 0 1 142 80" fill="transparent" />' +
+'<path id="topC" d="M 18 80 A 58 58 0 0 1 142 80" fill="transparent" />' +
 '<path id="botC" d="M 22 80 A 58 58 0 0 0 138 80" fill="transparent" />' +
 '<path id="botC2" d="M 32 80 A 48 48 0 0 0 128 80" fill="transparent" />' +
 '</defs>' +
@@ -501,7 +494,7 @@ sizeSel.innerHTML = '<option value="avery-40">L3415 - Ø 40 mm (24x)</option>' +
 '<option value="avery-30">6223 - Ø 30 mm (48x)</option>' +
 '<option value="avery-25">L7103 - Ø 25 mm (70x)</option>';
 } else {
-sizeSel.innerHTML = '<option value="raster-43">Münzkapsel 43 mm (24x)</option>' +
+sizeSel.innerHTML = '<option value="raster-43" selected>Münzkapsel 43 mm (24x)</option>' +
 '<option value="raster-40">Münzkapsel 40 mm (24x)</option>' +
 '<option value="raster-30">Münzkapsel 30 mm (48x)</option>' +
 '<option value="raster-25">Münzkapsel 25 mm (70x)</option>';
@@ -529,6 +522,7 @@ var grid = safeEl('sheetGrid');
 if (!grid) return;
 grid.innerHTML = '';
 var self = this;
+var config = formats[this.currentFormatId];
 for(var i=0; i < this.slots.length; i++) {
 (function(idx) {
 var div = document.createElement('div');
@@ -594,7 +588,6 @@ window.print();
 };
 App.init();
 });
-})();
 </script>
 </body>
 </html>
