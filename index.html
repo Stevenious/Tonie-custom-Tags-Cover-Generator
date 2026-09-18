@@ -3,405 +3,861 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tag Code Generator Next Generation</title>
+    <title>Tag Code Generator | Next Generation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* --- Tonies Theme Colors & Base --- */
         :root {
+            /* Tonies Brand Colors */
             --tonie-red: #e3000b;
+            --tonie-red-hover: #c2000a;
             --tonie-blue: #00a0e9;
-            --tonie-light: #f5f7fa;
-            --text-dark: #2c3e50;
+            --tonie-blue-hover: #0088c7;
+            
+            /* UI Colors */
+            --bg-color: #f4f7f6;
+            --panel-bg: #ffffff;
+            --text-dark: #2d3748;
+            --text-muted: #718096;
+            --border-light: #e2e8f0;
+            
+            /* Shadows & Radius */
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --radius-lg: 12px;
+            --radius-md: 8px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Prevent body scroll, manage in panels */
+        }
+
+        /* --- Header --- */
+        header {
+            background: var(--panel-bg);
+            padding: 15px 30px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        header h1 {
+            color: var(--tonie-red);
+            font-size: 1.5rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
-        body {
-            font-family: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--tonie-light);
-            color: var(--text-dark);
-            margin: 0;
+        .status-pill {
+            background: #e6fffa;
+            color: #319795;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* --- 3-Column Workspace --- */
+        .workspace {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr 1.5fr;
+            gap: 20px;
             padding: 20px;
-        }
-
-        h1 {
-            color: var(--tonie-red);
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .container {
-            max-width: 1000px;
+            height: calc(100vh - 66px); /* Minus header */
+            max-width: 1800px;
             margin: 0 auto;
-            background: white;
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            width: 100%;
         }
 
-        /* --- UI Sections --- */
+        @media (max-width: 1200px) {
+            .workspace { grid-template-columns: 1fr 1fr; overflow-y: auto; height: auto; }
+            .col-print { grid-column: span 2; }
+        }
+        @media (max-width: 768px) {
+            .workspace { grid-template-columns: 1fr; }
+            .col-print { grid-column: span 1; }
+        }
+
         .panel {
-            border: 2px solid #eef2f5;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
+            background: var(--panel-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
-        .panel h2 {
-            margin-top: 0;
+        .panel-header {
+            background: #f8fafc;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-light);
+            font-weight: 800;
             color: var(--tonie-blue);
-            font-size: 1.2em;
-        }
-
-        input[type="text"], input[type="file"], select, button {
-            padding: 10px;
-            margin: 5px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 1em;
-        }
-
-        input[type="text"] { width: 100%; box-sizing: border-box; }
-
-        button {
-            background-color: var(--tonie-red);
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background 0.2s;
-        }
-
-        button:hover { background-color: #c2000a; }
-        button.secondary { background-color: var(--tonie-blue); }
-        button.secondary:hover { background-color: #0088c7; }
-
-        /* --- Search Results --- */
-        .results-box {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-
-        .result-item {
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .result-item:hover { background-color: var(--tonie-light); }
-
-        /* --- Editor & Preview --- */
-        .editor-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+        .panel-content {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
         }
 
-        .preview-circle {
-            background-color: #eee;
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e0; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #a0aec0; }
+
+        /* --- Step 1: Search & Grid --- */
+        .search-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border-light);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-size: 1rem;
+            margin-bottom: 15px;
+            transition: all 0.2s;
+        }
+        .search-input:focus { outline: none; border-color: var(--tonie-blue); }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr); /* Genau 4 Kacheln! */
+            gap: 12px;
+        }
+
+        .tile {
+            aspect-ratio: 1;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+            background-color: #f1f5f9;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .tile:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-md);
+            border-color: var(--tonie-blue);
+            z-index: 2;
+        }
+
+        .tile-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255,255,255,0.9);
+            padding: 5px;
+            font-size: 0.65rem;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-weight: 600;
+        }
+
+        /* --- Step 2: Editor --- */
+        .editor-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .input-group input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .checkbox-group input { width: 18px; height: 18px; cursor: pointer; }
+
+        .editor-preview-container {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: var(--radius-md);
+            border: 1px dashed var(--border-light);
+        }
+
+        /* Shared Sticker Style (Editor & Print) */
+        .sticker {
             border-radius: 50%;
             background-size: cover;
             background-position: center;
+            background-color: #fff;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* SVG Circular Text inside Sticker */
+        .sticker-svg {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none; /* Klicks gehen durch aufs Drag&Drop */
+            --font-scale: 1; /* NEW: Skalierungsfaktor für den Slider */
+        }
+        
+        .sticker-svg text {
+            /* Dicker, weißer Rand um den Text, damit er auf jedem Bild lesbar bleibt! */
+            paint-order: stroke fill;
+            stroke: white;
+            stroke-width: 2.5px; /* Verkleinert für saubere Lesbarkeit der Buchstaben */
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        /* Größen wurden reduziert und an die CSS-Variable gekoppelt */
+        .svg-series { fill: var(--tonie-red); font-weight: 900; font-size: calc(9px * var(--font-scale)); text-transform: uppercase; }
+        .svg-title { fill: var(--text-dark); font-weight: 800; font-size: calc(8px * var(--font-scale)); }
+        .svg-id { fill: var(--text-muted); font-weight: 600; font-size: calc(4.5px * var(--font-scale)); font-family: monospace; letter-spacing: 1px; }
+
+        /* Delete Button für den Druckbogen */
+        .delete-btn {
+            position: absolute;
+            top: 10%; right: 10%;
+            background: var(--tonie-red);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px; height: 24px;
+            font-size: 16px;
+            cursor: pointer;
+            display: none;
+            align-items: center; justify-content: center;
+            z-index: 20;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            line-height: 1;
+            padding-bottom: 2px;
+        }
+
+        /* Sichtbar machen beim Hovern auf dem Druckbogen */
+        #a4-sheet .sticker:hover .delete-btn { display: flex; }
+        
+        @media (max-width: 768px) {
+            #a4-sheet .sticker .delete-btn { display: flex; opacity: 0.8; }
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-weight: 800;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
-            /* Standard-Vorschau in 43mm für Münzkapseln */
-            width: 162px; /* ca. 43mm auf Standard-Monitoren */
-            height: 162px;
-            margin: 0 auto;
+            gap: 8px;
         }
 
-        .preview-text {
-            background: rgba(255, 255, 255, 0.85);
-            width: 100%;
-            text-align: center;
-            font-size: 12px;
-            font-weight: bold;
-            padding: 5px 0;
-        }
+        .btn-primary { background: var(--tonie-blue); color: white; }
+        .btn-primary:hover { background: var(--tonie-blue-hover); transform: translateY(-1px); }
+        .btn-success { background: #48bb78; color: white; }
+        .btn-success:hover { background: #38a169; }
+        .btn-outline { background: transparent; border: 2px solid var(--border-light); color: var(--text-muted); }
+        .btn-outline:hover { border-color: var(--text-dark); color: var(--text-dark); }
 
-        /* --- Print Queue --- */
-        #print-queue {
+        /* --- Step 3: Print Sheet (Drag & Drop) --- */
+        .print-controls {
             display: flex;
-            flex-wrap: wrap;
             gap: 10px;
-            margin-top: 10px;
+            margin-bottom: 15px;
+        }
+        .print-controls select {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-md);
+            font-family: inherit;
+            font-weight: 600;
         }
 
-        .queue-item {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-size: cover;
-            background-position: center;
-            border: 2px solid var(--tonie-blue);
+        .a4-wrapper {
+            background: #e2e8f0;
+            padding: 20px;
+            border-radius: var(--radius-md);
+            overflow: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
         }
 
-        /* --- PRINT STYLES --- */
-        @media screen {
-            #print-layout { display: none; }
-        }
-
-        @media print {
-            body * { visibility: hidden; margin: 0; padding: 0; }
-            #print-layout, #print-layout * { visibility: visible; }
-            #print-layout {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                display: flex;
-                flex-wrap: wrap;
-                gap: 2mm; /* Standard Abstand */
-            }
-
-            /* Exakte mm Angaben für den Druck */
-            .print-circle {
-                border-radius: 50%;
-                background-size: cover;
-                background-position: center;
-                position: relative;
-                overflow: hidden;
-                box-sizing: border-box;
-                page-break-inside: avoid;
-            }
-
-            /* Spezifische Formate */
-            .format-30 { width: 30mm; height: 30mm; }
-            .format-40 { width: 40mm; height: 40mm; }
-            .format-43 { width: 43mm; height: 43mm; } /* Perfekt für Münzkapseln */
+        .a4-sheet {
+            background: white;
+            width: 210mm;
+            min-height: 297mm;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 10mm;
             
-            /* Avery Zweckform Layouts (Grid für DIN A4 Bögen) */
-            .format-avery30 {
-                width: 30mm; height: 30mm;
-                margin-right: 2.5mm; margin-bottom: 2.5mm;
-            }
-            .format-avery40 {
-                width: 40mm; height: 40mm;
-                margin-right: 3mm; margin-bottom: 3mm;
-            }
+            /* Grid configuration applies via JS based on format */
+            display: grid;
+            align-content: start;
+            justify-content: center;
+        }
 
-            .print-text {
+        /* The droppable slots */
+        .slot {
+            border: 1px dashed #cbd5e0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+            position: relative;
+        }
+        .slot.drag-over {
+            background: #e6fffa;
+            border: 2px dashed #319795;
+        }
+
+        /* When a sticker is inside a slot */
+        .slot .sticker {
+            width: 100%;
+            height: 100%;
+            cursor: grab;
+            box-shadow: none; /* Let slot handle borders */
+        }
+        .slot .sticker:active { cursor: grabbing; }
+        .slot .sticker .sticker-text-wrapper {
+            /* Scale text slightly for actual slots based on mm */
+            padding: 2mm 1mm;
+        }
+
+        /* --- Toast System --- */
+        #toast-container {
+            position: fixed;
+            bottom: 20px; left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .toast {
+            background: #2d3748; color: white;
+            padding: 12px 24px; border-radius: 30px;
+            font-weight: 600; font-size: 0.9rem;
+            box-shadow: var(--shadow-md);
+            animation: slideUp 0.3s forwards, fadeOut 0.3s 2.7s forwards;
+        }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeOut { to { opacity: 0; } }
+
+        /* --- Print Media Query --- */
+        @media print {
+            @page { size: A4; margin: 0; }
+            body * { visibility: hidden; }
+            .a4-sheet, .a4-sheet * { visibility: visible; }
+            
+            .a4-sheet {
                 position: absolute;
-                bottom: 10%;
-                width: 100%;
-                text-align: center;
-                background: rgba(255,255,255,0.9);
-                font-size: 8pt;
-                font-family: sans-serif;
-                font-weight: bold;
-                padding: 1mm 0;
+                left: 0; top: 0;
+                box-shadow: none;
+                width: 210mm; height: 297mm;
             }
+            
+            /* Remove dashed lines on empty slots when printing */
+            .slot { border: none !important; }
+            
+            /* Button beim Drucken natürlich ausblenden */
+            .delete-btn { display: none !important; }
+            
+            /* Only print slots that have a sticker */
+            .slot:empty { display: block; /* keep space */ }
+            
+            /* Ensure accurate colors */
+            .sticker { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h1>Tag Code Generator Next Generation</h1>
+    <!-- Globale SVG Pfade, an denen sich der Text ausrichtet -->
+    <svg style="width: 0; height: 0; position: absolute;" aria-hidden="true">
+        <defs>
+            <!-- Bogen Oben (Serie) -> Links-nach-Rechts, Uhrzeigersinn (1). Radius 38 -->
+            <path id="global-arc-top" d="M 12 50 A 38 38 0 1 1 88 50" />
+            <!-- Bogen Unten (Titel) -> Links-nach-Rechts, Gegen-Uhrzeigersinn (0) = Text aufrecht & richtig herum! Radius 44 -->
+            <path id="global-arc-title" d="M 6 50 A 44 44 0 0 0 94 50" />
+            <!-- Bogen Unten außen (ID) -> Links-nach-Rechts, Gegen-Uhrzeigersinn (0). Radius 49 -->
+            <path id="global-arc-id" d="M 1 50 A 49 49 0 0 0 99 50" />
+        </defs>
+    </svg>
 
-        <!-- Schritt 1: Datenquelle -->
-        <div class="panel">
-            <h2>1. Tonies.json laden (V1 oder V2)</h2>
-            <p style="font-size: 0.9em; color: #666;">Lade hier die Community JSON-Datei(en) rein. Sie werden lokal im Browser verarbeitet.</p>
-            <input type="file" id="json-upload" accept=".json" multiple>
-            <span id="load-status" style="margin-left: 10px; color: var(--tonie-blue); font-weight: bold;"></span>
-        </div>
+    <div id="toast-container"></div>
 
-        <!-- Schritt 2: Suchen -->
-        <div class="panel">
-            <h2>2. Suchen (z.B. "tkkg", "ID Nummer" oder "Titel")</h2>
-            <input type="text" id="search-input" placeholder="Suchbegriff eingeben..." disabled>
-            <div class="results-box" id="results-box">
-                <!-- Ergebnisse landen hier -->
-            </div>
-        </div>
+    <header>
+        <h1>Tag Code Generator</h1>
+        <div class="status-pill" id="status-indicator">Initialisiere...</div>
+    </header>
 
-        <!-- Schritt 3: Cover Editor -->
-        <div class="panel editor-grid">
-            <div>
-                <h2>3. Cover Editor</h2>
-                <label>Benutzerdefinierter Text auf dem Cover:</label>
-                <input type="text" id="cover-text" placeholder="z.B. TKKG Folge 1">
-                
-                <label>Hintergrundbild URL (wird auto-befüllt):</label>
-                <input type="text" id="cover-img-url">
-                
-                <label>Druckformat für die Warteschlange wählen:</label>
-                <select id="format-select">
-                    <option value="format-43">43mm (Münzkapseln)</option>
-                    <option value="format-40">40mm (Standard Rund)</option>
-                    <option value="format-30">30mm (Klein)</option>
-                    <option value="format-avery40">Avery Zweckform 40mm</option>
-                    <option value="format-avery30">Avery Zweckform 30mm</option>
-                </select>
-
-                <button onclick="addToQueue()" style="width: 100%; margin-top: 15px;">Zur Druck-Warteschlange hinzufügen</button>
-            </div>
-            <div>
-                <h2 style="text-align: center;">Vorschau</h2>
-                <div class="preview-circle" id="preview-circle">
-                    <div class="preview-text" id="preview-text-display">Tag Name</div>
+    <main class="workspace">
+        
+        <!-- Column 1: Search & Select -->
+        <section class="panel">
+            <div class="panel-header">1. Suchen & Wählen</div>
+            <div class="panel-content">
+                <input type="text" id="search-input" class="search-input" placeholder="Serie, Titel oder ID..." disabled>
+                <div class="results-grid" id="results-grid">
+                    <!-- Kacheln werden hier geladen -->
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Schritt 4: Drucken -->
-        <div class="panel">
-            <h2>4. Druck-Warteschlange (<span id="queue-count">0</span>)</h2>
-            <div id="print-queue"></div>
-            <button class="secondary" onclick="window.print()" style="margin-top: 15px; width: 100%;">🖨️ Aufkleber Drucken</button>
-            <button onclick="clearQueue()" style="background-color: #999; margin-top: 5px; width: 100%;">Warteschlange leeren</button>
-        </div>
-    </div>
+        <!-- Column 2: Editor -->
+        <section class="panel">
+            <div class="panel-header">2. Cover Anpassen</div>
+            <div class="panel-content" style="display: flex; flex-direction: column;">
+                
+                <div class="editor-form">
+                    <div class="input-group">
+                        <label>Serie / Album</label>
+                        <input type="text" id="edit-series" placeholder="z.B. TKKG">
+                    </div>
+                    <div class="input-group">
+                        <label>Titel</label>
+                        <input type="text" id="edit-title" placeholder="z.B. Folge 1">
+                    </div>
+                    <label class="checkbox-group">
+                        <input type="checkbox" id="edit-show-id" checked>
+                        Tonie-ID aufdrucken
+                    </label>
 
-    <!-- Unsichtbarer Container für den echten Druck -->
-    <div id="print-layout"></div>
+                    <!-- NEUER SLIDER FÜR SCHRIFTGRÖSSE -->
+                    <div class="input-group" style="margin-top: 5px;">
+                        <label style="display: flex; justify-content: space-between;">
+                            <span>Schriftgröße anpassen</span>
+                            <span id="font-size-val" style="color: var(--tonie-blue);">100%</span>
+                        </label>
+                        <input type="range" id="font-size-slider" min="50" max="150" value="100" step="5" style="width: 100%; accent-color: var(--tonie-blue); cursor: pointer;">
+                    </div>
+                </div>
+
+                <div class="editor-preview-container">
+                    <!-- Standard 150px Vorschau -->
+                    <div class="sticker" id="preview-sticker" style="width: 150px; height: 150px; border: 2px solid var(--border-light);">
+                        <svg viewBox="0 0 100 100" class="sticker-svg">
+                            <!-- Serie Oben -->
+                            <text class="svg-series">
+                                <textPath href="#global-arc-top" startOffset="50%" text-anchor="middle" id="preview-series-text">SERIE</textPath>
+                            </text>
+                            <!-- Titel Unten -->
+                            <text class="svg-title">
+                                <textPath href="#global-arc-title" startOffset="50%" text-anchor="middle" id="preview-title-text">Titel</textPath>
+                            </text>
+                            <!-- ID Unten -->
+                            <text class="svg-id">
+                                <textPath href="#global-arc-id" startOffset="50%" text-anchor="middle" id="preview-id-text">12345678</textPath>
+                            </text>
+                        </svg>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary" id="btn-add" style="margin-top: auto;" disabled>
+                    + Auf den Bogen legen
+                </button>
+            </div>
+        </section>
+
+        <!-- Column 3: Print Sheet -->
+        <section class="panel col-print">
+            <div class="panel-header">
+                3. Bogen & Druck
+                <span id="slot-counter" style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">0 / 24</span>
+            </div>
+            <div class="panel-content" style="display: flex; flex-direction: column;">
+                
+                <div class="print-controls">
+                    <select id="format-select">
+                        <option value="40">40mm (Avery Zweckform o.ä.) - 24 pro Bogen</option>
+                        <option value="43">43mm (Münzkapseln) - 20 pro Bogen</option>
+                        <option value="30">30mm (Avery Zweckform o.ä.) - 40 pro Bogen</option>
+                    </select>
+                    <button class="btn btn-outline" id="btn-clear" title="Bogen leeren">🗑️</button>
+                    <button class="btn btn-success" id="btn-print" style="flex: 1;">🖨️ Drucken</button>
+                </div>
+
+                <div class="a4-wrapper">
+                    <div class="a4-sheet" id="a4-sheet">
+                        <!-- Raster/Slots werden per JS generiert -->
+                    </div>
+                </div>
+                
+                <p style="text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 10px;">
+                    💡 Tipp: Du kannst die Sticker auf dem Bogen mit der Maus in freie Felder ziehen.
+                </p>
+
+            </div>
+        </section>
+
+    </main>
 
     <script>
-        let tonieData = [];
-        let printQueue = [];
+        // --- State Management ---
+        const DATA_URL = 'https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json';
+        let toniesData = [];
+        let currentItem = null;
+        let stickerCount = 0; // ID generator for draggable elements
 
-        // 1. JSON Dateien lokal einlesen und normalisieren
-        document.getElementById('json-upload').addEventListener('change', function(e) {
-            const files = e.target.files;
-            if (files.length === 0) return;
+        // Format Configurations for the A4 Sheet (210mm x 297mm)
+        const formatConfigs = {
+            '43': { size: '43mm', cols: 4, rows: 5, gap: '5mm' }, // 20 slots
+            '40': { size: '40mm', cols: 4, rows: 6, gap: '5mm' }, // 24 slots
+            '30': { size: '30mm', cols: 5, rows: 8, gap: '5mm' }  // 40 slots
+        };
 
-            document.getElementById('load-status').innerText = "Lade...";
-            tonieData = []; // Reset
+        // --- DOM Elements ---
+        const statusInd = document.getElementById('status-indicator');
+        const searchInput = document.getElementById('search-input');
+        const resultsGrid = document.getElementById('results-grid');
+        
+        const editSeries = document.getElementById('edit-series');
+        const editTitle = document.getElementById('edit-title');
+        const editShowId = document.getElementById('edit-show-id');
+        
+        const previewSticker = document.getElementById('preview-sticker');
+        const previewSeries = document.getElementById('preview-series-text');
+        const previewTitle = document.getElementById('preview-title-text');
+        const previewId = document.getElementById('preview-id-text');
+        
+        // Neu für den Slider:
+        const fontSizeSlider = document.getElementById('font-size-slider');
+        const fontSizeVal = document.getElementById('font-size-val');
 
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    try {
-                        const json = JSON.parse(event.target.result);
-                        
-                        // Normalisierung: V1 (Array) vs V2 (Objekt mit Hashes oder verschachtelt)
-                        let parsedItems = [];
-                        if (Array.isArray(json)) {
-                            parsedItems = json;
-                        } else {
-                            // Falls es ein Objekt ist (z.B. V2), extrahiere die Werte
-                            parsedItems = Object.values(json).flat(); 
-                        }
+        const btnAdd = document.getElementById('btn-add');
+        
+        const formatSelect = document.getElementById('format-select');
+        const a4Sheet = document.getElementById('a4-sheet');
+        const slotCounter = document.getElementById('slot-counter');
+        const btnClear = document.getElementById('btn-clear');
+        const btnPrint = document.getElementById('btn-print');
 
-                        // Mappe die wichtigsten Felder, da V1 und V2 oft unterschiedliche Keys haben
-                        parsedItems.forEach(item => {
-                            tonieData.push({
-                                title: item.title || item.name || 'Unbekannt',
-                                series: item.series || '',
-                                id: item.id || item.audio_id || item.hash || '',
-                                pic: item.pic || item.picture || item.image || ''
-                            });
-                        });
-
-                        document.getElementById('load-status').innerText = `${tonieData.length} Einträge geladen!`;
-                        document.getElementById('search-input').disabled = false;
-                    } catch (err) {
-                        alert("Fehler beim Parsen der JSON: " + err.message);
-                    }
-                };
-                reader.readAsText(file);
-            });
-        });
-
-        // 2. Echtzeit-Suche
-        document.getElementById('search-input').addEventListener('input', function(e) {
-            const query = e.target.value.toLowerCase();
-            const resultsBox = document.getElementById('results-box');
-            resultsBox.innerHTML = '';
-
-            if (query.length < 2) return; // Erst ab 2 Zeichen suchen
-
-            const filtered = tonieData.filter(item => 
-                item.title.toLowerCase().includes(query) || 
-                item.series.toLowerCase().includes(query) ||
-                String(item.id).toLowerCase().includes(query)
-            ).slice(0, 50); // Max 50 Ergebnisse für Performance
-
-            filtered.forEach(item => {
-                const div = document.createElement('div');
-                div.className = 'result-item';
-                // Aufbau des Suchergebnisses wie gewünscht: tkkg-TKKG - ID nummer
-                div.innerHTML = `
-                    <span><b>${item.series} - ${item.title}</b> <br><small style="color:#666;">ID: ${item.id}</small></span>
-                `;
-                div.onclick = () => loadIntoEditor(item);
-                resultsBox.appendChild(div);
-            });
-        });
-
-        // 3. Editor befüllen
-        function loadIntoEditor(item) {
-            const displayName = item.series ? `${item.series} - ${item.title}` : item.title;
-            document.getElementById('cover-text').value = displayName;
-            document.getElementById('cover-img-url').value = item.pic;
-            updatePreview();
+        // --- Utils ---
+        function showToast(msg) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerText = msg;
+            container.appendChild(toast);
+            setTimeout(() => { if(container.contains(toast)) toast.remove(); }, 3000);
         }
 
-        // Live-Updates im Editor
-        document.getElementById('cover-text').addEventListener('input', updatePreview);
-        document.getElementById('cover-img-url').addEventListener('input', updatePreview);
+        // --- Data Fetching & Normalization ---
+        async function loadData() {
+            try {
+                const response = await fetch(DATA_URL);
+                if (!response.ok) throw new Error('Netzwerkfehler');
+                const rawData = await response.json();
+                
+                // Normalize V1 (Array) or V2 (Object)
+                let items = Array.isArray(rawData) ? rawData : Object.values(rawData).flat();
+                
+                toniesData = items.map(item => {
+                    let id = item.audio_id || item.hash || item.id || '';
+                    if(Array.isArray(id)) id = id[0];
+                    return {
+                        title: item.title || item.name || '',
+                        series: item.series || '',
+                        id: String(id),
+                        pic: item.picture || item.pic || item.image || ''
+                    };
+                }).filter(i => i.title || i.series); // Filter empty
 
-        function updatePreview() {
-            const text = document.getElementById('cover-text').value;
-            const imgUrl = document.getElementById('cover-img-url').value;
-            
-            document.getElementById('preview-text-display').innerText = text;
-            if(imgUrl) {
-                document.getElementById('preview-circle').style.backgroundImage = `url('${imgUrl}')`;
-            } else {
-                document.getElementById('preview-circle').style.backgroundImage = 'none';
+                statusInd.innerText = `${toniesData.length} geladen`;
+                statusInd.style.background = '#e6fffa';
+                statusInd.style.color = '#319795';
+                
+                searchInput.disabled = false;
+                renderSearch(toniesData.slice(0, 20)); // Initial load 20
+                
+            } catch (err) {
+                console.error(err);
+                statusInd.innerText = "Fehler beim Laden";
+                statusInd.style.background = '#fed7d7';
+                statusInd.style.color = '#9b2c2c';
+                showToast("Fehler beim Laden der Tonies.json");
             }
         }
 
-        // 4. Zur Warteschlange & zum Druck-Layout hinzufügen
-        function addToQueue() {
-            const text = document.getElementById('cover-text').value;
-            const imgUrl = document.getElementById('cover-img-url').value;
-            const format = document.getElementById('format-select').value;
+        // --- Search Logic ---
+        searchInput.addEventListener('input', (e) => {
+            const q = e.target.value.toLowerCase().trim();
+            if(q.length < 2 && q.length > 0) return;
+            
+            const filtered = toniesData.filter(t => 
+                t.title.toLowerCase().includes(q) ||
+                t.series.toLowerCase().includes(q) ||
+                t.id.toLowerCase().includes(q)
+            ).slice(0, 24); // Limit to 24 results for speed and nice 4-col grid
+            
+            renderSearch(filtered);
+        });
 
-            if (!text && !imgUrl) {
-                alert("Bitte wähle zuerst einen Tag aus oder füge ein Bild/Text ein.");
+        function renderSearch(items) {
+            resultsGrid.innerHTML = '';
+            items.forEach(item => {
+                const tile = document.createElement('div');
+                tile.className = 'tile';
+                if(item.pic) tile.style.backgroundImage = `url('${item.pic}')`;
+                
+                const displayLabel = item.series ? item.series : item.title;
+                tile.innerHTML = `<div class="tile-overlay">${displayLabel}</div>`;
+                
+                tile.onclick = () => loadIntoEditor(item);
+                resultsGrid.appendChild(tile);
+            });
+        }
+
+        // --- Editor Logic ---
+        function loadIntoEditor(item) {
+            currentItem = item;
+            
+            let s = item.series || '';
+            let t = item.title || '';
+            
+            if (s && t.toLowerCase().includes(s.toLowerCase())) {
+                if (t.toLowerCase().startsWith(s.toLowerCase())) {
+                    // Serie steht am Anfang (z.B. "TKKG - Folge 1")
+                    t = t.substring(s.length).replace(/^[\s\-–:]+/, '');
+                } else {
+                    // Serie steht irgendwo anders im Titel
+                    t = t.replace(new RegExp(s, 'ig'), '').replace(/^[\s\-–:]+|[\s\-–:]+$/g, '');
+                }
+            }
+            
+            editSeries.value = s;
+            editTitle.value = t;
+            
+            if(item.pic) {
+                previewSticker.style.backgroundImage = `url('${item.pic}')`;
+            } else {
+                previewSticker.style.backgroundImage = 'none';
+                previewSticker.style.backgroundColor = '#e2e8f0';
+            }
+            
+            btnAdd.disabled = false;
+            updatePreviewText();
+        }
+
+        function updatePreviewText() {
+            if(!currentItem) return;
+            
+            const s = editSeries.value.trim();
+            const t = editTitle.value.trim();
+            const showId = editShowId.checked;
+
+            previewSeries.textContent = s;
+            previewTitle.textContent = t;
+            previewId.textContent = showId ? currentItem.id : '';
+        }
+
+        editSeries.addEventListener('input', updatePreviewText);
+        editTitle.addEventListener('input', updatePreviewText);
+        editShowId.addEventListener('change', updatePreviewText);
+
+        // Slider Event für die Live-Vorschau
+        fontSizeSlider.addEventListener('input', (e) => {
+            const scale = e.target.value / 100;
+            fontSizeVal.innerText = e.target.value + '%';
+            document.querySelector('#preview-sticker .sticker-svg').style.setProperty('--font-scale', scale);
+        });
+
+        // --- Print Sheet & Slots (Drag & Drop) ---
+        function initSheet() {
+            const config = formatConfigs[formatSelect.value];
+            a4Sheet.innerHTML = '';
+            
+            a4Sheet.style.gridTemplateColumns = `repeat(${config.cols}, ${config.size})`;
+            a4Sheet.style.gap = config.gap;
+            
+            const totalSlots = config.cols * config.rows;
+            
+            for(let i=0; i<totalSlots; i++) {
+                const slot = document.createElement('div');
+                slot.className = 'slot';
+                slot.style.width = config.size;
+                slot.style.height = config.size;
+                
+                // Drag & Drop Event Listeners for Slots
+                slot.addEventListener('dragover', (e) => {
+                    e.preventDefault(); // Necessary to allow dropping
+                    // Only highlight if slot is empty
+                    if(slot.children.length === 0) slot.classList.add('drag-over');
+                });
+                
+                slot.addEventListener('dragleave', () => {
+                    slot.classList.remove('drag-over');
+                });
+                
+                slot.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    slot.classList.remove('drag-over');
+                    
+                    // Only drop if slot is empty
+                    if(slot.children.length === 0) {
+                        const id = e.dataTransfer.getData('text/plain');
+                        const draggableElement = document.getElementById(id);
+                        if(draggableElement) slot.appendChild(draggableElement);
+                    }
+                    updateCounter();
+                });
+                
+                a4Sheet.appendChild(slot);
+            }
+            updateCounter();
+        }
+
+        formatSelect.addEventListener('change', () => {
+            if(a4Sheet.querySelector('.sticker')) {
+                const confirmChange = confirm("Format ändern? Der aktuelle Bogen wird gelöscht.");
+                if(!confirmChange) {
+                    // Revert select (simple approach, assumes previous value was cached, here we just clear for ease)
+                    return; 
+                }
+            }
+            initSheet();
+        });
+
+        // --- Add to Queue Logic ---
+        btnAdd.addEventListener('click', () => {
+            if(!currentItem) return;
+
+            // Find first empty slot
+            const emptySlot = Array.from(a4Sheet.querySelectorAll('.slot')).find(s => s.children.length === 0);
+            
+            if(!emptySlot) {
+                showToast("Der Bogen ist voll! Bitte Format ändern oder drucken.");
                 return;
             }
 
-            // Mini-Vorschau in der UI
-            const queueDiv = document.createElement('div');
-            queueDiv.className = 'queue-item';
-            queueDiv.style.backgroundImage = `url('${imgUrl}')`;
-            document.getElementById('print-queue').appendChild(queueDiv);
-
-            // Echtes Druck-Element anlegen
-            const printElement = document.createElement('div');
-            printElement.className = `print-circle ${format}`;
-            printElement.style.backgroundImage = `url('${imgUrl}')`;
+            // Create new sticker element for the sheet
+            stickerCount++;
+            const sticker = document.createElement('div');
+            sticker.className = 'sticker';
+            sticker.id = `sticker-${stickerCount}`;
+            sticker.draggable = true; // Make it draggable!
             
-            if (text) {
-                const textElement = document.createElement('div');
-                textElement.className = 'print-text';
-                textElement.innerText = text;
-                printElement.appendChild(textElement);
+            if(currentItem.pic) sticker.style.backgroundImage = `url('${currentItem.pic}')`;
+            
+            // Build inner SVG
+            const sText = editSeries.value.trim();
+            const tText = editTitle.value.trim();
+            const idText = editShowId.checked ? currentItem.id : '';
+            const fontScale = fontSizeSlider.value / 100; // Aktuellen Slider-Wert abgreifen
+
+            if(sText || tText || idText) {
+                sticker.innerHTML = `
+                    <svg viewBox="0 0 100 100" class="sticker-svg" style="--font-scale: ${fontScale}">
+                        <text class="svg-series">
+                            <textPath href="#global-arc-top" startOffset="50%" text-anchor="middle">${sText}</textPath>
+                        </text>
+                        <text class="svg-title">
+                            <textPath href="#global-arc-title" startOffset="50%" text-anchor="middle">${tText}</textPath>
+                        </text>
+                        <text class="svg-id">
+                            <textPath href="#global-arc-id" startOffset="50%" text-anchor="middle">${idText}</textPath>
+                        </text>
+                    </svg>
+                `;
             }
 
-            document.getElementById('print-layout').appendChild(printElement);
-            
-            // Counter updaten
-            const count = document.querySelectorAll('.queue-item').length;
-            document.getElementById('queue-count').innerText = count;
+            // Löschen Button hinzufügen
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.innerHTML = '×';
+            deleteBtn.title = "Sticker vom Bogen löschen";
+            deleteBtn.onmousedown = (e) => e.stopPropagation(); // Verhindert, dass der Klick das Draggen auslöst
+            deleteBtn.onclick = (e) => {
+                e.stopPropagation();
+                sticker.remove();
+                updateCounter();
+            };
+            sticker.appendChild(deleteBtn);
+
+            // Drag event for the sticker itself
+            sticker.addEventListener('dragstart', (e) => {
+                e.dataTransfer.setData('text/plain', sticker.id);
+                setTimeout(() => sticker.style.opacity = '0.5', 0);
+            });
+            sticker.addEventListener('dragend', () => {
+                sticker.style.opacity = '1';
+                updateCounter();
+            });
+
+            emptySlot.appendChild(sticker);
+            updateCounter();
+            showToast("Sticker auf Bogen gelegt!");
+        });
+
+        function updateCounter() {
+            const config = formatConfigs[formatSelect.value];
+            const total = config.cols * config.rows;
+            const used = a4Sheet.querySelectorAll('.sticker').length;
+            slotCounter.innerText = `${used} / ${total}`;
         }
 
-        function clearQueue() {
-            document.getElementById('print-queue').innerHTML = '';
-            document.getElementById('print-layout').innerHTML = '';
-            document.getElementById('queue-count').innerText = '0';
-        }
+        // --- Action Buttons ---
+        btnClear.addEventListener('click', () => {
+            initSheet();
+            showToast("Bogen geleert");
+        });
+
+        btnPrint.addEventListener('click', () => {
+            const used = a4Sheet.querySelectorAll('.sticker').length;
+            if(used === 0) {
+                showToast("Der Bogen ist leer!");
+                return;
+            }
+            window.print();
+        });
+
+        // Run setup
+        initSheet();
+        loadData();
+
     </script>
 </body>
 </html>
