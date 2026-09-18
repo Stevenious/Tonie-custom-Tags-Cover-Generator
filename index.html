@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Tonie & Tag Cover HUB V16</title>
+<title>Tonie & Tag Cover HUB V17</title>
 <style>
 :root, [data-theme="light"] {
 --brand-red: #A31E33;
@@ -260,7 +260,7 @@ offlineDb: [
 ],
 init: function() {
 try {
-var favs = localStorage.getItem('hub_favs_v16');
+var favs = localStorage.getItem('hub_favs_v17');
 if (favs) this.favorites = JSON.parse(favs);
 if (!Array.isArray(this.favorites)) this.favorites = [];
 } catch(e) { this.favorites = []; }
@@ -403,7 +403,7 @@ toggleFav: function(id) {
 var idx = this.favorites.indexOf(id);
 if (idx > -1) this.favorites.splice(idx, 1);
 else this.favorites.push(id);
-try { localStorage.setItem('hub_favs_v16', JSON.stringify(this.favorites)); } catch(e) {}
+try { localStorage.setItem('hub_favs_v17', JSON.stringify(this.favorites)); } catch(e) {}
 this.updateFavCounter();
 var tabFav = safeEl('tabFav');
 if (tabFav && tabFav.classList.contains('active')) this.switchTab('tabFav');
