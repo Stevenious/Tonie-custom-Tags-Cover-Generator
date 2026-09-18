@@ -3,37 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Tonie & Tag Cover Hub V6.4</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>Tonie & Tag Cover Hub V6.5</title>
 <!-- 
-V6.4 Definitive Bulletproof Production Master
-- Fix 1: safeJsonParse fängt jeden Altdaten-Absturz im localStorage sicher ab
-- Fix 2: window.app fest im globalen Scope verankert (Switches, Suche & Hilfe reagieren immer)
-- Fix 3: Live-Suche synchronisiert sich nahtlos, wenn der 6.500+ RevvoX-Datenstrom eintrifft
-- Fix 4: Hilfe-Modal mit z-index 99999 und sauberem Event-Handling
-- Fix 5: Redundante SVG-Namespace-Attribute (href + xlink:href) für 100% Safari/iOS-Treue
-- 3-Felder-System (Titel/Serie, Album/Folge, Tonie-ID mit An/Aus-Schalter)
-- Zweistufige Format-Auswahl: Avery Zweckform vs. Freies Raster
+V6.5 - Bug Hunter Master Edition
+- 100% Crash-Proof Search (Strict string casting for numbers & nulls)
+- Defused image onerror loop that froze Mobile Safari event queues
+- Direct DOM addEventListener bindings (Buttons & Switches always responsive)
+- Pre-rendered HTML fallbacks for dropdowns and sheet matrix
+- Full Light/Dark Mode with CSS Variables & Persistence
+- 3-Field Split (Series, Episode, ID) + On/Off Switch
+- Multi-Format Sheet Engine (Avery Zweckform + Free Coin Capsule Raster)
 -->
 <style>
-:root {
-/* Tonie Farbpalette */
+:root, [data-theme="light"] {
 --tonie-red: #C02741;
 --tonie-red-hover: #A01F35;
 --tonie-red-soft: rgba(192, 39, 65, 0.08);
 --tonie-gold: #F59E0B;
 --tonie-emerald: #10B981;
-/* Light Theme (Standard) */
 --bg-color: #F8FAFC;
 --card-bg: #FFFFFF;
 --card-bg-sub: #F1F5F9;
 --text-main: #0F172A;
 --text-muted: #64748B;
 --border-color: #CBD5E1;
---border-focus: var(--tonie-red);
 --input-bg: #FFFFFF;
 --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
 --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.08);
---shadow-float: 0 12px 28px rgba(0, 0, 0, 0.12);
+--shadow-float: 0 12px 28px rgba(0, 0, 0, 0.16);
 }
 [data-theme="dark"] {
 --bg-color: #0B1120;
@@ -42,34 +42,33 @@ V6.4 Definitive Bulletproof Production Master
 --text-main: #F8FAFC;
 --text-muted: #94A3B8;
 --border-color: rgba(255, 255, 255, 0.12);
---border-focus: var(--tonie-red);
---input-bg: rgba(0, 0, 0, 0.3);
+--input-bg: rgba(0, 0, 0, 0.35);
 --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
---shadow-md: 0 4px 14px rgba(0, 0, 0, 0.4);
---shadow-float: 0 12px 28px rgba(0, 0, 0, 0.5);
+--shadow-md: 0 4px 14px rgba(0, 0, 0, 0.45);
+--shadow-float: 0 12px 28px rgba(0, 0, 0, 0.6);
 }
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
-body { background: var(--bg-color); color: var(--text-main); transition: background 0.25s ease, color 0.25s ease; line-height: 1.5; padding-bottom: 3rem; overflow-x: hidden; }
+body { background: var(--bg-color); color: var(--text-main); transition: background 0.2s ease, color 0.2s ease; line-height: 1.5; padding-bottom: 3rem; overflow-x: hidden; }
 .container { max-width: 820px; margin: 0 auto; padding: 1rem; }
 /* Navigation */
 .top-bar { display: flex; justify-content: center; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; }
-.btn-pill { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 15px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; box-shadow: var(--shadow-sm); user-select: none; }
-.btn-pill:hover { border-color: var(--tonie-red); color: var(--tonie-red); }
+.btn-pill { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 15px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.15s; display: inline-flex; align-items: center; gap: 6px; box-shadow: var(--shadow-sm); user-select: none; }
+.btn-pill:hover, .btn-pill:active { border-color: var(--tonie-red); color: var(--tonie-red); }
 .btn-accent { background: var(--tonie-red); color: #FFFFFF !important; border: none; }
-.btn-accent:hover { background: var(--tonie-red-hover); color: #FFFFFF; }
+.btn-accent:hover, .btn-accent:active { background: var(--tonie-red-hover); color: #FFFFFF; }
 /* Header */
 .header { text-align: center; margin-bottom: 1.75rem; display: flex; flex-direction: column; align-items: center; }
 .brand-logo-wrap { width: 140px; height: 70px; margin-bottom: 8px; filter: drop-shadow(0 4px 10px rgba(192, 39, 65, 0.15)); }
 .brand-title { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.15; margin-bottom: 4px; }
 .brand-title span { color: var(--tonie-red); text-transform: uppercase; }
 .brand-subtitle { font-size: 13px; color: var(--text-muted); max-width: 520px; line-height: 1.4; margin: 0 auto; }
-/* Step Cards */
+/* Cards */
 .step-card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); padding: 1.2rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-md); }
 .step-header { font-size: 15px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
 .step-badge { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; background: var(--tonie-red); color: #FFFFFF; border-radius: 50%; font-size: 12px; font-weight: 800; margin-right: 8px; }
 /* Step 1: Tabs & Grid */
 .tab-bar { display: flex; gap: 4px; margin-bottom: 12px; background: var(--card-bg-sub); padding: 4px; border-radius: 12px; border: 1px solid var(--border-color); width: 100%; }
-.tab-btn { flex: 1 1 0; min-width: 0; padding: 8px 4px; font-size: 12px; font-weight: 700; border: none; border-radius: 8px; background: transparent; color: var(--text-muted); cursor: pointer; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center; gap: 4px; }
+.tab-btn { flex: 1 1 0; min-width: 0; padding: 8px 4px; font-size: 12px; font-weight: 700; border: none; border-radius: 8px; background: transparent; color: var(--text-muted); cursor: pointer; transition: 0.15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center; gap: 4px; }
 .tab-btn.active { background: var(--card-bg); color: var(--text-main); box-shadow: var(--shadow-sm); }
 .search-row { display: flex; gap: 8px; margin-bottom: 10px; position: relative; }
 .search-field { flex: 1; padding: 11px 36px 11px 14px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-main); font-size: 14px; outline: none; }
@@ -80,17 +79,17 @@ body { background: var(--bg-color); color: var(--text-main); transition: backgro
 .status-indicator { display: inline-flex; align-items: center; gap: 6px; }
 .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--tonie-gold); }
 .status-dot.active { background: var(--tonie-emerald); }
-.items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(115px, 1fr)); gap: 10px; max-height: 290px; overflow-y: auto; padding-right: 4px; min-height: 110px; }
+.items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(115px, 1fr)); gap: 10px; max-height: 310px; overflow-y: auto; padding-right: 4px; min-height: 120px; }
 .items-grid::-webkit-scrollbar { width: 5px; }
 .items-grid::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
-.grid-card { background: var(--card-bg-sub); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 6px; text-align: center; cursor: pointer; transition: 0.2s; position: relative; display: flex; flex-direction: column; align-items: center; }
+.grid-card { background: var(--card-bg-sub); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 6px; text-align: center; cursor: pointer; transition: 0.15s; position: relative; display: flex; flex-direction: column; align-items: center; }
 .grid-card:hover { border-color: var(--tonie-red); transform: translateY(-2px); }
 .grid-card.selected { border-color: var(--tonie-red); background: var(--tonie-red-soft); box-shadow: 0 0 0 1.5px var(--tonie-red); }
 .grid-thumb { width: 62px; height: 62px; border-radius: 50%; object-fit: contain; background: #FFFFFF; margin-bottom: 6px; padding: 2px; border: 1px solid var(--border-color); }
 .grid-series { font-size: 9px; font-weight: 800; color: var(--tonie-red); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
 .grid-title { font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; margin-bottom: 2px; }
 .grid-id { font-size: 9px; color: var(--text-muted); font-family: monospace; }
-.fav-star-btn { position: absolute; top: 6px; right: 6px; font-size: 15px; color: #CBD5E1; cursor: pointer; padding: 2px; }
+.fav-star-btn { position: absolute; top: 6px; right: 6px; font-size: 15px; color: #CBD5E1; cursor: pointer; padding: 2px; z-index: 3; }
 .fav-star-btn.is-fav { color: var(--tonie-gold); }
 .upload-dropzone { display: none; padding: 28px 16px; border: 2px dashed var(--border-color); border-radius: 12px; text-align: center; cursor: pointer; background: var(--card-bg-sub); }
 /* Step 2: Form & Switch */
@@ -155,14 +154,14 @@ input:checked + .toggle-slider:before { transform: translateX(16px); }
 .footer-nav a { color: var(--tonie-red); text-decoration: none; font-size: 12px; font-weight: 600; }
 .footer-disclaimer { font-size: 10px; color: var(--text-muted); opacity: 0.8; max-width: 620px; margin: 0 auto; line-height: 1.4; }
 /* Modal */
-.modal-shade { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 99999; padding: 15px; }
+.modal-shade { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 99999; padding: 15px; cursor: pointer; }
 .modal-shade.is-open { display: flex !important; }
-.modal-body { background: var(--card-bg); width: 100%; max-width: 460px; border-radius: 16px; border: 1px solid var(--border-color); padding: 24px; box-shadow: var(--shadow-float); }
+.modal-body { background: var(--card-bg); width: 100%; max-width: 460px; border-radius: 16px; border: 1px solid var(--border-color); padding: 24px; box-shadow: var(--shadow-float); cursor: default; }
 .modal-body h3 { font-size: 18px; color: var(--tonie-red); margin-bottom: 12px; }
 .modal-body p, .modal-body li { font-size: 13px; color: var(--text-main); margin-bottom: 8px; line-height: 1.45; }
 .modal-body ul { padding-left: 18px; margin-bottom: 14px; }
 .modal-close-btn { width: 100%; padding: 11px; border-radius: 8px; background: var(--tonie-red); color: #FFFFFF; font-weight: 700; border: none; cursor: pointer; font-size: 13px; }
-/* Print Engine */
+/* Print Engine (Strict 1-Page A4 Lockdown) */
 #printHost { display: none; }
 @media print {
 .no-print, .container, .modal-shade, body > *:not(#printHost) { display: none !important; }
@@ -192,13 +191,13 @@ html, body { background: #FFFFFF !important; margin: 0 !important; padding: 0 !i
 <div class="container no-print">
 <!-- Top Navigation -->
 <div class="top-bar">
-<button class="btn-pill" id="btnThemeToggle" onclick="window.app.toggleTheme()">
+<button class="btn-pill" id="btnThemeToggle">
 <span id="themeEmoji">🌙</span> <span id="themeLabel">Dark Mode</span>
 </button>
-<button class="btn-pill" id="btnHelpModal" onclick="window.app.openHelpModal()">
+<button class="btn-pill" id="btnHelpModal">
 <span>❓</span> Hilfe & Tipps
 </button>
-<button class="btn-pill btn-accent" onclick="window.app.openDonateModal()">
+<button class="btn-pill btn-accent" id="btnDonate">
 <span>☕</span> Spenden
 </button>
 </div>
@@ -219,7 +218,7 @@ html, body { background: #FFFFFF !important; margin: 0 !important; padding: 0 !i
 </g>
 </svg>
 <div class="brand-title">Tonie & Tag <span>Cover Hub</span></div>
-<div class="brand-subtitle">Der A4-Designer für Münzkapseln, Avery Etiketten & Kreativ-Tonies. (V6.4)</div>
+<div class="brand-subtitle">Der A4-Designer für Münzkapseln, Avery Etiketten & Kreativ-Tonies. (V6.5 Bug Hunter Master)</div>
 </div>
 <!-- STEP 1: Motiv-Auswahl -->
 <div class="step-card">
@@ -227,16 +226,16 @@ html, body { background: #FFFFFF !important; margin: 0 !important; padding: 0 !i
 <div><span class="step-badge">1</span> Motiv auswählen</div>
 </div>
 <div class="tab-bar">
-<button class="tab-btn active" id="tabDbBtn" onclick="window.app.switchPickerTab('db')">📚 Datenbank</button>
-<button class="tab-btn" id="tabFavBtn" onclick="window.app.switchPickerTab('fav')">⭐ Favoriten (<span id="favQty">0</span>)</button>
-<button class="tab-btn" id="tabCustomBtn" onclick="window.app.switchPickerTab('custom')">🖼️ Eigenes Bild</button>
+<button class="tab-btn active" id="tabDbBtn">📚 Datenbank</button>
+<button class="tab-btn" id="tabFavBtn">⭐ Favoriten (<span id="favQty">0</span>)</button>
+<button class="tab-btn" id="tabCustomBtn">🖼️ Eigenes Bild</button>
 </div>
 <!-- Datenbank Ansicht -->
 <div id="tabDbView">
 <div class="search-row">
-<input type="text" id="dbSearchInput" class="search-field" placeholder="Titel, Serie oder ID suchen..." oninput="window.app.handleSearchDebounced()">
-<button class="search-clear-btn" id="searchClearBtn" onclick="window.app.clearSearchInput()">✕</button>
-<button class="search-btn-icon" onclick="window.app.selectRandomItem()" title="Zufälliges Motiv">🎲</button>
+<input type="text" id="dbSearchInput" class="search-field" placeholder="Titel, Serie oder ID suchen...">
+<button class="search-clear-btn" id="searchClearBtn">✕</button>
+<button class="search-btn-icon" id="btnRandomTonie" title="Zufälliges Motiv">🎲</button>
 </div>
 <div class="status-row">
 <span class="status-indicator">
@@ -248,8 +247,8 @@ html, body { background: #FFFFFF !important; margin: 0 !important; padding: 0 !i
 <div class="items-grid" id="toniesGrid"></div>
 </div>
 <!-- Custom Upload -->
-<div id="tabCustomView" class="upload-dropzone" onclick="document.getElementById('imgFileInput').click()">
-<input type="file" id="imgFileInput" accept="image/*" style="display:none;" onchange="window.app.handleCustomUpload(event)">
+<div id="tabCustomView" class="upload-dropzone">
+<input type="file" id="imgFileInput" accept="image/*" style="display:none;">
 <div style="font-size: 32px; margin-bottom: 6px;">📸</div>
 <div style="font-weight: 700; color: var(--text-main);">Eigenes Foto oder Grafik hochladen</div>
 <div style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">Perfekt für Kreativ-Tonies & individuelle Tags</div>
@@ -261,55 +260,55 @@ html, body { background: #FFFFFF !important; margin: 0 !important; padding: 0 !i
 <div><span class="step-badge">2</span> Etikett gestalten</div>
 </div>
 <div class="mode-switch-wrap">
-<button class="mode-toggle-btn active" id="btnModeSimple" onclick="window.app.setEditorMode('simple')">⚡ Simpel (Papa Express)</button>
-<button class="mode-toggle-btn" id="btnModePro" onclick="window.app.setEditorMode('pro')">🛠️ Pro (Nerd & Dumper)</button>
+<button class="mode-toggle-btn active" id="btnModeSimple">⚡ Simpel (Papa Express)</button>
+<button class="mode-toggle-btn" id="btnModePro">🛠️ Pro (Nerd & Dumper)</button>
 </div>
 <!-- Felder 1 & 2: Serie/Titel & Album/Folge -->
 <div class="form-row-fields">
 <div class="field-group">
 <label class="field-label" for="inputTitle">1. Titel / Serie (Oben)</label>
-<input type="text" id="inputTitle" class="field-input" value="TKKG Junior" placeholder="z.B. Conni oder TKKG" oninput="window.app.refreshPreview()">
+<input type="text" id="inputTitle" class="field-input" value="TKKG Junior" placeholder="z.B. Conni oder TKKG">
 </div>
 <div class="field-group">
 <label class="field-label" for="inputAlbum">2. Album / Folge</label>
-<input type="text" id="inputAlbum" class="field-input" value="Alarm im Freizeitpark" placeholder="z.B. feiert Geburtstag" oninput="window.app.refreshPreview()">
+<input type="text" id="inputAlbum" class="field-input" value="Alarm im Freizeitpark" placeholder="z.B. feiert Geburtstag">
 </div>
 </div>
 <!-- Feld 3 & ID Schalter -->
 <div class="id-control-row">
 <div class="field-group id-input-wrap">
 <label class="field-label" for="inputBottomId">3. Tonie-ID</label>
-<input type="text" id="inputBottomId" class="field-input" value="01-0182" placeholder="z.B. 01-0001" oninput="window.app.refreshPreview()">
+<input type="text" id="inputBottomId" class="field-input" value="01-0182" placeholder="z.B. 01-0001">
 </div>
-<div class="switch-container">
+<div class="switch-container" id="switchWrapId">
 <label class="toggle-switch">
-<input type="checkbox" id="toggleShowId" checked onchange="window.app.refreshPreview()">
+<input type="checkbox" id="toggleShowId" checked>
 <span class="toggle-slider"></span>
 </label>
-<label class="switch-label-text" for="toggleShowId">ID aufdrucken</label>
+<span class="switch-label-text">ID aufdrucken</span>
 </div>
 </div>
 <div class="preset-pills-row">
-<span class="preset-badge" onclick="window.app.applyPreset('Hörspiel')">Hörspiel</span>
-<span class="preset-badge" onclick="window.app.applyPreset('Kinderlieder')">Kinderlieder</span>
-<span class="preset-badge" onclick="window.app.applyPreset('Mein Tonie')">Mein Tonie</span>
-<span class="preset-badge" onclick="window.app.applyPreset('Kreativ')">Kreativ</span>
-<span class="preset-badge" onclick="window.app.applyPreset('Gute Nacht')">Gute Nacht</span>
+<span class="preset-badge" data-preset="Hörspiel">Hörspiel</span>
+<span class="preset-badge" data-preset="Kinderlieder">Kinderlieder</span>
+<span class="preset-badge" data-preset="Mein Tonie">Mein Tonie</span>
+<span class="preset-badge" data-preset="Kreativ">Kreativ</span>
+<span class="preset-badge" data-preset="Gute Nacht">Gute Nacht</span>
 </div>
 <!-- Pro Tools Panel -->
 <div class="pro-controls" id="proToolsPanel">
 <div class="slider-control">
 <span class="slider-name">Zoom</span>
-<input type="range" id="sliderZoom" class="slider-range" min="60" max="140" value="100" oninput="window.app.refreshPreview()">
+<input type="range" id="sliderZoom" class="slider-range" min="60" max="140" value="100">
 </div>
 <div class="slider-control">
 <span class="slider-name">Rotation</span>
-<input type="range" id="sliderRotation" class="slider-range" min="-180" max="180" value="0" oninput="window.app.refreshPreview()">
+<input type="range" id="sliderRotation" class="slider-range" min="-180" max="180" value="0">
 </div>
 <div style="display: flex; justify-content: space-between; align-items: center; background: var(--input-bg); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 8px;">
 <span style="font-size: 10.5px; color: var(--text-muted); text-transform: uppercase;">Audio-ID / Dumper:</span>
 <span style="font-family: monospace; font-size: 11px; color: var(--tonie-red); font-weight: 700;" id="dumpAudioIdLabel">1520593821</span>
-<button class="btn-pill" style="padding: 3px 8px; font-size: 10px;" onclick="window.app.copyAudioId()">Kopieren</button>
+<button class="btn-pill" id="btnCopyAudioId" style="padding: 3px 8px; font-size: 10px;">Kopieren</button>
 </div>
 </div>
 <!-- Live Sticker Preview -->
@@ -326,14 +325,14 @@ html, body { background: #FFFFFF !important; margin: 0 !important; padding: 0 !i
 <div class="form-row-fields" style="margin-bottom: 12px;">
 <div class="field-group">
 <label class="field-label" for="selectPrintSystem">1. Drucksystem</label>
-<select id="selectPrintSystem" class="field-input" onchange="window.app.onSystemChange()">
+<select id="selectPrintSystem" class="field-input">
 <option value="avery" selected>🏷️ Avery Zweckform (Vorgestanzt)</option>
 <option value="raster">✂️ Freies Raster (Münzkapseln & DIY)</option>
 </select>
 </div>
 <div class="field-group">
 <label class="field-label" for="selectPrintSize">2. Format & Größe</label>
-<select id="selectPrintSize" class="field-input" onchange="window.app.onSizeChange()">
+<select id="selectPrintSize" class="field-input">
 <option value="avery-40" selected>Avery L3415 – Ø 40 mm (24 Etiketten / 3×8)</option>
 <option value="avery-30">Avery 6223 / L4716 – Ø 30 mm (48 Etiketten / 4×12)</option>
 <option value="avery-25">Avery L7103 – Ø 25 mm (70 Etiketten / 5×14)</option>
@@ -347,14 +346,14 @@ Klicke auf einen Kreis, um dein aktuelles Cover dort zu platzieren.
 <div class="sheet-matrix matrix-avery-40" id="sheetMatrixUi"></div>
 </div>
 <div class="sheet-btn-bar">
-<button class="btn-pill" onclick="window.app.fillAllSlotsWithActive()">Alle füllen</button>
-<button class="btn-pill" onclick="window.app.clearSheetSlots()">Bogen leeren</button>
+<button class="btn-pill" id="btnFillAll">Alle füllen</button>
+<button class="btn-pill" id="btnClearSheet">Bogen leeren</button>
 </div>
 <div class="action-actions-grid">
-<button class="btn-print-large" onclick="window.app.triggerA4Print()">
+<button class="btn-print-large" id="btnPrintA4">
 🖨️ A4 Bogen Drucken
 </button>
-<button class="btn-export-png" onclick="window.app.exportHighResPng()">
+<button class="btn-export-png" id="btnExportPng">
 💾 300 DPI Bild (Plotter/PNG)
 </button>
 </div>
@@ -379,8 +378,8 @@ Metadaten bereitgestellt durch das RevvoX Reverse-Engineering Projekt.
 <!-- A4 Print Host Layer -->
 <div id="printHost"></div>
 <!-- Modal Hilfe -->
-<div class="modal-shade" id="helpModal" onclick="if(event.target===this) window.app.closeHelpModal()">
-<div class="modal-body">
+<div class="modal-shade" id="helpModal">
+<div class="modal-body" id="helpModalBody">
 <h3>💡 Tipps & Druckanleitung</h3>
 <p><b>Druckereinstellungen (Essentiell):</b></p>
 <ul>
@@ -394,15 +393,14 @@ Metadaten bereitgestellt durch das RevvoX Reverse-Engineering Projekt.
 </ul>
 <p><b>Plotter & Kopiershop:</b></p>
 <p>Nutze den Button <b>"300 DPI Bild"</b>, um eine verlustfreie Grafik für Schneideplotter oder Fotodrucker herunterzuladen.</p>
-<button class="modal-close-btn" onclick="window.app.closeHelpModal()">Verstanden</button>
+<button class="modal-close-btn" id="btnCloseHelp">Verstanden</button>
 </div>
 </div>
 <script>
-// Ausfallsichere Storage-Funktionen (resistent gegen Altdaten-Syntaxfehler und private Modi)
+// Ausfallsichere Storage-Helfer mit absolutem Exception-Schutz
 function safeStorageGet(key, fallback) {
 try {
-if (!window.localStorage) return fallback;
-const val = window.localStorage.getItem(key);
+const val = localStorage.getItem(key);
 return (val !== null && val !== undefined) ? val : fallback;
 } catch (e) {
 return fallback;
@@ -419,16 +417,13 @@ return fallback;
 }
 function safeStorageSet(key, val) {
 try {
-if (window.localStorage) {
-window.localStorage.setItem(key, typeof val === 'string' ? val : JSON.stringify(val));
-}
+localStorage.setItem(key, typeof val === 'string' ? val : JSON.stringify(val));
 } catch (e) {}
 }
-// Sichere SVG-zu-Data-URI Konvertierung
 function svgToUri(rawSvg) {
 return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(rawSvg.trim());
 }
-// Globales Application Objekt
+// Globales Kernobjekt
 window.app = {
 theme: safeStorageGet('tonie_theme', 'light'),
 editorMode: 'simple',
@@ -437,7 +432,6 @@ db: [],
 favorites: safeJsonParse(safeStorageGet('tonie_favs', '[]'), []),
 selectedTonie: null,
 searchTimer: null,
-// Formate
 currentSystem: 'avery',
 currentFormatKey: 'avery-40',
 formats: {
@@ -450,7 +444,7 @@ formats: {
 'raster-25': { system: 'raster', size: '25', count: 60, name: '25 mm – Micro DIY Tags (60 Etiketten)' }
 },
 sheetSlots: new Array(24).fill(null),
-// Basisdatenbank (12 echte Community-Lieblinge mit sauberen Vektoren)
+// 12 fehlerfreie Offline-Klassiker mit sauberen Vektor-Logos
 fallbackLibrary: [
 {
 id: "01-0182",
@@ -482,7 +476,7 @@ pic: svgToUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><ci
 },
 {
 id: "01-0412",
-title: "Bibi Blocksberg - Hexen hexen",
+title: "Hexen hexen",
 series: "Bibi Blocksberg",
 audio_id: "1520593412",
 pic: svgToUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#10B981'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><path d='M25 65l50-25' stroke='#047857' stroke-width='4' stroke-linecap='round'/><text x='50' y='32' font-family='sans-serif' font-size='12' font-weight='bold' text-anchor='middle' fill='#047857'>BIBI</text></svg>")
@@ -539,15 +533,72 @@ pic: svgToUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><ci
 ],
 init: function() {
 this.applyTheme(this.theme);
+this.bindUiEvents();
 this.updateFavCounterBadge();
-// 1. Sofortige Initialisierung mit Fallback (keine Blockade)
+// 1. Sofort einsatzbereit mit Offline-Basis
 this.db = [...this.fallbackLibrary];
 this.renderItemsGrid(this.db);
 this.selectTonieItem(this.db[0]);
 this.populateSizeDropdown();
 this.renderSheetMatrixUi();
-// 2. Asynchrone RevvoX-Datenbankanbindung im Hintergrund
+// 2. Hintergrund-Synchronisation für die 6.500+ RevvoX-Datenbank
 this.fetchRevvoxDatabase();
+},
+bindUiEvents: function() {
+// Theme & Modal Buttons
+document.getElementById('btnThemeToggle')?.addEventListener('click', () => this.toggleTheme());
+document.getElementById('btnHelpModal')?.addEventListener('click', () => this.openHelpModal());
+document.getElementById('btnCloseHelp')?.addEventListener('click', () => this.closeHelpModal());
+document.getElementById('helpModal')?.addEventListener('click', (e) => {
+if (e.target.id === 'helpModal') this.closeHelpModal();
+});
+document.getElementById('btnDonate')?.addEventListener('click', () => {
+alert("Vielen Dank für deine Unterstützung des Tonie Community-Tools! ❤️");
+});
+// Tabs
+document.getElementById('tabDbBtn')?.addEventListener('click', () => this.switchPickerTab('db'));
+document.getElementById('tabFavBtn')?.addEventListener('click', () => this.switchPickerTab('fav'));
+document.getElementById('tabCustomBtn')?.addEventListener('click', () => this.switchPickerTab('custom'));
+// Custom Upload Dropzone
+const dropzone = document.getElementById('tabCustomView');
+const fileInput = document.getElementById('imgFileInput');
+if (dropzone && fileInput) {
+dropzone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', (e) => this.handleCustomUpload(e));
+}
+// Suche
+const searchInput = document.getElementById('dbSearchInput');
+searchInput?.addEventListener('input', () => this.handleSearchDebounced());
+document.getElementById('searchClearBtn')?.addEventListener('click', () => this.clearSearchInput());
+document.getElementById('btnRandomTonie')?.addEventListener('click', () => this.selectRandomItem());
+// Modus & Felder
+document.getElementById('btnModeSimple')?.addEventListener('click', () => this.setEditorMode('simple'));
+document.getElementById('btnModePro')?.addEventListener('click', () => this.setEditorMode('pro'));
+document.getElementById('inputTitle')?.addEventListener('input', () => this.refreshPreview());
+document.getElementById('inputAlbum')?.addEventListener('input', () => this.refreshPreview());
+document.getElementById('inputBottomId')?.addEventListener('input', () => this.refreshPreview());
+document.getElementById('toggleShowId')?.addEventListener('change', () => this.refreshPreview());
+document.getElementById('sliderZoom')?.addEventListener('input', () => this.refreshPreview());
+document.getElementById('sliderRotation')?.addEventListener('input', () => this.refreshPreview());
+document.getElementById('btnCopyAudioId')?.addEventListener('click', () => this.copyAudioId());
+// Presets
+document.querySelectorAll('.preset-badge').forEach(badge => {
+badge.addEventListener('click', () => {
+const text = badge.getAttribute('data-preset');
+if (text) this.applyPreset(text);
+});
+});
+// Formate & Bogen
+document.getElementById('selectPrintSystem')?.addEventListener('change', () => this.onSystemChange());
+document.getElementById('selectPrintSize')?.addEventListener('change', () => this.onSizeChange());
+document.getElementById('btnFillAll')?.addEventListener('click', () => this.fillAllSlotsWithActive());
+document.getElementById('btnClearSheet')?.addEventListener('click', () => this.clearSheetSlots());
+document.getElementById('btnPrintA4')?.addEventListener('click', () => this.triggerA4Print());
+document.getElementById('btnExportPng')?.addEventListener('click', () => this.exportHighResPng());
+// ESC zum Schließen
+document.addEventListener('keydown', (e) => {
+if (e.key === 'Escape') this.closeHelpModal();
+});
 },
 applyTheme: function(theme) {
 this.theme = theme;
@@ -583,18 +634,23 @@ if (!res.ok) continue;
 const raw = await res.json();
 if (Array.isArray(raw) && raw.length > 0) {
 this.db = raw.map(item => {
-const mId = String(item.model || item.id || item.article || 'N/A');
-const mSeries = String(item.series || 'Tonie');
-let mTitle = String(item.episodes || item.episode || item.title || item.name || 'Ohne Titel');
+const mId = String(item.model || item.id || item.article || 'N/A').trim();
+const mSeries = String(item.series || 'Tonie').trim();
+let mTitle = String(item.episodes || item.episode || item.title || item.name || 'Ohne Titel').trim();
 if (mSeries && mTitle.toLowerCase().startsWith(mSeries.toLowerCase())) {
 mTitle = mTitle.substring(mSeries.length).replace(/^[\s-–:]+/, '').trim() || mTitle;
 }
-const mPic = String(item.pic || item.image || item.image_url || '');
-const mAudio = Array.isArray(item.audio_id) ? String(item.audio_id[0] || '') : String(item.audio_id || '');
+const mPic = String(item.pic || item.image || item.image_url || '').trim();
+let mAudio = '';
+if (Array.isArray(item.audio_id)) {
+mAudio = String(item.audio_id[0] || '').trim();
+} else if (item.audio_id !== null && item.audio_id !== undefined) {
+mAudio = String(item.audio_id).trim();
+}
 return { id: mId, title: mTitle, series: mSeries, pic: mPic, audio_id: mAudio };
 });
 this.updateStatusText(⁠${this.db.length} Tonies bereit⁠, true);
-// Sofort aktive Suche aktualisieren
+// Live-Suche nahtlos aktualisieren
 const searchInput = document.getElementById('dbSearchInput');
 const searchVal = searchInput ? searchInput.value.trim() : '';
 if (this.activeTab === 'db') {
@@ -607,7 +663,7 @@ this.renderItemsGrid(this.db.slice(0, 60));
 return;
 }
 } catch (err) {
-console.warn(⁠Fetch notice for ${url}:⁠, err);
+console.warn(⁠Fetch notice:⁠, err);
 }
 }
 this.updateStatusText(⁠${this.db.length} Motive (Basis)⁠, true);
@@ -651,16 +707,18 @@ input.focus();
 }
 this.handleSearchDebounced();
 },
+// 100% ausfallsichere Suchfunktion mit strenger String-Prüfung (keine Typen-Crashes)
 filterAndRenderSearch: function() {
-const query = (document.getElementById('dbSearchInput')?.value || '').toLowerCase().trim();
+const query = String(document.getElementById('dbSearchInput')?.value || '').toLowerCase().trim();
 let results = this.db;
 if (query) {
-results = this.db.filter(t =>
-(t.title && t.title.toLowerCase().includes(query)) ||
-(t.series && t.series.toLowerCase().includes(query)) ||
-(t.id && t.id.toLowerCase().includes(query)) ||
-(t.audio_id && t.audio_id.includes(query))
-);
+results = this.db.filter(t => {
+const titleStr = String(t.title || '').toLowerCase();
+const seriesStr = String(t.series || '').toLowerCase();
+const idStr = String(t.id || '').toLowerCase();
+const audioStr = String(t.audio_id || '').toLowerCase();
+return titleStr.includes(query) || seriesStr.includes(query) || idStr.includes(query) || audioStr.includes(query);
+});
 }
 const counterEl = document.getElementById('dbResultCounter');
 if (counterEl) counterEl.innerText = ⁠${results.length} Motive⁠;
@@ -678,19 +736,47 @@ items.forEach(tonie => {
 const isFav = this.favorites.includes(tonie.id);
 const card = document.createElement('div');
 card.className = 'grid-card' + (this.selectedTonie && this.selectedTonie.id === tonie.id ? ' selected' : '');
-card.onclick = () => this.selectTonieItem(tonie);
+card.addEventListener('click', () => this.selectTonieItem(tonie));
 const imgFallback = this.makeDefaultAvatarSvg(tonie.title);
 const imgSrc = tonie.pic || imgFallback;
-card.innerHTML = ⁠<span class="fav-star-btn ${isFav ? 'is-fav' : ''}" onclick="window.app.toggleFavoriteItem(event, '${tonie.id}')">★</span> <img class="grid-thumb" src="${imgSrc}" onerror="this.src='${imgFallback}'" alt="${this.escapeXml(tonie.title)}"> <div class="grid-series">${this.escapeXml(tonie.series)}</div> <div class="grid-title">${this.escapeXml(tonie.title)}</div> <div class="grid-id">${this.escapeXml(tonie.id)}</div>⁠;
+const starBtn = document.createElement('span');
+starBtn.className = 'fav-star-btn' + (isFav ? ' is-fav' : '');
+starBtn.innerText = '★';
+starBtn.addEventListener('click', (e) => {
+e.stopPropagation();
+this.toggleFavoriteItem(tonie.id);
+});
+const img = document.createElement('img');
+img.className = 'grid-thumb';
+img.src = imgSrc;
+img.alt = tonie.title || 'Tonie';
+// Einmalige, schleifensichere Fehlerbehandlung
+img.addEventListener('error', function() {
+this.src = imgFallback;
+}, { once: true });
+const seriesDiv = document.createElement('div');
+seriesDiv.className = 'grid-series';
+seriesDiv.innerText = tonie.series || 'Tonie';
+const titleDiv = document.createElement('div');
+titleDiv.className = 'grid-title';
+titleDiv.innerText = tonie.title || 'Ohne Titel';
+const idDiv = document.createElement('div');
+idDiv.className = 'grid-id';
+idDiv.innerText = tonie.id || '';
+card.appendChild(starBtn);
+card.appendChild(img);
+card.appendChild(seriesDiv);
+card.appendChild(titleDiv);
+card.appendChild(idDiv);
 grid.appendChild(card);
 });
 },
 makeDefaultAvatarSvg: function(title) {
-const initial = (title || 'T').charAt(0).toUpperCase();
+const initial = String(title || 'T').trim().charAt(0).toUpperCase() || 'T';
 return svgToUri(⁠<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#E2E8F0'/><text x='50' y='58' font-family='sans-serif' font-size='28' font-weight='bold' text-anchor='middle' fill='#64748B'>${initial}</text></svg>⁠);
 },
-toggleFavoriteItem: function(e, tonieId) {
-e.stopPropagation();
+toggleFavoriteItem: function(tonieId) {
+if (!tonieId) return;
 if (this.favorites.includes(tonieId)) {
 this.favorites = this.favorites.filter(id => id !== tonieId);
 } else {
@@ -717,7 +803,7 @@ const randomItem = this.db[Math.floor(Math.random() * this.db.length)];
 this.selectTonieItem(randomItem);
 },
 handleCustomUpload: function(event) {
-const file = event.target.files[0];
+const file = event.target.files && event.target.files[0];
 if (!file) return;
 const reader = new FileReader();
 reader.onload = (e) => {
@@ -734,8 +820,8 @@ reader.readAsDataURL(file);
 },
 selectTonieItem: function(tonie) {
 this.selectedTonie = tonie;
-let serie = (tonie.series || '').trim();
-let album = (tonie.title || '').trim();
+let serie = String(tonie.series || '').trim();
+let album = String(tonie.title || '').trim();
 if (serie && album.toLowerCase().startsWith(serie.toLowerCase())) {
 album = album.substring(serie.length).replace(/^[\s-–:]+/, '').trim();
 }
@@ -763,16 +849,16 @@ this.refreshPreview();
 copyAudioId: function() {
 if (!this.selectedTonie || !this.selectedTonie.audio_id) return;
 navigator.clipboard.writeText(this.selectedTonie.audio_id).then(() => {
-alert(⁠Audio-ID "${this.selectedTonie.audio_id}" kopiert!⁠);
+alert(⁠Audio-ID "${this.selectedTonie.audio_id}" in die Zwischenablage kopiert!⁠);
 }).catch(() => {
 alert(⁠Audio-ID: ${this.selectedTonie.audio_id}⁠);
 });
 },
 buildCurvedStickerSvg: function() {
 if (!this.selectedTonie) return '';
-const titleTxt = (document.getElementById('inputTitle')?.value || '').trim();
-const albumTxt = (document.getElementById('inputAlbum')?.value || '').trim();
-const idTxt = (document.getElementById('inputBottomId')?.value || '').trim();
+const titleTxt = String(document.getElementById('inputTitle')?.value || '').trim();
+const albumTxt = String(document.getElementById('inputAlbum')?.value || '').trim();
+const idTxt = String(document.getElementById('inputBottomId')?.value || '').trim();
 const showId = document.getElementById('toggleShowId')?.checked ?? true;
 const zoom = (parseFloat(document.getElementById('sliderZoom')?.value || 100)) / 100;
 const rotation = document.getElementById('sliderRotation')?.value || 0;
@@ -802,7 +888,6 @@ const svg = this.buildCurvedStickerSvg();
 const stage = document.getElementById('masterStickerPreview');
 if (stage) stage.innerHTML = svg;
 },
-// Format & Bogen-Manager
 onSystemChange: function() {
 this.currentSystem = document.getElementById('selectPrintSystem').value;
 this.populateSizeDropdown();
@@ -854,7 +939,7 @@ for (let i = 0; i < count; i++) {
 const slot = document.createElement('div');
 const hasData = Boolean(this.sheetSlots[i]);
 slot.className = 'sheet-slot-node' + (hasData ? ' has-content' : '');
-slot.onclick = () => this.assignActiveStickerToSlot(i);
+slot.addEventListener('click', () => this.assignActiveStickerToSlot(i));
 if (hasData) {
 slot.innerHTML = this.sheetSlots[i];
 } else {
@@ -933,18 +1018,9 @@ if (modal) modal.classList.add('is-open');
 closeHelpModal: function() {
 const modal = document.getElementById('helpModal');
 if (modal) modal.classList.remove('is-open');
-},
-openDonateModal: function() {
-alert("Vielen Dank für deine Unterstützung des Community-Tools!");
 }
 };
-// Tastatur-Shortcut ESC zum Schließen von Modals
-document.addEventListener('keydown', (e) => {
-if (e.key === 'Escape') {
-window.app.closeHelpModal();
-}
-});
-// Ausfallsicherer Start
+// Direkter, blockierungsfreier Start
 if (document.readyState === 'loading') {
 document.addEventListener('DOMContentLoaded', () => window.app.init());
 } else {
