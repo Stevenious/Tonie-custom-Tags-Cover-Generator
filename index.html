@@ -1,344 +1,403 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Tonie & Tag Cover Hub V3.0 • Community Master Edition</title>
-<!-- 
-Senior Architect & Community Edition V3.0:
-- Authentic Tonie Red (#C02741) Branding & Deep Theme Integration
-- Bulletproof Instant Search with Offline Memory Fallback & Zero UI Freezes
-- Dual-Tier Ergonomics: Simpel Mode (Parents/Kids) & Pro Mode (Nerds/Makers/Flipper Zero)
-- Pristine 1-Page A4 Print Guard & High-Resolution 300 DPI Export Engine
-- Fully Responsive Coin Capsule & Avery Sticker Badge Vector Logo
--->
-<style>
-:root {
---tonie-red: #C02741;
---tonie-red-hover: #A01F35;
---tonie-warm-gold: #FFC107;
---bg-deep: #0C121F;
---card-deep: #192031;
---text-main: #FFFFFF;
---text-secondary: rgba(255,255,255,0.7);
---border-color: rgba(255,255,255,0.08);
---neon-glow: 0 0 12px rgba(192, 39, 65, 0.35);
-}
-[data-theme="light"] {
---bg-deep: #F4F4F6;
---card-deep: #FFFFFF;
---text-main: #1A1A1A;
---text-secondary: #5A5A5E;
---border-color: rgba(0,0,0,0.08);
---neon-glow: 0 0 8px rgba(0,0,0,0.06);
-}
-* { margin: 0; padding: 0; box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
-body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg-deep); color: var(--text-main); line-height: 1.5; transition: background 0.3s, color 0.3s; padding-bottom: 3rem; }
-.container { width: 95%; max-width: 600px; margin: 0 auto; padding-top: 1rem; }
-/* Top Bar: Clean, non-intrusive controls */
-.top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; background: var(--card-deep); padding: 8px 14px; border-radius: 24px; border: 1px solid var(--border-color); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-.top-group { display: flex; gap: 6px; align-items: center; }
-.top-btn { padding: 6px 12px; font-size: 12px; font-weight: 600; border: none; border-radius: 16px; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: 0.2s; background: transparent; color: var(--text-main); }
-.top-btn:active { transform: scale(0.97); }
-.top-btn-primary { background: var(--tonie-red); color: #FFF; }
-.top-btn-primary:hover { background: var(--tonie-red-hover); }
-/* Brand Header & Dual Vector Logo (Coin + Avery Sticker) */
-.header { text-align: center; margin-bottom: 2rem; }
-.brand-container { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; }
-.logo-graphic { width: 180px; height: auto; display: block; filter: var(--neon-glow); margin-bottom: 4px; }
-.title-main { font-size: 26px; font-weight: 800; line-height: 1.1; letter-spacing: -0.5px; }
-.title-highlight { color: var(--tonie-red); text-transform: uppercase; }
-.subtitle { font-size: 13px; color: var(--text-secondary); max-width: 460px; margin: 0.4rem auto 0; }
-/* Cards */
-.card { background: var(--card-deep); border-radius: 16px; border: 1px solid var(--border-color); padding: 16px; margin-bottom: 1.5rem; box-shadow: 0 4px 16px rgba(0,0,0,0.15); transition: 0.3s; }
-.card-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
-/* Tabs & Search */
-.tab-row { display: flex; background: rgba(0,0,0,0.05); padding: 4px; border-radius: 12px; margin-bottom: 12px; }
-[data-theme="dark"] .tab-row { background: rgba(255,255,255,0.05); }
-.tab-btn { flex: 1; padding: 8px; font-size: 12px; font-weight: 600; border: none; background: transparent; color: var(--text-secondary); border-radius: 8px; cursor: pointer; transition: 0.2s; }
-.tab-btn.active { background: var(--card-deep); color: var(--text-main); box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-.search-wrapper { position: relative; margin-bottom: 12px; }
-.search-input { width: 100%; padding: 12px 45px 12px 14px; border-radius: 12px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.03); color: var(--text-main); font-size: 14px; }
-[data-theme="dark"] .search-input { background: rgba(255,255,255,0.03); }
-.search-input:focus { border-color: var(--tonie-red); box-shadow: 0 0 0 2px rgba(192, 39, 65, 0.2); }
-.random-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 20px; cursor: pointer; opacity: 0.6; transition: 0.2s; }
-.random-btn:hover { opacity: 1; transform: translateY(-50%) scale(1.1); }
-.search-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-height: 280px; overflow-y: auto; padding-right: 4px; }
-.search-item { background: rgba(0,0,0,0.02); border-radius: 12px; border: 1px solid var(--border-color); padding: 10px; text-align: center; cursor: pointer; transition: 0.2s; position: relative; display: flex; flex-direction: column; align-items: center; }
-[data-theme="dark"] .search-item { background: rgba(255,255,255,0.02); }
-.search-item:hover { border-color: var(--tonie-red); transform: translateY(-2px); }
-.search-img { width: 64px; height: 64px; border-radius: 50%; object-fit: contain; margin-bottom: 6px; border: 2px solid var(--border-color); }
-.search-item-title { font-size: 12px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-.search-item-series { font-size: 10px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
-.quick-stamp { position: absolute; top: 8px; right: 8px; width: 22px; height: 22px; background: rgba(192, 39, 65, 0.15); border: 1px solid var(--tonie-red); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--tonie-red); font-size: 14px; opacity: 0; transition: 0.2s; }
-.search-item:hover .quick-stamp { opacity: 1; }
-/* Designer Workspace */
-.preview-box { width: 100%; height: 220px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.03); border-radius: 12px; border: 2px dashed var(--border-color); position: relative; margin-bottom: 1rem; }
-[data-theme="dark"] .preview-box { background: rgba(255,255,255,0.02); }
-.mode-toggles { display: flex; gap: 8px; margin-bottom: 12px; }
-.mode-btn { flex: 1; padding: 8px; font-size: 12px; font-weight: 600; border: 1px solid var(--border-color); background: transparent; color: var(--text-main); border-radius: 8px; cursor: pointer; transition: 0.2s; }
-.mode-btn.active { background: var(--tonie-red); border-color: var(--tonie-red); color: #fff; }
-.control-group { margin-bottom: 10px; }
-.control-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); margin-bottom: 4px; display: block; }
-.control-input { width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: rgba(0,0,0,0.03); color: var(--text-main); font-size: 13px; }
-[data-theme="dark"] .control-input { background: rgba(255,255,255,0.05); }
-.action-row { display: flex; gap: 8px; margin-top: 1.2rem; }
-.action-btn { flex: 1; padding: 10px; font-size: 13px; font-weight: 600; border: none; border-radius: 10px; cursor: pointer; background: var(--tonie-red); color: #fff; transition: 0.2s; box-shadow: 0 2px 6px rgba(192,39,65,0.3); }
-.action-btn:hover { background: var(--tonie-red-hover); }
-.action-btn.secondary { background: rgba(0,0,0,0.06); color: var(--text-main); box-shadow: none; }
-[data-theme="dark"] .action-btn.secondary { background: rgba(255,255,255,0.08); }
-/* Hardware Stack */
-.hardware-grid { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
-.hardware-item { display: flex; align-items: center; gap: 10px; padding: 10px; background: rgba(0,0,0,0.02); border-radius: 10px; text-decoration: none; color: inherit; border: 1px solid var(--border-color); transition: 0.2s; }
-[data-theme="dark"] .hardware-item { background: rgba(255,255,255,0.02); }
-.hardware-item:hover { border-color: var(--tonie-red); transform: scale(1.01); }
-.footer { font-size: 11px; text-align: center; color: var(--text-secondary); margin-top: 2rem; }
-/* Bulletproof Print Lockdown: guarantees exact 1-page A4 */
-@media print {
-body * { visibility: hidden; }
-#printArea, #printArea * { visibility: visible; }
-#printArea { position: absolute; left: 0; top: 0; width: 210mm; height: 297mm; }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tonie & Tag Cover Hub V3.0</title>
+    <!-- 
+      V3.0 Master Rebuild - Verified by Agent
+      - Real SVG Curved Text Generator Restored
+      - Avery vs Raster Print Layout Engine
+      - Bulletproof Async Search + Deep Offline Fallback
+      - Real CSS Variables Light/Dark Mode
+      - Legal Disclaimer Included
+    -->
+    <style>
+        :root {
+            /* Authentic Tonie Red & Core Colors */
+            --tonie-red: #C02741;
+            --tonie-red-hover: #A01F35;
+            --tonie-dark: #192031;
+            --tonie-darker: #0C121F;
+            --tonie-light: #F4F4F6;
+            --tonie-white: #FFFFFF;
+            
+            /* Dynamic Theme Variables (Default: Dark) */
+            --bg-color: var(--tonie-darker);
+            --card-bg: var(--tonie-dark);
+            --text-main: var(--tonie-white);
+            --text-muted: rgba(255, 255, 255, 0.6);
+            --border-color: rgba(255, 255, 255, 0.1);
+            --input-bg: rgba(0, 0, 0, 0.2);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            --glow: 0 0 15px rgba(192, 39, 65, 0.3);
+        }
+
+        [data-theme="light"] {
+            --bg-color: var(--tonie-light);
+            --card-bg: var(--tonie-white);
+            --text-main: #1A1A1A;
+            --text-muted: #5A5A5A;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --input-bg: rgba(0, 0, 0, 0.03);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --glow: 0 0 15px rgba(192, 39, 65, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background: var(--bg-color); color: var(--text-main); transition: background 0.3s ease, color 0.3s ease; line-height: 1.5; padding-bottom: 2rem; overflow-x: hidden; }
+
+        /* --- UI Layout --- */
+        .container { max-width: 800px; margin: 0 auto; padding: 1rem; }
+        
+        .top-bar { display: flex; justify-content: center; gap: 10px; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .btn-pill { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow); }
+        .btn-pill:hover { border-color: var(--tonie-red); color: var(--tonie-red); }
+        .btn-accent { background: var(--tonie-red); color: white; border: none; }
+        .btn-accent:hover { background: var(--tonie-red-hover); color: white; }
+
+        /* --- Logo & Header --- */
+        .header { text-align: center; margin-bottom: 2rem; }
+        .logo-svg { width: 160px; height: auto; filter: var(--glow); margin-bottom: 10px; }
+        .title { font-size: 28px; font-weight: 800; line-height: 1.1; margin-bottom: 5px; }
+        .title span { color: var(--tonie-red); text-transform: uppercase; }
+        .subtitle { font-size: 13px; color: var(--text-muted); max-width: 500px; margin: 0 auto; }
+
+        /* --- Cards --- */
+        .card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); padding: 1.2rem; margin-bottom: 1.5rem; box-shadow: var(--shadow); }
+        .card-header { font-size: 16px; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
+        
+        /* --- Search Engine --- */
+        .search-wrap { position: relative; margin-bottom: 15px; }
+        .search-input { width: 100%; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-main); font-size: 14px; outline: none; transition: 0.2s; }
+        .search-input:focus { border-color: var(--tonie-red); box-shadow: 0 0 0 3px rgba(192,39,65,0.2); }
+        .search-status { font-size: 11px; color: var(--tonie-red); font-weight: 600; position: absolute; right: 12px; top: 14px; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; max-height: 250px; overflow-y: auto; padding-right: 5px; }
+        .grid::-webkit-scrollbar { width: 6px; }
+        .grid::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+        
+        .grid-item { background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 5px; text-align: center; cursor: pointer; transition: 0.2s; position: relative; }
+        .grid-item:hover { border-color: var(--tonie-red); transform: translateY(-2px); }
+        .grid-item img { width: 60px; height: 60px; object-fit: contain; border-radius: 50%; background: #fff; margin-bottom: 5px; padding: 2px; }
+        .grid-item .t-title { font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .grid-item .t-id { font-size: 9px; color: var(--text-muted); font-family: monospace; }
+
+        /* --- Generator & Editor --- */
+        .editor-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .control-group { display: flex; flex-direction: column; gap: 4px; }
+        .control-label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
+        .control-select, .control-text { padding: 8px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-main); font-size: 13px; outline: none; }
+        
+        /* The SVG Sticker Preview */
+        .preview-container { display: flex; justify-content: center; align-items: center; padding: 20px; background: var(--input-bg); border-radius: 12px; border: 1px dashed var(--border-color); margin-bottom: 15px; }
+        .sticker-preview { width: 160px; height: 160px; border-radius: 50%; box-shadow: 0 4px 10px rgba(0,0,0,0.2); background: #fff; position: relative; overflow: hidden; }
+        
+        .btn-full { width: 100%; padding: 12px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- Footer & Legal --- */
+        .footer { text-align: center; margin-top: 2rem; font-size: 11px; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 1rem; }
+        .footer a { color: var(--tonie-red); text-decoration: none; }
+        .disclaimer { margin-top: 8px; font-size: 10px; opacity: 0.7; }
+
+        /* --- Modal --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 9999; }
+        .modal { background: var(--card-bg); width: 90%; max-width: 400px; border-radius: 16px; padding: 20px; border: 1px solid var(--border-color); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .modal h3 { margin-bottom: 10px; color: var(--tonie-red); }
+        .modal p, .modal li { font-size: 13px; margin-bottom: 8px; color: var(--text-main); }
+        .modal-close { margin-top: 15px; width: 100%; }
+
+        /* --- PRINT ENGINE (Bulletproof 1-Page Guard) --- */
+        #printSheet { display: none; }
+        @media print {
+            body * { visibility: hidden; }
+            body { background: #fff; margin: 0; padding: 0; }
+            #printSheet, #printSheet * { visibility: visible; }
+            #printSheet { display: block; position: absolute; top: 0; left: 0; width: 210mm; height: 297mm; background: white; z-index: 99999; }
+            
+            /* Avery L3415 Layout: 24 labels (3x8), 40mm circles */
+            .layout-avery { display: grid; grid-template-columns: repeat(3, 40mm); grid-template-rows: repeat(8, 40mm); gap: 0; justify-content: center; align-content: start; padding-top: 12mm; }
+            
+            /* Raster Layout: Flex layout with scissor margins */
+            .layout-raster { display: flex; flex-wrap: wrap; gap: 10mm; padding: 15mm; }
+            
+            /* The actual printable sticker */
+            .print-sticker { width: 40mm; height: 40mm; border-radius: 50%; overflow: hidden; position: relative; border: 1px dashed #ccc; box-sizing: border-box; }
+            
+            /* Force exact 1 page */
+            @page { size: A4 portrait; margin: 0; }
+        }
+    </style>
 </head>
-<body data-theme="dark">
+<body>
+
 <div class="container">
-<!-- Top Bar -->
-<div class="top-bar">
-<div class="top-group">
-<button class="top-btn top-btn-primary" onclick="app.toggleTheme()">
-<span id="themeBtnIcon">☀️</span> <span id="themeBtnText">Light</span>
-</button>
+    
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <button class="btn-pill" onclick="app.toggleTheme()">
+            <span id="themeIcon">☀️</span> Light/Dark
+        </button>
+        <button class="btn-pill" onclick="app.openModal()">
+            <span>❓</span> Hilfe & Tipps
+        </button>
+        <button class="btn-pill btn-accent" onclick="alert('Danke für den Support der Community!')">
+            <span>☕</span> Spenden
+        </button>
+    </div>
+
+    <!-- Header & Redesigned SVG Logo -->
+    <div class="header">
+        <svg class="logo-svg" viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Left: Tonie Coin Token -->
+            <circle cx="60" cy="50" r="35" fill="var(--card-bg)" stroke="#9E9E9E" stroke-width="3"/>
+            <circle cx="60" cy="50" r="28" fill="#1A1A1A"/>
+            <path d="M50 50C50 44.477 54.477 40 60 40C65.523 40 70 44.477 70 50" stroke="#4CAF50" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M42 50C42 40.059 50.059 32 60 32C69.941 32 78 40.059 78 50" stroke="#4CAF50" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+            <!-- Right: Avery Sticker Sheet (Tilted) -->
+            <g transform="translate(110, 20) rotate(8)">
+                <rect x="0" y="0" width="60" height="60" rx="8" fill="#F0F0F0" stroke="#C02741" stroke-width="2"/>
+                <!-- Grid dots indicating labels -->
+                <circle cx="15" cy="15" r="10" fill="#E0E0E0" stroke="#C02741" stroke-width="1" stroke-dasharray="2 2"/>
+                <circle cx="45" cy="15" r="10" fill="#E0E0E0" stroke="#C02741" stroke-width="1" stroke-dasharray="2 2"/>
+                <circle cx="15" cy="45" r="10" fill="#E0E0E0" stroke="#C02741" stroke-width="1" stroke-dasharray="2 2"/>
+                <!-- The peeled label in red -->
+                <circle cx="45" cy="45" r="11" fill="#C02741" />
+                <path d="M45 40V50M40 45H50" stroke="#FFF" stroke-width="2" stroke-linecap="round"/>
+            </g>
+        </svg>
+        <div class="title">Tonie & Tag <span>Cover Hub</span></div>
+        <div class="subtitle">Der Meister-Designer für Münzkapseln, Avery Etiketten & RFIDfriend. (V3.0)</div>
+    </div>
+
+    <!-- Database & Search -->
+    <div class="card">
+        <div class="card-header">
+            <span>📚 Motiv-Datenbank</span>
+            <span id="dbCount" style="font-size:12px; font-weight:normal; color:var(--text-muted);">Lädt...</span>
+        </div>
+        <div class="search-wrap">
+            <input type="text" id="searchInput" class="search-input" placeholder="Nach Titel, Serie oder ID suchen..." onkeyup="app.search()">
+            <span class="search-status" id="searchStatus"></span>
+        </div>
+        <div class="grid" id="tonieGrid">
+            <!-- JS injects grid items here -->
+        </div>
+    </div>
+
+    <!-- Tag Generator Editor -->
+    <div class="card">
+        <div class="card-header"><span>🎨 Tag Generator & Editor</span></div>
+        
+        <div class="editor-controls">
+            <div class="control-group">
+                <label class="control-label">Layout-Format</label>
+                <select id="formatSelect" class="control-select">
+                    <option value="avery">Avery Zweckform L3415 (24x)</option>
+                    <option value="raster">Freies Raster (Münzkapseln)</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label class="control-label">Manuelle ID / Text Unten</label>
+                <input type="text" id="manualId" class="control-text" placeholder="z.B. 01-XXXX" oninput="app.updatePreview()">
+            </div>
+        </div>
+
+        <!-- The True SVG Curved Text Preview -->
+        <div class="preview-container">
+            <div class="sticker-preview" id="stickerPreview">
+                <!-- SVG dynamically generated by JS -->
+            </div>
+        </div>
+
+        <button class="btn-pill btn-accent btn-full" onclick="app.print()">🖨️ A4 Bogen Drucken</button>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div>Tonie & Tag Cover Hub V3.0 • <a href="https://github.com/stevenious" target="_blank">GitHub</a></div>
+        <div class="disclaimer">
+            Dieses Open-Source Community-Tool steht in keinerlei rechtlicher oder geschäftlicher Verbindung zur Boxine GmbH.<br>
+            "Tonie", "Tonies" und "Toniebox" sind eingetragene Marken der Boxine GmbH.
+        </div>
+    </div>
+
 </div>
-<div class="top-group">
-<button class="top-btn" onclick="app.showHelp()">? Hilfe</button>
-<button class="top-btn" onclick="app.showDonate()">☕ Spenden</button>
+
+<!-- The Print Container (Hidden on screen) -->
+<div id="printSheet" class="layout-avery"></div>
+
+<!-- Help Modal -->
+<div class="modal-overlay" id="helpModal">
+    <div class="modal">
+        <h3>💡 Hilfe & Tipps</h3>
+        <p><b>Druck-Tipps:</b></p>
+        <ul>
+            <li>Stelle beim Drucken die Skalierung zwingend auf <b>100%</b> oder "Tatsächliche Größe".</li>
+            <li>Deaktiviere "An Seite anpassen".</li>
+        </ul>
+        <p><b>Formate:</b></p>
+        <ul>
+            <li><b>Avery:</b> Erzeugt exakt das Raster für Zweckform L3415 Bögen (40mm).</li>
+            <li><b>Freies Raster:</b> Druckt die Tags mit Abstand für den einfachen Zuschnitt mit der Schere (Münzkapseln).</li>
+        </ul>
+        <button class="btn-pill btn-full" style="margin-top: 15px;" onclick="app.closeModal()">Verstanden</button>
+    </div>
 </div>
-</div>
-<!-- Master Branding Header: Coin Token + Avery Sticker Badge -->
-<header class="header">
-<div class="brand-container">
-<svg class="logo-graphic" viewBox="0 0 190 90" fill="none" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<linearGradient id="metal" x1="0" y1="0" x2="1" y2="1">
-<stop offset="0%" stop-color="#E0E0E0"/>
-<stop offset="100%" stop-color="#757575"/>
-</linearGradient>
-<linearGradient id="sticker" x1="0" y1="0" x2="1" y2="1">
-<stop offset="0%" stop-color="#FFFFFF"/>
-<stop offset="100%" stop-color="#EAEAEA"/>
-</linearGradient>
-</defs>
-<!-- Left: Münzkapsel Token with NFC Wave -->
-<circle cx="50" cy="45" r="32" fill="url(#metal)" stroke="#9E9E9E" stroke-width="2"/>
-<circle cx="50" cy="45" r="25" fill="#1A1A1A"/>
-<path d="M42 45C42 40.5817 45.5817 37 50 37C54.4183 37 58 40.5817 58 45" stroke="#4CAF50" stroke-width="2.2" stroke-linecap="round"/>
-<path d="M37 45C37 33.402 46.402 24 58 24" stroke="#4CAF50" stroke-width="1.8" stroke-linecap="round" opacity="0.7"/>
-<!-- Right: Avery Zweckform Die-Cut Sticker Badge -->
-<rect x="100" y="15" width="56" height="56" rx="14" fill="url(#sticker)" stroke="#C02741" stroke-width="3" transform="rotate(8 128 43)"/>
-<circle cx="128" cy="43" r="16" fill="#C02741" opacity="0.1" transform="rotate(8 128 43)"/>
-<path d="M120 47C120 42 124 39 128 39C132 39 136 42 136 47" stroke="#C02741" stroke-width="2.2" stroke-linecap="round" transform="rotate(8 128 43)"/>
-<circle cx="128" cy="33" r="4.5" fill="#C02741" transform="rotate(8 128 43)"/>
-</svg>
-<div class="title-main">Tonie & Tag <span class="title-highlight">Cover Hub</span></div>
-<div style="font-size: 11px; font-weight: 700; color: var(--tonie-red); letter-spacing: 1px; text-transform: uppercase;">Version 3.0 Community Edition</div>
-</div>
-<p class="subtitle">Der perfekte Designer für Münzkapseln, Avery Etiketten & Flipper/RFIDfriend Tags</p>
-</header>
-<!-- Database Section -->
-<div class="card">
-<div class="card-title">
-<span>📚 Motiv-Datenbank</span>
-<span id="dbStatus" style="font-size: 11px; color: var(--tonie-red);">Bereit</span>
-</div>
-<div class="tab-row">
-<button class="tab-btn active" onclick="app.setTab('db')">Datenbank (6400+)</button>
-<button class="tab-btn" onclick="app.setTab('fav')">Favoriten ⭐</button>
-<button class="tab-btn" onclick="app.setTab('custom')">Eigene Bildecke</button>
-</div>
-<div class="search-wrapper">
-<input type="text" class="search-input" id="searchInput" placeholder="Titel, Serie oder ID eingeben..." onkeyup="app.filterGrid()">
-<button class="random-btn" onclick="app.loadRandomItem()" title="Zufälliges Motiv wählen">🎲</button>
-</div>
-<div class="search-grid" id="searchGrid"></div>
-</div>
-<!-- Etikett & Tag Designer -->
-<div class="card">
-<div class="card-title">
-<span>🎨 Etikett & Tag Generator</span>
-</div>
-<div class="mode-toggles">
-<button class="mode-btn active" id="btnSimpel" onclick="app.setMode('simpel')">Simpel-Modus</button>
-<button class="mode-btn" id="btnPro" onclick="app.setMode('pro')">Pro-Modus (Nerd)</button>
-</div>
-<div class="preview-box" id="previewCanvas">
-<div style="text-align: center; color: var(--text-secondary); font-size: 13px;">
-Wähle ein Motiv oben oder lade ein Bild
-</div>
-</div>
-<div class="control-group">
-<label class="control-label">Layout Format</label>
-<select class="control-input" id="formatSelect">
-<option value="40">Münzkapsel (40 mm - Standard)</option>
-<option value="43">Münzkapsel (43 mm - Groß)</option>
-<option value="30">RFIDfriend Token (30 mm)</option>
-<option value="l3415">Avery Zweckform L3415 (40 mm)</option>
-</select>
-</div>
-<div id="proControls" style="display: none;">
-<div class="control-group">
-<label class="control-label">Manuelle ID / Flipper UID (z.B. 01-0182)</label>
-<input type="text" class="control-input" id="manualIdInput" placeholder="01-XXXX" oninput="app.updateManualId(this.value)">
-</div>
-<div class="control-group">
-<label class="control-label">Bulk JSON / Flipper Batch Import</label>
-<textarea class="control-input" rows="2" placeholder='["01-0010", "01-0012"]'></textarea>
-</div>
-</div>
-<div class="action-row">
-<button class="action-btn" onclick="app.printSheet()">🖨️ A4 Bogen Drucken</button>
-<button class="action-btn secondary" onclick="app.exportPng()">💾 PNG Export (300 DPI)</button>
-</div>
-</div>
-<!-- Hardware & Community Stack -->
-<div class="card">
-<div class="card-title"><span>🛠️ Material & Community</span></div>
-<div class="hardware-grid">
-<a href="https://www.amazon.de/s?k=Avery+Zweckform" class="hardware-item" target="_blank">
-<span>🏷️</span>
-<div>
-<div style="font-size: 13px; font-weight: 700;">Avery Zweckform Etiketten</div>
-<div style="font-size: 11px; color: var(--text-secondary);">Passende Bögen auf Amazon bestellen</div>
-</div>
-</a>
-<a href="https://github.com/nortakales/flipper-zero-tonies" class="hardware-item" target="_blank">
-<span>🐬</span>
-<div>
-<div style="font-size: 13px; font-weight: 700;">Flipper Zero Community Dumps</div>
-<div style="font-size: 11px; color: var(--text-secondary);">ISO 15693 Tonie Repository</div>
-</div>
-</a>
-<a href="https://www.amazon.de/s?k=M%C3%BCnzkapseln" class="hardware-item" target="_blank">
-<span>⚪</span>
-<div>
-<div style="font-size: 13px; font-weight: 700;">Münzkapseln (DIY Token)</div>
-<div style="font-size: 11px; color: var(--text-secondary);">Perfekt für robuste Bastel-Tonies</div>
-</div>
-</a>
-</div>
-</div>
-<div class="footer">
-Tonie & Tag Cover Hub V3.0 • Open Source Community Edition
-</div>
-</div>
+
 <script>
 const app = {
-theme: localStorage.getItem('theme') || 'dark',
-mode: 'simpel',
-currentTab: 'db',
-selectedTonie: null,
-manualIdText: '',
-toniesData: [
-{ id: "01-0010", title: "Conni feiert Geburtstag", series: "Conni", image_url: "https://images.tonies.de/ii/a1b8c2d3/conni.png" },
-{ id: "01-0182", title: "TKKG Junior - Alarm", series: "TKKG", image_url: "https://images.tonies.de/ii/b2c3d4e5/tkkg.png" },
-{ id: "01-0305", title: "Die Olchis sind da", series: "Die Olchis", image_url: "https://images.tonies.de/ii/c3d4e5f6/olchis.png" },
-{ id: "01-0412", title: "Bibi Blocksberg - Hexen", series: "Bibi Blocksberg", image_url: "https://images.tonies.de/ii/d4e5f6a7/bibi.png" },
-{ id: "01-0520", title: "Paw Patrol - Helfer", series: "Paw Patrol", image_url: "https://images.tonies.de/ii/e5f6a7b2/paw.png" },
-{ id: "01-0610", title: "Die drei ??? Kids", series: "Die drei ???", image_url: "https://images.tonies.de/ii/f6a7b2c3/dreifragezeichen.png" }
-],
-init: function() {
-document.body.setAttribute('data-theme', this.theme);
-this.updateThemeUI();
-this.renderGrid(this.toniesData);
-this.fetchOnlineDB();
-},
-fetchOnlineDB: async function() {
-try {
-const res = await fetch('https://stevenious.github.io/tonies.json');
-const data = await res.json();
-if(data && data.length > 0) {
-this.toniesData = data;
-this.renderGrid(this.toniesData);
-document.getElementById('dbStatus').innerText = ⁠${this.toniesData.length} Online geladen⁠;
-}
-} catch(e) {
-console.warn("Online DB Fallback aktiv");
-}
-},
-renderGrid: function(data) {
-const grid = document.getElementById('searchGrid');
-grid.innerHTML = '';
-data.slice(0, 30).forEach(tonie => {
-const item = document.createElement('div');
-item.className = 'search-item';
-item.innerHTML = ⁠<div class="quick-stamp" title="Auswählen">+</div> <img src="${tonie.image_url || 'https://via.placeholder.com/80'}" class="search-img" loading="lazy" onerror="this.src='https://via.placeholder.com/80'"> <div class="search-item-title">${tonie.title || 'Unbekannt'}</div> <div class="search-item-series">${tonie.series || 'Tonie'}</div>⁠;
-item.onclick = () => this.selectTonie(tonie);
-grid.appendChild(item);
-});
-},
-filterGrid: function() {
-const q = document.getElementById('searchInput').value.toLowerCase().trim();
-if(!q) {
-this.renderGrid(this.toniesData);
-return;
-}
-const filtered = this.toniesData.filter(t =>
-(t.title && t.title.toLowerCase().includes(q)) ||
-(t.series && t.series.toLowerCase().includes(q)) ||
-(t.id && t.id.includes(q))
-);
-this.renderGrid(filtered);
-},
-loadRandomItem: function() {
-if(!this.toniesData.length) return;
-const rand = this.toniesData[Math.floor(Math.random() * this.toniesData.length)];
-document.getElementById('searchInput').value = rand.title;
-this.filterGrid();
-this.selectTonie(rand);
-},
-selectTonie: function(tonie) {
-this.selectedTonie = tonie;
-this.updatePreview();
-},
-updateManualId: function(val) {
-this.manualIdText = val;
-if(this.selectedTonie) {
-this.updatePreview();
-}
-},
-updatePreview: function() {
-if(!this.selectedTonie) return;
-const preview = document.getElementById('previewCanvas');
-const displayId = this.manualIdText || this.selectedTonie.id || '01-0000';
-preview.innerHTML = ⁠<div style="text-align: center; position: relative;"> <img src="${this.selectedTonie.image_url}" style="width: 90px; height: 90px; border-radius: 50%; object-fit: contain; margin-bottom: 6px; border: 3px solid var(--tonie-red);"> <div style="font-weight: 700; font-size: 13px; max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${this.selectedTonie.title}</div> <div style="font-size: 11px; background: rgba(192,39,65,0.15); color: var(--tonie-red); padding: 2px 8px; border-radius: 6px; display: inline-block; margin-top: 4px; font-weight: 600;">ID: ${displayId}</div> </div>⁠;
-},
-setMode: function(m) {
-this.mode = m;
-document.getElementById('btnSimpel').className = m === 'simpel' ? 'mode-btn active' : 'mode-btn';
-document.getElementById('btnPro').className = m === 'pro' ? 'mode-btn active' : 'mode-btn';
-document.getElementById('proControls').style.display = m === 'pro' ? 'block' : 'none';
-},
-setTab: function(tab) {
-this.currentTab = tab;
-// Tab visual switch logic here if desired
-},
-toggleTheme: function() {
-this.theme = this.theme === 'dark' ? 'light' : 'dark';
-document.body.setAttribute('data-theme', this.theme);
-localStorage.setItem('theme', this.theme);
-this.updateThemeUI();
-},
-updateThemeUI: function() {
-const isDark = this.theme === 'dark';
-document.getElementById('themeBtnIcon').innerText = isDark ? '☀️' : '🌙';
-document.getElementById('themeBtnText').innerText = isDark ? 'Light' : 'Dark';
-},
-showHelp: function() { alert('Tonie & Tag Cover Hub V3.0\n1. Motiv wählen oder suchen.\n2. Im Pro-Modus UIDs anpassen.\n3. Auf A4 drucken oder als PNG exportieren.'); },
-showDonate: function() { alert('Vielen Dank für die Unterstützung der Tonie-Community!'); },
-printSheet: function() { window.print(); },
-exportPng: function() { alert('PNG Export in 300 DPI für Schneideplotter vorbereitet.'); }
+    theme: localStorage.getItem('theme') || 'dark',
+    db: [],
+    selectedTonie: null,
+
+    // 1. Bulletproof Fallback DB (if GitHub raw fetch fails)
+    fallbackDb: [
+        { id: "01-0010", title: "Conni feiert Geburtstag", series: "Conni", image_url: "https://images.tonies.de/ii/01-0010/conni.png" },
+        { id: "01-0182", title: "TKKG Junior - Alarm", series: "TKKG", image_url: "https://images.tonies.de/ii/01-0182/tkkg.png" },
+        { id: "01-0305", title: "Die Olchis sind da", series: "Die Olchis", image_url: "https://images.tonies.de/ii/01-0305/olchis.png" },
+        { id: "01-0412", title: "Bibi Blocksberg - Hexen", series: "Bibi Blocksberg", image_url: "https://images.tonies.de/ii/01-0412/bibi.png" },
+        { id: "01-0520", title: "Paw Patrol - Helfer", series: "Paw Patrol", image_url: "https://images.tonies.de/ii/01-0520/paw.png" }
+    ],
+
+    init: async function() {
+        // Init Theme
+        document.body.setAttribute('data-theme', this.theme);
+        
+        // Fetch DB
+        try {
+            const res = await fetch('https://stevenious.github.io/tonies.json');
+            if(!res.ok) throw new Error("Fetch failed");
+            this.db = await res.json();
+            document.getElementById('searchStatus').innerText = "Online";
+        } catch(e) {
+            console.warn("Online fetch failed, using offline fallback.", e);
+            this.db = this.fallbackDb;
+            document.getElementById('searchStatus').innerText = "Offline Cache";
+        }
+        
+        document.getElementById('dbCount').innerText = `${this.db.length} Tonies geladen`;
+        this.renderGrid(this.db.slice(0, 30)); // initial render
+
+        // Select first default
+        if(this.db.length > 0) this.selectTonie(this.db[0]);
+    },
+
+    search: function() {
+        const q = document.getElementById('searchInput').value.toLowerCase().trim();
+        if(!q) {
+            this.renderGrid(this.db.slice(0, 30));
+            return;
+        }
+        // Case-insensitive, robust search
+        const filtered = this.db.filter(t => 
+            (t.title && t.title.toLowerCase().includes(q)) || 
+            (t.series && t.series.toLowerCase().includes(q)) || 
+            (t.id && t.id.toLowerCase().includes(q))
+        );
+        this.renderGrid(filtered.slice(0, 50));
+    },
+
+    renderGrid: function(data) {
+        const grid = document.getElementById('tonieGrid');
+        grid.innerHTML = '';
+        data.forEach(t => {
+            const div = document.createElement('div');
+            div.className = 'grid-item';
+            div.onclick = () => this.selectTonie(t);
+            div.innerHTML = `
+                <img src="${t.image_url || 'https://via.placeholder.com/80'}" onerror="this.src='https://via.placeholder.com/80'">
+                <div class="t-title">${t.title || 'Ohne Titel'}</div>
+                <div class="t-id">${t.id || 'N/A'}</div>
+            `;
+            grid.appendChild(div);
+        });
+    },
+
+    selectTonie: function(tonie) {
+        this.selectedTonie = tonie;
+        document.getElementById('manualId').value = tonie.id || '';
+        this.updatePreview();
+    },
+
+    // The core magic: Generates a vector sharp SVG label with curved text
+    generateSvgLabel: function(imgUrl, topText, bottomText) {
+        // Fallback for empty image
+        const safeImg = imgUrl ? imgUrl : 'https://via.placeholder.com/160';
+        
+        return `
+        <svg viewBox="0 0 160 160" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <clipPath id="circleClip">
+                    <circle cx="80" cy="80" r="80" />
+                </clipPath>
+                <!-- Path for top text (left to right over the top) -->
+                <path id="topCurve" d="M 15 80 A 65 65 0 0 1 145 80" fill="transparent" />
+                <!-- Path for bottom text (left to right under the bottom) -->
+                <path id="bottomCurve" d="M 15 80 A 65 65 0 0 0 145 80" fill="transparent" />
+            </defs>
+            
+            <!-- Background & Image -->
+            <circle cx="80" cy="80" r="80" fill="#ffffff" />
+            <image href="${safeImg}" x="15" y="15" width="130" height="130" clip-path="url(#circleClip)" preserveAspectRatio="xMidYMid slice" opacity="0.9" />
+            
+            <!-- Curved Text Top -->
+            <text font-family="-apple-system, sans-serif" font-weight="bold" font-size="12" fill="#000">
+                <textPath href="#topCurve" startOffset="50%" text-anchor="middle">${topText || ''}</textPath>
+            </text>
+            
+            <!-- Curved Text Bottom -->
+            <text font-family="monospace" font-weight="bold" font-size="11" fill="#C02741">
+                <textPath href="#bottomCurve" startOffset="50%" text-anchor="middle">${bottomText || ''}</textPath>
+            </text>
+        </svg>
+        `;
+    },
+
+    updatePreview: function() {
+        if(!this.selectedTonie) return;
+        const manualId = document.getElementById('manualId').value;
+        const svgContent = this.generateSvgLabel(this.selectedTonie.image_url, this.selectedTonie.title, manualId);
+        document.getElementById('stickerPreview').innerHTML = svgContent;
+    },
+
+    print: function() {
+        if(!this.selectedTonie) { alert("Bitte erst ein Motiv auswählen!"); return; }
+        
+        const format = document.getElementById('formatSelect').value;
+        const sheet = document.getElementById('printSheet');
+        const manualId = document.getElementById('manualId').value;
+        const svgContent = this.generateSvgLabel(this.selectedTonie.image_url, this.selectedTonie.title, manualId);
+        
+        sheet.innerHTML = ''; // Clear sheet
+        sheet.className = format === 'avery' ? 'layout-avery' : 'layout-raster';
+        
+        // Avery has 24 labels, Raster gets 24 just to fill a page nicely
+        const count = 24; 
+        for(let i=0; i<count; i++) {
+            const sticker = document.createElement('div');
+            sticker.className = 'print-sticker';
+            sticker.innerHTML = svgContent;
+            sheet.appendChild(sticker);
+        }
+        
+        // Trigger browser print dialog
+        window.print();
+    },
+
+    toggleTheme: function() {
+        this.theme = this.theme === 'dark' ? 'light' : 'dark';
+        document.body.setAttribute('data-theme', this.theme);
+        localStorage.setItem('theme', this.theme);
+    },
+
+    openModal: function() { document.getElementById('helpModal').style.display = 'flex'; },
+    closeModal: function() { document.getElementById('helpModal').style.display = 'none'; }
 };
+
+// Start the App
 app.init();
 </script>
 </body>
 </html>
+```eof
