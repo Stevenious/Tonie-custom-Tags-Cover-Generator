@@ -47,9 +47,12 @@
         .workspace { display: flex; flex: 1; overflow: hidden; position: relative; }
 
         /* SIDEBAR LEFT */
-        .sidebar-left { width: 330px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.3s ease; flex-shrink: 0; overflow: hidden; }
-        .sidebar-left.hidden { margin-left: -330px; border: none; }
-
+        .sidebar-left { width: 330px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
+        /* Focus-Mode States */
+        .sidebar-left.focus-hidden { width: 0 !important; transform: translateX(-100%); border: none; overflow: hidden; }
+        .sidebar-right.focus-hidden { width: 0 !important; transform: translateX(100%); border: none; overflow: hidden; }
+        
         .lib-tabs { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; }
         .lib-tab { flex: 1; padding: 12px 0; text-align: center; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: 0.2s; }
         .lib-tab.active { color: var(--brand); border-bottom-color: var(--brand); }
@@ -58,65 +61,116 @@
         .input-text { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-md); font-family: inherit; font-size: 0.88rem; outline: none; background: var(--bg-app); transition: border-color 0.2s; }
         .input-text:focus { border-color: var(--brand); }
 
-        .library-grid { padding: 12px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; overflow-y: auto; flex: 1; align-content: start; }
-        .asset-card { background: var(--bg-panel); border-radius: var(--radius-md); border: 1px solid var(--border); display: flex; flex-direction: column; position: relative; cursor: pointer; transition: 0.2s; overflow: hidden; padding: 8px; gap: 6px; box-shadow: var(--shadow-sm); min-height: 145px; box-sizing: border-box; }
+        /* KACHEL-GRID MIT PAGINIERUNGS-FIX */
+        .library-grid { 
+            padding: 12px; 
+            display: grid; 
+            grid-template-columns: repeat(2, minmax(0, 1fr)); 
+            gap: 12px; 
+            overflow-y: auto; 
+            overflow-x: hidden; 
+            flex: 1; 
+            align-content: start; 
+            grid-auto-rows: max-content; 
+        }
+        
+        .asset-card { 
+            background: var(--bg-panel); 
+            border-radius: var(--radius-md); 
+            border: 1px solid var(--border); 
+            display: flex; 
+            flex-direction: column; 
+            position: relative; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            padding: 8px; 
+            gap: 8px; 
+            box-shadow: var(--shadow-sm); 
+            min-width: 0; 
+            min-height: 160px; /* Harte Mindesthöhe gegen Quetschen */
+        }
         .asset-card:hover { border-color: var(--brand); transform: translateY(-2px); box-shadow: var(--shadow-md); }
         
-        .asset-thumb { width: 100%; height: 90px; min-height: 90px; flex-shrink: 0; background-size: contain; background-position: center; background-repeat: no-repeat; background-color: #FAFAFA; border-radius: 6px; border: 1px solid #F1F5F9; }
-        .asset-info { display: flex; flex-direction: column; gap: 2px; overflow: hidden; flex-shrink: 0; }
-        .asset-series { font-size: 0.68rem; font-weight: 700; color: var(--brand); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
-        .asset-title { font-size: 0.76rem; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.25; }
+        .asset-thumb { 
+            width: 100%; 
+            height: 90px; 
+            flex-shrink: 0; 
+            background-size: contain; 
+            background-position: center; 
+            background-repeat: no-repeat; 
+            border-radius: 6px; 
+            background-color: var(--bg-app);
+        }
         
-        .fav-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.95); border: 1px solid var(--border); border-radius: 50%; width: 26px; height: 26px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); z-index: 5; transition: 0.2s; color: #94A3B8; }
+        .asset-info { display: flex; flex-direction: column; gap: 3px; overflow: hidden; width: 100%; flex-shrink: 0; }
+        .asset-series { font-size: 0.68rem; font-weight: 700; color: var(--brand); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+        .asset-title { font-size: 0.76rem; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+        
+        /* FAVORITEN STERN: ☆ vs ★ */
+        .fav-btn { position: absolute; top: 6px; right: 6px; background: rgba(255,255,255,0.95); border: 1px solid var(--border); border-radius: 50%; width: 26px; height: 26px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; z-index: 5; color: #94A3B8; transition: 0.2s; padding-bottom: 2px; }
         .fav-btn:hover { transform: scale(1.1); color: #F59E0B; }
         .fav-btn.active { color: #F59E0B; border-color: #FDE68A; background: #FFFBEB; }
 
-        .quick-add-btn { position: absolute; bottom: 8px; right: 8px; background: var(--brand); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0.85); transition: 0.2s; z-index: 5; box-shadow: var(--shadow-sm); cursor: pointer; }
+        /* QUICK ADD */
+        .quick-add-btn { position: absolute; bottom: 8px; right: 8px; background: var(--brand); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0.85); transition: 0.2s; z-index: 5; cursor: pointer; }
         .asset-card:hover .quick-add-btn { opacity: 1; transform: scale(1); }
         .quick-add-btn:hover { background: var(--brand-hover); }
 
+        /* PAGINATION */
+        .pagination-controls { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; font-size: 13px; color: var(--text-muted); grid-column: 1 / -1; }
+        .pagination-controls button { background: var(--border); border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.2s; color: var(--text-main); }
+        .pagination-controls button:hover:not(:disabled) { background: #cbd5e1; }
+        .pagination-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
+
         /* CANVAS AREA */
-        .canvas-area { flex: 1; background: var(--bg-canvas); position: relative; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 28px; transition: 0.3s ease; }
+        .canvas-area { flex: 1; background: var(--bg-canvas); position: relative; overflow-y: auto; overflow-x: hidden; display: flex; flex-direction: column; align-items: center; padding: 28px; transition: 0.3s; }
         .canvas-area::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(var(--border) 1.2px, transparent 1.2px); background-size: 20px 20px; pointer-events: none; z-index: 0; }
 
         #view-design, #view-print { z-index: 1; display: none; width: 100%; align-items: center; flex-direction: column; }
         #view-design.active, #view-print.active { display: flex; }
 
-        .design-toolbar { display: flex; gap: 12px; margin-top: 24px; align-items: center; flex-wrap: wrap; justify-content: center; }
+        .design-toolbar { margin-bottom: 20px; display: flex; gap: 12px; align-items: center; width: 100%; max-width: 320px; justify-content: space-between; }
 
-        .preview-container { background: var(--bg-panel); padding: 32px; border-radius: 20px; box-shadow: var(--shadow-md); border: 1px solid var(--border); transition: 0.2s; display: flex; flex-direction: column; align-items: center; }
+        .preview-container { background: var(--bg-panel); padding: 32px; border-radius: 20px; box-shadow: var(--shadow-md); border: 1px solid var(--border); transition: 0.2s; display: flex; flex-direction: column; align-items: center; margin-bottom: 24px; position: relative; }
         .preview-container.drag-over { border-color: var(--brand); background: #fdf2f8; transform: scale(1.02); }
 
-        .sticker { width: 260px; height: 260px; border-radius: 50%; background-color: #fff; position: relative; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08), inset 0 0 0 1px var(--border); --bg-x: 50%; --bg-y: 20%; --bg-scale: 90%; background-position: var(--bg-x) var(--bg-y); background-size: var(--bg-scale); background-repeat: no-repeat; }
-        .sticker-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
-        .sticker-svg text { paint-order: stroke fill; stroke: white; stroke-width: 2.5px; stroke-linecap: round; stroke-linejoin: round; font-family: 'Nunito', sans-serif; }
+        .sticker { width: 280px; height: 280px; border-radius: 50%; background-color: #fff; position: relative; overflow: visible; box-shadow: 0 4px 20px rgba(0,0,0,0.08), inset 0 0 0 1px var(--border); --bg-x: 50%; --bg-y: 20%; --bg-scale: 90%; background-position: var(--bg-x) var(--bg-y); background-size: var(--bg-scale); background-repeat: no-repeat; }
         
-        /* Removed letter-spacing to prevent overlapping */
+        .sticker-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+        .sticker-svg text { paint-order: stroke fill; stroke: white; stroke-width: 3px; stroke-linecap: round; stroke-linejoin: round; font-family: 'Nunito', sans-serif; }
+        
         .svg-series { fill: var(--brand); font-weight: 900; text-transform: uppercase; }
         .svg-title { fill: #0F172A; font-weight: 800; }
         .svg-id { fill: #64748B; font-weight: 700; font-family: monospace; }
 
         /* PRINT STUDIO UI */
-        .print-toolbar { background: var(--bg-panel); padding: 10px 20px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); border: 1px solid var(--border); display: flex; gap: 10px; align-items: center; margin-bottom: 24px; z-index: 2; flex-wrap: wrap; }
+        .print-toolbar { background: var(--bg-panel); padding: 12px 24px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); border: 1px solid var(--border); display: flex; gap: 12px; align-items: center; margin-bottom: 24px; z-index: 10; flex-wrap: wrap; }
         
-        .a4-sheet { background: white; width: 210mm; min-height: 297mm; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); display: grid; box-sizing: border-box; position: relative; margin: 0 auto; }
+        .a4-sheet { background: white; width: 210mm; height: 297mm; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); display: grid; box-sizing: border-box; position: relative; margin: 0 auto; flex-shrink: 0; }
         .slot { border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
         .slot.drag-over { background: rgba(233, 30, 99, 0.1); border: 2px dashed var(--brand); }
         .slot .sticker { width: 100%; height: 100%; cursor: grab; box-shadow: none; }
         .a4-sheet.show-cut-marks .slot:empty { border: 0.5pt dashed #CBD5E1 !important; }
         .a4-sheet.show-cut-marks .sticker { border: 0.5pt dashed #94A3B8 !important; }
 
-        .delete-btn { position: absolute; top: 0; right: 0; background: var(--text-main); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-weight: bold; font-size: 11px; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 10; }
-        #view-print .sticker:hover .delete-btn { display: flex; }
+        /* HOVER AKTIONEN FÜR STICKER (+ / ✕) */
+        .sticker-actions { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; display: none; }
+        #view-print .sticker:hover .sticker-actions { display: block; }
+        .action-btn { position: absolute; width: 26px; height: 26px; border-radius: 50%; border: none; color: white; font-weight: bold; font-size: 15px; cursor: pointer; pointer-events: auto; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md); transition: 0.2s; }
+        
+        .btn-del { top: -6px; right: -6px; background: #ef4444; }
+        .btn-del:hover { background: #dc2626; transform: scale(1.15); }
+        
+        .btn-dup { top: -6px; left: -6px; background: #3b82f6; }
+        .btn-dup:hover { background: #2563eb; transform: scale(1.15); }
 
         /* SIDEBAR RIGHT */
-        .sidebar-right { width: 330px; background: var(--bg-panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-right 0.3s ease; flex-shrink: 0; }
-        .sidebar-right.hidden { margin-right: -330px; border: none; }
-
+        .sidebar-right { width: 330px; background: var(--bg-panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; flex-shrink: 0; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        
         .prop-section { padding: 20px; border-bottom: 1px solid var(--border); }
         .prop-title { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 14px; letter-spacing: 0.5px; }
         .prop-group { margin-bottom: 14px; }
-        .prop-group label { display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; font-weight: 600; margin-bottom: 6px; }
+        .prop-group label { display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; font-weight: 600; margin-bottom: 6px; cursor: pointer; }
         input[type="range"] { width: 100%; accent-color: var(--brand); cursor: pointer; }
         input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--brand); cursor: pointer; }
 
@@ -135,7 +189,7 @@
             #view-print, .a4-sheet, .a4-sheet * { visibility: visible; }
             #view-print { position: relative; left: 0; top: 0; width: 100%; padding: 0; display: block; }
             .a4-sheet { margin: 0; box-shadow: none; border: none; }
-            .print-toolbar, .delete-btn, .topbar, .sidebar-left, .sidebar-right, .toast, .modal-overlay { display: none !important; }
+            .print-toolbar, .sticker-actions, .topbar, .sidebar-left, .sidebar-right, .toast, .modal-overlay { display: none !important; }
         }
     </style>
 </head>
@@ -173,28 +227,35 @@
             
             <!-- DESIGN VIEW -->
             <div id="view-design" class="active">
-                <div class="preview-container" id="drop-zone">
-                    <div class="sticker" id="preview-sticker"></div>
-                    <div style="margin-top: 14px; font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
-                        <span>💡</span> Tipp: Eigene Bilddatei per Drag & Drop hier ablegen
-                    </div>
+                
+                <div class="design-toolbar">
+                    <button class="btn btn-outline" id="btn-back-lib" style="display: none;" onclick="App.showLibrary()">
+                        ← Andere Figur suchen
+                    </button>
+                    <button class="btn btn-primary" onclick="PrintStudio.addCurrentToSheet()">
+                        + Auf den Druckbogen
+                    </button>
                 </div>
 
-                <div class="design-toolbar">
-                    <button class="btn btn-primary" style="font-size: 1rem; padding: 12px 28px; box-shadow: var(--shadow-md);" onclick="PrintStudio.addCurrentToSheet()">
-                        + Auf den Druckbogen legen
-                    </button>
+                <div class="preview-container" id="drop-zone">
+                    <div class="sticker" id="preview-sticker"></div>
+                    <div style="margin-top: 20px; font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+                        💡 Tipp: Eigene Bilddatei per Drag & Drop hier ablegen
+                    </div>
                 </div>
             </div>
 
-            <!-- PRINT VIEW -->
+            <!-- PRINT VIEW (FOCUS MODE) -->
             <div id="view-print">
                 <div class="print-toolbar">
                     <select class="input-text" id="format-select" style="width: auto; font-weight: 600;">
-                        <option value="40">Freies Raster: 40mm (24 Stk - Kapsel)</option>
-                        <option value="43">Freies Raster: 43mm (20 Stk - Kapsel)</option>
-                        <option value="30">Freies Raster: 30mm (40 Stk - Token)</option>
-                        <option value="L3415">Avery Zweckform: 40mm (L3415)</option>
+                        <option value="40">1. Typ: Freies Raster (Schere/Stanzer)</option>
+                        <option value="L3415">1. Typ: Avery Zweckform (Etiketten)</option>
+                    </select>
+                    <select class="input-text" id="size-select" style="width: auto; font-weight: 600;">
+                        <option value="40">2. Größe: 40mm (24 Stk - Kapsel)</option>
+                        <option value="43">2. Größe: 43mm (20 Stk - Kapsel)</option>
+                        <option value="30">2. Größe: 30mm (40 Stk - Token)</option>
                     </select>
                     <label style="display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; user-select: none;">
                         <input type="checkbox" id="check-cutmarks" checked onchange="PrintStudio.toggleCutmarks()"> ✂️ Linien
@@ -206,6 +267,7 @@
                     <button class="btn btn-primary" onclick="Export.toPNG()">🖼️ PNG Export</button>
                     <button class="btn btn-primary" onclick="Export.showPrePrintModal()">🖨️ A4 Drucken</button>
                 </div>
+                
                 <div class="a4-sheet" id="a4-sheet"></div>
             </div>
         </section>
@@ -216,22 +278,22 @@
                 <div class="prop-title">Typografie</div>
                 
                 <div class="prop-group">
-                    <label style="display: flex; gap: 8px; justify-content: flex-start; margin-bottom: 8px; cursor: pointer;">
-                        <input type="checkbox" id="check-series" checked> <span>Serie (Oben)</span>
+                    <label>
+                        <span style="display: flex; gap: 6px;"><input type="checkbox" id="check-series" checked> Serie (Oben)</span>
                     </label>
                     <input type="text" class="input-text" id="inp-series">
                 </div>
                 
                 <div class="prop-group">
-                    <label style="display: flex; gap: 8px; justify-content: flex-start; margin-bottom: 8px; cursor: pointer;">
-                        <input type="checkbox" id="check-title" checked> <span>Titel (Unten)</span>
+                    <label>
+                        <span style="display: flex; gap: 6px;"><input type="checkbox" id="check-title" checked> Titel (Unten)</span>
                     </label>
                     <input type="text" class="input-text" id="inp-title">
                 </div>
                 
                 <div class="prop-group" style="margin-top: 18px;">
-                    <label style="display: flex; gap: 8px; justify-content: flex-start; margin-bottom: 8px; cursor: pointer;">
-                        <input type="checkbox" id="check-uid"> <span>UID / Code aufdrucken</span>
+                    <label>
+                        <span style="display: flex; gap: 6px;"><input type="checkbox" id="check-uid"> UID aufdrucken</span>
                     </label>
                     <input type="text" class="input-text" id="inp-uid" placeholder="Hex-Code / Audio-ID">
                 </div>
@@ -245,8 +307,8 @@
             <div class="prop-section">
                 <div class="prop-title">Bild-Transformation</div>
                 <div class="prop-group">
-                    <label><span>Zoom</span> <span id="val-zoom" style="color: var(--brand);">90%</span></label>
-                    <input type="range" id="slide-zoom" min="50" max="200" value="90">
+                    <label><span>Zoom</span> <span id="val-zoom" style="color: var(--brand);">100%</span></label>
+                    <input type="range" id="slide-zoom" min="50" max="200" value="100">
                 </div>
                 <div class="prop-group">
                     <label>Position X (↔)</label>
@@ -254,7 +316,7 @@
                 </div>
                 <div class="prop-group">
                     <label>Position Y (↕)</label>
-                    <input type="range" id="slide-y" min="0" max="100" value="20">
+                    <input type="range" id="slide-y" min="0" max="100" value="50">
                 </div>
             </div>
         </aside>
@@ -265,11 +327,11 @@
         <div class="modal-box">
             <h2 style="margin-bottom: 12px; font-size: 1.25rem;">Wichtiger Druck-Hinweis 🖨️</h2>
             <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px; line-height: 1.5;">
-                Damit die Aufkleber exakt in deine Kapseln oder auf die Etiketten passen, musst du im Druckdialog deines Browsers die Skalierung zwingend auf <strong style="color: var(--brand);">"100%"</strong> oder <strong style="color: var(--brand);">"Tatsächliche Größe"</strong> stellen. <br><br>Schalte "An Seite anpassen" aus!
+                Damit die Aufkleber exakt passen, stelle die Skalierung im Druckdialog deines Browsers zwingend auf <strong style="color: var(--brand);">"100%"</strong> oder <strong style="color: var(--brand);">"Tatsächliche Größe"</strong>.
             </p>
             <div style="display: flex; gap: 12px; justify-content: center;">
                 <button class="btn btn-outline" onclick="document.getElementById('print-modal').classList.remove('active')">Abbrechen</button>
-                <button class="btn btn-primary" onclick="Export.executePrint()">Alles klar, drucken!</button>
+                <button class="btn btn-primary" onclick="window.print(); document.getElementById('print-modal').classList.remove('active');">Alles klar, drucken!</button>
             </div>
         </div>
     </div>
@@ -277,12 +339,12 @@
     <div class="modal-overlay" id="clear-modal">
         <div class="modal-box">
             <h2 style="margin-bottom: 12px; font-size: 1.25rem;">Bogen leeren? 🗑️</h2>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px; line-height: 1.5;">
-                Möchtest du wirklich alle Aufkleber von diesem Druckbogen entfernen?
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px;">
+                Möchtest du alle Aufkleber vom Bogen entfernen?
             </p>
             <div style="display: flex; gap: 12px; justify-content: center;">
                 <button class="btn btn-outline" onclick="document.getElementById('clear-modal').classList.remove('active')">Abbrechen</button>
-                <button class="btn btn-primary" onclick="PrintStudio.executeClearSheet()">Ja, Bogen leeren</button>
+                <button class="btn btn-primary" onclick="PrintStudio.executeClearSheet()">Ja, leeren</button>
             </div>
         </div>
     </div>
@@ -293,10 +355,10 @@
         const CONFIG = {
             API_URL: 'https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json',
             FORMATS: {
-                '40': { type: 'free', size: '40mm', cols: 4, rows: 6, gap: '5mm', padding: '10mm' },
-                '43': { type: 'free', size: '43mm', cols: 4, rows: 5, gap: '5mm', padding: '10mm' },
-                '30': { type: 'free', size: '30mm', cols: 5, rows: 8, gap: '5mm', padding: '10mm' },
-                'L3415': { type: 'avery', size: '40mm', cols: 4, rows: 6, gap_col: '5mm', gap_row: '5mm', pad_top: '13mm', pad_left: '15mm' }
+                '40': { cols: 4, rows: 6, gap: '5mm', padding: '10mm' },
+                '43': { cols: 4, rows: 5, gap: '5mm', padding: '10mm' },
+                '30': { cols: 5, rows: 8, gap: '5mm', padding: '10mm' },
+                'L3415': { cols: 4, rows: 6, gap_col: '5mm', gap_row: '5mm', pad_top: '13mm', pad_left: '15mm' }
             }
         };
 
@@ -310,6 +372,49 @@
                 el.classList.add('show');
                 clearTimeout(this.timeout);
                 this.timeout = setTimeout(() => el.classList.remove('show'), 3000);
+            }
+        };
+
+        const App = {
+            init() { 
+                Editor.init(); 
+                PrintStudio.init(); 
+                Library.init(); 
+            },
+            switchView(view) {
+                document.getElementById('btn-design').classList.toggle('active', view === 'design');
+                document.getElementById('btn-print').classList.toggle('active', view === 'print');
+                
+                document.getElementById('view-design').classList.toggle('active', view === 'design');
+                document.getElementById('view-print').classList.toggle('active', view === 'print');
+                
+                const lib = document.getElementById('panel-library');
+                const props = document.getElementById('panel-props');
+
+                if(view === 'print') {
+                    // Full Focus Mode: Hide BOTH sidebars via !important class
+                    lib.classList.add('focus-hidden');
+                    props.classList.add('focus-hidden');
+                } else {
+                    // Restore properties sidebar immediately
+                    props.classList.remove('focus-hidden');
+                    
+                    // Logic for Library Auto-Hide
+                    if(!State.activeItem) {
+                        this.showLibrary();
+                    } else {
+                        this.hideLibrary();
+                    }
+                }
+            },
+            hideLibrary() {
+                document.getElementById('panel-library').classList.add('focus-hidden');
+                document.getElementById('btn-back-lib').style.display = 'inline-flex';
+            },
+            showLibrary() {
+                document.getElementById('panel-library').classList.remove('focus-hidden');
+                document.getElementById('btn-back-lib').style.display = 'none';
+                State.activeItem = null; // Reset selection so it stays open
             }
         };
 
@@ -356,6 +461,9 @@
                 
                 this.updateTransform();
                 this.render();
+
+                // Auto-Hide Library when a figure is selected (Focus Mode)
+                App.hideLibrary();
             },
             updateTransform() {
                 const z = document.getElementById('slide-zoom').value;
@@ -376,24 +484,28 @@
                 if(!State.activeItem) return '';
                 State.uidCounter++;
                 const id = State.uidCounter;
+                
                 const s = document.getElementById('inp-series').value.trim();
                 const t = document.getElementById('inp-title').value.trim();
-                const showUid = document.getElementById('check-uid').checked;
+                const uid = document.getElementById('inp-uid').value.trim();
+                
                 const showSeries = document.getElementById('check-series').checked;
                 const showTitle = document.getElementById('check-title').checked;
-                const uid = showUid ? document.getElementById('inp-uid').value.trim() : '';
+                const showUid = document.getElementById('check-uid').checked;
+                
                 const fScale = document.getElementById('slide-font').value / 100;
-
+                
+                // Sweep-Flag 0 forces text to run LTR on the bottom. letter-spacing inside SVG fixes overlap.
                 return `
-                    <svg viewBox="0 0 100 100" class="sticker-svg">
+                    <svg viewBox="0 0 100 100" class="sticker-svg" preserveAspectRatio="xMidYMid meet">
                         <defs>
                             <path id="top_${id}" d="M 12 50 A 38 38 0 0 1 88 50" />
-                            <path id="title_${id}" d="M 15 50 A 35 35 0 0 0 85 50" />
-                            <path id="id_${id}" d="M 5 50 A 45 45 0 0 0 95 50" />
+                            <path id="title_${id}" d="M 10 50 A 40 40 0 0 0 90 50" />
+                            <path id="id_${id}" d="M 4 50 A 46 46 0 0 0 96 50" />
                         </defs>
                         ${(showSeries && s) ? `<text class="svg-series" style="font-size: ${8.5 * fScale}px;"><textPath href="#top_${id}" startOffset="50%" text-anchor="middle">${s}</textPath></text>` : ''}
-                        ${(showTitle && t) ? `<text class="svg-title" style="font-size: ${7.2 * fScale}px;"><textPath href="#title_${id}" startOffset="50%" text-anchor="middle">${t}</textPath></text>` : ''}
-                        ${uid ? `<text class="svg-id" style="font-size: ${5 * fScale}px;"><textPath href="#id_${id}" startOffset="50%" text-anchor="middle">${uid}</textPath></text>` : ''}
+                        ${(showTitle && t) ? `<text class="svg-title" style="font-size: ${7 * fScale}px;" letter-spacing="0.15em"><textPath href="#title_${id}" startOffset="50%" text-anchor="middle">${t}</textPath></text>` : ''}
+                        ${(showUid && uid) ? `<text class="svg-id" style="font-size: ${4.5 * fScale}px;" letter-spacing="0.2em"><textPath href="#id_${id}" startOffset="50%" text-anchor="middle">${uid}</textPath></text>` : ''}
                     </svg>
                 `;
             },
@@ -405,33 +517,41 @@
         const PrintStudio = {
             init() { 
                 document.getElementById('format-select').addEventListener('change', () => this.buildSheet()); 
+                document.getElementById('size-select').addEventListener('change', () => this.buildSheet()); 
                 this.buildSheet(); 
             },
             buildSheet() {
                 const sheet = document.getElementById('a4-sheet');
-                const conf = CONFIG.FORMATS[document.getElementById('format-select').value];
+                const isAvery = document.getElementById('format-select').value === 'L3415';
+                const sizeKey = document.getElementById('size-select').value;
+                const conf = isAvery ? CONFIG.FORMATS['L3415'] : CONFIG.FORMATS[sizeKey];
+                
+                const sizeStr = sizeKey + 'mm';
+
                 sheet.innerHTML = '';
                 sheet.style = 'display: grid;';
                 
-                if(conf.type === 'free') {
-                    sheet.style.gridTemplateColumns = `repeat(${conf.cols}, ${conf.size})`;
+                if(!isAvery) {
+                    sheet.style.gridTemplateColumns = `repeat(${conf.cols}, ${sizeStr})`;
                     sheet.style.gap = conf.gap;
                     sheet.style.padding = conf.padding;
                     sheet.style.justifyContent = 'center';
+                    sheet.style.alignContent = 'start';
                 } else {
-                    sheet.style.gridTemplateColumns = `repeat(${conf.cols}, ${conf.size})`;
-                    sheet.style.gridTemplateRows = `repeat(${conf.rows}, ${conf.size})`;
+                    sheet.style.gridTemplateColumns = `repeat(${conf.cols}, ${sizeStr})`;
+                    sheet.style.gridTemplateRows = `repeat(${conf.rows}, ${sizeStr})`;
                     sheet.style.columnGap = conf.gap_col;
                     sheet.style.rowGap = conf.gap_row;
                     sheet.style.paddingTop = conf.pad_top;
                     sheet.style.paddingLeft = conf.pad_left;
+                    sheet.style.justifyContent = 'start';
                 }
                 
                 for(let i=0; i < (conf.cols * conf.rows); i++) {
                     const slot = document.createElement('div');
                     slot.className = 'slot';
-                    slot.style.width = conf.size;
-                    slot.style.height = conf.size;
+                    slot.style.width = sizeStr;
+                    slot.style.height = sizeStr;
                     
                     slot.addEventListener('dragover', e => { 
                         e.preventDefault(); 
@@ -464,11 +584,25 @@
                 node.style.setProperty('--bg-y', document.getElementById('slide-y').value + '%');
                 node.innerHTML = Editor.generateSVG();
                 
-                const del = document.createElement('button');
-                del.className = 'delete-btn';
-                del.innerHTML = '✕';
-                del.onclick = (e) => { e.stopPropagation(); node.remove(); };
-                node.appendChild(del);
+                // HOVER ACTIONS (Delete & Duplicate)
+                const actions = document.createElement('div');
+                actions.className = 'sticker-actions';
+                
+                const dupBtn = document.createElement('button');
+                dupBtn.className = 'action-btn btn-dup';
+                dupBtn.innerHTML = '+';
+                dupBtn.title = 'Aufkleber duplizieren';
+                dupBtn.onclick = (e) => { e.stopPropagation(); this.duplicateNode(node); };
+                
+                const delBtn = document.createElement('button');
+                delBtn.className = 'action-btn btn-del';
+                delBtn.innerHTML = '✕';
+                delBtn.title = 'Aufkleber löschen';
+                delBtn.onclick = (e) => { e.stopPropagation(); node.remove(); };
+                
+                actions.appendChild(dupBtn);
+                actions.appendChild(delBtn);
+                node.appendChild(actions);
                 
                 node.addEventListener('dragstart', e => { 
                     e.dataTransfer.setData('text/plain', node.id); 
@@ -476,6 +610,33 @@
                 });
                 node.addEventListener('dragend', () => node.style.opacity = '1');
                 return node;
+            },
+            duplicateNode(originalNode) {
+                const emptySlot = Array.from(document.querySelectorAll('.slot')).find(s => !s.children.length);
+                if(!emptySlot) {
+                    Toast.show("Der Druckbogen ist voll! 🛑");
+                    return;
+                }
+                
+                const clone = originalNode.cloneNode(true);
+                clone.id = `st-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+                
+                // Re-attach drag events
+                clone.addEventListener('dragstart', e => { 
+                    e.dataTransfer.setData('text/plain', clone.id); 
+                    setTimeout(() => clone.style.opacity = '0.5', 0); 
+                });
+                clone.addEventListener('dragend', () => clone.style.opacity = '1');
+                
+                // Re-attach button events
+                const del = clone.querySelector('.btn-del');
+                if(del) del.onclick = (e) => { e.stopPropagation(); clone.remove(); };
+                
+                const dup = clone.querySelector('.btn-dup');
+                if(dup) dup.onclick = (e) => { e.stopPropagation(); this.duplicateNode(clone); };
+                
+                emptySlot.appendChild(clone);
+                Toast.show("Sticker dupliziert! 👯");
             },
             addCurrentToSheet(silent = false) {
                 const node = this.createNode();
@@ -487,7 +648,6 @@
                 if(empty) { 
                     empty.appendChild(node);
                     if(!silent) {
-                        App.switchView('print');
                         Toast.show("Auf den Druckbogen gelegt! 🖨️");
                     }
                 } else {
@@ -520,13 +680,17 @@
             },
             toggleCutmarks() {
                 const sheet = document.getElementById('a4-sheet');
-                const isFree = CONFIG.FORMATS[document.getElementById('format-select').value].type === 'free';
+                const isFree = document.getElementById('format-select').value !== 'L3415';
                 sheet.classList.toggle('show-cut-marks', document.getElementById('check-cutmarks').checked && isFree);
             }
         };
 
         const Library = {
             currentMode: 'db',
+            currentPage: 1,
+            itemsPerPage: 6,
+            currentData: [],
+
             async init() {
                 State.favorites = JSON.parse(localStorage.getItem('taggen_favs')) || [];
                 document.getElementById('search-input').addEventListener('input', e => this.search(e.target.value));
@@ -542,24 +706,26 @@
                     })).filter(i => i.title || i.series);
 
                     document.getElementById('status-text').innerText = `${State.db.length} Tonies ✓`;
-                    this.render(State.db.slice(0, 30));
+                    this.render(State.db);
                 } catch(e) {
                     document.getElementById('status-text').innerText = "Offline Modus";
                 }
             },
             switchTab(tab) {
                 this.currentMode = tab;
+                this.currentPage = 1;
                 document.getElementById('tab-db').classList.toggle('active', tab === 'db');
                 document.getElementById('tab-fav').classList.toggle('active', tab === 'fav');
                 document.getElementById('search-input').value = '';
-                this.render(tab === 'fav' ? State.favorites : State.db.slice(0, 30));
+                this.render(tab === 'fav' ? State.favorites : State.db);
             },
             search(q) {
                 q = q.toLowerCase().trim();
+                this.currentPage = 1;
                 let source = this.currentMode === 'fav' ? State.favorites : State.db;
                 const res = q.length < 2 
-                    ? source.slice(0, 30) 
-                    : source.filter(t => t.title.toLowerCase().includes(q) || t.series.toLowerCase().includes(q) || t.id.includes(q)).slice(0, 50);
+                    ? source 
+                    : source.filter(t => t.title.toLowerCase().includes(q) || t.series.toLowerCase().includes(q) || t.id.includes(q));
                 this.render(res);
             },
             toggleFav(item, e) {
@@ -578,15 +744,21 @@
                 if(this.currentMode === 'fav') this.search(document.getElementById('search-input').value);
             },
             render(items) {
+                this.currentData = items;
                 const grid = document.getElementById('library-grid');
                 grid.innerHTML = '';
                 
                 if(!items.length) {
-                    grid.innerHTML = `<div style="grid-column: span 2; text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 30px 10px;">Keine Einträge gefunden.</div>`;
+                    grid.innerHTML = `<div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 30px 10px;">Keine Einträge gefunden.</div>`;
                     return;
                 }
 
-                items.forEach(item => {
+                // Pagination Logic
+                const totalPages = Math.ceil(this.currentData.length / this.itemsPerPage);
+                const start = (this.currentPage - 1) * this.itemsPerPage;
+                const paginatedData = this.currentData.slice(start, start + this.itemsPerPage);
+
+                paginatedData.forEach(item => {
                     const isFav = State.favorites.some(f => f.id === item.id && f.title === item.title);
                     const card = document.createElement('div');
                     card.className = 'asset-card';
@@ -611,58 +783,57 @@
                         e.stopPropagation();
                         Editor.load(item);
                         PrintStudio.addCurrentToSheet(true);
-                        Toast.show(`Auf Bogen gelegt! 🖨️`);
                     };
 
                     card.onclick = () => {
                         Editor.load(item);
-                        App.switchView('design');
                     };
                     
                     grid.appendChild(card);
                 });
+
+                // Add Pagination Controls if needed
+                if (totalPages > 1) {
+                    const pagination = document.createElement('div');
+                    pagination.className = 'pagination-controls';
+                    pagination.innerHTML = `
+                        <button onclick="Library.prevPage()" ${this.currentPage === 1 ? 'disabled' : ''}>← Zurück</button>
+                        <span>Seite ${this.currentPage} von ${totalPages}</span>
+                        <button onclick="Library.nextPage()" ${this.currentPage === totalPages ? 'disabled' : ''}>Weiter →</button>
+                    `;
+                    grid.appendChild(pagination);
+                }
+            },
+            nextPage() {
+                this.currentPage++;
+                this.render(this.currentData);
+            },
+            prevPage() {
+                this.currentPage--;
+                this.render(this.currentData);
             }
         };
 
         const Export = {
-            hideUI() { document.querySelectorAll('.delete-btn').forEach(b => b.style.display = 'none'); },
-            restoreUI() { document.querySelectorAll('.delete-btn').forEach(b => b.style.display = ''); },
             toPNG() {
-                this.hideUI();
                 Toast.show("Erstelle PNG... ⏳");
+                // Hide action buttons during snapshot
+                const actions = document.querySelectorAll('.sticker-actions');
+                actions.forEach(a => a.style.display = 'none');
+                
                 html2canvas(document.getElementById('a4-sheet'), { scale: 3, useCORS: true }).then(c => {
                     const a = document.createElement('a');
                     a.href = c.toDataURL('image/png');
                     a.download = 'TagGen_Druckbogen.png';
                     a.click();
-                    this.restoreUI();
+                    actions.forEach(a => a.style.display = ''); // Show again
                 }).catch(() => {
-                    this.restoreUI();
+                    actions.forEach(a => a.style.display = '');
                     Toast.show("Export fehlgeschlagen.");
                 });
             },
             showPrePrintModal() { 
                 document.getElementById('print-modal').classList.add('active'); 
-            },
-            executePrint() { 
-                document.getElementById('print-modal').classList.remove('active'); 
-                window.print(); 
-            }
-        };
-
-        const App = {
-            init() { 
-                Editor.init(); 
-                PrintStudio.init(); 
-                Library.init(); 
-            },
-            switchView(view) {
-                document.getElementById('btn-design').classList.toggle('active', view === 'design');
-                document.getElementById('btn-print').classList.toggle('active', view === 'print');
-                document.getElementById('view-design').classList.toggle('active', view === 'design');
-                document.getElementById('view-print').classList.toggle('active', view === 'print');
-                
-                document.getElementById('panel-library').classList.toggle('hidden', view === 'print');
             }
         };
 
