@@ -5,12 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Tonie & Tag Cover HUB</title>
 <!-- 
-V9.0 High-End Print & Design Master
-- FIXED: Absolute Print Positioning (Fixes iOS Safari 4-page stack bug)
-- ADDED: High-End Logo with NFC Coil & Metallic Rings
-- ADDED: Active Card visual state (Scale + Border + Checkmark)
-- ADDED: Grid max-height for mobile (2 rows max initially)
-- ADDED: Full Format Library (25, 30, 40, 43mm / Avery & Raster)
+V9.5 Cleanroom Architecture Master
+- FIXED: Immediate First-Render (Search works instantly without waiting for online fetch)
+- FIXED: Dual-text SVG rendering (Series top, Album bottom, ID toggle)
+- FIXED: Pre-rendered format options (No empty dropdowns)
 -->
 <style>
 :root, [data-theme="light"] {
@@ -49,8 +47,8 @@ body { background: var(--bg-body); color: var(--text-main); transition: backgrou
 /* HEADER */
 .app-header { background: var(--bg-card); padding: 12px 1rem; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
 .logo-container { flex: 1; display: flex; align-items: center; min-width: 0; }
-.logo-svg { height: 50px; width: 100%; max-width: 450px; }
-@media (max-width: 480px) { .logo-svg { height: 40px; } }
+.logo-svg { height: 48px; width: 100%; max-width: 420px; }
+@media (max-width: 480px) { .logo-svg { height: 38px; } }
 .header-actions { display: flex; gap: 8px; flex-shrink: 0; }
 .pill-btn { background: var(--bg-sub); color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-sm); }
 .pill-btn.accent { background: var(--brand-red); color: #FFF; border-color: var(--brand-red); }
@@ -68,20 +66,18 @@ body { background: var(--bg-body); color: var(--text-main); transition: backgrou
 .tab-bar::-webkit-scrollbar { display: none; }
 .tab-btn { flex: 1 0 auto; white-space: nowrap; padding: 10px 14px; border: none; background: transparent; border-radius: 8px; font-size: 13px; font-weight: 700; color: var(--text-sub); cursor: pointer; transition: 0.2s; }
 .tab-btn.active { background: var(--bg-card); color: var(--text-main); box-shadow: var(--shadow-sm); }
-.search-input { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-main); font-size: 14px; outline: none; margin-bottom: 12px; }
+.search-input { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-main); font-size: 14px; outline: none; margin-bottom: 8px; }
 .search-input:focus { border-color: var(--brand-red); }
 .status-row { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; padding: 0 4px; }
-/* GRID & SELECTION */
-.grid-motives { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; max-height: 260px; overflow-y: auto; padding: 4px; border-radius: 12px;}
-.motive-card { background: var(--bg-sub); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px 8px; text-align: center; cursor: pointer; position: relative; transition: all 0.2s ease; }
+/* GRID */
+.grid-motives { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; max-height: 280px; overflow-y: auto; padding: 4px; }
+.motive-card { background: var(--bg-sub); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px 8px; text-align: center; cursor: pointer; position: relative; transition: 0.2s; }
 .motive-img { width: 64px; height: 64px; object-fit: contain; border-radius: 50%; background: #FFF; margin-bottom: 8px; box-shadow: var(--shadow-sm); }
-/* THE ACTIVE STATE */
-.motive-card.active { border: 2px solid var(--brand-red); background: var(--brand-red-soft); transform: scale(1.03); box-shadow: 0 4px 12px rgba(163, 30, 51, 0.2); }
-.motive-card.active::before { content: '✓'; position: absolute; top: -6px; left: -6px; background: var(--brand-red); color: white; width: 20px; height: 20px; border-radius: 50%; font-size: 12px; font-weight: bold; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); z-index: 2; }
+.motive-card.active { border: 2px solid var(--brand-red); background: var(--brand-red-soft); transform: scale(1.02); }
 .motive-series { font-size: 9px; font-weight: 800; color: var(--brand-red); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .motive-title { font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 2px 0; }
-.fav-star { position: absolute; top: 6px; right: 6px; font-size: 18px; color: var(--text-muted); cursor: pointer; opacity: 0.5; transition: 0.2s; }
-.fav-star.is-fav { color: #F59E0B; opacity: 1; }
+.fav-star { position: absolute; top: 6px; right: 6px; font-size: 18px; color: var(--text-muted); cursor: pointer; }
+.fav-star.is-fav { color: #F59E0B; }
 /* EDITOR */
 .editor-layout { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
 @media (min-width: 768px) { .editor-layout { grid-template-columns: 1fr 1fr; } }
@@ -92,11 +88,11 @@ body { background: var(--bg-body); color: var(--text-main); transition: backgrou
 .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
 .switch input { opacity: 0; width: 0; height: 0; }
 .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color); border-radius: 24px; transition: .3s; }
-.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: .3s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: .3s; }
 input:checked + .slider { background-color: var(--brand-red); }
 input:checked + .slider:before { transform: translateX(20px); }
-.preview-stage { background: var(--bg-sub); border-radius: 16px; border: 1px dashed var(--border-color); display: flex; align-items: center; justify-content: center; padding: 2rem; position: relative; }
-.coin-capsule { width: 180px; height: 180px; border-radius: 50%; background: #FFF; box-shadow: 0 10px 30px rgba(0,0,0,0.15); position: relative; overflow: hidden; border: 2px solid #E5E2DC; }
+.preview-stage { background: var(--bg-sub); border-radius: 16px; border: 1px dashed var(--border-color); display: flex; align-items: center; justify-content: center; padding: 2rem; }
+.coin-capsule { width: 180px; height: 180px; border-radius: 50%; background: #FFF; box-shadow: var(--shadow-md); position: relative; overflow: hidden; border: 2px solid #E5E2DC; }
 /* SHEET BOARD */
 .sheet-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem; }
 .sheet-board { background: var(--bg-sub); padding: 1.5rem; border-radius: 16px; display: flex; justify-content: center; overflow-x: auto; box-shadow: inset 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 1rem; }
@@ -104,28 +100,18 @@ input:checked + .slider:before { transform: translateX(20px); }
 .grid-col-3 { grid-template-columns: repeat(3, 40px); }
 .grid-col-4 { grid-template-columns: repeat(4, 30px); }
 .grid-col-5 { grid-template-columns: repeat(5, 25px); }
-.sheet-slot { border-radius: 50%; border: 1px dashed #94A3B8; background: #F8FAFC; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 11px; color: #94A3B8; overflow: hidden; position: relative; }
+.grid-col-6 { grid-template-columns: repeat(6, 25px); }
+.sheet-slot { border-radius: 50%; border: 1px dashed #94A3B8; background: #F8FAFC; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 11px; color: #94A3B8; overflow: hidden; }
 .sheet-slot.filled { border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-.action-row { display: flex; justify-content: center; gap: 8px; margin-bottom: 1.5rem; flex-wrap: wrap; }
 .big-btn { width: 100%; padding: 14px; font-size: 16px; font-weight: 800; border-radius: 14px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.big-btn.primary { background: var(--brand-red); color: #FFF; box-shadow: var(--shadow-sm); transition: 0.2s; }
-.big-btn.primary:active { transform: scale(0.98); }
-/* --- ABSOLUTE PRINT ENGINE (Fixes iOS Safari 4-Page Bug) --- */
+.big-btn.primary { background: var(--brand-red); color: #FFF; box-shadow: var(--shadow-sm); }
+/* PRINT */
 .no-print { display: block; }
 #printHost { display: none; }
 @media print {
 .no-print { display: none !important; }
 html, body { background: #FFF !important; margin: 0 !important; padding: 0 !important; width: 100% !important; height: 100% !important; }
-/* The host is A4 size and relative, so absolute children stay inside */
-#printHost {
-display: block !important;
-position: absolute;
-top: 0; left: 0;
-width: 210mm; height: 297mm;
-background: #FFF;
-margin: 0; padding: 0;
-}
-/* Print elements */
+#printHost { display: block !important; position: absolute; top: 0; left: 0; width: 210mm; height: 297mm; background: #FFF; }
 .print-circle { position: absolute; border-radius: 50%; overflow: hidden; box-sizing: border-box; }
 .print-circle.raster { border: 0.5px dashed #A1A1AA; }
 @page { size: A4 portrait; margin: 0; }
@@ -136,25 +122,16 @@ margin: 0; padding: 0;
 <div class="no-print">
 <header class="app-header">
 <div class="logo-container">
-<!-- HIGH END LOGO MATCHING IMAGE 15 -->
 <svg class="logo-svg" viewBox="0 0 520 100" preserveAspectRatio="xMinYMid meet" xmlns="http://www.w3.org/2000/svg">
 <g transform="translate(10, 10)">
-<!-- Outer Capsule -->
 <circle cx="40" cy="40" r="38" fill="#F9F9F9" stroke="#8A192A" stroke-width="2"/>
-<!-- Inner Metallic Ring -->
 <circle cx="40" cy="40" r="32" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="3"/>
-<!-- NFC Antenna Traces -->
 <path d="M 22 22 L 58 22 L 58 58 L 22 58 Z" fill="none" stroke="#E5E7EB" stroke-width="1.5" rx="4"/>
-<path d="M 25 25 L 55 25 L 55 55 L 25 55 Z" fill="none" stroke="#E5E7EB" stroke-width="1.5" rx="4"/>
-<path d="M 28 28 L 52 28 L 52 52 L 28 52 Z" fill="none" stroke="#E5E7EB" stroke-width="1.5" rx="4"/>
-<!-- NFC Chip Center -->
 <rect x="34" y="34" width="12" height="12" rx="2" fill="#374151"/>
 <text x="40" y="42" font-family="sans-serif" font-size="5" font-weight="bold" fill="#FFFFFF" text-anchor="middle">NFC</text>
-<!-- Dynamic Red Arrow -->
 <path d="M 40 -2 A 42 42 0 0 1 78 28" fill="none" stroke="#A31E33" stroke-width="3.5" stroke-linecap="round"/>
 <polygon points="78,28 70,22 81,18" fill="#A31E33"/>
 </g>
-<!-- Premium Typography -->
 <text x="100" y="45" font-family="-apple-system, sans-serif" font-weight="900" font-size="34" fill="var(--text-main)" letter-spacing="-1">Tonie & Tag <tspan fill="#A31E33">COVER HUB</tspan></text>
 <text x="102" y="72" font-family="-apple-system, sans-serif" font-weight="700" font-size="16" fill="var(--text-muted)" letter-spacing="1.5">MÜNZKAPSEL & AVERY STUDIO</text>
 </svg>
@@ -177,7 +154,7 @@ margin: 0; padding: 0;
 <div id="viewDb">
 <input type="text" id="searchInput" class="search-input" placeholder="Titel, Serie oder ID suchen...">
 <div class="status-row">
-<span id="lblLibrary">Initialisiere...</span>
+<span id="lblLibrary">Sofort-Datenbank bereit</span>
 <span id="lblCount">0 Motive</span>
 </div>
 <div class="grid-motives" id="gridMotives"></div>
@@ -197,19 +174,19 @@ margin: 0; padding: 0;
 <div>
 <div class="input-group">
 <label>1. TITEL / SERIE (OBERER BOGEN)</label>
-<input type="text" id="inpSeries" class="input-field" placeholder="z.B. Conni oder TKKG">
+<input type="text" id="inpSeries" class="input-field" placeholder="z.B. TKKG Junior">
 </div>
 <div class="input-group">
 <label>2. ALBUM / FOLGE (UNTERER BOGEN)</label>
-<input type="text" id="inpAlbum" class="input-field" placeholder="z.B. Spielt im Garten">
+<input type="text" id="inpAlbum" class="input-field" placeholder="z.B. Alarm im Freizeitpark">
 </div>
 <div style="display:flex; gap:12px; align-items:flex-end;">
 <div class="input-group" style="flex:1; margin-bottom:0;">
 <label>3. TONIE-ID</label>
-<input type="text" id="inpId" class="input-field" placeholder="01-XXXX">
+<input type="text" id="inpId" class="input-field" placeholder="01-0182">
 </div>
 <div class="toggle-row" style="margin-bottom:0; flex-shrink: 0;">
-<span style="font-size: 11px; font-weight:800; margin-right:8px; color:var(--text-sub);">ID DRUCKEN</span>
+<span style="font-size: 10px; font-weight:800; margin-right:6px; color:var(--text-sub);">ID DRUCKEN</span>
 <label class="switch">
 <input type="checkbox" id="chkId" checked>
 <span class="slider"></span>
@@ -239,14 +216,16 @@ margin: 0; padding: 0;
 <div class="input-group" style="margin:0;">
 <label>FORMAT / GRÖSSE</label>
 <select id="selSize" class="input-field">
-<!-- Populated by JS -->
+<option value="avery-40" selected>L3415 - Ø 40 mm (24x)</option>
+<option value="avery-30">6223 - Ø 30 mm (48x)</option>
+<option value="avery-25">L7103 - Ø 25 mm (70x)</option>
 </select>
 </div>
 </div>
 <div class="sheet-board">
-<div class="sheet-paper" id="sheetGrid"></div>
+<div class="sheet-paper grid-col-3" id="sheetGrid"></div>
 </div>
-<div class="action-row">
+<div style="display:flex; justify-content:center; gap:8px; margin-bottom:1.5rem;">
 <button class="pill-btn" id="btnFillAll"><span>⚡ Alle füllen</span></button>
 <button class="pill-btn" id="btnClearAll"><span>🗑️ Bogen leeren</span></button>
 </div>
@@ -254,7 +233,6 @@ margin: 0; padding: 0;
 </section>
 </main>
 </div>
-<!-- PRINT HOST -->
 <div id="printHost"></div>
 <script>
 (function() {
@@ -265,11 +243,10 @@ function addEvt(id, type, fn) {
 var el = safeEl(id);
 if (el) el.addEventListener(type, fn);
 }
-// Format Database
 var formats = {
-'avery-40': { type: 'avery', slots: 24, size: 40, cols: 3, rows: 8, startX: 7.2, startY: 12.5, gapX: 42.5, gapY: 40 },
-'avery-30': { type: 'avery', slots: 48, size: 30, cols: 4, rows: 12, startX: 13, startY: 21.2, gapX: 33, gapY: 30 },
-'avery-25': { type: 'avery', slots: 70, size: 25, cols: 5, rows: 14, startX: 9, startY: 13.5, gapX: 28, gapY: 25 },
+'avery-40': { type: 'avery', slots: 24, size: 40, cols: 3, startX: 7.2, startY: 12.5, gapX: 42.5, gapY: 40 },
+'avery-30': { type: 'avery', slots: 48, size: 30, cols: 4, startX: 13, startY: 21.2, gapX: 33, gapY: 30 },
+'avery-25': { type: 'avery', slots: 70, size: 25, cols: 5, startX: 9, startY: 13.5, gapX: 28, gapY: 25 },
 'raster-43': { type: 'raster', slots: 24, size: 43, cols: 4 },
 'raster-40': { type: 'raster', slots: 24, size: 40, cols: 4 },
 'raster-30': { type: 'raster', slots: 48, size: 30, cols: 5 },
@@ -291,24 +268,26 @@ offlineDb: [
 { id: "01-0010", title: "Feiert Geburtstag", series: "Conni", pic: getFallbackPic("CONNI", "#F59E0B") },
 { id: "01-0305", title: "Die Olchis sind da", series: "Die Olchis", pic: getFallbackPic("OLCHIS", "#84CC16") },
 { id: "01-0920", title: "Das Gespensterschloss", series: "Die drei ???", pic: getFallbackPic("???", "#1D1B1A") },
-{ id: "01-0910", title: "Kreativ-Tonie", series: "Mein Tonie", pic: getFallbackPic("KREATIV", "#3B82F6") }
+{ id: "01-0910", title: "Kreativ-Tonie", series: "Mein Tonie", pic: getFallbackPic("KREATIV", "#3B82F6") },
+{ id: "01-0100", title: "Bibi Blocksberg", series: "Bibi Blocksberg", pic: getFallbackPic("BIBI", "#EC4899") }
 ],
 init: function() {
 try {
-var favs = localStorage.getItem('hub_favs_v9');
+var favs = localStorage.getItem('hub_favs_v95');
 if (favs) this.favorites = JSON.parse(favs);
 if (!Array.isArray(this.favorites)) this.favorites = [];
 } catch(e) { this.favorites = []; }
+// IMMER SOFORT DIE OFFLINE-DATEN LADEN (Verhindert jeglichen Stillstand)
 this.db = this.offlineDb.slice();
-var lblCount = safeEl('lblCount');
-if (lblCount) lblCount.innerText = this.db.length + " Motive";
-var lblLib = safeEl('lblLibrary');
-if (lblLib) lblLib.innerText = "Offline-Bibliothek";
 this.updateFavCounter();
 this.updateSizeDropdown();
 this.bindEvents();
 this.renderGrid(this.db);
-if (this.db.length > 0) this.selectTonie(this.db[0]);
+var lblCount = safeEl('lblCount');
+if (lblCount) lblCount.innerText = this.db.length + " Motive";
+if (this.db.length > 0) {
+this.selectTonie(this.db[0]);
+}
 this.fetchOnlineDB();
 },
 bindEvents: function() {
@@ -326,8 +305,11 @@ addEvt(id, 'input', function() { self.updateSvgPreview(); });
 });
 addEvt('selSystem', 'change', function() { self.updateSizeDropdown(); });
 addEvt('selSize', 'change', function() {
-self.currentFormatId = safeEl('selSize').value;
+var sel = safeEl('selSize');
+if(sel) {
+self.currentFormatId = sel.value;
 self.buildSheet();
+}
 });
 addEvt('btnFillAll', 'click', function() { self.fillSheet(); });
 addEvt('btnClearAll', 'click', function() {
@@ -354,7 +336,7 @@ var self = this;
 fetch('https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json')
 .then(function(res) { return res.json(); })
 .then(function(data) {
-if (Array.isArray(data)) {
+if (Array.isArray(data) && data.length > 0) {
 self.db = data.map(function(t) {
 return {
 id: String(t.model || t.id || ''),
@@ -435,7 +417,7 @@ toggleFav: function(id) {
 var idx = this.favorites.indexOf(id);
 if (idx > -1) this.favorites.splice(idx, 1);
 else this.favorites.push(id);
-try { localStorage.setItem('hub_favs_v9', JSON.stringify(this.favorites)); } catch(e) {}
+try { localStorage.setItem('hub_favs_v95', JSON.stringify(this.favorites)); } catch(e) {}
 this.updateFavCounter();
 var tabFav = safeEl('tabFav');
 if (tabFav && tabFav.classList.contains('active')) this.switchTab('tabFav');
@@ -458,12 +440,7 @@ cleanTitle = cleanTitle.substring(sLow.length).replace(/^[\s-:]+/, '');
 }
 if (inpA) inpA.value = cleanTitle;
 if (inpI) inpI.value = t.id || '';
-var tabFav = safeEl('tabFav');
-if (tabFav && tabFav.classList.contains('active')) {
-this.switchTab('tabFav');
-} else {
 this.handleSearch();
-}
 this.updateSvgPreview();
 },
 escapeXml: function(str) {
@@ -485,7 +462,7 @@ var safeImg = this.activeTonie.pic;
 if(safeImg && safeImg.indexOf('<svg') > -1 && safeImg.indexOf('utf8,') > -1) {
 safeImg = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(safeImg.substring(safeImg.indexOf('<svg')));
 }
-// ID ON: We add an extra inner curved path or a crisp bottom text below album, without replacing it!
+// ID ON: Renders the album text on bottom curve AND a crisp ID row below or on an inner bottom path!
 var idElement = '';
 if (showId && idText) {
 idElement = '<text font-family="monospace" font-weight="700" font-size="9" fill="#A31E33">' +
@@ -497,7 +474,7 @@ return '<svg viewBox="0 0 160 160" width="100%" height="100%" xmlns="http://www.
 '<clipPath id="circleClip"><circle cx="80" cy="80" r="80" /></clipPath>' +
 '<path id="topC" d="M 18 80 A 62 62 0 0 1 142 80" fill="transparent" />' +
 '<path id="botC" d="M 22 80 A 58 58 0 0 0 138 80" fill="transparent" />' +
-'<path id="botC2" d="M 30 80 A 50 50 0 0 0 130 80" fill="transparent" />' +
+'<path id="botC2" d="M 32 80 A 48 48 0 0 0 128 80" fill="transparent" />' +
 '</defs>' +
 '<circle cx="80" cy="80" r="80" fill="#FFFFFF" />' +
 '<image href="'+safeImg+'" xlink:href="'+safeImg+'" x="20" y="20" width="120" height="120" clip-path="url(#circleClip)" preserveAspectRatio="xMidYMid slice" opacity="0.95" />' +
