@@ -1,884 +1,833 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="de" data-theme="light">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Tonie & Tag Cover Hub V4.1 Master</title>
+<title>Tonie & Tag Cover Hub V6.2</title>
 <!-- 
-Tonie & Tag Cover Hub V4.1 - The Bulletproof Master Edition
-- Ultra-Defensive JavaScript Engine (Zero Crashes on iOS/Android/Private-Browsing)
-- Instant Offline Database (TKKG, Conni, Olchis, etc.) + Silent RevvoX Background Sync
-- Fully Working Theme Engine (Light / Dark Mode via Tonies.com Palette)
-- Ergonomic Two-Tier UI: Simpel (Papa Express) vs. Pro (Nerd & Dumper Tuning)
-- Guaranteed Strict 1-Page DIN-A4 Print Lockdown
-- True 300 DPI High-Res PNG Canvas Export
+V6.2 Definitive Community Master Edition
+- Zweistufige Format-Architektur: System-Auswahl (Avery vs. Freies Raster) + Format-Größe (25mm, 30mm, 40mm, 43mm)
+- Dynamischer Bogen-Manager (Automatische Anpassung der Slot-Anzahl 20 / 24 / 48 / 60 / 70)
+- Intelligentes 3-Felder-System: 1. Titel/Serie, 2. Album/Folge, 3. Tonie-ID
+- Interaktiver ID-Druckschalter (ID an/aus schaltet zwischen ID und Folgentext auf unterem Bogen um)
+- Mobile-gehärtete Tab-Leiste (Kein Text-Überlauf bei "Eigenes Bild")
+- Unveränderte, pfeilschnelle RevvoX JSON Multi-Source Such-Engine
+- 300-DPI PNG Exporter & 1-Page A4 Print Lockdown für alle Formate
 -->
 <style>
 :root {
+/* Authentic Tonie Palette */
 --tonie-red: #C02741;
 --tonie-red-hover: #A01F35;
---tonie-red-light: rgba(192, 39, 65, 0.14);
---tonie-gold: #FFB800;
---tonie-green: #10B981;
-/* Dark Theme (Default) */
---bg-body: #0E131F;
---bg-card: #171F32;
---bg-card-sub: #111728;
---bg-input: #0A0E18;
---text-main: #FFFFFF;
---text-muted: #94A3B8;
---border-color: rgba(255, 255, 255, 0.1);
---border-focus: var(--tonie-red);
---shadow-card: 0 8px 24px rgba(0, 0, 0, 0.35);
---glow: 0 0 20px rgba(192, 39, 65, 0.35);
-}
-[data-theme="light"] {
---bg-body: #F4F4F7;
---bg-card: #FFFFFF;
---bg-card-sub: #F8F9FA;
---bg-input: #FFFFFF;
---text-main: #111827;
+--tonie-red-soft: rgba(192, 39, 65, 0.08);
+--tonie-gold: #F59E0B;
+--tonie-emerald: #10B981;
+/* Light Theme (Default) */
+--bg-color: #F8FAFC;
+--card-bg: #FFFFFF;
+--card-bg-sub: #F1F5F9;
+--text-main: #0F172A;
 --text-muted: #64748B;
 --border-color: #E2E8F0;
 --border-focus: var(--tonie-red);
---shadow-card: 0 4px 16px rgba(0, 0, 0, 0.06);
---glow: 0 0 15px rgba(192, 39, 65, 0.15);
+--input-bg: #FFFFFF;
+--shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+--shadow-md: 0 4px 14px rgba(0, 0, 0, 0.07);
+--shadow-float: 0 12px 28px rgba(0, 0, 0, 0.1);
+}
+[data-theme="dark"] {
+--bg-color: #0B1120;
+--card-bg: #161F33;
+--card-bg-sub: #111827;
+--text-main: #F8FAFC;
+--text-muted: #94A3B8;
+--border-color: rgba(255, 255, 255, 0.1);
+--border-focus: var(--tonie-red);
+--input-bg: rgba(0, 0, 0, 0.25);
+--shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+--shadow-md: 0 4px 14px rgba(0, 0, 0, 0.4);
+--shadow-float: 0 12px 28px rgba(0, 0, 0, 0.5);
 }
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
-body { background: var(--bg-body); color: var(--text-main); line-height: 1.5; transition: background 0.2s ease, color 0.2s ease; padding-bottom: 3rem; overflow-x: hidden; }
+body { background: var(--bg-color); color: var(--text-main); transition: background 0.25s ease, color 0.25s ease; line-height: 1.5; padding-bottom: 3rem; overflow-x: hidden; }
 .container { max-width: 820px; margin: 0 auto; padding: 1rem; }
-/* --- Top Bar Navigation --- */
-.top-bar { display: flex; justify-content: center; gap: 8px; margin-bottom: 1.2rem; flex-wrap: wrap; }
-.btn-pill { background: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-color); padding: 7px 14px; border-radius: 24px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+/* --- Top Navigation --- */
+.top-bar { display: flex; justify-content: center; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+.btn-pill { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color); padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; box-shadow: var(--shadow-sm); }
 .btn-pill:hover { border-color: var(--tonie-red); color: var(--tonie-red); transform: translateY(-1px); }
-.btn-pill:active { transform: scale(0.97); }
-.btn-accent { background: var(--tonie-red); color: #fff !important; border: none; }
-.btn-accent:hover { background: var(--tonie-red-hover); color: #fff; }
-/* --- Header & Branding Logo --- */
-.header { text-align: center; margin-bottom: 1.5rem; }
-.logo-wrap { display: inline-flex; align-items: center; justify-content: center; margin-bottom: 8px; }
-.logo-svg { width: 140px; height: auto; filter: var(--glow); }
-.brand-title { font-size: 26px; font-weight: 800; line-height: 1.15; letter-spacing: -0.5px; }
+.btn-accent { background: var(--tonie-red); color: #FFFFFF !important; border: none; }
+.btn-accent:hover { background: var(--tonie-red-hover); color: #FFFFFF; }
+/* --- Header & Branding --- */
+.header { text-align: center; margin-bottom: 1.75rem; display: flex; flex-direction: column; align-items: center; }
+.brand-logo-wrap { width: 150px; height: 75px; margin-bottom: 8px; filter: drop-shadow(0 4px 10px rgba(192, 39, 65, 0.15)); }
+.brand-title { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.15; margin-bottom: 4px; }
 .brand-title span { color: var(--tonie-red); text-transform: uppercase; }
-.brand-sub { font-size: 13px; color: var(--text-muted); max-width: 520px; margin: 4px auto 0; line-height: 1.4; }
-/* --- Cards --- */
-.card { background: var(--bg-card); border-radius: 18px; border: 1px solid var(--border-color); padding: 1.2rem; margin-bottom: 1.2rem; box-shadow: var(--shadow-card); }
-.card-header { font-size: 15px; font-weight: 700; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
-/* --- Mode Switcher (Simple vs Pro) --- */
-.mode-switch-wrap { display: flex; background: var(--bg-card-sub); border: 1px solid var(--border-color); padding: 4px; border-radius: 12px; margin-bottom: 1rem; }
-.mode-btn { flex: 1; padding: 10px 12px; border: none; background: transparent; color: var(--text-muted); font-size: 13px; font-weight: 700; border-radius: 8px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
-.mode-btn.active { background: var(--tonie-red); color: #fff; box-shadow: 0 2px 8px rgba(192, 39, 65, 0.4); }
-/* --- Navigation Tabs --- */
-.tab-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-bottom: 12px; background: var(--bg-card-sub); padding: 4px; border-radius: 12px; border: 1px solid var(--border-color); }
-.tab-btn { padding: 9px 8px; font-size: 12.5px; font-weight: 700; border: none; border-radius: 8px; background: transparent; color: var(--text-muted); cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; white-space: nowrap; }
-.tab-btn.active { background: var(--tonie-red); color: #fff; box-shadow: 0 2px 8px rgba(192, 39, 65, 0.35); }
-.fav-badge { background: rgba(0,0,0,0.25); padding: 1px 6px; border-radius: 10px; font-size: 11px; margin-left: 2px; }
-/* --- Search Bar --- */
-.search-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: center; }
-.search-wrap { position: relative; flex: 1; }
-.search-input { width: 100%; padding: 12px 36px 12px 14px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main); font-size: 14px; outline: none; transition: 0.2s; }
-.search-input:focus { border-color: var(--border-focus); box-shadow: 0 0 0 3px var(--tonie-red-light); }
-.search-clear { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); font-size: 14px; display: none; width: 20px; height: 20px; line-height: 20px; text-align: center; }
-.btn-dice { background: var(--bg-card-sub); border: 1px solid var(--border-color); width: 44px; height: 44px; border-radius: 12px; font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; color: var(--text-main); flex-shrink: 0; }
-.btn-dice:hover { border-color: var(--tonie-red); transform: rotate(20deg) scale(1.05); }
-.search-meta { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--text-muted); margin-bottom: 10px; padding: 0 4px; }
-.status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 5px; background: #EAB308; }
-.status-dot.online { background: #10B981; box-shadow: 0 0 8px #10B981; }
-.status-dot.offline { background: var(--tonie-red); }
-/* --- Grid (Motiv-Auswahl) --- */
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(135px, 1fr)); gap: 10px; max-height: 300px; overflow-y: auto; padding-right: 4px; }
-.grid::-webkit-scrollbar { width: 5px; }
-.grid::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
-.grid-item { background: var(--bg-card-sub); border: 1px solid var(--border-color); border-radius: 14px; padding: 10px 8px; text-align: center; cursor: pointer; transition: 0.2s; position: relative; display: flex; flex-direction: column; align-items: center; }
-.grid-item:hover { border-color: var(--tonie-red); transform: translateY(-2px); }
-.grid-item.selected { border-color: var(--tonie-red); box-shadow: 0 0 0 2px var(--tonie-red); background: var(--tonie-red-light); }
-.grid-item img { width: 68px; height: 68px; object-fit: contain; border-radius: 50%; background: #ffffff; margin-bottom: 6px; padding: 3px; box-shadow: 0 2px 6px rgba(0,0,0,0.12); }
-.grid-item .t-series { font-size: 10px; color: var(--tonie-red); font-weight: 700; text-transform: uppercase; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.grid-item .t-title { font-size: 11.5px; font-weight: 700; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; }
-.grid-item .t-id { font-size: 9.5px; color: var(--text-muted); font-family: ui-monospace, monospace; }
-.fav-star { position: absolute; top: 6px; right: 6px; font-size: 16px; color: rgba(148, 163, 184, 0.4); transition: 0.2s; line-height: 1; padding: 4px; cursor: pointer; }
-.fav-star.active { color: var(--tonie-gold); text-shadow: 0 0 6px rgba(255,184,0,0.6); }
-/* --- Upload Panel --- */
-.upload-panel { display: none; padding: 25px 15px; border: 2px dashed var(--border-color); border-radius: 14px; text-align: center; cursor: pointer; transition: 0.2s; background: var(--bg-card-sub); }
-.upload-panel:hover { border-color: var(--tonie-red); }
-.upload-panel input { display: none; }
-.upload-icon { font-size: 34px; margin-bottom: 6px; }
-/* --- Editor & Controls --- */
-.editor-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-.control-group { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
-.control-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
-.control-select, .control-text { padding: 9px 12px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-input); color: var(--text-main); font-size: 13.5px; outline: none; transition: 0.2s; width: 100%; }
-.control-select:focus, .control-text:focus { border-color: var(--tonie-red); box-shadow: 0 0 0 3px var(--tonie-red-light); }
-.preset-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
-.preset-pill { font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 16px; background: var(--bg-card-sub); border: 1px solid var(--border-color); cursor: pointer; color: var(--text-muted); transition: 0.2s; }
-.preset-pill:hover { border-color: var(--tonie-red); color: var(--tonie-red); }
-/* --- Pro Mode Panel --- */
-.pro-panel { display: none; background: var(--bg-card-sub); border: 1px dashed var(--border-color); border-radius: 12px; padding: 12px; margin-bottom: 14px; }
-.slider-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 8px; }
-.slider-item { display: flex; flex-direction: column; gap: 3px; }
-.slider-label { display: flex; justify-content: space-between; font-size: 10.5px; color: var(--text-muted); font-weight: 600; }
-.slider-input { width: 100%; accent-color: var(--tonie-red); }
-.id-copy-row { display: flex; gap: 8px; align-items: center; background: var(--bg-input); border: 1px solid var(--border-color); border-radius: 10px; padding: 6px 10px; margin-top: 8px; }
-.id-copy-text { font-family: monospace; font-size: 12px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--tonie-red); font-weight: bold; }
-.btn-copy { padding: 5px 12px; font-size: 11px; font-weight: 700; border-radius: 6px; border: none; background: var(--tonie-red); color: white; cursor: pointer; transition: 0.2s; }
-.btn-copy:hover { background: var(--tonie-red-hover); }
-/* --- Sticker Live Preview --- */
-.preview-box { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 18px; background: var(--bg-card-sub); border-radius: 14px; border: 1px dashed var(--border-color); margin-bottom: 14px; }
-.sticker-preview { width: 180px; height: 180px; border-radius: 50%; box-shadow: 0 6px 18px rgba(0,0,0,0.25); background: #ffffff; position: relative; overflow: hidden; }
-/* --- Action Buttons --- */
-.action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.btn-main { width: 100%; padding: 12px 14px; font-size: 13.5px; font-weight: 700; border-radius: 12px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; border: none; }
-.btn-main:active { transform: scale(0.98); }
-.btn-print { background: var(--tonie-red); color: white; box-shadow: 0 4px 14px rgba(192, 39, 65, 0.4); }
-.btn-print:hover { background: var(--tonie-red-hover); }
-.btn-export { background: var(--bg-card-sub); color: var(--text-main); border: 1px solid var(--border-color); }
-.btn-export:hover { border-color: var(--tonie-red); color: var(--tonie-red); }
-/* --- Hardware Stack & Community --- */
-.hardware-grid { display: flex; flex-direction: column; gap: 8px; }
-.hardware-item { display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--bg-card-sub); border: 1px solid var(--border-color); border-radius: 12px; text-decoration: none; color: var(--text-main); transition: 0.2s; }
-.hardware-item:hover { border-color: var(--tonie-red); transform: translateX(3px); }
-.hw-icon { font-size: 22px; width: 28px; text-align: center; }
-.hw-title { font-size: 13px; font-weight: 700; }
-.hw-desc { font-size: 11px; color: var(--text-muted); }
-/* --- Footer & Legal Disclaimer --- */
-.footer { text-align: center; margin-top: 2.5rem; font-size: 11.5px; color: var(--text-muted); border-top: 1px solid var(--border-color); padding-top: 1.2rem; }
-.footer a { color: var(--tonie-red); text-decoration: none; font-weight: 600; }
-.disclaimer { margin-top: 8px; font-size: 10.5px; opacity: 0.75; line-height: 1.4; max-width: 580px; margin-left: auto; margin-right: auto; }
-/* --- Modal --- */
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 9999; padding: 1rem; }
-.modal { background: var(--bg-card); width: 100%; max-width: 440px; border-radius: 18px; padding: 22px; border: 1px solid var(--border-color); box-shadow: 0 16px 36px rgba(0,0,0,0.5); }
-.modal h3 { margin-bottom: 12px; color: var(--tonie-red); font-size: 18px; }
-.modal ul { margin-left: 18px; margin-bottom: 16px; font-size: 13px; color: var(--text-main); display: flex; flex-direction: column; gap: 8px; }
-.modal p { font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
-/* ============================================================
-STRICT 1-PAGE DIN-A4 PRINT ENGINE
-============================================================ */
-#printSheet { display: none; }
+.brand-subtitle { font-size: 13px; color: var(--text-muted); max-width: 520px; line-height: 1.4; margin: 0 auto; }
+/* --- Workflow Card Architecture --- */
+.step-card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); padding: 1.2rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-md); transition: border-color 0.2s; }
+.step-header { font-size: 15px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
+.step-badge { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; background: var(--tonie-red); color: #FFFFFF; border-radius: 50%; font-size: 12px; font-weight: 800; margin-right: 8px; }
+/* --- Step 1: Search & Database (Mobile-Hardened Tabs) --- */
+.tab-bar { display: flex; gap: 4px; margin-bottom: 12px; background: var(--card-bg-sub); padding: 4px; border-radius: 12px; border: 1px solid var(--border-color); width: 100%; }
+.tab-btn { flex: 1 1 0; min-width: 0; padding: 8px 4px; font-size: 11.5px; font-weight: 700; border: none; border-radius: 8px; background: transparent; color: var(--text-muted); cursor: pointer; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center; gap: 4px; }
+.tab-btn.active { background: var(--card-bg); color: var(--text-main); box-shadow: var(--shadow-sm); }
+@media (max-width: 380px) { .tab-btn { font-size: 10px; padding: 6px 2px; } }
+.search-row { display: flex; gap: 8px; margin-bottom: 10px; position: relative; }
+.search-field { flex: 1; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-main); font-size: 14px; outline: none; transition: 0.2s; }
+.search-field:focus { border-color: var(--tonie-red); box-shadow: 0 0 0 3px var(--tonie-red-soft); }
+.search-btn-icon { width: 44px; background: var(--card-bg-sub); border: 1px solid var(--border-color); border-radius: 10px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+.search-btn-icon:hover { border-color: var(--tonie-red); transform: rotate(15deg); }
+.status-row { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; padding: 0 4px; }
+.status-indicator { display: inline-flex; align-items: center; gap: 6px; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--tonie-gold); }
+.status-dot.active { background: var(--tonie-emerald); box-shadow: 0 0 8px rgba(16, 185, 129, 0.4); }
+.items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(115px, 1fr)); gap: 10px; max-height: 290px; overflow-y: auto; padding-right: 4px; }
+.items-grid::-webkit-scrollbar { width: 5px; }
+.items-grid::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+.grid-card { background: var(--card-bg-sub); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 6px; text-align: center; cursor: pointer; transition: 0.2s; position: relative; display: flex; flex-direction: column; align-items: center; }
+.grid-card:hover { border-color: var(--tonie-red); transform: translateY(-2px); }
+.grid-card.selected { border-color: var(--tonie-red); background: var(--tonie-red-soft); box-shadow: 0 0 0 1.5px var(--tonie-red); }
+.grid-thumb { width: 64px; height: 64px; border-radius: 50%; object-fit: contain; background: #FFFFFF; margin-bottom: 6px; padding: 2px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08); border: 1px solid var(--border-color); }
+.grid-series { font-size: 9px; font-weight: 800; color: var(--tonie-red); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+.grid-title { font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; margin-bottom: 2px; }
+.grid-id { font-size: 9px; color: var(--text-muted); font-family: monospace; }
+.fav-star-btn { position: absolute; top: 6px; right: 6px; font-size: 15px; color: #CBD5E1; cursor: pointer; transition: 0.2s; line-height: 1; }
+.fav-star-btn.is-fav { color: var(--tonie-gold); }
+.upload-dropzone { display: none; padding: 28px 16px; border: 2px dashed var(--border-color); border-radius: 12px; text-align: center; cursor: pointer; background: var(--card-bg-sub); transition: 0.2s; }
+.upload-dropzone:hover { border-color: var(--tonie-red); background: var(--tonie-red-soft); }
+/* --- Step 2: Tag Editor --- */
+.mode-switch-wrap { display: flex; background: var(--card-bg-sub); padding: 4px; border-radius: 10px; margin-bottom: 14px; border: 1px solid var(--border-color); }
+.mode-toggle-btn { flex: 1; padding: 7px; font-size: 12px; font-weight: 700; border: none; background: transparent; color: var(--text-muted); border-radius: 7px; cursor: pointer; transition: 0.2s; }
+.mode-toggle-btn.active { background: var(--tonie-red); color: #FFFFFF; }
+.form-row-fields { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 10px; }
+@media(min-width: 520px) { .form-row-fields { grid-template-columns: 1fr 1fr; } }
+.field-group { display: flex; flex-direction: column; gap: 4px; }
+.field-label { font-size: 10.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
+.field-input { padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-main); font-size: 13px; outline: none; transition: 0.2s; width: 100%; }
+.field-input:focus { border-color: var(--tonie-red); }
+/* ID and Toggle Switch Container */
+.id-control-row { display: flex; align-items: flex-end; gap: 10px; margin-bottom: 12px; }
+.id-input-wrap { flex: 1; }
+.switch-container { display: flex; align-items: center; gap: 8px; background: var(--card-bg-sub); padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border-color); height: 38px; cursor: pointer; user-select: none; }
+.switch-container label { font-size: 12px; font-weight: 700; color: var(--text-main); cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.toggle-switch { position: relative; width: 36px; height: 20px; display: inline-block; }
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-slider { position: absolute; cursor: pointer; inset: 0; background-color: #CBD5E1; transition: .2s; border-radius: 20px; }
+.toggle-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .2s; border-radius: 50%; }
+input:checked + .toggle-slider { background-color: var(--tonie-red); }
+input:checked + .toggle-slider:before { transform: translateX(16px); }
+.preset-pills-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+.preset-badge { font-size: 11px; padding: 4px 10px; border-radius: 12px; background: var(--card-bg-sub); border: 1px solid var(--border-color); cursor: pointer; color: var(--text-muted); font-weight: 600; transition: 0.2s; }
+.preset-badge:hover { border-color: var(--tonie-red); color: var(--tonie-red); }
+/* Pro Panel */
+.pro-controls { display: none; background: var(--card-bg-sub); padding: 12px; border-radius: 10px; border: 1px dashed var(--border-color); margin-bottom: 14px; }
+.slider-control { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.slider-name { width: 65px; font-size: 11px; font-weight: 600; color: var(--text-muted); }
+.slider-range { flex: 1; accent-color: var(--tonie-red); }
+.meta-dump-row { display: flex; justify-content: space-between; align-items: center; background: var(--input-bg); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 8px; }
+.meta-dump-text { font-family: monospace; font-size: 11px; color: var(--tonie-red); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.preview-canvas-box { display: flex; justify-content: center; padding: 18px; background: var(--card-bg-sub); border-radius: 12px; border: 1px solid var(--border-color); }
+.sticker-stage { width: 160px; height: 160px; border-radius: 50%; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15); background: #FFFFFF; position: relative; overflow: hidden; }
+/* --- Step 3: Layout & Multi-Format Sheet Manager --- */
+.sheet-interactive-wrap { background: #E2E8F0; padding: 16px; border-radius: 12px; display: flex; justify-content: center; overflow-x: auto; box-shadow: inset 0 2px 8px rgba(0,0,0,0.08); margin: 12px 0; }
+.sheet-matrix { display: grid; background: #FFFFFF; padding: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.12); width: max-content; }
+/* Grid Formats for Screen Preview */
+.sheet-matrix.matrix-avery-40 { grid-template-columns: repeat(3, 40px); grid-template-rows: repeat(8, 40px); gap: 3px; }
+.sheet-matrix.matrix-avery-30 { grid-template-columns: repeat(4, 32px); grid-template-rows: repeat(12, 32px); gap: 3px; }
+.sheet-matrix.matrix-avery-25 { grid-template-columns: repeat(5, 26px); grid-template-rows: repeat(14, 26px); gap: 2px; }
+.sheet-matrix.matrix-raster-43 { grid-template-columns: repeat(4, 42px); grid-template-rows: repeat(5, 42px); gap: 4px; }
+.sheet-matrix.matrix-raster-40 { grid-template-columns: repeat(4, 40px); grid-template-rows: repeat(6, 40px); gap: 4px; }
+.sheet-matrix.matrix-raster-30 { grid-template-columns: repeat(6, 32px); grid-template-rows: repeat(8, 32px); gap: 3px; }
+.sheet-matrix.matrix-raster-25 { grid-template-columns: repeat(6, 26px); grid-template-rows: repeat(10, 26px); gap: 2px; }
+.sheet-slot-node { border-radius: 50%; border: 1px dashed #94A3B8; cursor: pointer; transition: 0.15s; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; background: #F8FAFC; }
+.sheet-slot-node:hover { border-color: var(--tonie-red); background: var(--tonie-red-soft); transform: scale(1.06); z-index: 2; }
+.sheet-slot-node.has-content { border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.18); }
+.sheet-slot-node svg { width: 100%; height: 100%; }
+.matrix-avery-40 .sheet-slot-node { width: 40px; height: 40px; }
+.matrix-avery-30 .sheet-slot-node { width: 32px; height: 32px; font-size: 10px; }
+.matrix-avery-25 .sheet-slot-node { width: 26px; height: 26px; font-size: 9px; }
+.matrix-raster-43 .sheet-slot-node { width: 42px; height: 42px; }
+.matrix-raster-40 .sheet-slot-node { width: 40px; height: 40px; }
+.matrix-raster-30 .sheet-slot-node { width: 32px; height: 32px; font-size: 10px; }
+.matrix-raster-25 .sheet-slot-node { width: 26px; height: 26px; font-size: 9px; }
+.sheet-slot-number { font-size: 11px; color: #94A3B8; font-weight: 700; user-select: none; }
+.sheet-btn-bar { display: flex; justify-content: center; gap: 8px; margin-bottom: 12px; }
+.action-actions-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 10px; }
+@media(min-width: 520px) { .action-actions-grid { grid-template-columns: 1fr 1fr; } }
+.btn-print-large { background: var(--tonie-red); color: #FFFFFF; padding: 13px; font-size: 14px; font-weight: 700; border-radius: 10px; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(192, 39, 65, 0.3); display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+.btn-print-large:active { transform: scale(0.98); }
+.btn-export-png { background: var(--card-bg-sub); color: var(--text-main); border: 1px solid var(--border-color); padding: 13px; font-size: 13px; font-weight: 700; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
+.btn-export-png:hover { border-color: var(--tonie-red); color: var(--tonie-red); }
+/* --- Footer & Credits --- */
+.footer-wrap { text-align: center; margin-top: 2.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; }
+.footer-nav { display: flex; justify-content: center; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
+.footer-nav a { color: var(--tonie-red); text-decoration: none; font-size: 12px; font-weight: 600; }
+.footer-nav a:hover { text-decoration: underline; }
+.footer-disclaimer { font-size: 10px; color: var(--text-muted); opacity: 0.75; max-width: 620px; margin: 0 auto; line-height: 1.4; }
+/* --- Help Modal --- */
+.modal-shade { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 99999; padding: 15px; }
+.modal-body { background: var(--card-bg); width: 100%; max-width: 440px; border-radius: 16px; border: 1px solid var(--border-color); padding: 22px; box-shadow: var(--shadow-float); }
+.modal-body h3 { font-size: 17px; color: var(--tonie-red); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.modal-body p, .modal-body li { font-size: 13px; color: var(--text-main); margin-bottom: 8px; line-height: 1.4; }
+.modal-body ul { padding-left: 18px; margin-bottom: 14px; }
+.modal-close-btn { width: 100%; padding: 10px; border-radius: 8px; background: var(--tonie-red); color: #FFFFFF; font-weight: 700; border: none; cursor: pointer; }
+/* --- Strict 1-Page A4 Print Engine --- */
+#printHost { display: none; }
 @media print {
-body, html { background: #fff !important; margin: 0 !important; padding: 0 !important; height: 100% !important; overflow: hidden !important; }
-.container, .modal-overlay, .top-bar, .header, .card, .footer { display: none !important; }
-#printSheet { display: block !important; position: absolute; top: 0; left: 0; width: 210mm; height: 297mm; max-height: 297mm; background: white; z-index: 99999; margin: 0; padding: 0; overflow: hidden; }
-/* Avery Zweckform L3415: 3x8 = 24 Sticker, 40mm, exact margin */
-.layout-avery { display: grid; grid-template-columns: repeat(3, 40mm); grid-template-rows: repeat(8, 40mm); justify-content: center; align-content: start; padding-top: 12.5mm; gap: 0; }
-/* Freies Raster mit Schnittrand */
-.layout-raster-43 { display: flex; flex-wrap: wrap; gap: 6mm; padding: 10mm; justify-content: center; align-content: flex-start; }
-.layout-raster-40 { display: flex; flex-wrap: wrap; gap: 8mm; padding: 12mm; justify-content: center; align-content: flex-start; }
-.layout-raster-30 { display: flex; flex-wrap: wrap; gap: 8mm; padding: 12mm; justify-content: center; align-content: flex-start; }
-.layout-raster-25 { display: flex; flex-wrap: wrap; gap: 8mm; padding: 12mm; justify-content: center; align-content: flex-start; }
-.print-sticker { border-radius: 50%; overflow: hidden; position: relative; box-sizing: border-box; }
-.print-sticker.size-43 { width: 43mm; height: 43mm; border: 0.5px dashed #bbb; }
-.print-sticker.size-40 { width: 40mm; height: 40mm; border: 0.5px dashed #bbb; }
-.print-sticker.size-30 { width: 30mm; height: 30mm; border: 0.5px dashed #bbb; }
-.print-sticker.size-25 { width: 25mm; height: 25mm; border: 0.5px dashed #bbb; }
-.print-sticker.avery-mode { width: 40mm; height: 40mm; border: none; }
+.no-print, .container, .modal-shade, body > *:not(#printHost) { display: none !important; }
+html, body { background: #FFFFFF !important; margin: 0 !important; padding: 0 !important; width: 100% !important; height: 100% !important; }
+#printHost { display: block !important; position: absolute; top: 0; left: 0; width: 210mm; height: 297mm; background: #FFFFFF; z-index: 999999; overflow: hidden; margin: 0; padding: 0; box-sizing: border-box; }
+/* Avery Sheet Print Formats */
+.print-format-avery-40 { display: grid; grid-template-columns: repeat(3, 40mm); grid-template-rows: repeat(8, 40mm); gap: 0; justify-content: center; align-content: start; padding-top: 12.5mm; }
+.print-format-avery-30 { display: grid; grid-template-columns: repeat(4, 30mm); grid-template-rows: repeat(12, 30mm); gap: 0; justify-content: center; align-content: start; padding-top: 10mm; }
+.print-format-avery-25 { display: grid; grid-template-columns: repeat(5, 25mm); grid-template-rows: repeat(14, 25mm); gap: 0; justify-content: center; align-content: start; padding-top: 8mm; }
+/* Free Raster Print Formats (with Scissor Guides) */
+.print-format-raster-43 { display: flex; flex-wrap: wrap; gap: 4mm; padding: 10mm; align-content: flex-start; justify-content: center; }
+.print-format-raster-40 { display: flex; flex-wrap: wrap; gap: 4mm; padding: 10mm; align-content: flex-start; justify-content: center; }
+.print-format-raster-30 { display: flex; flex-wrap: wrap; gap: 3mm; padding: 10mm; align-content: flex-start; justify-content: center; }
+.print-format-raster-25 { display: flex; flex-wrap: wrap; gap: 3mm; padding: 10mm; align-content: flex-start; justify-content: center; }
+.print-cell { border-radius: 50%; box-sizing: border-box; overflow: hidden; position: relative; }
+.print-format-avery-40 .print-cell { width: 40mm; height: 40mm; border: none; }
+.print-format-avery-30 .print-cell { width: 30mm; height: 30mm; border: none; }
+.print-format-avery-25 .print-cell { width: 25mm; height: 25mm; border: none; }
+.print-format-raster-43 .print-cell { width: 43mm; height: 43mm; border: 0.5px dashed #94A3B8; }
+.print-format-raster-40 .print-cell { width: 40mm; height: 40mm; border: 0.5px dashed #94A3B8; }
+.print-format-raster-30 .print-cell { width: 30mm; height: 30mm; border: 0.5px dashed #94A3B8; }
+.print-format-raster-25 .print-cell { width: 25mm; height: 25mm; border: 0.5px dashed #94A3B8; }
 @page { size: A4 portrait; margin: 0; }
 }
 </style>
 </head>
 <body>
-<div class="container">
-<!-- Top Bar Navigation -->
+<div class="container no-print">
+<!-- Top Navigation Bar -->
 <div class="top-bar">
-<button class="btn-pill" id="btnThemeToggle" onclick="window.app.toggleTheme()">
-<span id="themeIcon">☀️</span> <span id="themeLabel">Light</span>
+<button class="btn-pill" onclick="app.toggleTheme()">
+<span id="themeEmoji">🌙</span> <span id="themeLabel">Dark Mode</span>
 </button>
-<button class="btn-pill" onclick="window.app.openModal('helpModal')">
+<button class="btn-pill" onclick="app.openHelpModal()">
 <span>❓</span> Hilfe & Tipps
 </button>
-<button class="btn-pill btn-accent" onclick="window.app.openModal('donateModal')">
+<button class="btn-pill btn-accent" onclick="app.openDonateModal()">
 <span>☕</span> Spenden
 </button>
 </div>
-<!-- Header Logo & Title -->
+<!-- Master Vector Logo Header -->
 <div class="header">
-<div class="logo-wrap">
-<svg class="logo-svg" viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-<!-- Left: Tonie Coin Token with NFC waves -->
-<circle cx="55" cy="50" r="36" fill="var(--bg-card)" stroke="#9E9E9E" stroke-width="2.5"/>
+<svg class="brand-logo-wrap" viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="55" cy="50" r="36" fill="var(--card-bg)" stroke="#94A3B8" stroke-width="3"/>
 <circle cx="55" cy="50" r="28" fill="#1E293B"/>
-<path d="M45 50C45 44.477 49.477 40 55 40C60.523 40 65 44.477 65 50" stroke="#10B981" stroke-width="2.5" stroke-linecap="round"/>
-<path d="M37 50C37 40.059 45.059 32 55 32C64.941 32 73 40.059 73 50" stroke="#10B981" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
-<!-- Right: Avery Sticker Sheet with peeling sticker -->
-<g transform="translate(115, 20) rotate(7)">
-<rect x="0" y="0" width="58" height="58" rx="8" fill="#F8FAFC" stroke="#C02741" stroke-width="2"/>
-<circle cx="15" cy="15" r="9" fill="#E2E8F0" stroke="#C02741" stroke-width="1" stroke-dasharray="2 2"/>
-<circle cx="43" cy="15" r="9" fill="#E2E8F0" stroke="#C02741" stroke-width="1" stroke-dasharray="2 2"/>
-<circle cx="15" cy="43" r="9" fill="#E2E8F0" stroke="#C02741" stroke-width="1" stroke-dasharray="2 2"/>
-<!-- Peeling Badge -->
-<circle cx="43" cy="43" r="10" fill="#C02741"/>
-<path d="M43 38V48M38 43H48" stroke="#FFF" stroke-width="2" stroke-linecap="round"/>
+<path d="M46 50C46 45.029 50.029 41 55 41C59.971 41 64 45.029 64 50" stroke="#10B981" stroke-width="2.5" stroke-linecap="round"/>
+<path d="M38 50C38 40.611 45.611 33 55 33C64.389 33 72 40.611 72 50" stroke="#10B981" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+<g transform="translate(112, 18) rotate(7)">
+<rect x="0" y="0" width="62" height="62" rx="8" fill="#FFFFFF" stroke="#C02741" stroke-width="2"/>
+<circle cx="16" cy="16" r="10" fill="#F1F5F9" stroke="#C02741" stroke-width="1" stroke-dasharray="2 2"/>
+<circle cx="46" cy="16" r="10" fill="#F1F5F9" stroke="#C02741" stroke-width="1" stroke-dasharray="2 2"/>
+<circle cx="16" cy="46" r="10" fill="#F1F5F9" stroke="#C02741" stroke-width="1" stroke-dasharray="2 2"/>
+<circle cx="46" cy="46" r="11" fill="#C02741" />
+<path d="M46 41V51M41 46H51" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
 </g>
 </svg>
-</div>
 <div class="brand-title">Tonie & Tag <span>Cover Hub</span></div>
-<div class="brand-sub">Der smarte Designer für Münzkapseln, Avery Etiketten & Kreativ-Tonies (V4.1 Master)</div>
+<div class="brand-subtitle">Der A4-Designer für Münzkapseln, Avery Etiketten & Kreativ-Tonies. (V6.2)</div>
 </div>
-<!-- Mode Selector: Simpel vs Pro -->
-<div class="mode-switch-wrap">
-<button class="mode-btn active" id="btnModeSimple" onclick="window.app.setMode('simple')">⚡ Simpel (Papa Express)</button>
-<button class="mode-btn" id="btnModePro" onclick="window.app.setMode('pro')">🛠️ Pro (Nerd & Feinschliff)</button>
+<!-- STEP 1: Database & Picker -->
+<div class="step-card">
+<div class="step-header">
+<div><span class="step-badge">1</span> Motiv auswählen</div>
 </div>
-<!-- Motiv-Auswahl Card (Tabs: DB / Favs / Custom) -->
-<div class="card">
 <div class="tab-bar">
-<button class="tab-btn active" id="tabDb" onclick="window.app.switchTab('db')">📚 Datenbank</button>
-<button class="tab-btn" id="tabFav" onclick="window.app.switchTab('fav')">⭐ Favoriten <span class="fav-badge" id="favCount">0</span></button>
-<button class="tab-btn" id="tabCustom" onclick="window.app.switchTab('custom')">🖼️ Eigenes Bild</button>
+<button class="tab-btn active" id="tabDbBtn" onclick="app.switchPickerTab('db')">📚 Datenbank</button>
+<button class="tab-btn" id="tabFavBtn" onclick="app.switchPickerTab('fav')">⭐ Favoriten (<span id="favQty">0</span>)</button>
+<button class="tab-btn" id="tabCustomBtn" onclick="app.switchPickerTab('custom')">🖼️ Eigenes Bild</button>
 </div>
-<!-- Database Panel -->
-<div id="panelDb">
+<!-- Database Tab Content -->
+<div id="tabDbView">
 <div class="search-row">
-<div class="search-wrap">
-<input type="text" id="searchInput" class="search-input" placeholder="Titel, Serie, ID oder Audio-ID suchen..." oninput="window.app.onSearchInput()">
-<span class="search-clear" id="searchClear" onclick="window.app.clearSearch()">✕</span>
+<input type="text" id="dbSearchInput" class="search-field" placeholder="Titel, Serie oder ID suchen..." oninput="app.handleSearchDebounced()">
+<button class="search-btn-icon" onclick="app.selectRandomItem()" title="Zufälliges Motiv">🎲</button>
 </div>
-<button class="btn-dice" title="Zufälligen Tonie wählen" onclick="window.app.pickRandom()">🎲</button>
+<div class="status-row">
+<span class="status-indicator">
+<span class="status-dot" id="dbStatusDot"></span>
+<span id="dbStatusText">Lade Datenbank...</span>
+</span>
+<span id="dbResultCounter">0 Motive</span>
 </div>
-<div class="search-meta">
-<span><span class="status-dot" id="statusDot"></span><span id="dbStatus">Lade Offline-Datenbank...</span></span>
-<span id="dbCounter">0 Motive</span>
+<div class="items-grid" id="toniesGrid"></div>
 </div>
-<div class="grid" id="tonieGrid"></div>
-</div>
-<!-- Custom Upload Panel -->
-<div id="panelCustom" class="upload-panel" onclick="document.getElementById('fileUpload').click()">
-<input type="file" id="fileUpload" accept="image/*" onchange="window.app.handleFileUpload(event)">
-<div class="upload-icon">📸</div>
-<div style="font-weight:700; font-size:14px; margin-bottom:4px;">Eigenes Foto oder Grafik hochladen</div>
-<div style="font-size:12px; color:var(--text-muted);">Tippe hier für Galerie oder Kamera (JPG, PNG, WEBP)</div>
+<!-- Custom Upload Tab Content -->
+<div id="tabCustomView" class="upload-dropzone" onclick="document.getElementById('imgFileInput').click()">
+<input type="file" id="imgFileInput" accept="image/*" style="display:none;" onchange="app.handleCustomUpload(event)">
+<div style="font-size: 30px; margin-bottom: 6px;">📸</div>
+<div style="font-weight: 700; color: var(--text-main);">Eigenes Foto oder Grafik hochladen</div>
+<div style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">Optimal für Kreativ-Tonies & individuelle Tags</div>
 </div>
 </div>
-<!-- Generator & Editor Card -->
-<div class="card">
-<div class="card-header">
-<span>🎨 Tag Generator & Editor</span>
-<span id="activeTonieLabel" style="font-size:12px; color:var(--tonie-red); font-weight:700;">Kein Motiv gewählt</span>
+<!-- STEP 2: Tag Editor (3-Field Engine) -->
+<div class="step-card">
+<div class="step-header">
+<div><span class="step-badge">2</span> Etikett gestalten</div>
 </div>
-<div class="editor-grid">
-<div class="control-group">
-<label class="control-label">Layout-Format</label>
-<select id="formatSelect" class="control-select" onchange="window.app.updatePreview()">
-<option value="avery-l3415">Avery Zweckform L3415 (24x 40mm)</option>
-<option value="raster-43">Münzkapseln 43mm (Freies Raster)</option>
-<option value="raster-40">Münzkapseln 40mm / Stanzer</option>
-<option value="raster-30">RFIDfriend Token 30mm</option>
-<option value="raster-25">Micro Token 25mm</option>
+<div class="mode-switch-wrap">
+<button class="mode-toggle-btn active" id="btnModeSimple" onclick="app.setEditorMode('simple')">⚡ Simpel (Papa Express)</button>
+<button class="mode-toggle-btn" id="btnModePro" onclick="app.setEditorMode('pro')">🛠️ Pro (Nerd & Dumper)</button>
+</div>
+<!-- Field 1 & 2: Serie/Titel & Album/Folge -->
+<div class="form-row-fields">
+<div class="field-group">
+<label class="field-label">1. Titel / Serie (Oben)</label>
+<input type="text" id="inputTitle" class="field-input" placeholder="z.B. Conni oder TKKG" oninput="app.refreshPreview()">
+</div>
+<div class="field-group">
+<label class="field-label">2. Album / Folge</label>
+<input type="text" id="inputAlbum" class="field-input" placeholder="z.B. feiert Geburtstag" oninput="app.refreshPreview()">
+</div>
+</div>
+<!-- Field 3 & ID Toggle Switch -->
+<div class="id-control-row">
+<div class="field-group id-input-wrap">
+<label class="field-label">3. Tonie-ID</label>
+<input type="text" id="inputBottomId" class="field-input" placeholder="z.B. 01-0001" oninput="app.refreshPreview()">
+</div>
+<div class="switch-container" onclick="document.getElementById('toggleShowId').click()">
+<label class="toggle-switch" onclick="event.stopPropagation()">
+<input type="checkbox" id="toggleShowId" checked onchange="app.refreshPreview()">
+<span class="toggle-slider"></span>
+</label>
+<label>ID aufdrucken</label>
+</div>
+</div>
+<div class="preset-pills-row">
+<span class="preset-badge" onclick="app.applyPreset('Hörspiel')">Hörspiel</span>
+<span class="preset-badge" onclick="app.applyPreset('Kinderlieder')">Kinderlieder</span>
+<span class="preset-badge" onclick="app.applyPreset('Mein Tonie')">Mein Tonie</span>
+<span class="preset-badge" onclick="app.applyPreset('Kreativ')">Kreativ</span>
+<span class="preset-badge" onclick="app.applyPreset('Gute Nacht')">Gute Nacht</span>
+</div>
+<!-- Pro Tools Panel -->
+<div class="pro-controls" id="proToolsPanel">
+<div class="slider-control">
+<span class="slider-name">Zoom</span>
+<input type="range" id="sliderZoom" class="slider-range" min="60" max="140" value="100" oninput="app.refreshPreview()">
+</div>
+<div class="slider-control">
+<span class="slider-name">Rotation</span>
+<input type="range" id="sliderRotation" class="slider-range" min="-180" max="180" value="0" oninput="app.refreshPreview()">
+</div>
+<div class="meta-dump-row">
+<span style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Audio-ID / Dumper:</span>
+<span class="meta-dump-text" id="dumpAudioIdLabel">Keine Audio-ID</span>
+<button class="btn-pill" style="padding: 3px 8px; font-size: 10px;" onclick="app.copyAudioId()">Kopieren</button>
+</div>
+</div>
+<!-- Live Sticker Stage -->
+<div class="preview-canvas-box">
+<div class="sticker-stage" id="masterStickerPreview"></div>
+</div>
+</div>
+<!-- STEP 3: Multi-Format & Sheet Manager -->
+<div class="step-card">
+<div class="step-header">
+<div><span class="step-badge">3</span> Druckbogen befüllen</div>
+<span id="sheetSlotCountBadge" style="font-size: 11px; font-weight: 700; color: var(--tonie-red);">24 Etiketten</span>
+</div>
+<!-- Zweistufige Format-Abfrage: 1. System, 2. Größe -->
+<div class="form-row-fields" style="margin-bottom: 12px;">
+<div class="field-group">
+<label class="field-label">1. Drucksystem</label>
+<select id="selectPrintSystem" class="field-input" onchange="app.onSystemChange()">
+<option value="avery">🏷️ Avery Zweckform (Vorgestanzt)</option>
+<option value="raster">✂️ Freies Raster (Münzkapseln & DIY)</option>
 </select>
 </div>
-<div class="control-group">
-<label class="control-label">ID / Text Unten</label>
-<input type="text" id="manualId" class="control-text" placeholder="z.B. 01-0182" oninput="window.app.updatePreview()">
+<div class="field-group">
+<label class="field-label">2. Format & Größe</label>
+<select id="selectPrintSize" class="field-input" onchange="app.onSizeChange()"></select>
 </div>
 </div>
-<div class="control-group">
-<label class="control-label">Titel / Text Oben</label>
-<input type="text" id="manualTitle" class="control-text" placeholder="Titel auf dem Aufkleber" oninput="window.app.updatePreview()">
+<p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-bottom: 8px;">
+Klicke auf einen Kreis, um dein aktuelles Cover dort zu platzieren.
+</p>
+<!-- Interactive Sheet Grid -->
+<div class="sheet-interactive-wrap">
+<div class="sheet-matrix matrix-avery-40" id="sheetMatrixUi"></div>
 </div>
-<!-- Quick Text Presets -->
-<div class="preset-row">
-<span style="font-size:11px; color:var(--text-muted); font-weight:600;">Vorlagen:</span>
-<span class="preset-pill" onclick="window.app.setPreset('Hörspiel')">Hörspiel</span>
-<span class="preset-pill" onclick="window.app.setPreset('Kinderlieder')">Kinderlieder</span>
-<span class="preset-pill" onclick="window.app.setPreset('Mein Tonie')">Mein Tonie</span>
-<span class="preset-pill" onclick="window.app.setPreset('Kreativ')">Kreativ</span>
-<span class="preset-pill" onclick="window.app.setPreset('Gute Nacht')">Gute Nacht</span>
+<div class="sheet-btn-bar">
+<button class="btn-pill" onclick="app.fillAllSlotsWithActive()">Alle füllen</button>
+<button class="btn-pill" onclick="app.clearSheetSlots()">Bogen leeren</button>
 </div>
-<!-- PRO-MODE CONTROLS -->
-<div class="pro-panel" id="proPanel">
-<div style="font-size:11px; font-weight:700; color:var(--tonie-red); text-transform:uppercase; margin-bottom:8px;">🛠️ Pro Feinschliff-Optionen</div>
-<div class="slider-row">
-<div class="slider-item">
-<div class="slider-label"><span>Bild Zoom</span><span id="valZoom">100%</span></div>
-<input type="range" id="sliderZoom" class="slider-input" min="50" max="180" value="100" oninput="window.app.updateProValues()">
-</div>
-<div class="slider-item">
-<div class="slider-label"><span>Rotation</span><span id="valRotate">0°</span></div>
-<input type="range" id="sliderRotate" class="slider-input" min="-180" max="180" value="0" oninput="window.app.updateProValues()">
-</div>
-</div>
-<div class="slider-row">
-<div class="slider-item">
-<div class="slider-label"><span>Text-Größe Oben</span><span id="valTextTop">12px</span></div>
-<input type="range" id="sliderTextTop" class="slider-input" min="8" max="16" value="12" oninput="window.app.updateProValues()">
-</div>
-<div class="slider-item">
-<div class="slider-label"><span>Text-Größe Unten</span><span id="valTextBottom">11px</span></div>
-<input type="range" id="sliderTextBottom" class="slider-input" min="8" max="15" value="11" oninput="window.app.updateProValues()">
-</div>
-</div>
-<!-- Copy ID & Audio-ID Bar for Dumper / TeddyCloud / Flipper -->
-<div class="id-copy-row">
-<span style="font-size:11px; color:var(--text-muted);">Dump-ID:</span>
-<span class="id-copy-text" id="rawAudioIdLabel">Keine Audio-ID</span>
-<button class="btn-copy" onclick="window.app.copyAudioId()">📋 Kopieren</button>
-</div>
-</div>
-<!-- Sticker Live Preview -->
-<div class="preview-box">
-<div class="sticker-preview" id="stickerPreview"></div>
-</div>
-<!-- Actions: Print & 300 DPI PNG Export -->
-<div class="action-row">
-<button class="btn-main btn-print" onclick="window.app.print()">
-<span>🖨️</span> A4 Bogen Drucken
+<div class="action-actions-grid">
+<button class="btn-print-large" onclick="app.triggerA4Print()">
+🖨️ A4 Bogen Drucken
 </button>
-<button class="btn-main btn-export" onclick="window.app.exportPng()">
-<span>💾</span> 300 DPI PNG Export
+<button class="btn-export-png" onclick="app.exportHighResPng()">
+💾 300 DPI Bild (Plotter/PNG)
 </button>
 </div>
 </div>
-<!-- Hardware & Community Empfehlungen -->
-<div class="card">
-<div class="card-header"><span>🛒 Material & Hardware-Tipps</span></div>
-<div class="hardware-grid">
-<a href="https://www.amazon.de/s?k=Avery+L3415" target="_blank" class="hardware-item">
-<span class="hw-icon">🏷️</span>
-<div>
-<div class="hw-title">Avery Zweckform L3415-10</div>
-<div class="hw-desc">Vorgestanzte 40mm A4-Bögen (24 Sticker/Seite, kein Ausschneiden)</div>
+<!-- Footer -->
+<div class="footer-wrap">
+<div class="footer-nav">
+<a href="https://www.avery-zweckform.com" target="_blank">🏷️ Avery Zweckform</a>
+<a href="http://rfidfriend.com/" target="_blank">📡 RFIDfriend Tags</a>
+<a href="https://github.com/toniebox-reverse-engineering" target="_blank">🐙 Team RevvoX</a>
+<a href="https://github.com/stevenious" target="_blank">💻 GitHub</a>
 </div>
-</a>
-<a href="https://www.amazon.de/s?k=M%C3%BCnzkapseln+40mm" target="_blank" class="hardware-item">
-<span class="hw-icon">🪙</span>
-<div>
-<div class="hw-title">Münzkapseln (40mm / 43mm)</div>
-<div class="hw-desc">Robuster Schutz für selbstgemachte Tonie-Token</div>
-</div>
-</a>
-<a href="http://rfidfriend.com/" target="_blank" class="hardware-item">
-<span class="hw-icon">📡</span>
-<div>
-<div class="hw-title">RFIDfriend SLIX-L Tags</div>
-<div class="hw-desc">Empfohlene NFC-Rohlinge der Toniebox-Community</div>
-</div>
-</a>
-</div>
-</div>
-<!-- Footer & Disclaimer -->
-<div class="footer">
-<div>Tonie & Tag Cover Hub V4.1 Master • Entwickelt mit Leidenschaft für die DIY-Community</div>
-<div class="disclaimer">
-Dieses Open-Source Tool steht in keiner geschäftlichen oder rechtlichen Verbindung zur Boxine GmbH.
+<div class="footer-disclaimer">
+Dieses Open-Source Community-Tool steht in keinerlei rechtlicher oder geschäftlicher Verbindung zur Boxine GmbH.
 
 "Tonie", "Tonies" und "Toniebox" sind eingetragene Marken der Boxine GmbH.
 
-Metadaten bereitgestellt durch das Team RevvoX Community-Projekt.
+Metadaten bereitgestellt durch das RevvoX Reverse-Engineering Projekt.
 </div>
 </div>
 </div>
-<!-- Hidden Strict 1-Page Print Sheet -->
-<div id="printSheet"></div>
-<!-- Offscreen Canvas for 300 DPI PNG Export -->
-<canvas id="exportCanvas" style="display:none;"></canvas>
-<!-- Help Modal -->
-<div class="modal-overlay" id="helpModal" onclick="if(event.target===this) window.app.closeModal('helpModal')">
-<div class="modal">
-<h3>💡 Druck- & Schneide-Tipps</h3>
+<!-- HIDDEN A4 PRINT LAYER -->
+<div id="printHost"></div>
+<!-- HELP MODAL -->
+<div class="modal-shade" id="helpModal" onclick="if(event.target===this) app.closeHelpModal()">
+<div class="modal-body">
+<h3>💡 Tipps & Druckanleitung</h3>
+<p><b>Druckereinstellungen (Essentiell):</b></p>
 <ul>
-<li><b>Druck-Skalierung:</b> Im Browser-Druckdialog zwingend <b>100%</b> bzw. <b>"Tatsächliche Größe"</b> wählen!</li>
-<li><b>"An Seite anpassen" deaktivieren:</b> Andernfalls verschiebt sich das Raster um wenige Millimeter.</li>
-<li><b>Avery L3415:</b> Nutze dieses Format für vorgestanzte 40mm Rundetiketten.</li>
-<li><b>Münzkapseln:</b> Wähle das Freie Raster für einfaches Schneiden mit Kreisstanzer oder Schere.</li>
-<li><b>300 DPI PNG:</b> Ideal zum Speichern für Cricut, Silhouette oder externe Fotodrucker.</li>
+<li>Skalierung im Druckdialog zwingend auf <b>100%</b> oder <b>"Tatsächliche Größe"</b> stellen!</li>
+<li>Niemals "An Seite anpassen" wählen, da sonst die Etiketten auf Avery-Bögen verrutschen.</li>
 </ul>
-<button class="btn-pill btn-accent" style="width:100%; justify-content:center;" onclick="window.app.closeModal('helpModal')">Alles klar!</button>
-</div>
-</div>
-<!-- Donate Modal -->
-<div class="modal-overlay" id="donateModal" onclick="if(event.target===this) window.app.closeModal('donateModal')">
-<div class="modal">
-<h3>☕ Danke für deinen Support!</h3>
-<p>Dieses Community-Tool ist zu 100% kostenlos und werbefrei. Wenn es dir geholfen hat, tolle Tonies für deine Kids zu zaubern, freue ich mich über einen Kaffee!</p>
-<button class="btn-pill btn-accent" style="width:100%; justify-content:center; margin-top:10px;" onclick="window.app.closeModal('donateModal')">Schließen</button>
+<p><b>Drucksysteme:</b></p>
+<ul>
+<li><b>Avery Zweckform:</b> Exakt auf vorgestanzte A4-Bögen kalibriert (z.B. L3415 à 40mm).</li>
+<li><b>Freies Raster:</b> Druckt feine Schnittlinien zum sauberen Ausschneiden für Münzkapseln (43mm, 40mm, 30mm, 25mm).</li>
+</ul>
+<button class="modal-close-btn" onclick="app.closeHelpModal()">Verstanden</button>
 </div>
 </div>
 <script>
-/
- Defensive Helpers to prevent any crash in iOS/Safari/Private Mode
-*/
-function safeStorageGet(key, defaultVal) {
-try {
-const v = localStorage.getItem(key);
-return v !== null ? v : defaultVal;
-} catch(e) {
-return defaultVal;
-}
-}
-function safeStorageSet(key, val) {
-try {
-localStorage.setItem(key, val);
-} catch(e) {}
-}
-function safeSetText(id, text) {
-const el = document.getElementById(id);
-if(el) el.innerText = text;
-}
-function safeSetVal(id, val) {
-const el = document.getElementById(id);
-if(el) el.value = val;
-}
-/
- Main Application Object attached directly to window
-*/
-window.app = {
-theme: safeStorageGet('tonie_theme_v4', 'dark'),
-mode: 'simple',
+const app = {
+theme: localStorage.getItem('tonie_theme') || 'light',
+editorMode: 'simple',
 activeTab: 'db',
 db: [],
-favorites: [],
+favorites: JSON.parse(localStorage.getItem('tonie_favs') || '[]'),
 selectedTonie: null,
-validImageUrl: '',
-searchDebounceTimer: null,
-pro: {
-zoom: 100,
-rotate: 0,
-textTopSize: 12,
-textBottomSize: 11
+searchTimer: null,
+// Format Configurations
+currentSystem: 'avery',
+currentFormatKey: 'avery-40',
+formats: {
+'avery-40': { system: 'avery', size: '40', count: 24, name: 'Avery L3415 – Ø 40 mm (24 Etiketten / 3×8)' },
+'avery-30': { system: 'avery', size: '30', count: 48, name: 'Avery 6223 / L4716 – Ø 30 mm (48 Etiketten / 4×12)' },
+'avery-25': { system: 'avery', size: '25', count: 70, name: 'Avery L7103 – Ø 25 mm (70 Etiketten / 5×14)' },
+'raster-43': { system: 'raster', size: '43', count: 20, name: '43 mm – Standard Münzkapseln (20 Etiketten)' },
+'raster-40': { system: 'raster', size: '40', count: 24, name: '40 mm – Kleine Münzkapseln (24 Etiketten)' },
+'raster-30': { system: 'raster', size: '30', count: 48, name: '30 mm – RFIDfriend & Token (48 Etiketten)' },
+'raster-25': { system: 'raster', size: '25', count: 60, name: '25 mm – Micro DIY Tags (60 Etiketten)' }
 },
-// Ultra-reliable Instant Offline Database: Pre-populated with popular Tonies (including multiple TKKG entries!)
-fallbackDb: [
-{ model: "01-0182", title: "TKKG Junior - Alarm im Freizeitpark", series: "TKKG Junior", pic: "", audio_id: ["1520593821"] },
-{ model: "01-0183", title: "TKKG Junior - Auf frischer Tat ertappt", series: "TKKG Junior", pic: "", audio_id: ["1520593822"] },
-{ model: "01-0180", title: "TKKG - Das Phantom auf dem Feuerstuhl", series: "TKKG", pic: "", audio_id: ["1520593800"] },
-{ model: "01-0010", title: "Conni feiert Geburtstag", series: "Conni", pic: "", audio_id: ["1492953874"] },
-{ model: "01-0305", title: "Die Olchis sind da", series: "Die Olchis", pic: "", audio_id: ["1500000001"] },
-{ model: "01-0412", title: "Bibi Blocksberg - Das Schulfest", series: "Bibi Blocksberg", pic: "", audio_id: ["1510000002"] },
-{ model: "01-0520", title: "Paw Patrol - Die Rettungshunde", series: "Paw Patrol", pic: "", audio_id: ["1530000003"] },
-{ model: "01-0610", title: "Bobo Siebenschläfer beim Kinderarzt", series: "Bobo Siebenschläfer", pic: "", audio_id: ["1540000004"] },
-{ model: "01-0730", title: "Die drei ??? - Das Gespensterschiff", series: "Die drei ???", pic: "", audio_id: ["1550000005"] },
-{ model: "01-0850", title: "Peppa Pig - Peppa fährt Ski", series: "Peppa Pig", pic: "", audio_id: ["1560000006"] },
-{ model: "01-0910", title: "Kreativ-Tonie Rot", series: "Kreativ-Tonie", pic: "", audio_id: ["1570000007"] },
-{ model: "01-0920", title: "Kreativ-Tonie Beere", series: "Kreativ-Tonie", pic: "", audio_id: ["1570000008"] }
+sheetSlots: [],
+// Offline Vector Library
+fallbackLibrary: [
+{
+id: "01-0182",
+title: "TKKG Junior - Alarm im Freizeitpark",
+series: "TKKG Junior",
+audio_id: "1520593821",
+pic: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23C02741'/><circle cx='50' cy='50' r='42' fill='%23FFFFFF'/><path d='M32 45h36M50 45v30' stroke='%23C02741' stroke-width='6' stroke-linecap='round'/><text x='50' y='32' font-family='sans-serif' font-size='14' font-weight='bold' text-anchor='middle' fill='%23C02741'>TKKG</text></svg>"
+},
+{
+id: "01-0180",
+title: "TKKG - Das Phantom auf dem Feuerstuhl",
+series: "TKKG",
+audio_id: "1520593800",
+pic: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%231E293B'/><circle cx='50' cy='50' r='42' fill='%23FFFFFF'/><text x='50' y='58' font-family='sans-serif' font-size='20' font-weight='900' text-anchor='middle' fill='%231E293B'>TKKG</text></svg>"
+},
+{
+id: "01-0010",
+title: "Conni feiert Geburtstag",
+series: "Conni",
+audio_id: "1520593010",
+pic: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23F59E0B'/><circle cx='50' cy='50' r='42' fill='%23FFFFFF'/><path d='M30 40h40v30H30z' fill='%23E11D48'/><circle cx='50' cy='30' r='10' fill='%23FCD34D'/><text x='50' y='85' font-family='sans-serif' font-size='10' font-weight='bold' text-anchor='middle' fill='%23E11D48'>CONNI</text></svg>"
+},
+{
+id: "01-0305",
+title: "Die Olchis sind da",
+series: "Die Olchis",
+audio_id: "1520593305",
+pic: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%2384CC16'/><circle cx='50' cy='50' r='42' fill='%23FFFFFF'/><circle cx='38' cy='46' r='5' fill='%23000'/><circle cx='62' cy='46' r='5' fill='%23000'/><path d='M40 65q10 8 20 0' stroke='%23000' stroke-width='3' fill='none'/><text x='50' y='28' font-family='sans-serif' font-size='11' font-weight='bold' text-anchor='middle' fill='%234D7C0F'>OLCHIS</text></svg>"
+},
+{
+id: "01-0412",
+title: "Bibi Blocksberg - Hexen hexen",
+series: "Bibi Blocksberg",
+audio_id: "1520593412",
+pic: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%2310B981'/><circle cx='50' cy='50' r='42' fill='%23FFFFFF'/><path d='M25 65l50-25' stroke='%23047857' stroke-width='4' stroke-linecap='round'/><text x='50' y='32' font-family='sans-serif' font-size='12' font-weight='bold' text-anchor='middle' fill='%23047857'>BIBI</text></svg>"
+},
+{
+id: "01-0910",
+title: "Kreativ-Tonie Rot",
+series: "Kreativ-Tonie",
+audio_id: "1520593910",
+pic: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23C02741'/><circle cx='50' cy='50' r='42' fill='%23FFFFFF'/><circle cx='50' cy='38' r='12' fill='%23C02741'/><path d='M35 72c0-10 7-18 15-18s15 8 15 18z' fill='%23C02741'/></svg>"
+},
+{
+id: "01-0920",
+title: "Die drei ??? - Das Gespensterschloss",
+series: "Die drei ???",
+audio_id: "1520593920",
+pic: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23000000'/><circle cx='50' cy='50' r='42' fill='%23FFFFFF'/><text x='35' y='58' font-family='sans-serif' font-size='22' font-weight='900' fill='%23FFFFFF'>?</text><text x='50' y='58' font-family='sans-serif' font-size='22' font-weight='900' fill='%23E11D48'>?</text><text x='65' y='58' font-family='sans-serif' font-size='22' font-weight='900' fill='%232563EB'>?</text></svg>"
+}
 ],
-// Clean inline SVG Tonie icon placeholder (Zero external network dependencies)
-placeholderImg: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="%23f1f5f9"/><path d="M50 25c-8 0-14 6-14 14 0 5 3 9 7 12v18h14V51c4-3 7-7 7-12 0-8-6-14-14-14z" fill="%23C02741"/><rect x="40" y="72" width="20" height="6" rx="3" fill="%2394a3b8"/></svg>',
 init: function() {
-try {
-const rawFavs = safeStorageGet('tonie_favs_v4', '[]');
-this.favorites = Array.isArray(JSON.parse(rawFavs)) ? JSON.parse(rawFavs) : [];
-} catch(e) {
-this.favorites = [];
-}
-this.applyTheme();
-this.updateFavCounter();
-// Immediate boot with Fallback DB (UI is instant, zero delay)
-this.db = this.fallbackDb.map((item, idx) => this.normalizeItem(item, idx));
-safeSetText('dbStatus', 'Offline-Bereit');
-safeSetText('dbCounter', ⁠${this.db.length} Motive⁠);
-this.renderGrid(this.db);
-if(this.db.length > 0) {
-this.selectTonie(this.db[0]);
-}
-// Silent background fetch for full RevvoX tonies.json (6000+ entries)
-this.loadFullDatabase();
+this.applyTheme(this.theme);
+this.updateFavCounterBadge();
+this.populateSizeDropdown();
+this.applyFormat(this.currentFormatKey);
+// 1. Instant Boot
+this.db = this.fallbackLibrary;
+this.renderItemsGrid(this.db);
+this.selectTonieItem(this.db[0]);
+this.updateStatusText("Offline-Basis aktiv", false);
+// 2. Multi-Source Pipeline
+this.fetchRevvoxDatabase();
 },
-normalizeItem: function(raw, idx) {
-const id = String(raw.model || raw.article || raw.id || (raw.audio_id && raw.audio_id[0]) || ⁠T-${idx+1}⁠);
-const series = String(raw.series || raw.category || 'Tonie');
-const episode = String(raw.episodes || raw.episode || '');
-let title = String(raw.title || raw.name || '');
-if(!title && episode) {
-title = series ? ⁠${series} - ${episode}⁠ : episode;
-}
-if(!title) title = series || 'Unbekanntes Motiv';
-let image_url = String(raw.pic || raw.image || raw.image_url || raw.picture || (raw.images && raw.images[0]) || '');
-if(image_url.startsWith('http://')) {
-image_url = image_url.replace('http://', 'https://');
-}
-let audioId = '';
-if(Array.isArray(raw.audio_id) && raw.audio_id.length > 0) {
-audioId = String(raw.audio_id[0]);
-} else if(raw.audio_id) {
-audioId = String(raw.audio_id);
-}
-return { id, series, episode, title, image_url, audioId, raw };
+applyTheme: function(theme) {
+this.theme = theme;
+document.documentElement.setAttribute('data-theme', theme);
+localStorage.setItem('tonie_theme', theme);
+const isLight = theme === 'light';
+document.getElementById('themeEmoji').innerText = isLight ? '🌙' : '☀️';
+document.getElementById('themeLabel').innerText = isLight ? 'Dark Mode' : 'Light Mode';
 },
-loadFullDatabase: async function() {
-const endpoints = [
+toggleTheme: function() {
+this.applyTheme(this.theme === 'light' ? 'dark' : 'light');
+},
+updateStatusText: function(text, isOnline) {
+document.getElementById('dbStatusText').innerText = text;
+const dot = document.getElementById('dbStatusDot');
+dot.className = 'status-dot' + (isOnline ? ' active' : '');
+},
+fetchRevvoxDatabase: async function() {
+const sources = [
+'./tonies.json',
 'https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json',
-'https://cdn.jsdelivr.net/gh/toniebox-reverse-engineering/tonies-json@release/tonies.json',
-'./tonies.json'
+'https://cdn.jsdelivr.net/gh/toniebox-reverse-engineering/tonies-json@release/tonies.json'
 ];
-for(const url of endpoints) {
+for (const url of sources) {
 try {
 const res = await fetch(url);
-if(!res.ok) continue;
-const rawData = await res.json();
-if(Array.isArray(rawData) && rawData.length > 0) {
-this.db = rawData.map((item, idx) => this.normalizeItem(item, idx));
-const dot = document.getElementById('statusDot');
-if(dot) dot.className = "status-dot online";
-safeSetText('dbStatus', ⁠Online (${this.db.length} Tonies)⁠);
-// Re-apply current search filter if user already started typing
-const currentInput = (document.getElementById('searchInput')?.value || '').trim();
-if(currentInput) {
-this.search();
-} else {
-safeSetText('dbCounter', ⁠${this.db.length} Motive⁠);
-if(this.activeTab === 'db') {
-this.renderGrid(this.db.slice(0, 50));
-}
+if (!res.ok) continue;
+const raw = await res.json();
+if (Array.isArray(raw) && raw.length > 0) {
+this.db = raw.map(item => {
+const mId = String(item.model || item.id || item.article || 'N/A');
+const mTitle = String(item.title || item.name || (item.series ? ⁠${item.series} - ${item.episode || ''}⁠ : 'Ohne Titel'));
+const mSeries = String(item.series || 'Tonie');
+const mPic = String(item.pic || item.image || item.image_url || '');
+const mAudio = Array.isArray(item.audio_id) ? String(item.audio_id[0]) : String(item.audio_id || '');
+return { id: mId, title: mTitle, series: mSeries, pic: mPic, audio_id: mAudio };
+});
+this.updateStatusText(⁠${this.db.length} Tonies online bereit⁠, true);
+if (this.activeTab === 'db' && !document.getElementById('dbSearchInput').value.trim()) {
+this.renderItemsGrid(this.db.slice(0, 48));
 }
 return;
 }
-} catch(err) {
-console.warn(⁠Fetch notice: ${url} not reachable, checking next...⁠);
+} catch (err) {
+console.warn(⁠Fetch notice for ${url}:⁠, err);
 }
 }
-// If remote endpoints failed, status remains offline-ready
-safeSetText('dbStatus', ⁠Offline-Cache (${this.db.length} Tonies)⁠);
+this.updateStatusText("Offline-Cache aktiv", false);
 },
-setMode: function(m) {
-this.mode = m;
-const btnSimple = document.getElementById('btnModeSimple');
-const btnPro = document.getElementById('btnModePro');
-const panel = document.getElementById('proPanel');
-if(btnSimple) btnSimple.className = 'mode-btn' + (m === 'simple' ? ' active' : '');
-if(btnPro) btnPro.className = 'mode-btn' + (m === 'pro' ? ' active' : '');
-if(panel) panel.style.display = m === 'pro' ? 'block' : 'none';
-this.updatePreview();
+setEditorMode: function(mode) {
+this.editorMode = mode;
+document.getElementById('btnModeSimple').className = 'mode-toggle-btn' + (mode === 'simple' ? ' active' : '');
+document.getElementById('btnModePro').className = 'mode-toggle-btn' + (mode === 'pro' ? ' active' : '');
+document.getElementById('proToolsPanel').style.display = mode === 'pro' ? 'block' : 'none';
 },
-switchTab: function(tab) {
+switchPickerTab: function(tab) {
 this.activeTab = tab;
-const btnDb = document.getElementById('tabDb');
-const btnFav = document.getElementById('tabFav');
-const btnCustom = document.getElementById('tabCustom');
-const panelDb = document.getElementById('panelDb');
-const panelCustom = document.getElementById('panelCustom');
-if(btnDb) btnDb.className = 'tab-btn' + (tab === 'db' ? ' active' : '');
-if(btnFav) btnFav.className = 'tab-btn' + (tab === 'fav' ? ' active' : '');
-if(btnCustom) btnCustom.className = 'tab-btn' + (tab === 'custom' ? ' active' : '');
-if(tab === 'custom') {
-if(panelDb) panelDb.style.display = 'none';
-if(panelCustom) panelCustom.style.display = 'block';
-} else {
-if(panelDb) panelDb.style.display = 'block';
-if(panelCustom) panelCustom.style.display = 'none';
-if(tab === 'fav') {
-this.renderFavorites();
-} else {
-this.search();
+document.getElementById('tabDbBtn').className = 'tab-btn' + (tab === 'db' ? ' active' : '');
+document.getElementById('tabFavBtn').className = 'tab-btn' + (tab === 'fav' ? ' active' : '');
+document.getElementById('tabCustomBtn').className = 'tab-btn' + (tab === 'custom' ? ' active' : '');
+document.getElementById('tabDbView').style.display = tab === 'custom' ? 'none' : 'block';
+document.getElementById('tabCustomView').style.display = tab === 'custom' ? 'block' : 'none';
+if (tab === 'db') this.handleSearchDebounced();
+if (tab === 'fav') this.renderFavoritesList();
+},
+handleSearchDebounced: function() {
+clearTimeout(this.searchTimer);
+this.searchTimer = setTimeout(() => this.filterAndRenderSearch(), 120);
+},
+filterAndRenderSearch: function() {
+const query = document.getElementById('dbSearchInput').value.toLowerCase().trim();
+let results = this.db;
+if (query) {
+results = this.db.filter(t =>
+t.title.toLowerCase().includes(query) ||
+t.series.toLowerCase().includes(query) ||
+t.id.toLowerCase().includes(query) ||
+(t.audio_id && t.audio_id.includes(query))
+);
 }
-}
+document.getElementById('dbResultCounter').innerText = ⁠${results.length} Motive⁠;
+this.renderItemsGrid(results.slice(0, 60));
 },
-onSearchInput: function() {
-clearTimeout(this.searchDebounceTimer);
-this.searchDebounceTimer = setTimeout(() => this.search(), 80);
-},
-search: function() {
-const input = document.getElementById('searchInput');
-const clearBtn = document.getElementById('searchClear');
-const q = (input?.value || '').toLowerCase().trim();
-if(clearBtn) clearBtn.style.display = q ? 'block' : 'none';
-if(this.activeTab === 'fav') {
-this.renderFavorites(q);
-return;
-}
-if(!q) {
-this.renderGrid(this.db.slice(0, 50));
-safeSetText('dbCounter', ⁠${this.db.length} Motive⁠);
-return;
-}
-// Defensive In-Memory Filter with String Conversion
-const filtered = this.db.filter(t => {
-const title = String(t.title || '').toLowerCase();
-const series = String(t.series || '').toLowerCase();
-const id = String(t.id || '').toLowerCase();
-const audioId = String(t.audioId || '').toLowerCase();
-return title.includes(q) || series.includes(q) || id.includes(q) || audioId.includes(q);
-});
-safeSetText('dbCounter', ⁠${filtered.length} Treffer⁠);
-this.renderGrid(filtered.slice(0, 80));
-},
-clearSearch: function() {
-safeSetVal('searchInput', '');
-this.search();
-},
-pickRandom: function() {
-if(!this.db || this.db.length === 0) return;
-const randomIndex = Math.floor(Math.random() * this.db.length);
-this.selectTonie(this.db[randomIndex]);
-},
-renderGrid: function(data) {
-const grid = document.getElementById('tonieGrid');
-if(!grid) return;
+renderItemsGrid: function(items) {
+const grid = document.getElementById('toniesGrid');
 grid.innerHTML = '';
-if(!data || data.length === 0) {
-grid.innerHTML = '<div style="grid-column:1/-1; text-align:center; padding:24px; color:var(--text-muted); font-size:13px;">Keine passenden Motive gefunden.</div>';
+if (!items || items.length === 0) {
+grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 25px 0; font-size: 13px;">Kein Motiv gefunden. Versuche einen anderen Begriff.</div>';
 return;
 }
-const fragment = document.createDocumentFragment();
-data.forEach(t => {
-const isFav = this.favorites.includes(t.id);
-const div = document.createElement('div');
-div.className = 'grid-item' + (this.selectedTonie && this.selectedTonie.id === t.id ? ' selected' : '');
-div.innerHTML = ⁠<span class="fav-star ${isFav ? 'active' : ''}" title="Als Favorit merken">★</span> <img src="${t.image_url || this.placeholderImg}" loading="lazy" alt="Cover"> <div class="t-series">${this.escapeXml(t.series)}</div> <div class="t-title">${this.escapeXml(t.title)}</div> <div class="t-id">${this.escapeXml(t.id)}</div>⁠;
-const star = div.querySelector('.fav-star');
-if(star) {
-star.onclick = (e) => {
+items.forEach(tonie => {
+const isFav = this.favorites.includes(tonie.id);
+const card = document.createElement('div');
+card.className = 'grid-card' + (this.selectedTonie && this.selectedTonie.id === tonie.id ? ' selected' : '');
+card.onclick = () => this.selectTonieItem(tonie);
+card.innerHTML = ⁠<span class="fav-star-btn ${isFav ? 'is-fav' : ''}" onclick="app.toggleFavoriteItem(event, '${tonie.id}')">★</span> <img class="grid-thumb" src="${tonie.pic || this.makeDefaultAvatarSvg(tonie.title)}" onerror="this.src='${this.makeDefaultAvatarSvg(tonie.title)}'" alt="${this.escapeXml(tonie.title)}"> <div class="grid-series">${this.escapeXml(tonie.series)}</div> <div class="grid-title">${this.escapeXml(tonie.title)}</div> <div class="grid-id">${this.escapeXml(tonie.id)}</div>⁠;
+grid.appendChild(card);
+});
+},
+makeDefaultAvatarSvg: function(title) {
+const initial = (title || 'T').charAt(0).toUpperCase();
+return ⁠data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23E2E8F0'/><text x='50' y='58' font-family='sans-serif' font-size='28' font-weight='bold' text-anchor='middle' fill='%2364748B'>${initial}</text></svg>⁠;
+},
+toggleFavoriteItem: function(e, tonieId) {
 e.stopPropagation();
-this.toggleFavorite(t.id);
-};
-}
-const img = div.querySelector('img');
-if(img) {
-img.onerror = () => { img.src = this.placeholderImg; };
-}
-div.onclick = () => this.selectTonie(t);
-fragment.appendChild(div);
-});
-grid.appendChild(fragment);
-},
-renderFavorites: function(filterQuery = '') {
-const favTonies = this.db.filter(t => this.favorites.includes(t.id));
-let data = favTonies;
-if(filterQuery) {
-data = favTonies.filter(t => {
-const title = String(t.title || '').toLowerCase();
-const series = String(t.series || '').toLowerCase();
-const id = String(t.id || '').toLowerCase();
-return title.includes(filterQuery) || series.includes(filterQuery) || id.includes(filterQuery);
-});
-}
-safeSetText('dbCounter', ⁠${data.length} Favoriten⁠);
-this.renderGrid(data);
-},
-toggleFavorite: function(id) {
-if(this.favorites.includes(id)) {
-this.favorites = this.favorites.filter(favId => favId !== id);
+if (this.favorites.includes(tonieId)) {
+this.favorites = this.favorites.filter(id => id !== tonieId);
 } else {
-this.favorites.push(id);
+this.favorites.push(tonieId);
 }
-safeStorageSet('tonie_favs_v4', JSON.stringify(this.favorites));
-this.updateFavCounter();
-if(this.activeTab === 'fav') {
-const currentQ = (document.getElementById('searchInput')?.value || '').toLowerCase().trim();
-this.renderFavorites(currentQ);
-} else {
-this.renderGrid(this.db.slice(0, 50));
-}
+localStorage.setItem('tonie_favs', JSON.stringify(this.favorites));
+this.updateFavCounterBadge();
+if (this.activeTab === 'fav') this.renderFavoritesList();
+else this.filterAndRenderSearch();
 },
-updateFavCounter: function() {
-safeSetText('favCount', String(this.favorites.length));
+updateFavCounterBadge: function() {
+document.getElementById('favQty').innerText = this.favorites.length;
 },
-selectTonie: function(tonie) {
-this.selectedTonie = tonie;
-safeSetVal('manualId', tonie.id || '');
-safeSetVal('manualTitle', tonie.title || '');
-safeSetText('activeTonieLabel', tonie.title || 'Gewählt');
-safeSetText('rawAudioIdLabel', tonie.audioId ? ⁠Audio-ID: ${tonie.audioId}⁠ : (tonie.id || 'N/A'));
-// Highlight selected item in Grid
-document.querySelectorAll('.grid-item').forEach(el => el.classList.remove('selected'));
-// Preload image with safe fallback
-if(tonie.image_url) {
-const img = new Image();
-img.onload = () => {
-this.validImageUrl = tonie.image_url;
-this.updatePreview();
-};
-img.onerror = () => {
-this.validImageUrl = this.placeholderImg;
-this.updatePreview();
-};
-img.src = tonie.image_url;
-} else {
-this.validImageUrl = this.placeholderImg;
-this.updatePreview();
-}
+renderFavoritesList: function() {
+const favItems = this.db.filter(t => this.favorites.includes(t.id));
+document.getElementById('dbResultCounter').innerText = ⁠${favItems.length} Favoriten⁠;
+this.renderItemsGrid(favItems);
 },
-handleFileUpload: function(event) {
-const file = event.target.files && event.target.files[0];
-if(!file) return;
+selectRandomItem: function() {
+if (!this.db || this.db.length === 0) return;
+const randomItem = this.db[Math.floor(Math.random() * this.db.length)];
+this.selectTonieItem(randomItem);
+},
+handleCustomUpload: function(event) {
+const file = event.target.files[0];
+if (!file) return;
 const reader = new FileReader();
 reader.onload = (e) => {
 const customTonie = {
-id: "KREATIV-" + Math.floor(1000 + Math.random() * 9000),
-title: file.name.replace(/.[^/.]+$/, ""),
-series: "Eigenes Bild",
-image_url: e.target.result,
-audioId: "CUSTOM"
+id: "KREATIV-TAG",
+title: "Mein Tonie",
+series: "Kreativ",
+pic: e.target.result,
+audio_id: "CUSTOM"
 };
-this.selectTonie(customTonie);
+this.selectTonieItem(customTonie);
 };
 reader.readAsDataURL(file);
 },
-setPreset: function(text) {
-safeSetVal('manualTitle', text);
-this.updatePreview();
+// --- 3-Felder System: Titel / Album / ID ---
+selectTonieItem: function(tonie) {
+this.selectedTonie = tonie;
+let serie = (tonie.series || '').trim();
+let album = (tonie.title || '').trim();
+if (serie && album.toLowerCase().startsWith(serie.toLowerCase())) {
+album = album.substring(serie.length).replace(/^[\s-–:]+/, '').trim();
+}
+if ((!serie || serie === 'Tonie') && album.includes(' - ')) {
+const parts = album.split(' - ');
+serie = parts[0].trim();
+album = parts.slice(1).join(' - ').trim();
+}
+document.getElementById('inputTitle').value = serie || album || 'Tonie';
+document.getElementById('inputAlbum').value = album !== serie ? album : '';
+document.getElementById('inputBottomId').value = tonie.id || '';
+document.getElementById('dumpAudioIdLabel').innerText = tonie.audio_id || 'Keine ID';
+const cards = document.querySelectorAll('.grid-card');
+cards.forEach(c => c.classList.remove('selected'));
+this.refreshPreview();
 },
-updateProValues: function() {
-const zoomEl = document.getElementById('sliderZoom');
-const rotateEl = document.getElementById('sliderRotate');
-const topEl = document.getElementById('sliderTextTop');
-const bottomEl = document.getElementById('sliderTextBottom');
-this.pro.zoom = zoomEl ? parseInt(zoomEl.value) : 100;
-this.pro.rotate = rotateEl ? parseInt(rotateEl.value) : 0;
-this.pro.textTopSize = topEl ? parseInt(topEl.value) : 12;
-this.pro.textBottomSize = bottomEl ? parseInt(bottomEl.value) : 11;
-safeSetText('valZoom', ⁠${this.pro.zoom}%⁠);
-safeSetText('valRotate', ⁠${this.pro.rotate}°⁠);
-safeSetText('valTextTop', ⁠${this.pro.textTopSize}px⁠);
-safeSetText('valTextBottom', ⁠${this.pro.textBottomSize}px⁠);
-this.updatePreview();
+applyPreset: function(text) {
+document.getElementById('inputAlbum').value = text;
+this.refreshPreview();
 },
 copyAudioId: function() {
-if(!this.selectedTonie) return;
-const text = this.selectedTonie.audioId || this.selectedTonie.id || '';
-if(navigator.clipboard && navigator.clipboard.writeText) {
-navigator.clipboard.writeText(text).then(() => {
-alert(⁠ID in die Zwischenablage kopiert: ${text}⁠);
-}).catch(() => {
-prompt("ID kopieren:", text);
-});
-} else {
-prompt("ID kopieren:", text);
-}
+if (!this.selectedTonie || !this.selectedTonie.audio_id) return;
+navigator.clipboard.writeText(this.selectedTonie.audio_id);
+alert(⁠Audio-ID "${this.selectedTonie.audio_id}" kopiert!⁠);
 },
-generateSvgLabel: function(imgUrl, topText, bottomText) {
-const zoom = this.pro.zoom / 100;
-const rotate = this.pro.rotate;
-const topSize = this.pro.textTopSize;
-const bottomSize = this.pro.textBottomSize;
-const imgWidth = 130 * zoom;
-const imgHeight = 130 * zoom;
-const imgX = 80 - (imgWidth / 2);
-const imgY = 80 - (imgHeight / 2);
-return `
-<svg viewBox="0 0 160 160" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-<defs>
-<clipPath id="circleClip"><circle cx="80" cy="80" r="79" /></clipPath>
-<!-- Calibrated Text Curves: Perfectly centered inside the sticker -->
-<path id="topCurve" d="M 23 80 A 57 57 0 0 1 137 80" fill="transparent" />
-<path id="bottomCurve" d="M 23 80 A 57 57 0 0 0 137 80" fill="transparent" />
-</defs>
-<!-- White Sticker Background -->
-<circle cx="80" cy="80" r="80" fill="#ffffff" />
-<!-- Cover Artwork with Transform -->
-<g clip-path="url(#circleClip)">
-<g transform="rotate(${rotate}, 80, 80)">
-<image href="${imgUrl}" x="${imgX}" y="${imgY}" width="${imgWidth}" height="${imgHeight}" preserveAspectRatio="xMidYMid slice" opacity="0.95" />
-</g>
-</g>
-<!-- Curved Title Text -->
-<text font-family="-apple-system, sans-serif" font-weight="700" font-size="${topSize}" fill="#111827">
-<textPath href="#topCurve" startOffset="50%" text-anchor="middle">${this.escapeXml(topText || '')}</textPath>
-</text>
-<!-- Curved ID / Bottom Text -->
-<text font-family="ui-monospace, monospace" font-weight="700" font-size="${bottomSize}" fill="#C02741">
-<textPath href="#bottomCurve" startOffset="50%" text-anchor="middle">${this.escapeXml(bottomText || '')}</textPath>
-</text>
-</svg>
-`;
+// --- Dynamic Curved-Text SVG Generator ---
+buildCurvedStickerSvg: function() {
+if (!this.selectedTonie) return '';
+const titleTxt = (document.getElementById('inputTitle').value || '').trim();
+const albumTxt = (document.getElementById('inputAlbum').value || '').trim();
+const idTxt = (document.getElementById('inputBottomId').value || '').trim();
+const showId = document.getElementById('toggleShowId').checked;
+const zoom = (document.getElementById('sliderZoom').value || 100) / 100;
+const rotation = document.getElementById('sliderRotation').value || 0;
+const imgUrl = this.selectedTonie.pic || this.makeDefaultAvatarSvg(titleTxt || albumTxt);
+let topString = '';
+let bottomString = '';
+let isBottomId = false;
+if (showId && idTxt) {
+if (titleTxt && albumTxt) {
+topString = ⁠${titleTxt} – ${albumTxt}⁠;
+} else {
+topString = titleTxt || albumTxt;
+}
+bottomString = idTxt;
+isBottomId = true;
+} else {
+topString = titleTxt;
+bottomString = albumTxt;
+isBottomId = false;
+}
+const bottomColor = isBottomId ? "#C02741" : "#0F172A";
+const bottomFont = isBottomId ? "monospace" : "-apple-system, sans-serif";
+const bottomSize = isBottomId ? "10.5" : "10";
+return ⁠<svg viewBox="0 0 160 160" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"> <defs> <clipPath id="circleMask"><circle cx="80" cy="80" r="79" /></clipPath> <path id="topArc" d="M 22 80 A 58 58 0 0 1 138 80" fill="transparent" /> <path id="bottomArc" d="M 22 80 A 58 58 0 0 0 138 80" fill="transparent" /> </defs> <circle cx="80" cy="80" r="80" fill="#FFFFFF" /> <g clip-path="url(#circleMask)"> <image href="${imgUrl}" x="${80 - (62 * zoom)}" y="${80 - (62 * zoom)}" width="${124 * zoom}" height="${124 * zoom}" preserveAspectRatio="xMidYMid slice" transform="rotate(${rotation} 80 80)" opacity="0.96" /> </g> <text font-family="-apple-system, sans-serif" font-weight="800" font-size="11" fill="#0F172A"> <textPath href="#topArc" startOffset="50%" text-anchor="middle">${this.escapeXml(topString)}</textPath> </text> <text font-family="${bottomFont}" font-weight="700" font-size="${bottomSize}" fill="${bottomColor}"> <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">${this.escapeXml(bottomString)}</textPath> </text> </svg>⁠;
 },
 escapeXml: function(str) {
-return String(str || '').replace(/[<>&'"]/g, c => {
-switch (c) {
-case '<': return '<';
-case '>': return '>';
-case '&': return '&';
-case ''': return ''';
-case '"': return '"';
-default: return c;
-}
+return String(str).replace(/[&<>"']/g, c => ({ '&': '&', '<': '<', '>': '>', '"': '"', "'": ''' }[c]));
+},
+refreshPreview: function() {
+const svg = this.buildCurvedStickerSvg();
+document.getElementById('masterStickerPreview').innerHTML = svg;
+},
+// --- Zweistufige Format-Auswahl: System & Größe ---
+onSystemChange: function() {
+this.currentSystem = document.getElementById('selectPrintSystem').value;
+this.populateSizeDropdown();
+this.onSizeChange();
+},
+populateSizeDropdown: function() {
+const sizeSelect = document.getElementById('selectPrintSize');
+sizeSelect.innerHTML = '';
+const system = this.currentSystem;
+const matchingKeys = Object.keys(this.formats).filter(k => this.formats[k].system === system);
+matchingKeys.forEach(k => {
+const opt = document.createElement('option');
+opt.value = k;
+opt.textContent = this.formats[k].name;
+sizeSelect.appendChild(opt);
 });
-},
-updatePreview: function() {
-const title = document.getElementById('manualTitle')?.value || '';
-const id = document.getElementById('manualId')?.value || '';
-const svgContent = this.generateSvgLabel(this.validImageUrl || this.placeholderImg, title, id);
-const preview = document.getElementById('stickerPreview');
-if(preview) preview.innerHTML = svgContent;
-},
-print: function() {
-const format = document.getElementById('formatSelect')?.value || 'avery-l3415';
-const sheet = document.getElementById('printSheet');
-if(!sheet) return;
-const title = document.getElementById('manualTitle')?.value || '';
-const id = document.getElementById('manualId')?.value || '';
-const svgContent = this.generateSvgLabel(this.validImageUrl || this.placeholderImg, title, id);
-sheet.innerHTML = '';
-let count = 24;
-let sizeClass = 'size-40';
-let layoutClass = 'layout-avery';
-if(format === 'avery-l3415') {
-layoutClass = 'layout-avery';
-sizeClass = 'avery-mode';
-count = 24;
-} else if(format === 'raster-43') {
-layoutClass = 'layout-raster-43';
-sizeClass = 'size-43';
-count = 20;
-} else if(format === 'raster-40') {
-layoutClass = 'layout-raster-40';
-sizeClass = 'size-40';
-count = 24;
-} else if(format === 'raster-30') {
-layoutClass = 'layout-raster-30';
-sizeClass = 'size-30';
-count = 35;
-} else if(format === 'raster-25') {
-layoutClass = 'layout-raster-25';
-sizeClass = 'size-25';
-count = 48;
+if (matchingKeys.length > 0) {
+sizeSelect.value = matchingKeys[0];
+this.currentFormatKey = matchingKeys[0];
 }
-sheet.className = layoutClass;
-for(let i = 0; i < count; i++) {
-const sticker = document.createElement('div');
-sticker.className = ⁠print-sticker ${sizeClass}⁠;
-sticker.innerHTML = svgContent;
-sheet.appendChild(sticker);
-}
-window.print();
 },
-// 300 DPI High-Res Single Sticker PNG Export
-exportPng: function() {
-const title = document.getElementById('manualTitle')?.value || 'tonie-cover';
-const id = document.getElementById('manualId')?.value || 'tag';
-const svgContent = this.generateSvgLabel(this.validImageUrl || this.placeholderImg, title, id);
-const canvas = document.getElementById('exportCanvas');
-if(!canvas) return;
-canvas.width = 600;
-canvas.height = 600;
+onSizeChange: function() {
+this.currentFormatKey = document.getElementById('selectPrintSize').value;
+this.applyFormat(this.currentFormatKey);
+},
+applyFormat: function(formatKey) {
+const fmt = this.formats[formatKey];
+if (!fmt) return;
+document.getElementById('sheetSlotCountBadge').innerText = ⁠${fmt.count} Etiketten⁠;
+// Update sheet matrix class
+const matrix = document.getElementById('sheetMatrixUi');
+matrix.className = ⁠sheet-matrix matrix-${formatKey}⁠;
+// Preserve slots or adjust size
+const prevSlots = [...this.sheetSlots];
+this.sheetSlots = new Array(fmt.count).fill(null);
+for (let i = 0; i < Math.min(prevSlots.length, fmt.count); i++) {
+this.sheetSlots[i] = prevSlots[i];
+}
+this.renderSheetMatrixUi();
+},
+renderSheetMatrixUi: function() {
+const matrix = document.getElementById('sheetMatrixUi');
+matrix.innerHTML = '';
+const count = this.sheetSlots.length;
+for (let i = 0; i < count; i++) {
+const slot = document.createElement('div');
+const hasData = Boolean(this.sheetSlots[i]);
+slot.className = 'sheet-slot-node' + (hasData ? ' has-content' : '');
+slot.onclick = () => this.assignActiveStickerToSlot(i);
+if (hasData) {
+slot.innerHTML = this.sheetSlots[i];
+} else {
+slot.innerHTML = ⁠<span class="sheet-slot-number">${i + 1}</span>⁠;
+}
+matrix.appendChild(slot);
+}
+},
+assignActiveStickerToSlot: function(index) {
+if (!this.selectedTonie) {
+alert("Bitte wähle zuerst ein Motiv in Schritt 1 aus!");
+return;
+}
+this.sheetSlots[index] = this.buildCurvedStickerSvg();
+this.renderSheetMatrixUi();
+},
+fillAllSlotsWithActive: function() {
+if (!this.selectedTonie) {
+alert("Bitte wähle zuerst ein Motiv in Schritt 1 aus!");
+return;
+}
+const svg = this.buildCurvedStickerSvg();
+this.sheetSlots = this.sheetSlots.map(() => svg);
+this.renderSheetMatrixUi();
+},
+clearSheetSlots: function() {
+this.sheetSlots.fill(null);
+this.renderSheetMatrixUi();
+},
+// --- High-Resolution 300 DPI Export ---
+exportHighResPng: function() {
+if (!this.selectedTonie) {
+alert("Bitte erst ein Motiv auswählen!");
+return;
+}
+const svgMarkup = this.buildCurvedStickerSvg();
+const canvas = document.createElement('canvas');
+canvas.width = 1200;
+canvas.height = 1200;
 const ctx = canvas.getContext('2d');
+const blob = new Blob([svgMarkup], { type: 'image/svg+xml;charset=utf-8' });
+const url = URL.createObjectURL(blob);
 const img = new Image();
-const svgBlob = new Blob([svgContent], { type: 'image/svg+xml;charset=utf-8' });
-const url = URL.createObjectURL(svgBlob);
-img.onload = function() {
-ctx.clearRect(0, 0, 600, 600);
-ctx.drawImage(img, 0, 0, 600, 600);
+img.onload = () => {
+ctx.fillStyle = '#FFFFFF';
+ctx.fillRect(0, 0, 1200, 1200);
+ctx.drawImage(img, 0, 0, 1200, 1200);
 URL.revokeObjectURL(url);
 const a = document.createElement('a');
-a.download = ⁠${title.toLowerCase().replace(/[^a-z0-9]/gi, '_')}_${id}_300dpi.png⁠;
+a.download = ⁠Tonie-Tag-${(this.selectedTonie.id || 'custom')}.png⁠;
 a.href = canvas.toDataURL('image/png');
 a.click();
 };
 img.src = url;
 },
-toggleTheme: function() {
-this.theme = this.theme === 'dark' ? 'light' : 'dark';
-safeStorageSet('tonie_theme_v4', this.theme);
-this.applyTheme();
-},
-applyTheme: function() {
-document.body.setAttribute('data-theme', this.theme);
-safeSetText('themeIcon', this.theme === 'dark' ? '☀️' : '🌙');
-safeSetText('themeLabel', this.theme === 'dark' ? 'Light' : 'Dark');
-},
-openModal: function(id) {
-const el = document.getElementById(id);
-if(el) el.style.display = 'flex';
-},
-closeModal: function(id) {
-const el = document.getElementById(id);
-if(el) el.style.display = 'none';
+// --- A4 Print Engine ---
+triggerA4Print: function() {
+const hasStickers = this.sheetSlots.some(s => s !== null);
+if (!hasStickers) {
+this.fillAllSlotsWithActive();
 }
+const printHost = document.getElementById('printHost');
+printHost.innerHTML = '';
+printHost.className = 'print-format-' + this.currentFormatKey;
+this.sheetSlots.forEach(svgString => {
+const cell = document.createElement('div');
+cell.className = 'print-cell';
+cell.innerHTML = svgString || '';
+printHost.appendChild(cell);
+});
+window.print();
+},
+// Modals
+openHelpModal: function() { document.getElementById('helpModal').style.display = 'flex'; },
+closeHelpModal: function() { document.getElementById('helpModal').style.display = 'none'; },
+openDonateModal: function() { alert("Vielen Dank für deine Unterstützung der Community! Ein Klick auf GitHub Star hilft uns riesig."); }
 };
-// Safe Boot: DOMContentLoaded + Direct fallback
-if (document.readyState === 'loading') {
-document.addEventListener('DOMContentLoaded', () => window.app.init());
-} else {
-window.app.init();
-}
+document.addEventListener('DOMContentLoaded', () => app.init());
 </script>
 </body>
 </html>
