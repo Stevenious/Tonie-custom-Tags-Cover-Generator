@@ -52,18 +52,18 @@
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
 body { background: var(--bg-canvas); color: var(--text-primary); transition: background 0.25s ease, color 0.25s ease; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
 /* ==========================================================================
-2. NAVIGATION & TOP BAR
+2. NAVIGATION & TOP BAR (CLEANED UP & SPACIOUS)
 ========================================================================== */
 .app-header { background: var(--surface-card); border-bottom: 1px solid var(--surface-border); position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-subtle); }
-.header-inner { max-width: 960px; margin: 0 auto; padding: 0.75rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
-.brand-cluster { display: flex; align-items: center; gap: 10px; cursor: pointer; text-decoration: none; }
-.brand-logo-svg { width: 44px; height: 44px; filter: drop-shadow(0 3px 6px var(--tonie-red-glow)); }
-.brand-titles { display: flex; flex-direction: column; }
-.brand-name { font-size: 19px; font-weight: 900; letter-spacing: -0.5px; line-height: 1.1; color: var(--text-primary); }
+.header-inner { max-width: 960px; margin: 0 auto; padding: 0.85rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.brand-cluster { display: flex; align-items: center; gap: 12px; cursor: pointer; text-decoration: none; flex: 1; min-width: 0; }
+.brand-logo-svg { width: 44px; height: 44px; flex-shrink: 0; filter: drop-shadow(0 3px 6px var(--tonie-red-glow)); }
+.brand-titles { display: flex; flex-direction: column; min-width: 0; }
+.brand-name { font-size: 20px; font-weight: 900; letter-spacing: -0.5px; line-height: 1.15; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .brand-name span { color: var(--tonie-red); }
-.brand-tagline { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
-.header-actions { display: flex; align-items: center; gap: 8px; }
-.pill-btn { border: 1px solid var(--surface-border); background: var(--surface-sub); color: var(--text-primary); padding: 7px 13px; border-radius: 999px; font-size: 12.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease; box-shadow: var(--shadow-subtle); }
+.brand-tagline { font-size: 10.5px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.header-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.pill-btn { border: 1px solid var(--surface-border); background: var(--surface-sub); color: var(--text-primary); padding: 7px 13px; border-radius: 999px; font-size: 12.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease; box-shadow: var(--shadow-subtle); white-space: nowrap; }
 .pill-btn:hover { border-color: var(--tonie-red); color: var(--tonie-red); transform: translateY(-1px); }
 .pill-btn.accent { background: var(--tonie-red); color: #FFFFFF; border-color: var(--tonie-red); }
 .pill-btn.accent:hover { background: var(--tonie-red-hover); color: #FFFFFF; }
@@ -71,9 +71,9 @@ body { background: var(--bg-canvas); color: var(--text-primary); transition: bac
 3. STUDIO WORKFLOW STEPPER TABS
 ========================================================================== */
 .stepper-nav { background: var(--surface-card); border-bottom: 1px solid var(--surface-border); }
-.stepper-inner { max-width: 960px; margin: 0 auto; padding: 0.5rem 1rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.stepper-inner { max-width: 960px; margin: 0 auto; padding: 0.5rem 1rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .step-tab { border: none; background: transparent; padding: 10px 8px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px; font-weight: 800; color: var(--text-secondary); transition: all 0.2s ease; }
-.step-tab .step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--surface-sub); border: 1px solid var(--surface-border); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: var(--text-primary); }
+.step-tab .step-num { width: 24px; height: 24px; border-radius: 50%; background: var(--surface-sub); border: 1px solid var(--surface-border); display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800; color: var(--text-primary); }
 .step-tab.active { background: var(--tonie-red-soft); color: var(--tonie-red); }
 .step-tab.active .step-num { background: var(--tonie-red); color: #FFFFFF; border-color: var(--tonie-red); }
 @media(max-width: 600px) {
@@ -94,26 +94,26 @@ body { background: var(--bg-canvas); color: var(--text-primary); transition: bac
 5. SECTION 1: MOTIV AUSWÄHLEN (DATABASE & SEARCH)
 ========================================================================== */
 .sub-tab-bar { display: flex; gap: 6px; background: var(--surface-sub); padding: 4px; border-radius: 14px; margin-bottom: 1rem; border: 1px solid var(--surface-border); }
-.sub-tab { flex: 1; border: none; background: transparent; padding: 8px; border-radius: 10px; font-size: 12.5px; font-weight: 700; color: var(--text-secondary); cursor: pointer; transition: 0.15s; }
+.sub-tab { flex: 1; border: none; background: transparent; padding: 8px 4px; border-radius: 10px; font-size: 12px; font-weight: 700; color: var(--text-secondary); cursor: pointer; transition: 0.15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .sub-tab.active { background: var(--surface-card); color: var(--text-primary); box-shadow: var(--shadow-subtle); }
 .search-bar-wrap { display: flex; gap: 8px; margin-bottom: 10px; position: relative; }
 .search-input-field { flex: 1; padding: 12px 40px 12px 14px; border-radius: 14px; border: 1px solid var(--surface-border); background: var(--input-bg); color: var(--text-primary); font-size: 14.5px; font-weight: 500; outline: none; transition: border-color 0.2s; }
 .search-input-field:focus { border-color: var(--tonie-red); box-shadow: 0 0 0 3px var(--tonie-red-soft); }
 .search-clear-cross { position: absolute; right: 54px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 16px; color: var(--text-muted); cursor: pointer; display: none; padding: 4px; }
-.icon-btn-square { width: 46px; height: 46px; border-radius: 14px; border: 1px solid var(--surface-border); background: var(--surface-sub); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.icon-btn-square { width: 46px; height: 46px; border-radius: 14px; border: 1px solid var(--surface-border); background: var(--surface-sub); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; flex-shrink: 0; }
 .icon-btn-square:hover { border-color: var(--tonie-red); transform: scale(1.05); }
 .status-strip { display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; color: var(--text-secondary); font-weight: 600; padding: 0 4px; margin-bottom: 12px; }
 .status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--tonie-gold); margin-right: 5px; }
 .status-dot.online { background: var(--tonie-emerald); }
-.motives-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(125px, 1fr)); gap: 12px; max-height: 380px; overflow-y: auto; padding-right: 4px; min-height: 140px; }
+.motives-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; max-height: 420px; overflow-y: auto; padding-right: 4px; min-height: 140px; }
 .motives-grid::-webkit-scrollbar { width: 6px; }
 .motives-grid::-webkit-scrollbar-thumb { background: var(--surface-border); border-radius: 4px; }
 .tonie-thumb-card { background: var(--surface-sub); border: 1px solid var(--surface-border); border-radius: 16px; padding: 12px 8px 8px; text-align: center; cursor: pointer; position: relative; display: flex; flex-direction: column; align-items: center; transition: all 0.15s ease; }
 .tonie-thumb-card:hover { border-color: var(--tonie-red); transform: translateY(-3px); box-shadow: var(--shadow-card); }
 .tonie-thumb-card.is-active { border-color: var(--tonie-red); background: var(--tonie-red-soft); box-shadow: 0 0 0 2px var(--tonie-red); }
-.thumb-avatar { width: 68px; height: 68px; border-radius: 50%; object-fit: contain; background: #FFFFFF; padding: 3px; border: 1px solid var(--surface-border); margin-bottom: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+.thumb-avatar { width: 70px; height: 70px; border-radius: 50%; object-fit: contain; background: #FFFFFF; padding: 3px; border: 1px solid var(--surface-border); margin-bottom: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
 .thumb-series { font-size: 9.5px; font-weight: 800; color: var(--tonie-red); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
-.thumb-title { font-size: 11.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; margin: 1px 0; }
+.thumb-title { font-size: 11.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; margin: 2px 0; }
 .thumb-id { font-size: 9.5px; color: var(--text-muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
 .card-fav-star { position: absolute; top: 6px; right: 8px; font-size: 16px; color: #CBD5E1; cursor: pointer; padding: 2px; }
 .card-fav-star.is-fav { color: var(--tonie-gold); }
@@ -198,9 +198,11 @@ body { background: var(--bg-canvas); color: var(--text-primary); transition: bac
 .modal-dialog p, .modal-dialog li { font-size: 13.5px; color: var(--text-primary); margin-bottom: 8px; line-height: 1.5; }
 .modal-dialog ul { padding-left: 20px; margin-bottom: 16px; }
 /* ==========================================================================
-9. FOOTER & LEGAL DISCLAIMER
+9. FOOTER & CLEAN COMMUNITY SUPPORT
 ========================================================================== */
-.app-footer { margin-top: auto; border-top: 1px solid var(--surface-border); padding: 2rem 1rem; text-align: center; background: var(--surface-card); }
+.app-footer { margin-top: auto; border-top: 1px solid var(--surface-border); padding: 2.5rem 1rem 2rem; text-align: center; background: var(--surface-card); }
+.footer-donate-card { max-width: 420px; margin: 0 auto 1.75rem; background: var(--surface-sub); border: 1px solid var(--surface-border); border-radius: 18px; padding: 16px; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.footer-donate-text { font-size: 12.5px; font-weight: 600; color: var(--text-secondary); line-height: 1.4; }
 .footer-links { display: flex; justify-content: center; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
 .footer-links a { color: var(--tonie-red); text-decoration: none; font-size: 12.5px; font-weight: 700; }
 .footer-legal-disclaimer { font-size: 11px; color: var(--text-muted); max-width: 680px; margin: 0 auto; line-height: 1.5; }
@@ -209,8 +211,8 @@ body { background: var(--bg-canvas); color: var(--text-primary); transition: bac
 ========================================================================== */
 #printContainer { display: none; }
 @media print {
-.app-header, .stepper-nav, .studio-main, .app-footer, .modal-shade { display: none !important; }
-html, body { background: #FFFFFF !important; margin: 0 !important; padding: 0 !important; width: 100% !important; height: 100% !important; }
+header, nav, main, footer, .modal-shade { display: none !important; }
+html, body { background: #FFFFFF !important; margin: 0 !important; padding: 0 !important; width: 100% !important; height: 100% !important; overflow: hidden !important; }
 #printContainer { display: block !important; position: absolute; top: 0; left: 0; width: 210mm; height: 297mm; background: #FFFFFF; z-index: 999999; margin: 0; padding: 0; box-sizing: border-box; }
 .print-avery-40 { display: grid; grid-template-columns: repeat(3, 40mm); grid-template-rows: repeat(8, 40mm); justify-content: center; padding-top: 12.5mm; }
 .print-avery-30 { display: grid; grid-template-columns: repeat(4, 30mm); grid-template-rows: repeat(12, 30mm); justify-content: center; padding-top: 10mm; }
@@ -232,7 +234,7 @@ html, body { background: #FFFFFF !important; margin: 0 !important; padding: 0 !i
 </style>
 </head>
 <body>
-<!-- Header Navigation -->
+<!-- Header Navigation: Spacious, uncluttered & responsive -->
 <header class="app-header">
 <div class="header-inner">
 <div class="brand-cluster" id="btnLogoHome">
@@ -250,13 +252,10 @@ html, body { background: #FFFFFF !important; margin: 0 !important; padding: 0 !i
 </div>
 <div class="header-actions">
 <button class="pill-btn" id="btnThemeToggle" title="Design wechseln">
-<span id="themeIcon">☀️</span> <span id="themeLabel">Dark Mode</span>
+<span id="themeIcon">☀️</span> <span id="themeLabel">Dark</span>
 </button>
 <button class="pill-btn" id="btnHelp" title="Druckanleitung & Hilfe">
 <span>❓</span> Hilfe
-</button>
-<button class="pill-btn accent" id="btnDonate">
-<span>☕</span> Spenden
 </button>
 </div>
 </div>
@@ -304,7 +303,7 @@ SCHRITT 1: MOTIV WÄHLEN
 </div>
 <div class="status-strip">
 <span><span class="status-dot online" id="statusDot"></span><span id="statusLabel">Offline-Bibliothek bereit</span></span>
-<span id="resultCountLabel">6 Motive</span>
+<span id="resultCountLabel">12 Motive</span>
 </div>
 <div class="motives-grid" id="motivesGrid"></div>
 </div>
@@ -441,8 +440,19 @@ SCHRITT 3: DRUCKBOGEN BEFÜLLEN
 </div>
 </section>
 </main>
-<!-- Footer & Legal -->
+<!-- Footer & Clean Community Support -->
 <footer class="app-footer">
+<div class="footer-donate-card">
+<div style="font-size: 24px;">☕</div>
+<div class="footer-donate-text">
+<b>Gefällt dir der Tonie & Tag Cover Hub?</b>
+
+Dieses Projekt ist 100% kostenlos und Open-Source. Wenn es dir geholfen hat, unterstütze die Weiterentwicklung gerne mit einem Kaffee!
+</div>
+<button class="pill-btn accent" id="btnDonate" style="padding: 9px 20px;">
+<span>❤️</span> Projekt mit einem Kaffee unterstützen
+</button>
+</div>
 <div class="footer-links">
 <a href="https://www.avery-zweckform.com" target="_blank" rel="noopener">Avery Zweckform</a>
 <a href="http://rfidfriend.com/" target="_blank" rel="noopener">RFIDfriend Tags</a>
@@ -475,41 +485,45 @@ Metadaten bereitgestellt durch das offizielle RevvoX Reverse-Engineering Projekt
 </ul>
 <p><b>Resteverwertung von Bögen:</b></p>
 <p>In Schritt 3 kannst du jeden Kreis einzeln anklicken. Wenn auf deinem Bogen die ersten 3 Etiketten fehlen, klicke einfach ab Kreis 4!</p>
-<button class="pill-btn accent" id="btnCloseHelp" style="width: 100%; justify-content: center; margin-top: 10px;">Verstanden</button>
+<button class="pill-btn accent" id="btnCloseHelp" style="width: 100%; justify-content: center; margin-top: 14px;">Verstanden</button>
 </div>
 </div>
 <!-- ==========================================================================
-JAVASCRIPT STUDIO ARCHITECTURE (100% BULLETPROOF)
+JAVASCRIPT STUDIO ARCHITECTURE (100% CRASH-PROOF & VALIDATED)
 ========================================================================== -->
 <script>
 (function() {
 "use strict";
-// Safe Storage Helpers
-function getStorage(key, fallback) {
+// Safe Storage Helpers (Guaranteed to NEVER throw TypeErrors or JSON exceptions)
+function safeGetStorage(key, fallback) {
 try {
 const val = localStorage.getItem(key);
 return (val !== null && val !== undefined) ? val : fallback;
 } catch(e) { return fallback; }
 }
-function setStorage(key, val) {
+function safeSetStorage(key, val) {
 try { localStorage.setItem(key, typeof val === 'string' ? val : JSON.stringify(val)); } catch(e) {}
 }
-function parseJson(str, fallback) {
+function safeGetFavorites() {
 try {
-const res = JSON.parse(str);
-return res || fallback;
-} catch(e) { return fallback; }
+const raw = localStorage.getItem('tonie_favs');
+if (!raw) return [];
+const parsed = JSON.parse(raw);
+if (Array.isArray(parsed)) return parsed.filter(x => typeof x === 'string' || typeof x === 'number').map(String);
+if (parsed && typeof parsed === 'object') return Object.keys(parsed);
+return [];
+} catch(e) { return []; }
 }
 function encodeSvgUri(svg) {
 return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg.trim());
 }
 const AppStudio = {
 currentStep: 1,
-theme: getStorage('tonie_theme', 'light'),
+theme: (safeGetStorage('tonie_theme', 'light') === 'dark') ? 'dark' : 'light',
 editorMode: 'simple',
 activeSubTab: 'db',
 db: [],
-favorites: parseJson(getStorage('tonie_favs', '[]'), []),
+favorites: safeGetFavorites(),
 selectedTonie: null,
 searchDebounceTimer: null,
 currentSystem: 'avery',
@@ -528,11 +542,18 @@ fallbackLibrary: [
 { id: "01-0182", title: "Alarm im Freizeitpark", series: "TKKG Junior", audio_id: "1520593821", pic: encodeSvgUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#C02741'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><path d='M32 45h36M50 45v30' stroke='#C02741' stroke-width='6' stroke-linecap='round'/><text x='50' y='32' font-family='sans-serif' font-size='14' font-weight='bold' text-anchor='middle' fill='#C02741'>TKKG</text></svg>") },
 { id: "01-0180", title: "Das Phantom auf dem Feuerstuhl", series: "TKKG", audio_id: "1520593800", pic: encodeSvgUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#1E293B'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><text x='50' y='58' font-family='sans-serif' font-size='20' font-weight='900' text-anchor='middle' fill='#1E293B'>TKKG</text></svg>") },
 { id: "01-0010", title: "Conni feiert Geburtstag", series: "Conni", audio_id: "1520593010", pic: encodeSvgUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#F59E0B'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><path d='M30 40h40v30H30z' fill='#E11D48'/><circle cx='50' cy='30' r='10' fill='#FCD34D'/><text x='50' y='85' font-family='sans-serif' font-size='10' font-weight='bold' text-anchor='middle' fill='#E11D48'>CONNI</text></svg>") },
+{ id: "01-0011", title: "Conni auf dem Bauernhof", series: "Conni", audio_id: "1520593011", pic: encodeSvgUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#10B981'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><circle cx='50' cy='38' r='12' fill='#F59E0B'/><text x='50' y='75' font-family='sans-serif' font-size='11' font-weight='bold' text-anchor='middle' fill='#10B981'>CONNI</text></svg>") },
 { id: "01-0305", title: "Die Olchis sind da", series: "Die Olchis", audio_id: "1520593305", pic: encodeSvgUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#84CC16'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><circle cx='38' cy='46' r='5' fill='#000'/><circle cx='62' cy='46' r='5' fill='#000'/><path d='M40 65q10 8 20 0' stroke='#000' stroke-width='3' fill='none'/><text x='50' y='28' font-family='sans-serif' font-size='11' font-weight='bold' text-anchor='middle' fill='#4D7C0F'>OLCHIS</text></svg>") },
 { id: "01-0920", title: "Das Gespensterschloss", series: "Die drei ???", audio_id: "1520593920", pic: encodeSvgUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#000000'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><text x='35' y='58' font-family='sans-serif' font-size='22' font-weight='900' fill='#FFFFFF'>?</text><text x='50' y='58' font-family='sans-serif' font-size='22' font-weight='900' fill='#E11D48'>?</text><text x='65' y='58' font-family='sans-serif' font-size='22' font-weight='900' fill='#2563EB'>?</text></svg>") },
+{ id: "01-0925", title: "Panik im Paradies", series: "Die drei ??? Kids", audio_id: "1520593925", pic: encodeSvgUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#0284C7'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><text x='50' y='58' font-family='sans-serif' font-size='18' font-weight='900' text-anchor='middle' fill='#0284C7'>??? KIDS</text></svg>") },
+{ id: "01-0520", title: "Die Rettungshunde", series: "PAW Patrol", audio_id: "1520593520", pic: encodeSvgUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#2563EB'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><polygon points='50,22 60,44 84,46 66,62 72,85 50,72 28,85 34,62 16,46 40,44' fill='#DC2626'/><text x='50' y='60' font-family='sans-serif' font-size='11' font-weight='900' text-anchor='middle' fill='#FFFFFF'>PAW</text></svg>") },
+{ id: "01-0410", title: "Das Schulfest", series: "Bibi Blocksberg", audio_id: "1520593410", pic: encodeSvgUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#10B981'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><path d='M30 65l40-30M35 70l30-40' stroke='#059669' stroke-width='4'/><text x='50' y='32' font-family='sans-serif' font-size='12' font-weight='bold' text-anchor='middle' fill='#059669'>BIBI</text></svg>") },
+{ id: "01-0220", title: "Bobo beim Kinderarzt", series: "Bobo Siebenschläfer", audio_id: "1520593220", pic: encodeSvgUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#F97316'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><circle cx='50' cy='48' r='18' fill='#FED7AA'/><circle cx='44' cy='45' r='3' fill='#000'/><circle cx='56' cy='45' r='3' fill='#000'/><text x='50' y='82' font-family='sans-serif' font-size='11' font-weight='bold' text-anchor='middle' fill='#EA580C'>BOBO</text></svg>") },
+{ id: "01-0730", title: "Meine Geburtstagsparty", series: "Peppa Pig", audio_id: "1520593730", pic: encodeSvgUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#EC4899'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><circle cx='50' cy='45' r='16' fill='#F472B6'/><circle cx='46' cy='42' r='2' fill='#000'/><circle cx='54' cy='42' r='2' fill='#000'/><text x='50' y='80' font-family='sans-serif' font-size='11' font-weight='bold' text-anchor='middle' fill='#DB2777'>PEPPA</text></svg>") },
 { id: "01-0910", title: "Kreativ-Tonie Rot", series: "Kreativ-Tonie", audio_id: "1520593910", pic: encodeSvgUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#C02741'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><circle cx='50' cy='38' r='12' fill='#C02741'/><path d='M35 72c0-10 7-18 15-18s15 8 15 18z' fill='#C02741'/></svg>") }
 ],
 init: function() {
+try {
 this.applyTheme(this.theme);
 this.db = [...this.fallbackLibrary];
 this.bindEvents();
@@ -542,16 +563,19 @@ this.renderMotives(this.db);
 this.selectTonie(this.db[0]);
 this.renderSheetMatrix();
 this.fetchOnlineRevvoxData();
+} catch(err) {
+console.error("Initialization error guarded:", err);
+}
 },
 applyTheme: function(theme) {
 this.theme = theme;
 document.documentElement.setAttribute('data-theme', theme);
-setStorage('tonie_theme', theme);
+safeSetStorage('tonie_theme', theme);
 const isLight = theme === 'light';
 const icon = document.getElementById('themeIcon');
 const label = document.getElementById('themeLabel');
 if (icon) icon.innerText = isLight ? '☀️' : '🌙';
-if (label) label.innerText = isLight ? 'Dark Mode' : 'Light Mode';
+if (label) label.innerText = isLight ? 'Dark' : 'Light';
 },
 toggleTheme: function() {
 this.applyTheme(this.theme === 'light' ? 'dark' : 'light');
@@ -561,9 +585,9 @@ this.currentStep = stepNum;
 document.querySelectorAll('.step-tab').forEach(tab => {
 tab.classList.toggle('active', parseInt(tab.getAttribute('data-step')) === stepNum);
 });
-document.getElementById('viewStep1').classList.toggle('active', stepNum === 1);
-document.getElementById('viewStep2').classList.toggle('active', stepNum === 2);
-document.getElementById('viewStep3').classList.toggle('active', stepNum === 3);
+document.getElementById('viewStep1')?.classList.toggle('active', stepNum === 1);
+document.getElementById('viewStep2')?.classList.toggle('active', stepNum === 2);
+document.getElementById('viewStep3')?.classList.toggle('active', stepNum === 3);
 window.scrollTo({ top: 0, behavior: 'smooth' });
 },
 bindEvents: function() {
@@ -575,6 +599,7 @@ document.getElementById('btnCloseHelp')?.addEventListener('click', () => this.to
 document.getElementById('helpModal')?.addEventListener('click', (e) => {
 if (e.target.id === 'helpModal') this.toggleHelpModal(false);
 });
+// Donate in Footer
 document.getElementById('btnDonate')?.addEventListener('click', () => {
 alert("Vielen Dank für deine Unterstützung des Tonie Community-Tools! ❤️");
 });
@@ -634,6 +659,7 @@ fetchOnlineRevvoxData: async function() {
 const statusDot = document.getElementById('statusDot');
 const statusLabel = document.getElementById('statusLabel');
 const urls = [
+'./tonies.json',
 'https://cdn.jsdelivr.net/gh/toniebox-reverse-engineering/tonies-json@release/tonies.json',
 'https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json'
 ];
@@ -641,22 +667,24 @@ for (const u of urls) {
 try {
 const controller = new AbortController();
 const timer = setTimeout(() => controller.abort(), 4000);
-const res = await fetch(u, { signal: controller.signal, cache: 'force-cache' });
+const res = await fetch(u, { signal: controller.signal });
 clearTimeout(timer);
 if (!res.ok) continue;
 const data = await res.json();
 if (Array.isArray(data) && data.length > 0) {
 this.db = data.map(item => {
-const mId = String(item.model || item.id || item.article || 'N/A').trim();
+const mId = String(item.model || item.id || item.article || item.no || '').trim();
 const mSeries = String(item.series || 'Tonie').trim();
-let mTitle = String(item.episodes || item.episode || item.title || item.name || 'Ohne Titel').trim();
+let mTitle = String(item.episodes || item.episode || item.title || item.name || '').trim();
+if (!mTitle) mTitle = mSeries;
 if (mSeries && mTitle.toLowerCase().startsWith(mSeries.toLowerCase())) {
 mTitle = mTitle.substring(mSeries.length).replace(/^[\s-–:]+/, '').trim() || mTitle;
 }
 const mPic = String(item.pic || item.image || item.image_url || '').trim();
 let mAudio = '';
-if (Array.isArray(item.audio_id)) mAudio = String(item.audio_id[0] || '').trim();
-else if (item.audio_id !== null && item.audio_id !== undefined) mAudio = String(item.audio_id).trim();
+const rawAudio = item['audio-id'] || item.audio_id || item.audioId;
+if (Array.isArray(rawAudio)) mAudio = String(rawAudio[0] || '').trim();
+else if (rawAudio !== null && rawAudio !== undefined) mAudio = String(rawAudio).trim();
 return { id: mId, title: mTitle, series: mSeries, pic: mPic, audio_id: mAudio };
 });
 if (statusDot) statusDot.className = 'status-dot online';
@@ -665,7 +693,7 @@ this.runSearchFilter();
 return;
 }
 } catch(e) {
-console.warn("Revvox fetch noticed, falling back gracefully.");
+// Silently continue to fallback url
 }
 }
 },
@@ -686,7 +714,7 @@ const input = document.getElementById('searchInput');
 const clearBtn = document.getElementById('searchClearBtn');
 if (clearBtn) clearBtn.style.display = (input && input.value.trim().length > 0) ? 'block' : 'none';
 clearTimeout(this.searchDebounceTimer);
-this.searchDebounceTimer = setTimeout(() => this.runSearchFilter(), 120);
+this.searchDebounceTimer = setTimeout(() => this.runSearchFilter(), 80);
 },
 clearSearch: function() {
 const input = document.getElementById('searchInput');
@@ -720,7 +748,7 @@ grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(
 return;
 }
 list.forEach(tonie => {
-const isFav = this.favorites.includes(tonie.id);
+const isFav = Array.isArray(this.favorites) ? this.favorites.includes(String(tonie.id)) : false;
 const card = document.createElement('div');
 card.className = 'tonie-thumb-card' + (this.selectedTonie && this.selectedTonie.id === tonie.id ? ' is-active' : '');
 card.addEventListener('click', () => {
@@ -764,22 +792,24 @@ return encodeSvgUri(⁠<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 
 },
 toggleFavorite: function(id) {
 if (!id) return;
-if (this.favorites.includes(id)) {
-this.favorites = this.favorites.filter(fId => fId !== id);
+const idStr = String(id);
+if (!Array.isArray(this.favorites)) this.favorites = [];
+if (this.favorites.includes(idStr)) {
+this.favorites = this.favorites.filter(fId => fId !== idStr);
 } else {
-this.favorites.push(id);
+this.favorites.push(idStr);
 }
-setStorage('tonie_favs', this.favorites);
+safeSetStorage('tonie_favs', this.favorites);
 this.updateFavBadge();
 if (this.activeSubTab === 'fav') this.renderFavorites();
 else this.runSearchFilter();
 },
 updateFavBadge: function() {
 const b = document.getElementById('favCountBadge');
-if (b) b.innerText = this.favorites.length;
+if (b) b.innerText = Array.isArray(this.favorites) ? this.favorites.length : 0;
 },
 renderFavorites: function() {
-const list = this.db.filter(t => this.favorites.includes(t.id));
+const list = this.db.filter(t => Array.isArray(this.favorites) && this.favorites.includes(String(t.id)));
 const countEl = document.getElementById('resultCountLabel');
 if (countEl) countEl.innerText = ⁠${list.length} Favoriten⁠;
 this.renderMotives(list);
