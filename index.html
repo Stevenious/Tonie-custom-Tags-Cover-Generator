@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TagGen Studio</title>
+    <title>TagGen Studio - Crafting Workshop</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
@@ -44,10 +44,10 @@
             font-family: 'Nunito', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
+            overflow-x: hidden;
             transition: background-color 0.3s, color 0.3s;
         }
 
@@ -101,20 +101,57 @@
         .btn-outline { background: transparent; border: 2px solid var(--border-color); color: var(--text-main); }
         .btn-outline:hover { border-color: var(--text-main); background: rgba(0,0,0,0.02); }
 
+        /* Guided Stepper / Wizard Bar */
+        .wizard-bar {
+            background: var(--panel-bg);
+            padding: 10px 30px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            align-items: center;
+            font-weight: 800;
+            font-size: 0.9rem;
+        }
+        .wizard-step {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-muted);
+            opacity: 0.7;
+            transition: all 0.2s;
+        }
+        .wizard-step.active {
+            color: var(--tonie-red);
+            opacity: 1;
+        }
+        .wizard-step span {
+            background: var(--border-color);
+            color: var(--text-main);
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem;
+        }
+        .wizard-step.active span {
+            background: var(--tonie-red);
+            color: white;
+        }
+
         /* Workspace Grid */
         .workspace {
             display: grid;
             grid-template-columns: 350px 350px 1fr;
             gap: 20px;
             padding: 20px;
-            height: calc(100vh - 71px);
             max-width: 1920px;
             margin: 0 auto;
             width: 100%;
+            flex: 1;
         }
 
         @media (max-width: 1200px) {
-            .workspace { grid-template-columns: 1fr 1fr; overflow-y: auto; height: auto; }
+            .workspace { grid-template-columns: 1fr 1fr; }
             .col-print { grid-column: span 2; }
         }
         @media (max-width: 768px) {
@@ -130,6 +167,7 @@
             flex-direction: column;
             overflow: hidden;
             border: 1px solid var(--border-color);
+            position: relative;
         }
 
         .panel-header {
@@ -195,6 +233,23 @@
         }
         [data-theme="dark"] .tile-overlay { background: rgba(45, 55, 72, 0.9); color: #f7fafc; }
 
+        /* 1-Click Quick Add Button on Tiles */
+        .tile-quick-add {
+            position: absolute; top: 6px; right: 6px;
+            background: var(--tonie-red); color: white;
+            border: none; border-radius: 50%; width: 28px; height: 28px;
+            font-size: 16px; font-weight: 900; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            opacity: 0; transform: scale(0.8);
+            transition: all 0.2s ease;
+            z-index: 5;
+        }
+        .tile:hover .tile-quick-add {
+            opacity: 1; transform: scale(1);
+        }
+        .tile-quick-add:hover { background: var(--tonie-red-hover); transform: scale(1.1); }
+
         .editor-form { display: flex; flex-direction: column; gap: 12px; }
         
         .input-group label {
@@ -230,8 +285,8 @@
         .pro-badge { background: #ecc94b; color: #744210; padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: 5px; }
 
         .editor-preview-container {
-            margin-top: 20px; display: flex; justify-content: center;
-            padding: 20px; background: var(--slot-empty);
+            margin-top: 15px; display: flex; justify-content: center;
+            padding: 15px; background: var(--slot-empty);
             border-radius: 12px; border: 1px dashed var(--border-color);
         }
 
@@ -242,7 +297,7 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             
             --bg-x: 50%;
-            --bg-y: 20%; 
+            --bg-y: 15%; 
             --bg-scale: 100%;
             background-position: var(--bg-x) var(--bg-y);
             background-size: var(--bg-scale);
@@ -257,14 +312,14 @@
         
         .sticker-svg text {
             paint-order: stroke fill;
-            stroke: white; stroke-width: 1.5px;
+            stroke: white; stroke-width: 1.2px;
             stroke-linecap: round; stroke-linejoin: round;
             font-family: 'Nunito', sans-serif;
         }
 
-        .svg-series { fill: var(--tonie-red); font-weight: 900; font-size: calc(6.5px * var(--font-scale)); text-transform: uppercase; }
-        .svg-title { fill: #1a202c; font-weight: 800; font-size: calc(5px * var(--font-scale)); }
-        .svg-id { fill: #718096; font-weight: 700; font-size: calc(3.5px * var(--font-scale)); font-family: monospace; letter-spacing: 1px; }
+        .svg-series { fill: var(--tonie-red); font-weight: 900; font-size: calc(6px * var(--font-scale)); text-transform: uppercase; }
+        .svg-title { fill: #1a202c; font-weight: 800; font-size: calc(4.8px * var(--font-scale)); }
+        .svg-id { fill: #718096; font-weight: 700; font-size: calc(3.4px * var(--font-scale)); font-family: monospace; letter-spacing: 0.5px; }
 
         .delete-btn {
             position: absolute; top: 5%; right: 5%;
@@ -293,6 +348,7 @@
         .toolbar-top {
             display: flex; gap: 10px; flex-wrap: wrap;
             padding-bottom: 15px; border-bottom: 1px dashed var(--border-color);
+            align-items: center;
         }
 
         .toolbar-top select {
@@ -307,11 +363,11 @@
         }
 
         .action-group {
-            display: flex; gap: 10px; flex-wrap: wrap;
+            display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
         }
 
         .divider {
-            width: 1px; background-color: var(--border-color); margin: 0 5px;
+            width: 1px; background-color: var(--border-color); margin: 0 5px; height: 24px;
         }
 
         #btn-print {
@@ -337,6 +393,7 @@
             display: flex; justify-content: center; align-items: flex-start;
             border: 1px inset var(--border-color);
             box-shadow: inset 0 4px 10px rgba(0,0,0,0.05);
+            min-height: 500px;
         }
 
         .a4-sheet {
@@ -357,27 +414,49 @@
         .slot .sticker { width: 100%; height: 100%; cursor: grab; box-shadow: none; }
         .slot .sticker:active { cursor: grabbing; }
 
+        /* Toast Container */
         #toast-container {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            z-index: 9999; display: flex; flex-direction: column; gap: 10px;
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
+            z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none;
         }
         .toast {
             background: var(--text-main); color: var(--bg-color);
             padding: 12px 24px; border-radius: 30px; font-weight: 700; font-size: 0.9rem;
-            box-shadow: var(--shadow-md);
+            box-shadow: var(--shadow-md); pointer-events: auto;
             animation: slideUp 0.3s forwards, fadeOut 0.3s 3.7s forwards;
         }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeOut { to { opacity: 0; } }
 
+        /* Pre-Print Confidence Modal */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+            z-index: 10000; display: none; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .modal-card {
+            background: var(--panel-bg); color: var(--text-main);
+            width: 100%; max-width: 500px; border-radius: 16px;
+            padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+            animation: zoomIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .modal-title { font-size: 1.3rem; font-weight: 900; color: var(--tonie-red); margin-bottom: 12px; display: flex; align-items: center; gap: 10px; }
+        .modal-body { font-size: 0.95rem; line-height: 1.6; color: var(--text-main); margin-bottom: 20px; }
+        .modal-body ul { margin-left: 20px; margin-top: 10px; }
+        .modal-body li { margin-bottom: 6px; }
+        .modal-actions { display: flex; gap: 12px; justify-content: flex-end; }
+
         @media print {
             @page { size: A4 portrait; margin: 0; }
             body { background: white; margin: 0; padding: 0; height: 100%; overflow: visible; }
-            header, .panel:not(.col-print), .print-toolbar, .panel-header, #toast-container, p, #help-section { display: none !important; }
+            header, .wizard-bar, .panel:not(.col-print), .print-toolbar, .panel-header, #toast-container, p, #help-section, .modal-overlay { display: none !important; }
             .workspace { display: block; padding: 0; margin: 0; height: auto; grid-template-columns: 1fr; }
             .col-print { border: none; box-shadow: none; border-radius: 0; padding: 0; background: transparent; }
             .panel-content { padding: 0; overflow: visible; }
-            .a4-wrapper { background: transparent; padding: 0; border: none; border-radius: 0; overflow: visible; justify-content: flex-start; box-shadow: none; }
+            .a4-wrapper { background: transparent; padding: 0; border: none; border-radius: 0; overflow: visible; justify-content: flex-start; box-shadow: none; min-height: auto; }
             .a4-sheet {
                 position: absolute; left: 0; top: 0; box-shadow: none; border: none;
                 width: 210mm; height: 297mm; page-break-after: avoid; page-break-before: avoid;
@@ -393,6 +472,25 @@
 <body>
 
     <div id="toast-container"></div>
+
+    <!-- Pre-Print Confidence Modal -->
+    <div class="modal-overlay" id="printModal">
+        <div class="modal-card">
+            <div class="modal-title">🖨️ Druck-Sicherheitscheck</div>
+            <div class="modal-body">
+                Stickerbögen reagieren empfindlich auf falsche Druckereinstellungen. Bitte beachte vor dem Start:
+                <ul>
+                    <li><b>Skalierung:</b> Unbedingt auf exakt <b>100%</b> oder "Tatsächliche Größe" stellen (nicht "An Seite anpassen").</li>
+                    <li><b>Randlos / Ränder:</b> Seitenränder im Browser-Dialog auf <b>Standard</b> oder <b>Keine</b> belassen.</li>
+                    <li><b>Papier:</b> Lege Avery Zweckform-Etiketten oder Klebepapier seitenrichtig in das Einabefach.</li>
+                </ul>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closePrintModal()">Abbrechen</button>
+                <button class="btn btn-primary" onclick="confirmPrint()">Jetzt drucken starten</button>
+            </div>
+        </div>
+    </div>
 
     <header>
         <h1>
@@ -419,41 +517,51 @@
                     <path d="M 54 30 L 30 54 Q 38 38 54 30 Z" fill="#e2e8f0" filter="url(#shadowFlap)"/>
                 </g>
             </svg>
-            <div style="display: flex; align-items: baseline; gap: 4px;">
+            <div style="display: flex; align-items: baseline; gap: 6px;">
                 <span style="color: var(--tonie-red); font-weight: 900;">TagGen</span>
                 <span style="color: var(--text-main); font-weight: 900;">Studio</span>
             </div>
         </h1>
         <div class="header-controls">
             <span class="badge" id="status-indicator">Lade Datenbank...</span>
-            <button class="btn btn-outline btn-icon" id="toggle-help" title="Hilfe anzeigen">ℹ️</button>
+            <button class="btn btn-outline btn-icon" id="toggle-help" title="Hilfe & Anleitung">ℹ️</button>
             <button class="btn btn-outline btn-icon" id="toggle-theme" title="Light/Dark Mode">🌙</button>
         </div>
     </header>
 
+    <!-- Guided Journey Wizard Bar -->
+    <div class="wizard-bar">
+        <div class="wizard-step active" id="step1-ind"><span>1</span> Motiv auswählen</div>
+        <div class="wizard-step" id="step2-ind"><span>2</span> Cover anpassen</div>
+        <div class="wizard-step" id="step3-ind"><span>3</span> Drucken & Fertigstellen</div>
+    </div>
+
     <div id="help-section" style="display: none; background: var(--panel-bg); padding: 20px; margin: 20px auto 0; max-width: 1920px; width: calc(100% - 40px); border-radius: var(--radius); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
-        <h3 style="color: var(--tonie-red); margin-bottom: 10px;">ℹ️ Bedienungshilfe & Druckhinweise</h3>
+        <h3 style="color: var(--tonie-red); margin-bottom: 10px;">ℹ️ Crafting Workshop Anleitung</h3>
         <ul style="margin-left: 20px; line-height: 1.6; color: var(--text-main);">
-            <li><b>1. Suchen oder Foto:</b> Wähle zwischen der Community-Datenbank (Live-Suche) oder lade ein eigenes Bild hoch.</li>
-            <li><b>2. Editor:</b> Passe Titel und Serie an. Aktiviere den <b>PRO-Modus</b>, um Bild-Position (X/Y), Zoom und Schriftgröße anzupassen.</li>
-            <li><b>3. Druckbogen:</b> Wähle den Typ und die Größe. Ziehe fertige Sticker per Drag & Drop auf leere Felder.</li>
-            <li><b>🖨️ Wichtig beim Drucken:</b> Achte im Browser-Druckdialog darauf, dass die Skalierung auf exakt <b>100%</b> steht!</li>
+            <li><b>1. Motiv wählen:</b> Nutze die Live-Suche (1-Klick "+" direkt auf den Kacheln zum schnellen Hinzufügen) oder lade ein eigenes Foto hoch.</li>
+            <li><b>2. Cover Editor:</b> Passe Serie & Titel an. Aktiviere <b>PRO</b> für Feintuning, Zoom & UIDs.</li>
+            <li><b>3. Druckbogen:</b> Wähle deine physischen Medien (🪙 Münzkapseln oder 📄 Avery Zweckform Bögen). Nutzen Sie "Bogen vollmachen" für schnelles Tiling.</li>
         </ul>
     </div>
 
     <main class="workspace" id="main-workspace">
         
-        <section class="panel">
-            <div class="panel-header">1. Motiv wählen</div>
+        <!-- Step 1 Panel -->
+        <section class="panel" id="panel-choose">
+            <div class="panel-header">
+                <span>1. Motiv wählen</span>
+                <span style="font-size:0.75rem; color:var(--tonie-red); font-weight:900;">WIZARD STEP 1</span>
+            </div>
             <div class="panel-content">
                 <div class="tab-bar">
-                    <button class="tab-btn active" id="tabDb" onclick="switchTab('db')">📚 Datenbank</button>
+                    <button class="tab-btn active" id="tabDb" onclick="switchTab('db')">📚 Community DB</button>
                     <button class="tab-btn" id="tabCustom" onclick="switchTab('custom')">📷 Eigenes Foto</button>
                 </div>
 
                 <div id="sectionDb">
                     <div class="search-bar">
-                        <input type="text" id="search-input" placeholder="Serie, Titel, ID eingeben..." disabled>
+                        <input type="text" id="search-input" placeholder="TKKG, Die drei ???, ID..." disabled>
                         <button class="btn btn-secondary" id="btn-random" title="Zufälliger Tonie" disabled>🎲</button>
                     </div>
                     <div class="results-grid" id="results-grid"></div>
@@ -468,9 +576,10 @@
             </div>
         </section>
 
-        <section class="panel">
+        <!-- Step 2 Panel -->
+        <section class="panel" id="panel-style">
             <div class="panel-header">
-                <span>2. Cover Editor</span>
+                <span>2. Cover anpassen</span>
                 <label class="checkbox-group" style="font-size: 0.75rem; font-weight: 800; background: var(--tonie-blue); color: white; padding: 4px 10px; border-radius: 12px; margin: 0;">
                     <input type="checkbox" id="toggle-pro"> PRO-Modus
                 </label>
@@ -478,11 +587,11 @@
             <div class="panel-content" style="display: flex; flex-direction: column;">
                 <div class="editor-form">
                     <div class="input-group">
-                        <label>Serie (Oben)</label>
+                        <label>Serie (Oben gebogen)</label>
                         <input type="text" id="edit-series" placeholder="z.B. TKKG">
                     </div>
                     <div class="input-group">
-                        <label>Titel (Unten)</label>
+                        <label>Titel (Unten gebogen)</label>
                         <input type="text" id="edit-title" placeholder="z.B. Folge 1">
                     </div>
                     
@@ -510,7 +619,7 @@
                             </div>
                             <div class="input-group" style="flex: 1;">
                                 <label>Bild Y (↕)</label>
-                                <input type="range" id="slide-y" min="0" max="100" value="20" step="1">
+                                <input type="range" id="slide-y" min="0" max="100" value="15" step="1">
                             </div>
                         </div>
                     </div>
@@ -528,9 +637,10 @@
             </div>
         </section>
 
-        <section class="panel col-print">
+        <!-- Step 3 Panel -->
+        <section class="panel col-print" id="panel-print">
             <div class="panel-header">
-                3. A4 Druck & Export
+                <span>3. Arrange & Print (Druckbogen)</span>
                 <span id="slot-counter" style="font-size: 0.85rem; font-weight: 800; color: var(--text-muted);">0 / 24</span>
             </div>
             <div class="panel-content" style="display: flex; flex-direction: column;">
@@ -538,8 +648,8 @@
                 <div class="print-toolbar">
                     <div class="toolbar-top">
                         <select id="format-type-select">
-                            <option value="free">1. Typ: Freies Raster (Schere/Stanzer)</option>
-                            <option value="avery">1. Typ: Avery Zweckform (Etiketten)</option>
+                            <option value="free">🪙 1. Typ: Freies Raster (Münzkapseln)</option>
+                            <option value="avery">📄 1. Typ: Avery Zweckform (Etiketten)</option>
                         </select>
                         <select id="format-size-select"></select>
                         <label class="checkbox-group" id="wrapper-cut-marks" style="background: var(--input-bg); padding: 0 15px; border: 1px solid var(--border-color); border-radius: 8px; justify-content: center; display: flex;">
@@ -550,6 +660,7 @@
                     <div class="toolbar-bottom">
                         <div class="action-group">
                             <button class="btn btn-outline" id="btn-clear" title="Bogen leeren">🗑️ Bogen leeren</button>
+                            <button class="btn btn-outline" id="btn-autofill" title="Restliche Felder automatisch füllen">⚡ Bogen vollmachen</button>
                             <button class="btn btn-outline" id="btn-export-flipper" style="display: none;" title="Liste als JSON speichern">💾 Für später speichern (JSON)</button>
                         </div>
                         <div class="action-group">
@@ -590,14 +701,14 @@
 
         const sizeOptions = {
             'free': [
-                { value: '43', text: '2. Größe: 43mm (20 Stk)' },
-                { value: '40', text: '2. Größe: 40mm (24 Stk)' },
-                { value: '30', text: '2. Größe: 30mm (40 Stk)' },
-                { value: '25', text: '2. Größe: 25mm (54 Stk)' }
+                { value: '43', text: '🪙 2. Größe: 43mm (20 Stk)' },
+                { value: '40', text: '🪙 2. Größe: 40mm (24 Stk - Kapsel)' },
+                { value: '30', text: '🪙 2. Größe: 30mm (40 Stk)' },
+                { value: '25', text: '🪙 2. Größe: 25mm (54 Stk)' }
             ],
             'avery': [
-                { value: 'L3415', text: '2. Größe: 40mm (Avery 24 Stk)' },
-                { value: 'avery30', text: '2. Größe: 30mm (Avery 45 Stk)' }
+                { value: 'L3415', text: '📄 2. Größe: 40mm (Avery L3415 - 24 Stk)' },
+                { value: 'avery30', text: '📄 2. Größe: 30mm (Avery 30mm - 45 Stk)' }
             ]
         };
 
@@ -632,14 +743,25 @@
             sheet: document.getElementById('a4-sheet'),
             counter: document.getElementById('slot-counter'),
             btnClear: document.getElementById('btn-clear'),
+            btnAutoFill: document.getElementById('btn-autofill'),
             btnPrint: document.getElementById('btn-print'),
             btnPdf: document.getElementById('btn-pdf'),
             btnPng: document.getElementById('btn-png'),
             btnExport: document.getElementById('btn-export-flipper'),
             themeToggle: document.getElementById('toggle-theme'),
             proToggle: document.getElementById('toggle-pro'),
-            workspace: document.getElementById('main-workspace')
+            workspace: document.getElementById('main-workspace'),
+            steps: {
+                1: document.getElementById('step1-ind'),
+                2: document.getElementById('step2-ind'),
+                3: document.getElementById('step3-ind')
+            }
         };
+
+        function setWizardStep(stepNum) {
+            Object.values(ui.steps).forEach(s => s.classList.remove('active'));
+            if(ui.steps[stepNum]) ui.steps[stepNum].classList.add('active');
+        }
 
         function initThemes() {
             const savedTheme = localStorage.getItem('theme') || 'light';
@@ -672,7 +794,7 @@
                 ui.workspace.classList.remove('is-pro');
                 ui.btnExport.style.display = 'none';
                 ui.sliders.font.value = 100; ui.sliders.zoom.value = 100;
-                ui.sliders.x.value = 50; ui.sliders.y.value = 20;
+                ui.sliders.x.value = 50; ui.sliders.y.value = 15;
                 applySliders();
             }
         }
@@ -705,7 +827,7 @@
                         pic: event.target.result
                     });
                     switchTab('db');
-                    showToast("Bild geladen!");
+                    showToast("Bild erfolgreich geladen! 🖼️");
                 };
                 reader.readAsDataURL(file);
             }
@@ -792,8 +914,23 @@
                 if(item.pic) tile.style.backgroundImage = `url('${item.pic}')`;
                 
                 const displayLabel = item.series ? `${item.series} - ${item.title}` : item.title;
-                tile.innerHTML = `<div class="tile-overlay">${displayLabel}</div>`;
-                tile.onclick = () => loadIntoEditor(item);
+                tile.innerHTML = `
+                    <div class="tile-overlay">${displayLabel}</div>
+                    <button class="tile-quick-add" title="Sofort zum Bogen hinzufügen">+</button>
+                `;
+                
+                // 1-Click Quick Add Button functionality
+                const quickAddBtn = tile.querySelector('.tile-quick-add');
+                quickAddBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    loadIntoEditor(item);
+                    quickAddToSheet();
+                };
+
+                tile.onclick = () => {
+                    loadIntoEditor(item);
+                    setWizardStep(2);
+                };
                 ui.grid.appendChild(tile);
             });
         }
@@ -818,6 +955,7 @@
             ui.preview.box.style.backgroundImage = item.pic ? `url('${item.pic}')` : 'none';
             ui.btnAdd.disabled = false;
             updatePreviewText();
+            setWizardStep(2);
         }
 
         function buildSvgString(sText, tText, idText, fontScale) {
@@ -826,8 +964,8 @@
                 <svg viewBox="0 0 100 100" class="sticker-svg" style="--font-scale: ${fontScale}">
                     <defs>
                         <path id="top_${uid}" d="M 14 50 A 36 36 0 0 1 86 50" />
-                        <path id="title_${uid}" d="M 86 54 A 36 36 0 0 1 14 54" />
-                        <path id="id_${uid}" d="M 90 60 A 40 40 0 0 1 10 60" />
+                        <path id="title_${uid}" d="M 86 55 A 36 36 0 0 0 14 55" />
+                        <path id="id_${uid}" d="M 90 61 A 40 40 0 0 0 10 61" />
                     </defs>
                     <text class="svg-series"><textPath href="#top_${uid}" startOffset="50%" text-anchor="middle">${sText}</textPath></text>
                     <text class="svg-title"><textPath href="#title_${uid}" startOffset="50%" text-anchor="middle">${tText}</textPath></text>
@@ -925,11 +1063,7 @@
         ui.formatType.addEventListener('change', () => { if(ui.sheet.querySelector('.sticker') && !confirm("Bogen leeren?")) return; queuedItems = []; updateSizeSelect(); });
         ui.formatSize.addEventListener('change', () => { if(ui.sheet.querySelector('.sticker') && !confirm("Größe ändern leert Bogen?")) return; initSheet(); queuedItems = []; });
 
-        ui.btnAdd.addEventListener('click', () => {
-            if(!currentItem) return;
-            const emptySlot = Array.from(ui.sheet.querySelectorAll('.slot')).find(s => s.children.length === 0);
-            if(!emptySlot) { showToast("Bogen ist voll!"); return; }
-
+        function createStickerElement() {
             stickerCount++;
             const sticker = document.createElement('div');
             sticker.className = 'sticker'; sticker.id = `sticker-${stickerCount}`; sticker.draggable = true;
@@ -958,8 +1092,46 @@
             sticker.addEventListener('dragstart', (e) => { e.dataTransfer.setData('text/plain', sticker.id); setTimeout(() => sticker.style.opacity = '0.5', 0); });
             sticker.addEventListener('dragend', () => { sticker.style.opacity = '1'; updateCounter(); });
 
+            return sticker;
+        }
+
+        function quickAddToSheet() {
+            if(!currentItem) return;
+            const emptySlot = Array.from(ui.sheet.querySelectorAll('.slot')).find(s => s.children.length === 0);
+            if(!emptySlot) { showToast("Bogen ist voll! Bitte drucken oder leeren."); return; }
+
+            const sticker = createStickerElement();
             emptySlot.appendChild(sticker);
-            updateCounter(); showToast("Hinzugefügt!");
+            updateCounter();
+            showToast("✨ 1-Click: Zum Bogen hinzugefügt!");
+            setWizardStep(3);
+        }
+
+        ui.btnAdd.addEventListener('click', () => {
+            if(!currentItem) return;
+            const emptySlot = Array.from(ui.sheet.querySelectorAll('.slot')).find(s => s.children.length === 0);
+            if(!emptySlot) { showToast("Bogen ist voll!"); return; }
+
+            const sticker = createStickerElement();
+            emptySlot.appendChild(sticker);
+            updateCounter(); 
+            showToast("Erfolgreich auf den Bogen gelegt!");
+            setWizardStep(3);
+        });
+
+        // Auto-Fill Feature ("Bogen vollmachen")
+        ui.btnAutoFill.addEventListener('click', () => {
+            if(!currentItem) { showToast("Bitte wähle zuerst ein Motiv aus!"); return; }
+            const emptySlots = Array.from(ui.sheet.querySelectorAll('.slot')).filter(s => s.children.length === 0);
+            if(emptySlots.length === 0) { showToast("Bogen ist bereits voll!"); return; }
+
+            emptySlots.forEach(slot => {
+                const sticker = createStickerElement();
+                slot.appendChild(sticker);
+            });
+            updateCounter();
+            showToast(`⚡ Bogen voll gemacht (${emptySlots.length} Sticker hinzugefügt)!`);
+            setWizardStep(3);
         });
 
         function updateCounter() {
@@ -967,39 +1139,59 @@
             ui.counter.innerText = `${ui.sheet.querySelectorAll('.sticker').length} / ${config.cols * config.rows}`;
         }
 
-        ui.btnClear.addEventListener('click', () => { initSheet(); queuedItems = []; showToast("Geleert"); });
+        ui.btnClear.addEventListener('click', () => { initSheet(); queuedItems = []; showToast("Bogen geleert"); });
         
-        ui.btnPrint.addEventListener('click', () => { 
-            if(ui.sheet.querySelectorAll('.sticker').length) {
-                showToast("🖨️ Hinweis: Bitte Skalierung im Druck auf 100% stellen!");
-                setTimeout(() => window.print(), 800);
-            } else {
-                showToast("Bogen ist leer!"); 
-            }
-        });
+        // Pre-Print Confidence Modal Handling
+        let pendingPrintAction = null;
 
-        ui.btnPdf.addEventListener('click', () => {
-            if(!ui.sheet.querySelectorAll('.sticker').length) { showToast("Bogen ist leer!"); return; }
+        function openPrintModal(action) {
+            const stickersCount = ui.sheet.querySelectorAll('.sticker').length;
+            if(stickersCount === 0) { showToast("Bogen ist leer!"); return; }
+            pendingPrintAction = action;
+            document.getElementById('printModal').style.display = 'flex';
+        }
+
+        function closePrintModal() {
+            document.getElementById('printModal').style.display = 'none';
+            pendingPrintAction = null;
+        }
+
+        function confirmPrint() {
+            const action = pendingPrintAction;
+            closePrintModal();
+            if(action === 'print') {
+                showToast("🖨️ Druckdialog wird geöffnet (Skalierung auf 100% achten)...");
+                setTimeout(() => window.print(), 600);
+            } else if(action === 'pdf') {
+                exportPdf();
+            }
+        }
+
+        ui.btnPrint.addEventListener('click', () => openPrintModal('print'));
+        ui.btnPdf.addEventListener('click', () => openPrintModal('pdf'));
+
+        function exportPdf() {
             showToast("⏳ PDF wird generiert...");
             const btns = ui.sheet.querySelectorAll('.delete-btn'); btns.forEach(b => b.style.display = 'none');
             
             html2pdf().set({
-                margin: 0, filename: 'TagGen_Druckbogen.pdf', image: { type: 'jpeg', quality: 1.0 },
+                margin: 0, filename: 'TagGen_Studio_Bogen.pdf', image: { type: 'jpeg', quality: 1.0 },
                 html2canvas: { scale: 3, useCORS: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             }).from(ui.sheet).save().then(() => {
-                showToast("✅ PDF gespeichert!"); btns.forEach(b => b.style.display = '');
+                showToast("✅ PDF erfolgreich gespeichert!"); btns.forEach(b => b.style.display = '');
             });
-        });
+        }
 
         ui.btnPng.addEventListener('click', () => {
-            if(!ui.sheet.querySelectorAll('.sticker').length) { showToast("Bogen ist leer!"); return; }
+            const stickersCount = ui.sheet.querySelectorAll('.sticker').length;
+            if(!stickersCount) { showToast("Bogen ist leer!"); return; }
             showToast("⏳ 300dpi PNG wird generiert...");
             const btns = ui.sheet.querySelectorAll('.delete-btn'); btns.forEach(b => b.style.display = 'none');
             
             html2canvas(ui.sheet, { scale: 3.125, useCORS: true, backgroundColor: '#ffffff' }).then(canvas => {
-                const link = document.createElement('a'); link.download = 'TagGen_Druckbogen_300dpi.png';
+                const link = document.createElement('a'); link.download = 'TagGen_Studio_300dpi.png';
                 link.href = canvas.toDataURL('image/png'); link.click();
-                showToast("✅ PNG gespeichert!"); btns.forEach(b => b.style.display = '');
+                showToast("✅ PNG erfolgreich gespeichert!"); btns.forEach(b => b.style.display = '');
             });
         });
 
@@ -1008,7 +1200,7 @@
             if(!exportData.length) { showToast("Keine IDs auf dem Bogen."); return; }
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
             const a = document.createElement('a'); a.href = dataStr; a.download = "taggen_export.json";
-            document.body.appendChild(a); a.click(); a.remove(); showToast("Export gespeichert!");
+            document.body.appendChild(a); a.click(); a.remove(); showToast("Export erfolgreich!");
         });
 
         const btnHelp = document.getElementById('toggle-help');
