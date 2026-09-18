@@ -2,842 +2,667 @@
 <html lang="de" data-theme="light">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TagGen Studio V2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TagGen Studio V2 – Phoenix</title>
     
-    <!-- External Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Nunito:wght@700;900&display=swap" rel="stylesheet">
     
     <style>
-        /* ==========================================================================
-           MODULE: CSS Variables & Theme (Figma/Canva Style)
-           ========================================================================== */
         :root {
-            --primary: #E91E63;
-            --primary-hover: #D81B60;
-            --accent: #2196F3;
-            
-            --bg-app: #F5F5F5;
+            --brand: #E91E63;
+            --brand-hover: #D81B60;
+            --bg-app: #F8FAFC;
             --bg-panel: #FFFFFF;
-            --bg-canvas: #E5E5E5;
-            --bg-hover: #F0F0F0;
-            
-            --text-main: #1C1C1E;
-            --text-sub: #636366;
-            --border: #E5E5EA;
-            
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
-            --shadow-md: 0 4px 6px rgba(0,0,0,0.07);
-            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
-            
-            --radius-sm: 6px;
-            --radius-md: 10px;
-            --radius-lg: 16px;
-            
+            --bg-canvas: #F1F5F9;
+            --text-main: #0F172A;
+            --text-muted: #64748B;
+            --border: #E2E8F0;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08);
+            --radius-md: 8px;
+            --radius-lg: 14px;
             font-family: 'Inter', sans-serif;
         }
 
-        [data-theme="dark"] {
-            --bg-app: #121212;
-            --bg-panel: #1E1E1E;
-            --bg-canvas: #0A0A0A;
-            --bg-hover: #2C2C2C;
-            
-            --text-main: #F5F5F5;
-            --text-sub: #A0A0A5;
-            --border: #333333;
-        }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: var(--bg-app); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        /* TOPBAR */
+        .topbar { height: 60px; background: var(--bg-panel); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 24px; z-index: 10; flex-shrink: 0; }
+        .brand-logo { font-weight: 800; font-size: 1.15rem; display: flex; align-items: center; gap: 8px; letter-spacing: -0.5px; }
+        .brand-logo span { color: var(--brand); font-weight: 900; }
         
-        body {
-            background-color: var(--bg-app);
-            color: var(--text-main);
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            transition: background-color 0.2s, color 0.2s;
-        }
+        .view-switcher { display: flex; background: var(--bg-app); padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--border); }
+        .tab-btn { padding: 8px 18px; border: none; background: transparent; border-radius: 6px; font-weight: 600; font-size: 0.85rem; color: var(--text-muted); cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 6px; }
+        .tab-btn.active { background: var(--bg-panel); color: var(--text-main); box-shadow: var(--shadow-sm); }
 
-        /* ==========================================================================
-           MODULE: Layout & Navigation
-           ========================================================================== */
-        .topbar {
-            height: 56px;
-            background: var(--bg-panel);
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 20px;
-            z-index: 100;
-        }
+        .btn { padding: 9px 18px; border: none; border-radius: var(--radius-md); font-weight: 600; font-size: 0.85rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: 0.2s; }
+        .btn-primary { background: var(--brand); color: white; }
+        .btn-primary:hover { background: var(--brand-hover); box-shadow: 0 4px 12px rgba(233, 30, 99, 0.2); }
+        .btn-outline { background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-main); }
+        .btn-outline:hover { background: var(--bg-canvas); }
 
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 800;
-            font-size: 1.2rem;
-            letter-spacing: -0.5px;
-        }
+        .workspace { display: flex; flex: 1; overflow: hidden; position: relative; }
 
-        .brand svg { width: 28px; height: 28px; }
+        /* SIDEBAR LEFT */
+        .sidebar-left { width: 330px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.3s ease; flex-shrink: 0; overflow: hidden; }
+        .sidebar-left.hidden { margin-left: -330px; border: none; }
 
-        .view-toggle {
-            display: flex;
-            background: var(--bg-app);
-            padding: 4px;
-            border-radius: var(--radius-sm);
-            border: 1px solid var(--border);
-        }
+        .lib-tabs { display: flex; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .lib-tab { flex: 1; padding: 12px 0; text-align: center; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: 0.2s; }
+        .lib-tab.active { color: var(--brand); border-bottom-color: var(--brand); }
 
-        .view-btn {
-            padding: 6px 16px;
-            border: none;
-            background: transparent;
-            border-radius: 4px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            color: var(--text-sub);
-            cursor: pointer;
-            transition: 0.2s;
-        }
+        .search-container { padding: 14px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+        .input-text { width: 100%; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-md); font-family: inherit; font-size: 0.88rem; outline: none; background: var(--bg-app); transition: border-color 0.2s; }
+        .input-text:focus { border-color: var(--brand); }
 
-        .view-btn.active {
-            background: var(--bg-panel);
-            color: var(--text-main);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .topbar-actions { display: flex; gap: 12px; align-items: center; }
-
-        .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: var(--radius-sm);
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            transition: 0.2s;
-            font-family: inherit;
-        }
-
-        .btn-primary { background: var(--primary); color: white; }
-        .btn-primary:hover { background: var(--primary-hover); }
-        .btn-secondary { background: var(--accent); color: white; }
-        .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
-        .btn-outline:hover { background: var(--bg-hover); }
-        .btn-icon { padding: 8px; border-radius: var(--radius-sm); }
-
-        .workspace {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        /* ==========================================================================
-           MODULE: Left Sidebar (Library)
-           ========================================================================== */
-        .sidebar-left {
-            width: 320px;
-            background: var(--bg-panel);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-            transition: width 0.3s ease;
-        }
-
-        .panel-header {
-            padding: 16px;
-            border-bottom: 1px solid var(--border);
-            font-weight: 700;
-            font-size: 0.9rem;
-        }
-
-        .search-box {
-            margin: 16px;
-            display: flex;
-            gap: 8px;
-        }
+        .library-grid { padding: 12px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; overflow-y: auto; flex: 1; align-content: start; }
+        .asset-card { background: var(--bg-panel); border-radius: var(--radius-md); border: 1px solid var(--border); display: flex; flex-direction: column; position: relative; cursor: pointer; transition: 0.2s; overflow: hidden; padding: 8px; gap: 6px; box-shadow: var(--shadow-sm); min-height: 145px; box-sizing: border-box; }
+        .asset-card:hover { border-color: var(--brand); transform: translateY(-2px); box-shadow: var(--shadow-md); }
         
-        .input-text {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            background: var(--bg-app);
-            color: var(--text-main);
-            font-family: inherit;
-            font-size: 0.9rem;
-            outline: none;
-        }
-        .input-text:focus { border-color: var(--accent); }
-
-        .library-grid {
-            padding: 0 16px 16px 16px;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            overflow-y: auto;
-            flex: 1;
-        }
-
-        .asset-card {
-            aspect-ratio: 1;
-            background-color: var(--bg-app);
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border);
-            position: relative;
-            cursor: pointer;
-            overflow: hidden;
-            background-size: cover;
-            background-position: center;
-            transition: 0.2s;
-        }
-
-        .asset-card:hover {
-            border-color: var(--accent);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .asset-label {
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            background: rgba(255,255,255,0.95);
-            padding: 6px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-align: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            border-top: 1px solid var(--border);
-            color: #1C1C1E;
-        }
-        [data-theme="dark"] .asset-label { background: rgba(30,30,30,0.95); color: #F5F5F5; }
-
-        /* ==========================================================================
-           MODULE: Center Canvas (Editor & Print Studio)
-           ========================================================================== */
-        .canvas-area {
-            flex: 1;
-            background: var(--bg-canvas);
-            position: relative;
-            overflow: auto;
-            display: flex;
-            padding: 40px;
-        }
-
-        .canvas-area::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-image: radial-gradient(var(--border) 1px, transparent 1px);
-            background-size: 20px 20px;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        #view-design, #view-print {
-            z-index: 1;
-            display: none;
-            width: 100%;
-        }
+        .asset-thumb { width: 100%; height: 90px; min-height: 90px; flex-shrink: 0; background-size: contain; background-position: center; background-repeat: no-repeat; background-color: #FAFAFA; border-radius: 6px; border: 1px solid #F1F5F9; }
+        .asset-info { display: flex; flex-direction: column; gap: 2px; overflow: hidden; flex-shrink: 0; }
+        .asset-series { font-size: 0.68rem; font-weight: 700; color: var(--brand); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+        .asset-title { font-size: 0.76rem; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.25; }
         
-        #view-design.active { 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-        }
+        .fav-btn { position: absolute; top: 10px; right: 10px; background: rgba(255,255,255,0.95); border: 1px solid var(--border); border-radius: 50%; width: 26px; height: 26px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-sm); z-index: 5; transition: 0.2s; color: #94A3B8; }
+        .fav-btn:hover { transform: scale(1.1); color: #F59E0B; }
+        .fav-btn.active { color: #F59E0B; border-color: #FDE68A; background: #FFFBEB; }
 
-        #view-print.active { 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 20px;
-        }
+        .quick-add-btn { position: absolute; bottom: 8px; right: 8px; background: var(--brand); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0.85); transition: 0.2s; z-index: 5; box-shadow: var(--shadow-sm); cursor: pointer; }
+        .asset-card:hover .quick-add-btn { opacity: 1; transform: scale(1); }
+        .quick-add-btn:hover { background: var(--brand-hover); }
 
-        .active-sticker-container {
-            background: var(--bg-panel);
-            padding: 30px;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-lg);
-            border: 1px solid var(--border);
-        }
+        /* CANVAS AREA */
+        .canvas-area { flex: 1; background: var(--bg-canvas); position: relative; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 28px; transition: 0.3s ease; }
+        .canvas-area::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: radial-gradient(var(--border) 1.2px, transparent 1.2px); background-size: 20px 20px; pointer-events: none; z-index: 0; }
 
-        .sticker {
-            width: 250px;
-            height: 250px;
-            border-radius: 50%;
-            background-color: #fff;
-            position: relative;
-            overflow: hidden;
-            box-shadow: inset 0 0 0 1px var(--border);
-            --bg-x: 50%; --bg-y: 15%; --bg-scale: 100%;
-            background-position: var(--bg-x) var(--bg-y);
-            background-size: var(--bg-scale);
-            background-repeat: no-repeat;
-        }
+        #view-design, #view-print { z-index: 1; display: none; width: 100%; align-items: center; flex-direction: column; }
+        #view-design.active, #view-print.active { display: flex; }
 
-        .sticker-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; --font-scale: 1; }
-        .sticker-svg text { paint-order: stroke fill; stroke: white; stroke-width: 2px; stroke-linecap: round; stroke-linejoin: round; font-family: 'Nunito', sans-serif; }
-        .svg-series { fill: var(--primary); font-weight: 900; font-size: calc(9px * var(--font-scale)); text-transform: uppercase; letter-spacing: 0.5px; }
+        .design-toolbar { display: flex; gap: 12px; margin-top: 24px; align-items: center; flex-wrap: wrap; justify-content: center; }
+
+        .preview-container { background: var(--bg-panel); padding: 32px; border-radius: 20px; box-shadow: var(--shadow-md); border: 1px solid var(--border); transition: 0.2s; display: flex; flex-direction: column; align-items: center; }
+        .preview-container.drag-over { border-color: var(--brand); background: #fdf2f8; transform: scale(1.02); }
+
+        .sticker { width: 260px; height: 260px; border-radius: 50%; background-color: #fff; position: relative; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08), inset 0 0 0 1px var(--border); --bg-x: 50%; --bg-y: 20%; --bg-scale: 90%; background-position: var(--bg-x) var(--bg-y); background-size: var(--bg-scale); background-repeat: no-repeat; }
+        .sticker-svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+        .sticker-svg text { paint-order: stroke fill; stroke: white; stroke-width: 2.5px; stroke-linecap: round; stroke-linejoin: round; font-family: 'Nunito', sans-serif; }
         
-        /* Adjusted Typography for bottom texts */
-        .svg-title { fill: #1C1C1E; font-weight: 800; font-size: calc(7px * var(--font-scale)); letter-spacing: 0.2px; }
-        .svg-id { fill: #636366; font-weight: 700; font-size: calc(5px * var(--font-scale)); font-family: monospace; letter-spacing: 0.8px; }
+        /* Removed letter-spacing to prevent overlapping */
+        .svg-series { fill: var(--brand); font-weight: 900; text-transform: uppercase; }
+        .svg-title { fill: #0F172A; font-weight: 800; }
+        .svg-id { fill: #64748B; font-weight: 700; font-family: monospace; }
 
-        /* Print Toolbar (Now integrated cleanly above the sheet) */
-        .print-toolbar {
-            background: var(--bg-panel);
-            padding: 12px 20px;
-            border-radius: var(--radius-md);
-            box-shadow: var(--shadow-md);
-            border: 1px solid var(--border);
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            justify-content: center;
-            flex-wrap: wrap;
-            max-width: 210mm;
-            width: 100%;
-        }
-
-        .a4-sheet {
-            background: white;
-            width: 210mm;
-            min-height: 297mm;
-            box-shadow: var(--shadow-lg);
-            display: grid;
-            box-sizing: border-box;
-            position: relative;
-        }
+        /* PRINT STUDIO UI */
+        .print-toolbar { background: var(--bg-panel); padding: 10px 20px; border-radius: var(--radius-lg); box-shadow: var(--shadow-md); border: 1px solid var(--border); display: flex; gap: 10px; align-items: center; margin-bottom: 24px; z-index: 2; flex-wrap: wrap; }
         
-        .slot {
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-        }
-        
-        .slot.drag-over { background: rgba(33, 150, 243, 0.1); border: 2px dashed var(--accent); }
+        .a4-sheet { background: white; width: 210mm; min-height: 297mm; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1); display: grid; box-sizing: border-box; position: relative; margin: 0 auto; }
+        .slot { border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; }
+        .slot.drag-over { background: rgba(233, 30, 99, 0.1); border: 2px dashed var(--brand); }
         .slot .sticker { width: 100%; height: 100%; cursor: grab; box-shadow: none; }
-        
-        .a4-sheet.show-cut-marks .sticker { border: 0.5pt dashed #A0A0A5 !important; }
-        .a4-sheet.show-cut-marks .slot { border: 0.5pt dashed #A0A0A5 !important; }
+        .a4-sheet.show-cut-marks .slot:empty { border: 0.5pt dashed #CBD5E1 !important; }
+        .a4-sheet.show-cut-marks .sticker { border: 0.5pt dashed #94A3B8 !important; }
 
-        .delete-btn {
-            position: absolute; top: 5%; right: 5%;
-            background: var(--primary); color: white;
-            border: none; border-radius: 50%;
-            width: 24px; height: 24px; font-weight: bold;
-            cursor: pointer; display: none; align-items: center; justify-content: center;
-            z-index: 10; box-shadow: var(--shadow-sm);
-        }
+        .delete-btn { position: absolute; top: 0; right: 0; background: var(--text-main); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-weight: bold; font-size: 11px; cursor: pointer; display: none; align-items: center; justify-content: center; z-index: 10; }
         #view-print .sticker:hover .delete-btn { display: flex; }
 
-        /* ==========================================================================
-           MODULE: Right Sidebar (Properties)
-           ========================================================================== */
-        .sidebar-right {
-            width: 300px;
-            background: var(--bg-panel);
-            border-left: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-            overflow-y: auto;
-        }
+        /* SIDEBAR RIGHT */
+        .sidebar-right { width: 330px; background: var(--bg-panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-right 0.3s ease; flex-shrink: 0; }
+        .sidebar-right.hidden { margin-right: -330px; border: none; }
 
-        .prop-section {
-            padding: 20px;
-            border-bottom: 1px solid var(--border);
-        }
-        .prop-title { font-size: 0.75rem; font-weight: 700; color: var(--text-sub); text-transform: uppercase; margin-bottom: 12px; letter-spacing: 0.5px; }
+        .prop-section { padding: 20px; border-bottom: 1px solid var(--border); }
+        .prop-title { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 14px; letter-spacing: 0.5px; }
+        .prop-group { margin-bottom: 14px; }
+        .prop-group label { display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; font-weight: 600; margin-bottom: 6px; }
+        input[type="range"] { width: 100%; accent-color: var(--brand); cursor: pointer; }
+        input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--brand); cursor: pointer; }
 
-        .prop-group { margin-bottom: 12px; }
-        .prop-group label { display: flex; justify-content: space-between; font-size: 0.8rem; font-weight: 600; margin-bottom: 6px; }
-        
-        input[type="range"] {
-            width: 100%;
-            accent-color: var(--accent);
-            cursor: pointer;
-        }
+        /* MODALS & TOASTS */
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: #0F172A; color: white; padding: 12px 24px; border-radius: 30px; font-size: 0.88rem; font-weight: 600; box-shadow: var(--shadow-md); z-index: 200; transition: transform 0.3s cubic-bezier(0.18, 0.89, 0.32, 1.28), opacity 0.3s; opacity: 0; pointer-events: none; }
+        .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
-        select.input-text { cursor: pointer; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; }
+        .modal-overlay.active { display: flex; }
+        .modal-box { background: white; padding: 32px; border-radius: 20px; max-width: 420px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15); }
 
-        /* ==========================================================================
-           MODULE: Print Media Queries
-           ========================================================================== */
         @media print {
             @page { size: A4 portrait; margin: 0; }
-            body, html { width: 100%; height: 100%; margin: 0; padding: 0; background: white; }
-            .topbar, .sidebar-left, .sidebar-right, .print-toolbar { display: none !important; }
-            .workspace, .canvas-area, #view-print { display: block !important; padding: 0 !important; margin: 0 !important; background: transparent !important; }
-            .canvas-area::before { display: none; }
-            .a4-sheet { margin: 0; box-shadow: none; width: 210mm; height: 297mm; page-break-inside: avoid; }
-            .a4-sheet.show-cut-marks .slot { border: 0.5pt dashed #A0A0A5 !important; border-radius: 0 !important; box-sizing: border-box; }
-            .delete-btn { display: none !important; }
-            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            body * { visibility: hidden; }
+            body, .workspace, .canvas-area { height: auto; overflow: visible; display: block; background: white; padding: 0; }
+            #view-print, .a4-sheet, .a4-sheet * { visibility: visible; }
+            #view-print { position: relative; left: 0; top: 0; width: 100%; padding: 0; display: block; }
+            .a4-sheet { margin: 0; box-shadow: none; border: none; }
+            .print-toolbar, .delete-btn, .topbar, .sidebar-left, .sidebar-right, .toast, .modal-overlay { display: none !important; }
         }
     </style>
 </head>
 <body>
 
     <header class="topbar">
-        <div class="brand">
-            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                <rect width="100" height="100" rx="20" fill="var(--primary)"/>
-                <circle cx="50" cy="50" r="30" fill="none" stroke="white" stroke-width="8" stroke-dasharray="10 10"/>
-                <path d="M 50 35 A 15 15 0 0 1 65 50" fill="none" stroke="white" stroke-width="6" stroke-linecap="round"/>
-                <circle cx="50" cy="50" r="8" fill="white"/>
+        <div class="brand-logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--brand)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
             </svg>
-            TagGen Studio <span style="color:var(--primary);">V2</span>
+            TagGen Studio <span>V2 Phoenix</span>
         </div>
-
-        <div class="view-toggle">
-            <button class="view-btn active" id="btn-view-design" onclick="App.switchView('design')">🎨 Design</button>
-            <button class="view-btn" id="btn-view-print" onclick="App.switchView('print')">🖨️ Print Studio</button>
+        <div class="view-switcher">
+            <button class="tab-btn active" id="btn-design" onclick="App.switchView('design')">🎨 Cover Editor</button>
+            <button class="tab-btn" id="btn-print" onclick="App.switchView('print')">🖨️ Print Studio</button>
         </div>
-
-        <div class="topbar-actions">
-            <span id="status-indicator" style="font-size: 0.8rem; font-weight: 600; color: var(--text-sub);">Lade Daten...</span>
-            <button class="btn btn-outline btn-icon" onclick="App.toggleTheme()" title="Theme wechseln">🌓</button>
-            <button class="btn btn-primary" onclick="PrintStudio.addCurrentToSheet()" id="nav-btn-add">+ Zum Bogen</button>
-        </div>
+        <div style="font-size: 0.78rem; font-weight: 600; color: var(--text-muted);" id="status-text">Lade Datenbank...</div>
     </header>
 
     <main class="workspace">
-        <!-- LEFT SIDEBAR: Library -->
+        <!-- LEFT: LIBRARY -->
         <aside class="sidebar-left" id="panel-library">
-            <div class="panel-header">Assets & Bibliothek</div>
-            
-            <div class="search-box">
-                <input type="text" class="input-text" id="search-input" placeholder="Tonie suchen...">
-                <button class="btn btn-outline btn-icon" title="Eigenes Bild" onclick="document.getElementById('fileUpload').click()">📷</button>
-                <input type="file" id="fileUpload" accept="image/*" style="display:none" onchange="Library.handleCustomUpload(event)">
+            <div class="lib-tabs">
+                <div class="lib-tab active" id="tab-db" onclick="Library.switchTab('db')">📚 Datenbank</div>
+                <div class="lib-tab" id="tab-fav" onclick="Library.switchTab('fav')">⭐ Favoriten</div>
             </div>
-
-            <div class="library-grid" id="library-grid">
-                <!-- Injected via JS -->
+            <div class="search-container">
+                <input type="text" class="input-text" id="search-input" placeholder="Tonie oder ID suchen...">
             </div>
+            <div class="library-grid" id="library-grid"></div>
         </aside>
 
-        <!-- CENTER: Canvas -->
+        <!-- CENTER: CANVAS -->
         <section class="canvas-area">
             
             <!-- DESIGN VIEW -->
             <div id="view-design" class="active">
-                <div class="active-sticker-container">
-                    <div class="sticker" id="preview-sticker">
-                        <div id="preview-svg-container" style="width:100%; height:100%; position:relative;"></div>
+                <div class="preview-container" id="drop-zone">
+                    <div class="sticker" id="preview-sticker"></div>
+                    <div style="margin-top: 14px; font-size: 0.8rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+                        <span>💡</span> Tipp: Eigene Bilddatei per Drag & Drop hier ablegen
                     </div>
+                </div>
+
+                <div class="design-toolbar">
+                    <button class="btn btn-primary" style="font-size: 1rem; padding: 12px 28px; box-shadow: var(--shadow-md);" onclick="PrintStudio.addCurrentToSheet()">
+                        + Auf den Druckbogen legen
+                    </button>
                 </div>
             </div>
 
             <!-- PRINT VIEW -->
             <div id="view-print">
                 <div class="print-toolbar">
-                    <select class="input-text" id="format-type-select" style="width: 180px;">
-                        <option value="free">Freies Raster</option>
-                        <option value="avery">Avery Zweckform</option>
+                    <select class="input-text" id="format-select" style="width: auto; font-weight: 600;">
+                        <option value="40">Freies Raster: 40mm (24 Stk - Kapsel)</option>
+                        <option value="43">Freies Raster: 43mm (20 Stk - Kapsel)</option>
+                        <option value="30">Freies Raster: 30mm (40 Stk - Token)</option>
+                        <option value="L3415">Avery Zweckform: 40mm (L3415)</option>
                     </select>
-                    <select class="input-text" id="format-size-select" style="width: 180px;"></select>
-                    <button class="btn btn-outline" id="btn-cutmarks">✂️ Linien</button>
-                    <div style="width: 1px; background: var(--border); margin: 0 5px; height: 20px;"></div>
-                    <button class="btn btn-outline" onclick="PrintStudio.autoFill()">⚡ Füllen</button>
-                    <button class="btn btn-outline" onclick="PrintStudio.clear()">🗑️ Leeren</button>
-                    <button class="btn btn-secondary" onclick="PrintStudio.exportPDF()">📄 PDF Export</button>
-                    <button class="btn btn-primary" onclick="window.print()">🖨️ A4 Drucken</button>
+                    <label style="display: flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.85rem; cursor: pointer; user-select: none;">
+                        <input type="checkbox" id="check-cutmarks" checked onchange="PrintStudio.toggleCutmarks()"> ✂️ Linien
+                    </label>
+                    <div style="width: 1px; height: 24px; background: var(--border); margin: 0 4px;"></div>
+                    <button class="btn btn-outline" onclick="PrintStudio.batchFill()" title="Aktuelles Motiv auf alle leeren Plätze füllen">⚡ Füllen</button>
+                    <button class="btn btn-outline" onclick="PrintStudio.confirmClearSheet()" title="Bogen leeren">🗑️</button>
+                    <div style="width: 1px; height: 24px; background: var(--border); margin: 0 4px;"></div>
+                    <button class="btn btn-primary" onclick="Export.toPNG()">🖼️ PNG Export</button>
+                    <button class="btn btn-primary" onclick="Export.showPrePrintModal()">🖨️ A4 Drucken</button>
                 </div>
-                <div class="a4-sheet show-cut-marks" id="a4-sheet"></div>
+                <div class="a4-sheet" id="a4-sheet"></div>
             </div>
-
         </section>
 
-        <!-- RIGHT SIDEBAR: Properties -->
-        <aside class="sidebar-right" id="panel-properties">
+        <!-- RIGHT: PROPERTIES -->
+        <aside class="sidebar-right" id="panel-props">
             <div class="prop-section">
                 <div class="prop-title">Typografie</div>
+                
                 <div class="prop-group">
-                    <label>Serie (Oben)</label>
-                    <input type="text" class="input-text" id="edit-series" placeholder="z.B. TKKG">
+                    <label style="display: flex; gap: 8px; justify-content: flex-start; margin-bottom: 8px; cursor: pointer;">
+                        <input type="checkbox" id="check-series" checked> <span>Serie (Oben)</span>
+                    </label>
+                    <input type="text" class="input-text" id="inp-series">
                 </div>
+                
                 <div class="prop-group">
-                    <label>Titel (Unten)</label>
-                    <input type="text" class="input-text" id="edit-title" placeholder="z.B. Folge 1">
+                    <label style="display: flex; gap: 8px; justify-content: flex-start; margin-bottom: 8px; cursor: pointer;">
+                        <input type="checkbox" id="check-title" checked> <span>Titel (Unten)</span>
+                    </label>
+                    <input type="text" class="input-text" id="inp-title">
                 </div>
-                <div class="prop-group">
-                    <label>Audio-ID (UID)</label>
-                    <input type="text" class="input-text" id="edit-uid" placeholder="Hex / ID...">
+                
+                <div class="prop-group" style="margin-top: 18px;">
+                    <label style="display: flex; gap: 8px; justify-content: flex-start; margin-bottom: 8px; cursor: pointer;">
+                        <input type="checkbox" id="check-uid"> <span>UID / Code aufdrucken</span>
+                    </label>
+                    <input type="text" class="input-text" id="inp-uid" placeholder="Hex-Code / Audio-ID">
                 </div>
-                <div class="prop-group" style="margin-top: 15px;">
-                    <label><span>Schriftgröße</span> <span id="val-font" style="color: var(--accent);">100%</span></label>
-                    <input type="range" id="slide-font" min="50" max="150" value="100" step="5">
+                
+                <div class="prop-group" style="margin-top: 14px;">
+                    <label><span>Schriftgröße</span> <span id="val-font" style="color: var(--brand);">100%</span></label>
+                    <input type="range" id="slide-font" min="60" max="140" value="100">
                 </div>
             </div>
 
             <div class="prop-section">
                 <div class="prop-title">Bild-Transformation</div>
                 <div class="prop-group">
-                    <label><span>Zoom</span> <span id="val-zoom" style="color: var(--accent);">100%</span></label>
-                    <input type="range" id="slide-zoom" min="50" max="250" value="100" step="5">
+                    <label><span>Zoom</span> <span id="val-zoom" style="color: var(--brand);">90%</span></label>
+                    <input type="range" id="slide-zoom" min="50" max="200" value="90">
                 </div>
                 <div class="prop-group">
                     <label>Position X (↔)</label>
-                    <input type="range" id="slide-x" min="0" max="100" value="50" step="1">
+                    <input type="range" id="slide-x" min="0" max="100" value="50">
                 </div>
                 <div class="prop-group">
                     <label>Position Y (↕)</label>
-                    <input type="range" id="slide-y" min="0" max="100" value="15" step="1">
+                    <input type="range" id="slide-y" min="0" max="100" value="20">
                 </div>
-            </div>
-            
-            <div class="prop-section" style="border:none;">
-                <button class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;" onclick="PrintStudio.addCurrentToSheet()">
-                    Auf den Bogen legen
-                </button>
             </div>
         </aside>
     </main>
 
+    <!-- MODALS -->
+    <div class="modal-overlay" id="print-modal">
+        <div class="modal-box">
+            <h2 style="margin-bottom: 12px; font-size: 1.25rem;">Wichtiger Druck-Hinweis 🖨️</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px; line-height: 1.5;">
+                Damit die Aufkleber exakt in deine Kapseln oder auf die Etiketten passen, musst du im Druckdialog deines Browsers die Skalierung zwingend auf <strong style="color: var(--brand);">"100%"</strong> oder <strong style="color: var(--brand);">"Tatsächliche Größe"</strong> stellen. <br><br>Schalte "An Seite anpassen" aus!
+            </p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button class="btn btn-outline" onclick="document.getElementById('print-modal').classList.remove('active')">Abbrechen</button>
+                <button class="btn btn-primary" onclick="Export.executePrint()">Alles klar, drucken!</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="clear-modal">
+        <div class="modal-box">
+            <h2 style="margin-bottom: 12px; font-size: 1.25rem;">Bogen leeren? 🗑️</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 24px; line-height: 1.5;">
+                Möchtest du wirklich alle Aufkleber von diesem Druckbogen entfernen?
+            </p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button class="btn btn-outline" onclick="document.getElementById('clear-modal').classList.remove('active')">Abbrechen</button>
+                <button class="btn btn-primary" onclick="PrintStudio.executeClearSheet()">Ja, Bogen leeren</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="app-toast"></div>
+
     <script>
         const CONFIG = {
-            DATA_URL: 'https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json',
-            CACHE_KEY: 'taggen_v2_data'
+            API_URL: 'https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json',
+            FORMATS: {
+                '40': { type: 'free', size: '40mm', cols: 4, rows: 6, gap: '5mm', padding: '10mm' },
+                '43': { type: 'free', size: '43mm', cols: 4, rows: 5, gap: '5mm', padding: '10mm' },
+                '30': { type: 'free', size: '30mm', cols: 5, rows: 8, gap: '5mm', padding: '10mm' },
+                'L3415': { type: 'avery', size: '40mm', cols: 4, rows: 6, gap_col: '5mm', gap_row: '5mm', pad_top: '13mm', pad_left: '15mm' }
+            }
         };
 
-        const FORMATS = {
-            '43': { type: 'free', size: '43mm', cols: 4, rows: 5, gap: '5mm', padding: '10mm', text: '43mm (20 Stk - Kapsel)' },
-            '40': { type: 'free', size: '40mm', cols: 4, rows: 6, gap: '5mm', padding: '10mm', text: '40mm (24 Stk - Kapsel)' },
-            '30': { type: 'free', size: '30mm', cols: 5, rows: 8, gap: '5mm', padding: '10mm', text: '30mm (40 Stk - Token)' },
-            'L3415': { type: 'avery', size: '40mm', cols: 4, rows: 6, gap_col: '5mm', gap_row: '5mm', pad_top: '13mm', pad_left: '15mm', text: '40mm (Avery L3415 - 24 Stk)' },
-            'avery30': { type: 'avery', size: '30mm', cols: 5, rows: 9, gap_col: '3mm', gap_row: '3mm', pad_top: '12mm', pad_left: '15mm', text: '30mm (Avery 30mm - 45 Stk)' }
-        };
+        const State = { activeItem: null, uidCounter: 0, db: [], favorites: [] };
 
-        const DOM = {
-            status: document.getElementById('status-indicator'),
-            search: document.getElementById('search-input'),
-            grid: document.getElementById('library-grid'),
-            editSeries: document.getElementById('edit-series'),
-            editTitle: document.getElementById('edit-title'),
-            editUid: document.getElementById('edit-uid'),
-            slideFont: document.getElementById('slide-font'),
-            slideZoom: document.getElementById('slide-zoom'),
-            slideX: document.getElementById('slide-x'),
-            slideY: document.getElementById('slide-y'),
-            valFont: document.getElementById('val-font'),
-            valZoom: document.getElementById('val-zoom'),
-            previewBox: document.getElementById('preview-sticker'),
-            previewSvg: document.getElementById('preview-svg-container'),
-            sheet: document.getElementById('a4-sheet'),
-            typeSelect: document.getElementById('format-type-select'),
-            sizeSelect: document.getElementById('format-size-select'),
-            btnCutmarks: document.getElementById('btn-cutmarks'),
-            viewDesign: document.getElementById('view-design'),
-            viewPrint: document.getElementById('view-print'),
-            btnDesign: document.getElementById('btn-view-design'),
-            btnPrint: document.getElementById('btn-view-print'),
-            panelProps: document.getElementById('panel-properties'),
-            panelLibrary: document.getElementById('panel-library')
+        const Toast = {
+            timeout: null,
+            show(msg) {
+                const el = document.getElementById('app-toast');
+                el.innerText = msg;
+                el.classList.add('show');
+                clearTimeout(this.timeout);
+                this.timeout = setTimeout(() => el.classList.remove('show'), 3000);
+            }
         };
 
         const Editor = {
-            currentItem: null,
-            uidCounter: 0,
-
             init() {
-                [DOM.editSeries, DOM.editTitle, DOM.editUid].forEach(el => el.addEventListener('input', () => this.renderSVG()));
-                [DOM.slideFont, DOM.slideZoom, DOM.slideX, DOM.slideY].forEach(el => el.addEventListener('input', () => this.applyTransformations()));
+                ['inp-series', 'inp-title', 'inp-uid', 'check-uid', 'check-series', 'check-title'].forEach(id => {
+                    document.getElementById(id).addEventListener('input', () => this.render());
+                });
+                ['slide-zoom', 'slide-x', 'slide-y', 'slide-font'].forEach(id => {
+                    document.getElementById(id).addEventListener('input', () => this.updateTransform());
+                });
+                
+                const dropZone = document.getElementById('drop-zone');
+                dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+                dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+                dropZone.addEventListener('drop', (e) => {
+                    e.preventDefault(); dropZone.classList.remove('drag-over');
+                    if (e.dataTransfer.files && e.dataTransfer.files[0]) this.loadCustomImage(e.dataTransfer.files[0]);
+                });
             },
-
-            loadItem(item) {
-                this.currentItem = item;
+            loadCustomImage(file) {
+                const reader = new FileReader();
+                reader.onload = ev => {
+                    this.load({ title: "Custom Tag", series: "Eigenes Bild", id: "", pic: ev.target.result });
+                    Toast.show("Eigenes Foto geladen! 🖼️");
+                };
+                reader.readAsDataURL(file);
+            },
+            load(item) {
+                State.activeItem = item;
                 let s = item.series || ''; 
                 let t = item.title || '';
+                
                 if(s && t.toLowerCase().includes(s.toLowerCase())) {
                     t = t.replace(new RegExp(s, 'ig'), '').replace(/^[\s\-–:]+|[\s\-–:]+$/g, '');
                 }
                 t = t.replace(/(?:Folge|Teil|Vol\.?|Episode)\s*\d+[\s\-–:]*/ig, '').trim();
 
-                DOM.editSeries.value = s;
-                DOM.editTitle.value = t || item.title || '';
-                DOM.editUid.value = item.id !== 'undefined' ? item.id : '';
-                DOM.previewBox.style.backgroundImage = item.pic ? `url('${item.pic}')` : 'none';
+                document.getElementById('inp-series').value = s;
+                document.getElementById('inp-title').value = t;
+                document.getElementById('inp-uid').value = item.id && item.id !== 'undefined' ? item.id : '';
                 
-                this.renderSVG();
-                this.applyTransformations();
+                document.getElementById('preview-sticker').style.backgroundImage = item.pic ? `url('${item.pic}')` : 'none';
+                
+                this.updateTransform();
+                this.render();
             },
+            updateTransform() {
+                const z = document.getElementById('slide-zoom').value;
+                const x = document.getElementById('slide-x').value;
+                const y = document.getElementById('slide-y').value;
+                const f = document.getElementById('slide-font').value;
 
-            applyTransformations() {
-                DOM.valFont.innerText = DOM.slideFont.value + '%';
-                DOM.valZoom.innerText = DOM.slideZoom.value + '%';
-                DOM.previewBox.style.setProperty('--bg-scale', DOM.slideZoom.value + '%');
-                DOM.previewBox.style.setProperty('--bg-x', DOM.slideX.value + '%');
-                DOM.previewBox.style.setProperty('--bg-y', DOM.slideY.value + '%');
-                this.renderSVG();
+                document.getElementById('val-zoom').innerText = z + '%';
+                document.getElementById('val-font').innerText = f + '%';
+
+                const p = document.getElementById('preview-sticker');
+                p.style.setProperty('--bg-scale', z + '%');
+                p.style.setProperty('--bg-x', x + '%');
+                p.style.setProperty('--bg-y', y + '%');
+                this.render();
             },
+            generateSVG() {
+                if(!State.activeItem) return '';
+                State.uidCounter++;
+                const id = State.uidCounter;
+                const s = document.getElementById('inp-series').value.trim();
+                const t = document.getElementById('inp-title').value.trim();
+                const showUid = document.getElementById('check-uid').checked;
+                const showSeries = document.getElementById('check-series').checked;
+                const showTitle = document.getElementById('check-title').checked;
+                const uid = showUid ? document.getElementById('inp-uid').value.trim() : '';
+                const fScale = document.getElementById('slide-font').value / 100;
 
-            buildSVGString(sText, tText, idText, fontScale) {
-                this.uidCounter++;
-                const uid = `arc_${this.uidCounter}`;
-                // PERFECTED MATH:
-                // Top text curves from left to right over the top. Radius 35.
-                // Title text curves from left to right over the bottom. Sweep=0 keeps it upright. Radius 32 (closer to image).
-                // ID text curves from left to right over the bottom. Radius 42 (pushed out to the edge).
                 return `
-                    <svg viewBox="0 0 100 100" class="sticker-svg" style="--font-scale: ${fontScale}">
+                    <svg viewBox="0 0 100 100" class="sticker-svg">
                         <defs>
-                            <path id="top_${uid}" d="M 15 50 A 35 35 0 0 1 85 50" />
-                            <path id="title_${uid}" d="M 18 50 A 32 32 0 0 0 82 50" />
-                            <path id="id_${uid}" d="M 8 50 A 42 42 0 0 0 92 50" />
+                            <path id="top_${id}" d="M 12 50 A 38 38 0 0 1 88 50" />
+                            <path id="title_${id}" d="M 15 50 A 35 35 0 0 0 85 50" />
+                            <path id="id_${id}" d="M 5 50 A 45 45 0 0 0 95 50" />
                         </defs>
-                        <text class="svg-series"><textPath href="#top_${uid}" startOffset="50%" text-anchor="middle">${sText}</textPath></text>
-                        <text class="svg-title"><textPath href="#title_${uid}" startOffset="50%" text-anchor="middle">${tText}</textPath></text>
-                        <text class="svg-id"><textPath href="#id_${uid}" startOffset="50%" text-anchor="middle">${idText}</textPath></text>
+                        ${(showSeries && s) ? `<text class="svg-series" style="font-size: ${8.5 * fScale}px;"><textPath href="#top_${id}" startOffset="50%" text-anchor="middle">${s}</textPath></text>` : ''}
+                        ${(showTitle && t) ? `<text class="svg-title" style="font-size: ${7.2 * fScale}px;"><textPath href="#title_${id}" startOffset="50%" text-anchor="middle">${t}</textPath></text>` : ''}
+                        ${uid ? `<text class="svg-id" style="font-size: ${5 * fScale}px;"><textPath href="#id_${id}" startOffset="50%" text-anchor="middle">${uid}</textPath></text>` : ''}
                     </svg>
                 `;
             },
-
-            renderSVG() {
-                if(!this.currentItem) return;
-                const svgStr = this.buildSVGString(
-                    DOM.editSeries.value.trim(), 
-                    DOM.editTitle.value.trim(), 
-                    DOM.editUid.value.trim(), 
-                    DOM.slideFont.value / 100
-                );
-                DOM.previewSvg.innerHTML = svgStr;
-                return svgStr;
+            render() { 
+                document.getElementById('preview-sticker').innerHTML = this.generateSVG(); 
             }
         };
 
         const PrintStudio = {
-            stickerCount: 0,
-
-            init() {
-                DOM.typeSelect.addEventListener('change', () => this.populateSizeOptions());
-                DOM.sizeSelect.addEventListener('change', () => this.buildSheet());
-                DOM.btnCutmarks.addEventListener('click', () => {
-                    DOM.sheet.classList.toggle('show-cut-marks');
-                    DOM.btnCutmarks.classList.toggle('btn-primary');
-                });
-                this.populateSizeOptions();
+            init() { 
+                document.getElementById('format-select').addEventListener('change', () => this.buildSheet()); 
+                this.buildSheet(); 
             },
-
-            populateSizeOptions() {
-                const type = DOM.typeSelect.value;
-                DOM.sizeSelect.innerHTML = '';
-                Object.entries(FORMATS).filter(([_, conf]) => conf.type === type).forEach(([key, conf]) => {
-                    const opt = document.createElement('option');
-                    opt.value = key; opt.innerText = conf.text;
-                    DOM.sizeSelect.appendChild(opt);
-                });
-                DOM.btnCutmarks.style.display = type === 'free' ? 'inline-flex' : 'none';
-                this.buildSheet();
-            },
-
             buildSheet() {
-                const config = FORMATS[DOM.sizeSelect.value];
-                DOM.sheet.innerHTML = ''; 
-                DOM.sheet.style = 'display: grid;';
+                const sheet = document.getElementById('a4-sheet');
+                const conf = CONFIG.FORMATS[document.getElementById('format-select').value];
+                sheet.innerHTML = '';
+                sheet.style = 'display: grid;';
                 
-                if(config.type === 'free') {
-                    DOM.sheet.style.gridTemplateColumns = `repeat(${config.cols}, ${config.size})`;
-                    DOM.sheet.style.gap = config.gap;
-                    DOM.sheet.style.padding = config.padding;
-                    DOM.sheet.style.justifyContent = 'center';
+                if(conf.type === 'free') {
+                    sheet.style.gridTemplateColumns = `repeat(${conf.cols}, ${conf.size})`;
+                    sheet.style.gap = conf.gap;
+                    sheet.style.padding = conf.padding;
+                    sheet.style.justifyContent = 'center';
                 } else {
-                    DOM.sheet.style.gridTemplateColumns = `repeat(${config.cols}, ${config.size})`;
-                    DOM.sheet.style.gridTemplateRows = `repeat(${config.rows}, ${config.size})`;
-                    DOM.sheet.style.columnGap = config.gap_col;
-                    DOM.sheet.style.rowGap = config.gap_row;
-                    DOM.sheet.style.paddingTop = config.pad_top;
-                    DOM.sheet.style.paddingLeft = config.pad_left;
+                    sheet.style.gridTemplateColumns = `repeat(${conf.cols}, ${conf.size})`;
+                    sheet.style.gridTemplateRows = `repeat(${conf.rows}, ${conf.size})`;
+                    sheet.style.columnGap = conf.gap_col;
+                    sheet.style.rowGap = conf.gap_row;
+                    sheet.style.paddingTop = conf.pad_top;
+                    sheet.style.paddingLeft = conf.pad_left;
                 }
                 
-                for(let i=0; i < config.cols * config.rows; i++) {
+                for(let i=0; i < (conf.cols * conf.rows); i++) {
                     const slot = document.createElement('div');
                     slot.className = 'slot';
-                    slot.style.width = config.size;
-                    slot.style.height = config.size;
+                    slot.style.width = conf.size;
+                    slot.style.height = conf.size;
                     
-                    slot.addEventListener('dragover', e => { e.preventDefault(); if(!slot.children.length) slot.classList.add('drag-over'); });
+                    slot.addEventListener('dragover', e => { 
+                        e.preventDefault(); 
+                        if(!slot.children.length) slot.classList.add('drag-over'); 
+                    });
                     slot.addEventListener('dragleave', () => slot.classList.remove('drag-over'));
-                    slot.addEventListener('drop', e => {
-                        e.preventDefault(); slot.classList.remove('drag-over');
-                        if(!slot.children.length) {
-                            const d = document.getElementById(e.dataTransfer.getData('text/plain'));
-                            if(d) slot.appendChild(d);
+                    slot.addEventListener('drop', e => { 
+                        e.preventDefault(); 
+                        slot.classList.remove('drag-over'); 
+                        const data = e.dataTransfer.getData('text/plain'); 
+                        if(data && !slot.children.length) {
+                            const node = document.getElementById(data);
+                            if(node) slot.appendChild(node);
                         }
                     });
-                    DOM.sheet.appendChild(slot);
+                    sheet.appendChild(slot);
                 }
+                this.toggleCutmarks();
             },
-
-            createStickerNode() {
-                if(!Editor.currentItem) return null;
-                this.stickerCount++;
-                const sticker = document.createElement('div');
-                sticker.className = 'sticker';
-                sticker.id = `print-sticker-${this.stickerCount}`;
-                sticker.draggable = true;
+            createNode() {
+                if(!State.activeItem) return null;
+                const node = document.createElement('div');
+                node.className = 'sticker';
+                node.id = `st-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
+                node.draggable = true;
                 
-                if(Editor.currentItem.pic) sticker.style.backgroundImage = `url('${Editor.currentItem.pic}')`;
-                sticker.style.setProperty('--bg-scale', DOM.slideZoom.value + '%');
-                sticker.style.setProperty('--bg-x', DOM.slideX.value + '%');
-                sticker.style.setProperty('--bg-y', DOM.slideY.value + '%');
-                sticker.innerHTML = Editor.renderSVG();
-
+                if(State.activeItem.pic) node.style.backgroundImage = `url('${State.activeItem.pic}')`;
+                node.style.setProperty('--bg-scale', document.getElementById('slide-zoom').value + '%');
+                node.style.setProperty('--bg-x', document.getElementById('slide-x').value + '%');
+                node.style.setProperty('--bg-y', document.getElementById('slide-y').value + '%');
+                node.innerHTML = Editor.generateSVG();
+                
                 const del = document.createElement('button');
                 del.className = 'delete-btn';
-                del.innerHTML = '×';
-                del.onclick = e => { e.stopPropagation(); sticker.remove(); };
-                sticker.appendChild(del);
-
-                sticker.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', sticker.id); setTimeout(() => sticker.style.opacity = '0.5', 0); });
-                sticker.addEventListener('dragend', () => sticker.style.opacity = '1');
-                return sticker;
+                del.innerHTML = '✕';
+                del.onclick = (e) => { e.stopPropagation(); node.remove(); };
+                node.appendChild(del);
+                
+                node.addEventListener('dragstart', e => { 
+                    e.dataTransfer.setData('text/plain', node.id); 
+                    setTimeout(() => node.style.opacity = '0.5', 0); 
+                });
+                node.addEventListener('dragend', () => node.style.opacity = '1');
+                return node;
             },
-
-            addCurrentToSheet() {
-                const node = this.createStickerNode();
-                if(!node) { alert("Bitte erst ein Motiv wählen!"); return; }
-                const empty = Array.from(DOM.sheet.querySelectorAll('.slot')).find(s => !s.children.length);
-                if(!empty) { alert("Druckbogen ist voll!"); return; }
-                empty.appendChild(node);
-                App.switchView('print');
+            addCurrentToSheet(silent = false) {
+                const node = this.createNode();
+                if(!node) {
+                    Toast.show("Bitte wähle zuerst ein Motiv aus! 👆");
+                    return;
+                }
+                const empty = Array.from(document.querySelectorAll('.slot')).find(s => !s.children.length);
+                if(empty) { 
+                    empty.appendChild(node);
+                    if(!silent) {
+                        App.switchView('print');
+                        Toast.show("Auf den Druckbogen gelegt! 🖨️");
+                    }
+                } else {
+                    Toast.show("Der Druckbogen ist bereits voll!");
+                }
             },
-
-            autoFill() {
-                const empties = Array.from(DOM.sheet.querySelectorAll('.slot')).filter(s => !s.children.length);
-                if(!empties.length) return alert("Bogen ist voll!");
+            batchFill() {
+                const empties = Array.from(document.querySelectorAll('.slot')).filter(s => !s.children.length);
+                if(!empties.length) {
+                    Toast.show("Der Bogen ist bereits voll!");
+                    return;
+                }
+                if(!State.activeItem) {
+                    Toast.show("Bitte wähle zuerst ein Motiv im Editor!");
+                    return;
+                }
                 empties.forEach(slot => {
-                    const node = this.createStickerNode();
+                    const node = this.createNode();
                     if(node) slot.appendChild(node);
                 });
+                Toast.show(`${empties.length} Plätze gefüllt! ⚡`);
             },
-
-            clear() {
-                if(confirm("Bogen wirklich leeren?")) this.buildSheet();
+            confirmClearSheet() {
+                document.getElementById('clear-modal').classList.add('active');
             },
-
-            exportPDF() {
-                const btns = DOM.sheet.querySelectorAll('.delete-btn');
-                btns.forEach(b => b.style.display = 'none');
-                html2pdf().set({
-                    margin: 0, filename: 'TagGen_V2_Bogen.pdf',
-                    image: { type: 'jpeg', quality: 1.0 },
-                    html2canvas: { scale: 3, useCORS: true },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-                }).from(DOM.sheet).save().then(() => btns.forEach(b => b.style.display = ''));
+            executeClearSheet() {
+                document.getElementById('clear-modal').classList.remove('active');
+                this.buildSheet();
+                Toast.show("Bogen geleert! 🗑️");
+            },
+            toggleCutmarks() {
+                const sheet = document.getElementById('a4-sheet');
+                const isFree = CONFIG.FORMATS[document.getElementById('format-select').value].type === 'free';
+                sheet.classList.toggle('show-cut-marks', document.getElementById('check-cutmarks').checked && isFree);
             }
         };
 
         const Library = {
-            data: [],
+            currentMode: 'db',
             async init() {
-                DOM.search.addEventListener('input', e => this.search(e.target.value));
-                await this.fetchData();
-            },
-            async fetchData() {
-                const cached = localStorage.getItem(CONFIG.CACHE_KEY);
-                if (cached) {
-                    try {
-                        this.data = JSON.parse(cached);
-                        this.renderGrid(this.data.slice(0, 12));
-                        DOM.status.innerText = `Library geladen ✓`;
-                        return;
-                    } catch(e) {}
-                }
+                State.favorites = JSON.parse(localStorage.getItem('taggen_favs')) || [];
+                document.getElementById('search-input').addEventListener('input', e => this.search(e.target.value));
                 try {
-                    DOM.status.innerText = 'Lade GitHub...';
-                    const response = await fetch(CONFIG.DATA_URL);
-                    const rawData = await response.json();
-                    let items = Array.isArray(rawData) ? rawData : Object.values(rawData).flat();
-                    this.data = items.map(i => ({
-                        title: i.title || i.name || '',
+                    const res = await fetch(CONFIG.API_URL);
+                    const data = await res.json();
+                    let items = Array.isArray(data) ? data : Object.values(data).flat();
+                    State.db = items.map(i => ({
+                        title: i.title || i.name || i.episodes || '',
                         series: i.series || '',
-                        id: String(i.audio_id || i.hash || i.id || ''),
+                        id: String((Array.isArray(i.audio_id) ? i.audio_id[0] : i.audio_id) || i.hash || i.id || ''),
                         pic: i.picture || i.pic || i.image || ''
                     })).filter(i => i.title || i.series);
-                    localStorage.setItem(CONFIG.CACHE_KEY, JSON.stringify(this.data));
-                    this.renderGrid(this.data.slice(0, 12));
-                    DOM.status.innerText = `${this.data.length} Einträge ✓`;
-                } catch (err) {
-                    DOM.status.innerText = "Offline Modus";
+
+                    document.getElementById('status-text').innerText = `${State.db.length} Tonies ✓`;
+                    this.render(State.db.slice(0, 30));
+                } catch(e) {
+                    document.getElementById('status-text').innerText = "Offline Modus";
                 }
             },
-            search(query) {
-                const q = query.toLowerCase().trim();
-                if(q.length < 2) { this.renderGrid(this.data.slice(0, 12)); return; }
-                const results = this.data.filter(t => t.title.toLowerCase().includes(q) || t.series.toLowerCase().includes(q) || t.id.toLowerCase().includes(q)).slice(0, 12);
-                this.renderGrid(results);
+            switchTab(tab) {
+                this.currentMode = tab;
+                document.getElementById('tab-db').classList.toggle('active', tab === 'db');
+                document.getElementById('tab-fav').classList.toggle('active', tab === 'fav');
+                document.getElementById('search-input').value = '';
+                this.render(tab === 'fav' ? State.favorites : State.db.slice(0, 30));
             },
-            renderGrid(items) {
-                DOM.grid.innerHTML = '';
+            search(q) {
+                q = q.toLowerCase().trim();
+                let source = this.currentMode === 'fav' ? State.favorites : State.db;
+                const res = q.length < 2 
+                    ? source.slice(0, 30) 
+                    : source.filter(t => t.title.toLowerCase().includes(q) || t.series.toLowerCase().includes(q) || t.id.includes(q)).slice(0, 50);
+                this.render(res);
+            },
+            toggleFav(item, e) {
+                e.stopPropagation();
+                const idx = State.favorites.findIndex(f => f.id === item.id && f.title === item.title);
+                if (idx > -1) {
+                    State.favorites.splice(idx, 1);
+                    e.currentTarget.classList.remove('active');
+                    e.currentTarget.innerText = '☆';
+                } else {
+                    State.favorites.push(item);
+                    e.currentTarget.classList.add('active');
+                    e.currentTarget.innerText = '★';
+                }
+                localStorage.setItem('taggen_favs', JSON.stringify(State.favorites));
+                if(this.currentMode === 'fav') this.search(document.getElementById('search-input').value);
+            },
+            render(items) {
+                const grid = document.getElementById('library-grid');
+                grid.innerHTML = '';
+                
+                if(!items.length) {
+                    grid.innerHTML = `<div style="grid-column: span 2; text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 30px 10px;">Keine Einträge gefunden.</div>`;
+                    return;
+                }
+
                 items.forEach(item => {
+                    const isFav = State.favorites.some(f => f.id === item.id && f.title === item.title);
                     const card = document.createElement('div');
                     card.className = 'asset-card';
-                    if(item.pic) card.style.backgroundImage = `url('${item.pic}')`;
-                    const label = document.createElement('div');
-                    label.className = 'asset-label';
-                    label.innerText = item.series ? `${item.series} - ${item.title}` : item.title;
-                    card.appendChild(label);
-                    card.onclick = () => { Editor.loadItem(item); App.switchView('design'); };
-                    DOM.grid.appendChild(card);
-                });
-            },
-            handleCustomUpload(e) {
-                const file = e.target.files[0];
-                if(file) {
-                    const reader = new FileReader();
-                    reader.onload = ev => {
-                        Editor.loadItem({ title: "Custom", series: "Eigenes Bild", id: "TAG", pic: ev.target.result });
+                    
+                    const bgStyle = item.pic 
+                        ? `background-image: url('${item.pic}');` 
+                        : `background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23CBD5E1' stroke-width='1.5'%3E%3Cpath d='M9 18V5l12-2v13'%3E%3C/path%3E%3Ccircle cx='6' cy='18' r='3'%3E%3C/circle%3E%3Ccircle cx='18' cy='16' r='3'%3E%3C/circle%3E%3C/svg%3E"); background-size: 40px;`;
+
+                    card.innerHTML = `
+                        <button class="fav-btn ${isFav ? 'active' : ''}" title="Favorit">${isFav ? '★' : '☆'}</button>
+                        <div class="asset-thumb" style="${bgStyle}"></div>
+                        <div class="asset-info">
+                            <span class="asset-series" title="${item.series || 'Tonie'}">${item.series || 'Tonie'}</span>
+                            <span class="asset-title" title="${item.title || 'Unbekannt'}">${item.title || 'Unbekannt'}</span>
+                        </div>
+                        <button class="quick-add-btn" title="Direkt auf Bogen legen">+</button>
+                    `;
+
+                    card.querySelector('.fav-btn').onclick = (e) => this.toggleFav(item, e);
+                    
+                    card.querySelector('.quick-add-btn').onclick = (e) => {
+                        e.stopPropagation();
+                        Editor.load(item);
+                        PrintStudio.addCurrentToSheet(true);
+                        Toast.show(`Auf Bogen gelegt! 🖨️`);
+                    };
+
+                    card.onclick = () => {
+                        Editor.load(item);
                         App.switchView('design');
                     };
-                    reader.readAsDataURL(file);
-                }
+                    
+                    grid.appendChild(card);
+                });
+            }
+        };
+
+        const Export = {
+            hideUI() { document.querySelectorAll('.delete-btn').forEach(b => b.style.display = 'none'); },
+            restoreUI() { document.querySelectorAll('.delete-btn').forEach(b => b.style.display = ''); },
+            toPNG() {
+                this.hideUI();
+                Toast.show("Erstelle PNG... ⏳");
+                html2canvas(document.getElementById('a4-sheet'), { scale: 3, useCORS: true }).then(c => {
+                    const a = document.createElement('a');
+                    a.href = c.toDataURL('image/png');
+                    a.download = 'TagGen_Druckbogen.png';
+                    a.click();
+                    this.restoreUI();
+                }).catch(() => {
+                    this.restoreUI();
+                    Toast.show("Export fehlgeschlagen.");
+                });
+            },
+            showPrePrintModal() { 
+                document.getElementById('print-modal').classList.add('active'); 
+            },
+            executePrint() { 
+                document.getElementById('print-modal').classList.remove('active'); 
+                window.print(); 
             }
         };
 
         const App = {
-            init() {
-                this.initTheme();
-                Editor.init();
-                PrintStudio.init();
-                Library.init();
-            },
-            initTheme() {
-                const saved = localStorage.getItem('theme') || 'light';
-                document.documentElement.setAttribute('data-theme', saved);
-            },
-            toggleTheme() {
-                const current = document.documentElement.getAttribute('data-theme');
-                const next = current === 'dark' ? 'light' : 'dark';
-                document.documentElement.setAttribute('data-theme', next);
-                localStorage.setItem('theme', next);
+            init() { 
+                Editor.init(); 
+                PrintStudio.init(); 
+                Library.init(); 
             },
             switchView(view) {
-                DOM.viewDesign.classList.toggle('active', view === 'design');
-                DOM.viewPrint.classList.toggle('active', view === 'print');
-                DOM.btnDesign.classList.toggle('active', view === 'design');
-                DOM.btnPrint.classList.toggle('active', view === 'print');
+                document.getElementById('btn-design').classList.toggle('active', view === 'design');
+                document.getElementById('btn-print').classList.toggle('active', view === 'print');
+                document.getElementById('view-design').classList.toggle('active', view === 'design');
+                document.getElementById('view-print').classList.toggle('active', view === 'print');
                 
-                // Hide panels in print view to maximize space
-                DOM.panelProps.style.display = view === 'print' ? 'none' : 'flex';
-                DOM.panelLibrary.style.display = view === 'print' ? 'none' : 'flex'; // Hides left sidebar!
-                document.getElementById('nav-btn-add').style.display = view === 'print' ? 'none' : 'flex';
+                document.getElementById('panel-library').classList.toggle('hidden', view === 'print');
             }
         };
 
