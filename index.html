@@ -49,7 +49,6 @@
         /* SIDEBAR LEFT */
         .sidebar-left { width: 330px; background: var(--bg-panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         
-        /* Focus-Mode States */
         .sidebar-left.focus-hidden { width: 0 !important; transform: translateX(-100%); border: none; overflow: hidden; }
         .sidebar-right.focus-hidden { width: 0 !important; transform: translateX(100%); border: none; overflow: hidden; }
         
@@ -87,7 +86,7 @@
             gap: 8px; 
             box-shadow: var(--shadow-sm); 
             min-width: 0; 
-            min-height: 160px; /* Harte Mindesthöhe gegen Quetschen */
+            min-height: 160px;
         }
         .asset-card:hover { border-color: var(--brand); transform: translateY(-2px); box-shadow: var(--shadow-md); }
         
@@ -106,17 +105,14 @@
         .asset-series { font-size: 0.68rem; font-weight: 700; color: var(--brand); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
         .asset-title { font-size: 0.76rem; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
         
-        /* FAVORITEN STERN: ☆ vs ★ */
         .fav-btn { position: absolute; top: 6px; right: 6px; background: rgba(255,255,255,0.95); border: 1px solid var(--border); border-radius: 50%; width: 26px; height: 26px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; z-index: 5; color: #94A3B8; transition: 0.2s; padding-bottom: 2px; }
         .fav-btn:hover { transform: scale(1.1); color: #F59E0B; }
         .fav-btn.active { color: #F59E0B; border-color: #FDE68A; background: #FFFBEB; }
 
-        /* QUICK ADD */
         .quick-add-btn { position: absolute; bottom: 8px; right: 8px; background: var(--brand); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0.85); transition: 0.2s; z-index: 5; cursor: pointer; }
         .asset-card:hover .quick-add-btn { opacity: 1; transform: scale(1); }
         .quick-add-btn:hover { background: var(--brand-hover); }
 
-        /* PAGINATION */
         .pagination-controls { display: flex; justify-content: space-between; align-items: center; padding: 15px 0; font-size: 13px; color: var(--text-muted); grid-column: 1 / -1; }
         .pagination-controls button { background: var(--border); border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.2s; color: var(--text-main); }
         .pagination-controls button:hover:not(:disabled) { background: #cbd5e1; }
@@ -153,16 +149,43 @@
         .a4-sheet.show-cut-marks .slot:empty { border: 0.5pt dashed #CBD5E1 !important; }
         .a4-sheet.show-cut-marks .sticker { border: 0.5pt dashed #94A3B8 !important; }
 
-        /* HOVER AKTIONEN FÜR STICKER (+ / ✕) */
-        .sticker-actions { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; display: none; }
-        #view-print .sticker:hover .sticker-actions { display: block; }
-        .action-btn { position: absolute; width: 26px; height: 26px; border-radius: 50%; border: none; color: white; font-weight: bold; font-size: 15px; cursor: pointer; pointer-events: auto; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md); transition: 0.2s; }
-        
-        .btn-del { top: -6px; right: -6px; background: #ef4444; }
-        .btn-del:hover { background: #dc2626; transform: scale(1.15); }
-        
-        .btn-dup { top: -6px; left: -6px; background: #3b82f6; }
-        .btn-dup:hover { background: #2563eb; transform: scale(1.15); }
+        /* OPTIMIERTE ACTION-PILLEN FÜR PRINT-STICKER */
+        .sticker-actions { 
+            position: absolute; 
+            top: 6px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            display: flex; 
+            gap: 4px; 
+            background: rgba(15, 23, 42, 0.85); 
+            backdrop-filter: blur(4px); 
+            padding: 3px 6px; 
+            border-radius: 20px; 
+            opacity: 0.2; 
+            transition: opacity 0.2s ease, transform 0.2s ease; 
+            z-index: 10; 
+        }
+        #view-print .sticker:hover .sticker-actions { 
+            opacity: 1; 
+            transform: translateX(-50%) translateY(0); 
+        }
+        .sticker-action-btn { 
+            background: transparent; 
+            border: none; 
+            color: #fff; 
+            width: 24px; 
+            height: 24px; 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            cursor: pointer; 
+            font-size: 13px; 
+            font-weight: bold; 
+            transition: background 0.15s; 
+        }
+        .sticker-action-btn.clone:hover { background: #0284c7; }
+        .sticker-action-btn.delete:hover { background: #e11d48; }
 
         /* SIDEBAR RIGHT */
         .sidebar-right { width: 330px; background: var(--bg-panel); border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; flex-shrink: 0; transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -227,7 +250,6 @@
             
             <!-- DESIGN VIEW -->
             <div id="view-design" class="active">
-                
                 <div class="design-toolbar">
                     <button class="btn btn-outline" id="btn-back-lib" style="display: none;" onclick="App.showLibrary()">
                         ← Andere Figur suchen
@@ -276,28 +298,18 @@
         <aside class="sidebar-right" id="panel-props">
             <div class="prop-section">
                 <div class="prop-title">Typografie</div>
-                
                 <div class="prop-group">
-                    <label>
-                        <span style="display: flex; gap: 6px;"><input type="checkbox" id="check-series" checked> Serie (Oben)</span>
-                    </label>
+                    <label><span style="display: flex; gap: 6px;"><input type="checkbox" id="check-series" checked> Serie (Oben)</span></label>
                     <input type="text" class="input-text" id="inp-series">
                 </div>
-                
                 <div class="prop-group">
-                    <label>
-                        <span style="display: flex; gap: 6px;"><input type="checkbox" id="check-title" checked> Titel (Unten)</span>
-                    </label>
+                    <label><span style="display: flex; gap: 6px;"><input type="checkbox" id="check-title" checked> Titel (Unten)</span></label>
                     <input type="text" class="input-text" id="inp-title">
                 </div>
-                
                 <div class="prop-group" style="margin-top: 18px;">
-                    <label>
-                        <span style="display: flex; gap: 6px;"><input type="checkbox" id="check-uid"> UID aufdrucken</span>
-                    </label>
+                    <label><span style="display: flex; gap: 6px;"><input type="checkbox" id="check-uid"> UID aufdrucken</span></label>
                     <input type="text" class="input-text" id="inp-uid" placeholder="Hex-Code / Audio-ID">
                 </div>
-                
                 <div class="prop-group" style="margin-top: 14px;">
                     <label><span>Schriftgröße</span> <span id="val-font" style="color: var(--brand);">100%</span></label>
                     <input type="range" id="slide-font" min="60" max="140" value="100">
@@ -392,14 +404,10 @@
                 const props = document.getElementById('panel-props');
 
                 if(view === 'print') {
-                    // Full Focus Mode: Hide BOTH sidebars via !important class
                     lib.classList.add('focus-hidden');
                     props.classList.add('focus-hidden');
                 } else {
-                    // Restore properties sidebar immediately
                     props.classList.remove('focus-hidden');
-                    
-                    // Logic for Library Auto-Hide
                     if(!State.activeItem) {
                         this.showLibrary();
                     } else {
@@ -414,7 +422,7 @@
             showLibrary() {
                 document.getElementById('panel-library').classList.remove('focus-hidden');
                 document.getElementById('btn-back-lib').style.display = 'none';
-                State.activeItem = null; // Reset selection so it stays open
+                State.activeItem = null;
             }
         };
 
@@ -461,8 +469,6 @@
                 
                 this.updateTransform();
                 this.render();
-
-                // Auto-Hide Library when a figure is selected (Focus Mode)
                 App.hideLibrary();
             },
             updateTransform() {
@@ -495,7 +501,6 @@
                 
                 const fScale = document.getElementById('slide-font').value / 100;
                 
-                // Sweep-Flag 0 forces text to run LTR on the bottom. letter-spacing inside SVG fixes overlap.
                 return `
                     <svg viewBox="0 0 100 100" class="sticker-svg" preserveAspectRatio="xMidYMid meet">
                         <defs>
@@ -584,18 +589,18 @@
                 node.style.setProperty('--bg-y', document.getElementById('slide-y').value + '%');
                 node.innerHTML = Editor.generateSVG();
                 
-                // HOVER ACTIONS (Delete & Duplicate)
+                // Pillen-Leiste oben auf dem Sticker
                 const actions = document.createElement('div');
                 actions.className = 'sticker-actions';
                 
                 const dupBtn = document.createElement('button');
-                dupBtn.className = 'action-btn btn-dup';
-                dupBtn.innerHTML = '+';
+                dupBtn.className = 'sticker-action-btn clone';
+                dupBtn.innerHTML = '＋';
                 dupBtn.title = 'Aufkleber duplizieren';
                 dupBtn.onclick = (e) => { e.stopPropagation(); this.duplicateNode(node); };
                 
                 const delBtn = document.createElement('button');
-                delBtn.className = 'action-btn btn-del';
+                delBtn.className = 'sticker-action-btn delete';
                 delBtn.innerHTML = '✕';
                 delBtn.title = 'Aufkleber löschen';
                 delBtn.onclick = (e) => { e.stopPropagation(); node.remove(); };
@@ -621,18 +626,16 @@
                 const clone = originalNode.cloneNode(true);
                 clone.id = `st-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
                 
-                // Re-attach drag events
                 clone.addEventListener('dragstart', e => { 
                     e.dataTransfer.setData('text/plain', clone.id); 
                     setTimeout(() => clone.style.opacity = '0.5', 0); 
                 });
                 clone.addEventListener('dragend', () => clone.style.opacity = '1');
                 
-                // Re-attach button events
-                const del = clone.querySelector('.btn-del');
+                const del = clone.querySelector('.delete');
                 if(del) del.onclick = (e) => { e.stopPropagation(); clone.remove(); };
                 
-                const dup = clone.querySelector('.btn-dup');
+                const dup = clone.querySelector('.clone');
                 if(dup) dup.onclick = (e) => { e.stopPropagation(); this.duplicateNode(clone); };
                 
                 emptySlot.appendChild(clone);
@@ -647,9 +650,7 @@
                 const empty = Array.from(document.querySelectorAll('.slot')).find(s => !s.children.length);
                 if(empty) { 
                     empty.appendChild(node);
-                    if(!silent) {
-                        Toast.show("Auf den Druckbogen gelegt! 🖨️");
-                    }
+                    if(!silent) Toast.show("Auf den Druckbogen gelegt! 🖨️");
                 } else {
                     Toast.show("Der Druckbogen ist bereits voll!");
                 }
@@ -753,7 +754,6 @@
                     return;
                 }
 
-                // Pagination Logic
                 const totalPages = Math.ceil(this.currentData.length / this.itemsPerPage);
                 const start = (this.currentPage - 1) * this.itemsPerPage;
                 const paginatedData = this.currentData.slice(start, start + this.itemsPerPage);
@@ -778,21 +778,16 @@
                     `;
 
                     card.querySelector('.fav-btn').onclick = (e) => this.toggleFav(item, e);
-                    
                     card.querySelector('.quick-add-btn').onclick = (e) => {
                         e.stopPropagation();
                         Editor.load(item);
                         PrintStudio.addCurrentToSheet(true);
                     };
-
-                    card.onclick = () => {
-                        Editor.load(item);
-                    };
+                    card.onclick = () => Editor.load(item);
                     
                     grid.appendChild(card);
                 });
 
-                // Add Pagination Controls if needed
                 if (totalPages > 1) {
                     const pagination = document.createElement('div');
                     pagination.className = 'pagination-controls';
@@ -817,7 +812,6 @@
         const Export = {
             toPNG() {
                 Toast.show("Erstelle PNG... ⏳");
-                // Hide action buttons during snapshot
                 const actions = document.querySelectorAll('.sticker-actions');
                 actions.forEach(a => a.style.display = 'none');
                 
@@ -826,7 +820,7 @@
                     a.href = c.toDataURL('image/png');
                     a.download = 'TagGen_Druckbogen.png';
                     a.click();
-                    actions.forEach(a => a.style.display = ''); // Show again
+                    actions.forEach(a => a.style.display = '');
                 }).catch(() => {
                     actions.forEach(a => a.style.display = '');
                     Toast.show("Export fehlgeschlagen.");
