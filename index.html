@@ -3,37 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Tonie & Tag Cover Hub V6.2</title>
+<title>Tonie & Tag Cover Hub V6.3</title>
 <!-- 
-V6.2 Definitive Community Master Edition
-- Zweistufige Format-Architektur: System-Auswahl (Avery vs. Freies Raster) + Format-Größe (25mm, 30mm, 40mm, 43mm)
-- Dynamischer Bogen-Manager (Automatische Anpassung der Slot-Anzahl 20 / 24 / 48 / 60 / 70)
-- Intelligentes 3-Felder-System: 1. Titel/Serie, 2. Album/Folge, 3. Tonie-ID
-- Interaktiver ID-Druckschalter (ID an/aus schaltet zwischen ID und Folgentext auf unterem Bogen um)
-- Mobile-gehärtete Tab-Leiste (Kein Text-Überlauf bei "Eigenes Bild")
-- Unveränderte, pfeilschnelle RevvoX JSON Multi-Source Such-Engine
-- 300-DPI PNG Exporter & 1-Page A4 Print Lockdown für alle Formate
+V6.3 Definitive Bulletproof Architecture
+- Fix 1: Alle SVGs strikt mit encodeURIComponent gekapselt (kein Safari-Crash mehr)
+- Fix 2: Dropdowns & Bogen-Slots direkt im HTML vorgerendert (nie wieder "Keine Optionen")
+- Fix 3: Crash-sichere Storage-Engine (funktioniert auch im privaten Safari-Modus)
+- Fix 4: Dual-Ready Initialisierung (läuft garantiert auf Desktop & Mobile)
+- 3-Felder-System (Titel/Serie, Album/Folge, Tonie-ID mit An/Aus-Schalter)
+- Zweistufige Format-Auswahl: Avery Zweckform vs. Freies Raster
+- RevvoX Multi-CDN Live-Suche
 -->
 <style>
 :root {
-/* Authentic Tonie Palette */
+/* Tonie Farbpalette */
 --tonie-red: #C02741;
 --tonie-red-hover: #A01F35;
 --tonie-red-soft: rgba(192, 39, 65, 0.08);
 --tonie-gold: #F59E0B;
 --tonie-emerald: #10B981;
-/* Light Theme (Default) */
+/* Light Theme (Standard) */
 --bg-color: #F8FAFC;
 --card-bg: #FFFFFF;
 --card-bg-sub: #F1F5F9;
 --text-main: #0F172A;
 --text-muted: #64748B;
---border-color: #E2E8F0;
+--border-color: #CBD5E1;
 --border-focus: var(--tonie-red);
 --input-bg: #FFFFFF;
---shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
---shadow-md: 0 4px 14px rgba(0, 0, 0, 0.07);
---shadow-float: 0 12px 28px rgba(0, 0, 0, 0.1);
+--shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+--shadow-md: 0 4px 14px rgba(0, 0, 0, 0.08);
+--shadow-float: 0 12px 28px rgba(0, 0, 0, 0.12);
 }
 [data-theme="dark"] {
 --bg-color: #0B1120;
@@ -41,9 +41,9 @@ V6.2 Definitive Community Master Edition
 --card-bg-sub: #111827;
 --text-main: #F8FAFC;
 --text-muted: #94A3B8;
---border-color: rgba(255, 255, 255, 0.1);
+--border-color: rgba(255, 255, 255, 0.12);
 --border-focus: var(--tonie-red);
---input-bg: rgba(0, 0, 0, 0.25);
+--input-bg: rgba(0, 0, 0, 0.3);
 --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
 --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.4);
 --shadow-float: 0 12px 28px rgba(0, 0, 0, 0.5);
@@ -51,65 +51,61 @@ V6.2 Definitive Community Master Edition
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
 body { background: var(--bg-color); color: var(--text-main); transition: background 0.25s ease, color 0.25s ease; line-height: 1.5; padding-bottom: 3rem; overflow-x: hidden; }
 .container { max-width: 820px; margin: 0 auto; padding: 1rem; }
-/* --- Top Navigation --- */
+/* Navigation */
 .top-bar { display: flex; justify-content: center; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; }
 .btn-pill { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color); padding: 7px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 6px; box-shadow: var(--shadow-sm); }
-.btn-pill:hover { border-color: var(--tonie-red); color: var(--tonie-red); transform: translateY(-1px); }
+.btn-pill:hover { border-color: var(--tonie-red); color: var(--tonie-red); }
 .btn-accent { background: var(--tonie-red); color: #FFFFFF !important; border: none; }
 .btn-accent:hover { background: var(--tonie-red-hover); color: #FFFFFF; }
-/* --- Header & Branding --- */
+/* Header */
 .header { text-align: center; margin-bottom: 1.75rem; display: flex; flex-direction: column; align-items: center; }
 .brand-logo-wrap { width: 150px; height: 75px; margin-bottom: 8px; filter: drop-shadow(0 4px 10px rgba(192, 39, 65, 0.15)); }
 .brand-title { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.15; margin-bottom: 4px; }
 .brand-title span { color: var(--tonie-red); text-transform: uppercase; }
 .brand-subtitle { font-size: 13px; color: var(--text-muted); max-width: 520px; line-height: 1.4; margin: 0 auto; }
-/* --- Workflow Card Architecture --- */
-.step-card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); padding: 1.2rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-md); transition: border-color 0.2s; }
+/* Step Cards */
+.step-card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); padding: 1.2rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-md); }
 .step-header { font-size: 15px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
 .step-badge { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; background: var(--tonie-red); color: #FFFFFF; border-radius: 50%; font-size: 12px; font-weight: 800; margin-right: 8px; }
-/* --- Step 1: Search & Database (Mobile-Hardened Tabs) --- */
+/* Step 1: Tabs & Grid */
 .tab-bar { display: flex; gap: 4px; margin-bottom: 12px; background: var(--card-bg-sub); padding: 4px; border-radius: 12px; border: 1px solid var(--border-color); width: 100%; }
-.tab-btn { flex: 1 1 0; min-width: 0; padding: 8px 4px; font-size: 11.5px; font-weight: 700; border: none; border-radius: 8px; background: transparent; color: var(--text-muted); cursor: pointer; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center; gap: 4px; }
+.tab-btn { flex: 1 1 0; min-width: 0; padding: 8px 4px; font-size: 12px; font-weight: 700; border: none; border-radius: 8px; background: transparent; color: var(--text-muted); cursor: pointer; transition: 0.2s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center; gap: 4px; }
 .tab-btn.active { background: var(--card-bg); color: var(--text-main); box-shadow: var(--shadow-sm); }
-@media (max-width: 380px) { .tab-btn { font-size: 10px; padding: 6px 2px; } }
-.search-row { display: flex; gap: 8px; margin-bottom: 10px; position: relative; }
-.search-field { flex: 1; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-main); font-size: 14px; outline: none; transition: 0.2s; }
+.search-row { display: flex; gap: 8px; margin-bottom: 10px; }
+.search-field { flex: 1; padding: 11px 14px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-main); font-size: 14px; outline: none; }
 .search-field:focus { border-color: var(--tonie-red); box-shadow: 0 0 0 3px var(--tonie-red-soft); }
-.search-btn-icon { width: 44px; background: var(--card-bg-sub); border: 1px solid var(--border-color); border-radius: 10px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-.search-btn-icon:hover { border-color: var(--tonie-red); transform: rotate(15deg); }
+.search-btn-icon { width: 44px; background: var(--card-bg-sub); border: 1px solid var(--border-color); border-radius: 10px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 .status-row { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; padding: 0 4px; }
 .status-indicator { display: inline-flex; align-items: center; gap: 6px; }
 .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--tonie-gold); }
-.status-dot.active { background: var(--tonie-emerald); box-shadow: 0 0 8px rgba(16, 185, 129, 0.4); }
+.status-dot.active { background: var(--tonie-emerald); }
 .items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(115px, 1fr)); gap: 10px; max-height: 290px; overflow-y: auto; padding-right: 4px; }
 .items-grid::-webkit-scrollbar { width: 5px; }
 .items-grid::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
 .grid-card { background: var(--card-bg-sub); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 6px; text-align: center; cursor: pointer; transition: 0.2s; position: relative; display: flex; flex-direction: column; align-items: center; }
 .grid-card:hover { border-color: var(--tonie-red); transform: translateY(-2px); }
 .grid-card.selected { border-color: var(--tonie-red); background: var(--tonie-red-soft); box-shadow: 0 0 0 1.5px var(--tonie-red); }
-.grid-thumb { width: 64px; height: 64px; border-radius: 50%; object-fit: contain; background: #FFFFFF; margin-bottom: 6px; padding: 2px; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08); border: 1px solid var(--border-color); }
+.grid-thumb { width: 64px; height: 64px; border-radius: 50%; object-fit: contain; background: #FFFFFF; margin-bottom: 6px; padding: 2px; border: 1px solid var(--border-color); }
 .grid-series { font-size: 9px; font-weight: 800; color: var(--tonie-red); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
 .grid-title { font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; margin-bottom: 2px; }
 .grid-id { font-size: 9px; color: var(--text-muted); font-family: monospace; }
-.fav-star-btn { position: absolute; top: 6px; right: 6px; font-size: 15px; color: #CBD5E1; cursor: pointer; transition: 0.2s; line-height: 1; }
+.fav-star-btn { position: absolute; top: 6px; right: 6px; font-size: 15px; color: #CBD5E1; cursor: pointer; }
 .fav-star-btn.is-fav { color: var(--tonie-gold); }
-.upload-dropzone { display: none; padding: 28px 16px; border: 2px dashed var(--border-color); border-radius: 12px; text-align: center; cursor: pointer; background: var(--card-bg-sub); transition: 0.2s; }
-.upload-dropzone:hover { border-color: var(--tonie-red); background: var(--tonie-red-soft); }
-/* --- Step 2: Tag Editor --- */
+.upload-dropzone { display: none; padding: 28px 16px; border: 2px dashed var(--border-color); border-radius: 12px; text-align: center; cursor: pointer; background: var(--card-bg-sub); }
+/* Step 2: Form & Switch */
 .mode-switch-wrap { display: flex; background: var(--card-bg-sub); padding: 4px; border-radius: 10px; margin-bottom: 14px; border: 1px solid var(--border-color); }
-.mode-toggle-btn { flex: 1; padding: 7px; font-size: 12px; font-weight: 700; border: none; background: transparent; color: var(--text-muted); border-radius: 7px; cursor: pointer; transition: 0.2s; }
+.mode-toggle-btn { flex: 1; padding: 7px; font-size: 12px; font-weight: 700; border: none; background: transparent; color: var(--text-muted); border-radius: 7px; cursor: pointer; }
 .mode-toggle-btn.active { background: var(--tonie-red); color: #FFFFFF; }
 .form-row-fields { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 10px; }
 @media(min-width: 520px) { .form-row-fields { grid-template-columns: 1fr 1fr; } }
 .field-group { display: flex; flex-direction: column; gap: 4px; }
 .field-label { font-size: 10.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
-.field-input { padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-main); font-size: 13px; outline: none; transition: 0.2s; width: 100%; }
+.field-input { padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-main); font-size: 13px; outline: none; width: 100%; }
 .field-input:focus { border-color: var(--tonie-red); }
-/* ID and Toggle Switch Container */
 .id-control-row { display: flex; align-items: flex-end; gap: 10px; margin-bottom: 12px; }
 .id-input-wrap { flex: 1; }
 .switch-container { display: flex; align-items: center; gap: 8px; background: var(--card-bg-sub); padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border-color); height: 38px; cursor: pointer; user-select: none; }
-.switch-container label { font-size: 12px; font-weight: 700; color: var(--text-main); cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.switch-label-text { font-size: 12px; font-weight: 700; color: var(--text-main); cursor: pointer; }
 .toggle-switch { position: relative; width: 36px; height: 20px; display: inline-block; }
 .toggle-switch input { opacity: 0; width: 0; height: 0; }
 .toggle-slider { position: absolute; cursor: pointer; inset: 0; background-color: #CBD5E1; transition: .2s; border-radius: 20px; }
@@ -117,22 +113,18 @@ body { background: var(--bg-color); color: var(--text-main); transition: backgro
 input:checked + .toggle-slider { background-color: var(--tonie-red); }
 input:checked + .toggle-slider:before { transform: translateX(16px); }
 .preset-pills-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
-.preset-badge { font-size: 11px; padding: 4px 10px; border-radius: 12px; background: var(--card-bg-sub); border: 1px solid var(--border-color); cursor: pointer; color: var(--text-muted); font-weight: 600; transition: 0.2s; }
+.preset-badge { font-size: 11px; padding: 4px 10px; border-radius: 12px; background: var(--card-bg-sub); border: 1px solid var(--border-color); cursor: pointer; color: var(--text-muted); font-weight: 600; }
 .preset-badge:hover { border-color: var(--tonie-red); color: var(--tonie-red); }
-/* Pro Panel */
 .pro-controls { display: none; background: var(--card-bg-sub); padding: 12px; border-radius: 10px; border: 1px dashed var(--border-color); margin-bottom: 14px; }
 .slider-control { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
 .slider-name { width: 65px; font-size: 11px; font-weight: 600; color: var(--text-muted); }
 .slider-range { flex: 1; accent-color: var(--tonie-red); }
-.meta-dump-row { display: flex; justify-content: space-between; align-items: center; background: var(--input-bg); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 8px; }
-.meta-dump-text { font-family: monospace; font-size: 11px; color: var(--tonie-red); font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .preview-canvas-box { display: flex; justify-content: center; padding: 18px; background: var(--card-bg-sub); border-radius: 12px; border: 1px solid var(--border-color); }
-.sticker-stage { width: 160px; height: 160px; border-radius: 50%; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15); background: #FFFFFF; position: relative; overflow: hidden; }
-/* --- Step 3: Layout & Multi-Format Sheet Manager --- */
+.sticker-stage { width: 160px; height: 160px; border-radius: 50%; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12); background: #FFFFFF; position: relative; overflow: hidden; }
+/* Step 3: Sheet Manager */
 .sheet-interactive-wrap { background: #E2E8F0; padding: 16px; border-radius: 12px; display: flex; justify-content: center; overflow-x: auto; box-shadow: inset 0 2px 8px rgba(0,0,0,0.08); margin: 12px 0; }
 .sheet-matrix { display: grid; background: #FFFFFF; padding: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.12); width: max-content; }
-/* Grid Formats for Screen Preview */
-.sheet-matrix.matrix-avery-40 { grid-template-columns: repeat(3, 40px); grid-template-rows: repeat(8, 40px); gap: 3px; }
+.sheet-matrix.matrix-avery-40 { grid-template-columns: repeat(3, 40px); grid-template-rows: repeat(8, 40px); gap: 4px; }
 .sheet-matrix.matrix-avery-30 { grid-template-columns: repeat(4, 32px); grid-template-rows: repeat(12, 32px); gap: 3px; }
 .sheet-matrix.matrix-avery-25 { grid-template-columns: repeat(5, 26px); grid-template-rows: repeat(14, 26px); gap: 2px; }
 .sheet-matrix.matrix-raster-43 { grid-template-columns: repeat(4, 42px); grid-template-rows: repeat(5, 42px); gap: 4px; }
@@ -154,38 +146,34 @@ input:checked + .toggle-slider:before { transform: translateX(16px); }
 .sheet-btn-bar { display: flex; justify-content: center; gap: 8px; margin-bottom: 12px; }
 .action-actions-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 10px; }
 @media(min-width: 520px) { .action-actions-grid { grid-template-columns: 1fr 1fr; } }
-.btn-print-large { background: var(--tonie-red); color: #FFFFFF; padding: 13px; font-size: 14px; font-weight: 700; border-radius: 10px; border: none; cursor: pointer; box-shadow: 0 4px 14px rgba(192, 39, 65, 0.3); display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
-.btn-print-large:active { transform: scale(0.98); }
-.btn-export-png { background: var(--card-bg-sub); color: var(--text-main); border: 1px solid var(--border-color); padding: 13px; font-size: 13px; font-weight: 700; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.2s; }
-.btn-export-png:hover { border-color: var(--tonie-red); color: var(--tonie-red); }
-/* --- Footer & Credits --- */
+.btn-print-large { background: var(--tonie-red); color: #FFFFFF; padding: 13px; font-size: 14px; font-weight: 700; border-radius: 10px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+.btn-export-png { background: var(--card-bg-sub); color: var(--text-main); border: 1px solid var(--border-color); padding: 13px; font-size: 13px; font-weight: 700; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+/* Footer */
 .footer-wrap { text-align: center; margin-top: 2.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; }
 .footer-nav { display: flex; justify-content: center; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
 .footer-nav a { color: var(--tonie-red); text-decoration: none; font-size: 12px; font-weight: 600; }
-.footer-nav a:hover { text-decoration: underline; }
-.footer-disclaimer { font-size: 10px; color: var(--text-muted); opacity: 0.75; max-width: 620px; margin: 0 auto; line-height: 1.4; }
-/* --- Help Modal --- */
+.footer-disclaimer { font-size: 10px; color: var(--text-muted); opacity: 0.8; max-width: 620px; margin: 0 auto; line-height: 1.4; }
+/* Modal */
 .modal-shade { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.55); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 99999; padding: 15px; }
-.modal-body { background: var(--card-bg); width: 100%; max-width: 440px; border-radius: 16px; border: 1px solid var(--border-color); padding: 22px; box-shadow: var(--shadow-float); }
-.modal-body h3 { font-size: 17px; color: var(--tonie-red); margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.modal-body { background: var(--card-bg); width: 100%; max-width: 440px; border-radius: 16px; border: 1px solid var(--border-color); padding: 22px; }
+.modal-body h3 { font-size: 17px; color: var(--tonie-red); margin-bottom: 10px; }
 .modal-body p, .modal-body li { font-size: 13px; color: var(--text-main); margin-bottom: 8px; line-height: 1.4; }
 .modal-body ul { padding-left: 18px; margin-bottom: 14px; }
 .modal-close-btn { width: 100%; padding: 10px; border-radius: 8px; background: var(--tonie-red); color: #FFFFFF; font-weight: 700; border: none; cursor: pointer; }
-/* --- Strict 1-Page A4 Print Engine --- */
+/* Print Engine */
 #printHost { display: none; }
 @media print {
 .no-print, .container, .modal-shade, body > *:not(#printHost) { display: none !important; }
 html, body { background: #FFFFFF !important; margin: 0 !important; padding: 0 !important; width: 100% !important; height: 100% !important; }
 #printHost { display: block !important; position: absolute; top: 0; left: 0; width: 210mm; height: 297mm; background: #FFFFFF; z-index: 999999; overflow: hidden; margin: 0; padding: 0; box-sizing: border-box; }
-/* Avery Sheet Print Formats */
-.print-format-avery-40 { display: grid; grid-template-columns: repeat(3, 40mm); grid-template-rows: repeat(8, 40mm); gap: 0; justify-content: center; align-content: start; padding-top: 12.5mm; }
-.print-format-avery-30 { display: grid; grid-template-columns: repeat(4, 30mm); grid-template-rows: repeat(12, 30mm); gap: 0; justify-content: center; align-content: start; padding-top: 10mm; }
-.print-format-avery-25 { display: grid; grid-template-columns: repeat(5, 25mm); grid-template-rows: repeat(14, 25mm); gap: 0; justify-content: center; align-content: start; padding-top: 8mm; }
-/* Free Raster Print Formats (with Scissor Guides) */
-.print-format-raster-43 { display: flex; flex-wrap: wrap; gap: 4mm; padding: 10mm; align-content: flex-start; justify-content: center; }
-.print-format-raster-40 { display: flex; flex-wrap: wrap; gap: 4mm; padding: 10mm; align-content: flex-start; justify-content: center; }
-.print-format-raster-30 { display: flex; flex-wrap: wrap; gap: 3mm; padding: 10mm; align-content: flex-start; justify-content: center; }
-.print-format-raster-25 { display: flex; flex-wrap: wrap; gap: 3mm; padding: 10mm; align-content: flex-start; justify-content: center; }
+.print-format-avery-40 { display: grid; grid-template-columns: repeat(3, 40mm); grid-template-rows: repeat(8, 40mm); justify-content: center; align-content: start; padding-top: 12.5mm; }
+.print-format-avery-30 { display: grid; grid-template-columns: repeat(4, 30mm); grid-template-rows: repeat(12, 30mm); justify-content: center; align-content: start; padding-top: 10mm; }
+.print-format-avery-25 { display: grid; grid-template-columns: repeat(5, 25mm); grid-template-rows: repeat(14, 25mm); justify-content: center; align-content: start; padding-top: 8mm; }
+.print-format-raster-43, .print-format-raster-40, .print-format-raster-30, .print-format-raster-25 { display: flex; flex-wrap: wrap; padding: 10mm; align-content: flex-start; justify-content: center; }
+.print-format-raster-43 { gap: 4mm; }
+.print-format-raster-40 { gap: 4mm; }
+.print-format-raster-30 { gap: 3mm; }
+.print-format-raster-25 { gap: 3mm; }
 .print-cell { border-radius: 50%; box-sizing: border-box; overflow: hidden; position: relative; }
 .print-format-avery-40 .print-cell { width: 40mm; height: 40mm; border: none; }
 .print-format-avery-30 .print-cell { width: 30mm; height: 30mm; border: none; }
@@ -200,7 +188,7 @@ html, body { background: #FFFFFF !important; margin: 0 !important; padding: 0 !i
 </head>
 <body>
 <div class="container no-print">
-<!-- Top Navigation Bar -->
+<!-- Top Navigation -->
 <div class="top-bar">
 <button class="btn-pill" onclick="app.toggleTheme()">
 <span id="themeEmoji">🌙</span> <span id="themeLabel">Dark Mode</span>
@@ -212,7 +200,7 @@ html, body { background: #FFFFFF !important; margin: 0 !important; padding: 0 !i
 <span>☕</span> Spenden
 </button>
 </div>
-<!-- Master Vector Logo Header -->
+<!-- Header -->
 <div class="header">
 <svg class="brand-logo-wrap" viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg">
 <circle cx="55" cy="50" r="36" fill="var(--card-bg)" stroke="#94A3B8" stroke-width="3"/>
@@ -229,9 +217,9 @@ html, body { background: #FFFFFF !important; margin: 0 !important; padding: 0 !i
 </g>
 </svg>
 <div class="brand-title">Tonie & Tag <span>Cover Hub</span></div>
-<div class="brand-subtitle">Der A4-Designer für Münzkapseln, Avery Etiketten & Kreativ-Tonies. (V6.2)</div>
+<div class="brand-subtitle">Der A4-Designer für Münzkapseln, Avery Etiketten & Kreativ-Tonies. (V6.3)</div>
 </div>
-<!-- STEP 1: Database & Picker -->
+<!-- STEP 1: Motiv-Auswahl -->
 <div class="step-card">
 <div class="step-header">
 <div><span class="step-badge">1</span> Motiv auswählen</div>
@@ -241,7 +229,7 @@ html, body { background: #FFFFFF !important; margin: 0 !important; padding: 0 !i
 <button class="tab-btn" id="tabFavBtn" onclick="app.switchPickerTab('fav')">⭐ Favoriten (<span id="favQty">0</span>)</button>
 <button class="tab-btn" id="tabCustomBtn" onclick="app.switchPickerTab('custom')">🖼️ Eigenes Bild</button>
 </div>
-<!-- Database Tab Content -->
+<!-- Datenbank Ansicht -->
 <div id="tabDbView">
 <div class="search-row">
 <input type="text" id="dbSearchInput" class="search-field" placeholder="Titel, Serie oder ID suchen..." oninput="app.handleSearchDebounced()">
@@ -249,22 +237,22 @@ html, body { background: #FFFFFF !important; margin: 0 !important; padding: 0 !i
 </div>
 <div class="status-row">
 <span class="status-indicator">
-<span class="status-dot" id="dbStatusDot"></span>
-<span id="dbStatusText">Lade Datenbank...</span>
+<span class="status-dot active" id="dbStatusDot"></span>
+<span id="dbStatusText">Bereit</span>
 </span>
-<span id="dbResultCounter">0 Motive</span>
+<span id="dbResultCounter">7 Motive</span>
 </div>
 <div class="items-grid" id="toniesGrid"></div>
 </div>
-<!-- Custom Upload Tab Content -->
+<!-- Custom Upload -->
 <div id="tabCustomView" class="upload-dropzone" onclick="document.getElementById('imgFileInput').click()">
 <input type="file" id="imgFileInput" accept="image/*" style="display:none;" onchange="app.handleCustomUpload(event)">
-<div style="font-size: 30px; margin-bottom: 6px;">📸</div>
+<div style="font-size: 32px; margin-bottom: 6px;">📸</div>
 <div style="font-weight: 700; color: var(--text-main);">Eigenes Foto oder Grafik hochladen</div>
-<div style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">Optimal für Kreativ-Tonies & individuelle Tags</div>
+<div style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">Perfekt für Kreativ-Tonies & individuelle Tags</div>
 </div>
 </div>
-<!-- STEP 2: Tag Editor (3-Field Engine) -->
+<!-- STEP 2: Etikett gestalten -->
 <div class="step-card">
 <div class="step-header">
 <div><span class="step-badge">2</span> Etikett gestalten</div>
@@ -273,29 +261,29 @@ html, body { background: #FFFFFF !important; margin: 0 !important; padding: 0 !i
 <button class="mode-toggle-btn active" id="btnModeSimple" onclick="app.setEditorMode('simple')">⚡ Simpel (Papa Express)</button>
 <button class="mode-toggle-btn" id="btnModePro" onclick="app.setEditorMode('pro')">🛠️ Pro (Nerd & Dumper)</button>
 </div>
-<!-- Field 1 & 2: Serie/Titel & Album/Folge -->
+<!-- Felder 1 & 2: Serie/Titel & Album/Folge -->
 <div class="form-row-fields">
 <div class="field-group">
-<label class="field-label">1. Titel / Serie (Oben)</label>
-<input type="text" id="inputTitle" class="field-input" placeholder="z.B. Conni oder TKKG" oninput="app.refreshPreview()">
+<label class="field-label" for="inputTitle">1. Titel / Serie (Oben)</label>
+<input type="text" id="inputTitle" class="field-input" value="TKKG Junior" placeholder="z.B. Conni oder TKKG" oninput="app.refreshPreview()">
 </div>
 <div class="field-group">
-<label class="field-label">2. Album / Folge</label>
-<input type="text" id="inputAlbum" class="field-input" placeholder="z.B. feiert Geburtstag" oninput="app.refreshPreview()">
+<label class="field-label" for="inputAlbum">2. Album / Folge</label>
+<input type="text" id="inputAlbum" class="field-input" value="Alarm im Freizeitpark" placeholder="z.B. feiert Geburtstag" oninput="app.refreshPreview()">
 </div>
 </div>
-<!-- Field 3 & ID Toggle Switch -->
+<!-- Feld 3 & ID Schalter -->
 <div class="id-control-row">
 <div class="field-group id-input-wrap">
-<label class="field-label">3. Tonie-ID</label>
-<input type="text" id="inputBottomId" class="field-input" placeholder="z.B. 01-0001" oninput="app.refreshPreview()">
+<label class="field-label" for="inputBottomId">3. Tonie-ID</label>
+<input type="text" id="inputBottomId" class="field-input" value="01-0182" placeholder="z.B. 01-0001" oninput="app.refreshPreview()">
 </div>
-<div class="switch-container" onclick="document.getElementById('toggleShowId').click()">
-<label class="toggle-switch" onclick="event.stopPropagation()">
+<div class="switch-container">
+<label class="toggle-switch">
 <input type="checkbox" id="toggleShowId" checked onchange="app.refreshPreview()">
 <span class="toggle-slider"></span>
 </label>
-<label>ID aufdrucken</label>
+<label class="switch-label-text" for="toggleShowId">ID aufdrucken</label>
 </div>
 </div>
 <div class="preset-pills-row">
@@ -315,43 +303,71 @@ html, body { background: #FFFFFF !important; margin: 0 !important; padding: 0 !i
 <span class="slider-name">Rotation</span>
 <input type="range" id="sliderRotation" class="slider-range" min="-180" max="180" value="0" oninput="app.refreshPreview()">
 </div>
-<div class="meta-dump-row">
-<span style="font-size: 10px; color: var(--text-muted); text-transform: uppercase;">Audio-ID / Dumper:</span>
-<span class="meta-dump-text" id="dumpAudioIdLabel">Keine Audio-ID</span>
+<div style="display: flex; justify-content: space-between; align-items: center; background: var(--input-bg); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 8px;">
+<span style="font-size: 10.5px; color: var(--text-muted); text-transform: uppercase;">Audio-ID / Dumper:</span>
+<span style="font-family: monospace; font-size: 11px; color: var(--tonie-red); font-weight: 700;" id="dumpAudioIdLabel">1520593821</span>
 <button class="btn-pill" style="padding: 3px 8px; font-size: 10px;" onclick="app.copyAudioId()">Kopieren</button>
 </div>
 </div>
-<!-- Live Sticker Stage -->
+<!-- Live Sticker Preview -->
 <div class="preview-canvas-box">
 <div class="sticker-stage" id="masterStickerPreview"></div>
 </div>
 </div>
-<!-- STEP 3: Multi-Format & Sheet Manager -->
+<!-- STEP 3: Bogen & Formate (HTML-vorgerendert gegen "Keine Optionen") -->
 <div class="step-card">
 <div class="step-header">
 <div><span class="step-badge">3</span> Druckbogen befüllen</div>
 <span id="sheetSlotCountBadge" style="font-size: 11px; font-weight: 700; color: var(--tonie-red);">24 Etiketten</span>
 </div>
-<!-- Zweistufige Format-Abfrage: 1. System, 2. Größe -->
 <div class="form-row-fields" style="margin-bottom: 12px;">
 <div class="field-group">
-<label class="field-label">1. Drucksystem</label>
+<label class="field-label" for="selectPrintSystem">1. Drucksystem</label>
 <select id="selectPrintSystem" class="field-input" onchange="app.onSystemChange()">
-<option value="avery">🏷️ Avery Zweckform (Vorgestanzt)</option>
+<option value="avery" selected>🏷️ Avery Zweckform (Vorgestanzt)</option>
 <option value="raster">✂️ Freies Raster (Münzkapseln & DIY)</option>
 </select>
 </div>
 <div class="field-group">
-<label class="field-label">2. Format & Größe</label>
-<select id="selectPrintSize" class="field-input" onchange="app.onSizeChange()"></select>
+<label class="field-label" for="selectPrintSize">2. Format & Größe</label>
+<select id="selectPrintSize" class="field-input" onchange="app.onSizeChange()">
+<option value="avery-40" selected>Avery L3415 – Ø 40 mm (24 Etiketten / 3×8)</option>
+<option value="avery-30">Avery 6223 / L4716 – Ø 30 mm (48 Etiketten / 4×12)</option>
+<option value="avery-25">Avery L7103 – Ø 25 mm (70 Etiketten / 5×14)</option>
+</select>
 </div>
 </div>
 <p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-bottom: 8px;">
 Klicke auf einen Kreis, um dein aktuelles Cover dort zu platzieren.
 </p>
-<!-- Interactive Sheet Grid -->
+<!-- Vorgerenderte Slots im HTML (niemals weißer leerer Kasten) -->
 <div class="sheet-interactive-wrap">
-<div class="sheet-matrix matrix-avery-40" id="sheetMatrixUi"></div>
+<div class="sheet-matrix matrix-avery-40" id="sheetMatrixUi">
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(0)"><span class="sheet-slot-number">1</span></div>
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(1)"><span class="sheet-slot-number">2</span></div>
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(2)"><span class="sheet-slot-number">3</span></div>
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(3)"><span class="sheet-slot-number">4</span></div>
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(4)"><span class="sheet-slot-number">5</span></div>
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(5)"><span class="sheet-slot-number">6</span></div>
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(6)"><span class="sheet-slot-number">7</span></div>
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(7)"><span class="sheet-slot-number">8</span></div>
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(8)"><span class="sheet-slot-number">9</span></div>
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(9)"><span class="sheet-slot-number">10</span></div>
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(10)"><span class="sheet-slot-number">11</span></div>
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(11)"><span class="sheet-slot-number">12</span></div>
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(12)"><span class="sheet-slot-number">13</span></div>
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(13)"><span class="sheet-slot-number">14</span></div>
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(14)"><span class="sheet-slot-number">15</span></div>
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(15)"><span class="sheet-slot-number">16</span></div>
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(16)"><span class="sheet-slot-number">17</span></div>
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(17)"><span class="sheet-slot-number">18</span></div>
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(18)"><span class="sheet-slot-number">19</span></div>
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(19)"><span class="sheet-slot-number">20</span></div>
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(20)"><span class="sheet-slot-number">21</span></div>
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(21)"><span class="sheet-slot-number">22</span></div>
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(22)"><span class="sheet-slot-number">23</span></div>
+<div class="sheet-slot-node" onclick="app.assignActiveStickerToSlot(23)"><span class="sheet-slot-number">24</span></div>
+</div>
 </div>
 <div class="sheet-btn-bar">
 <button class="btn-pill" onclick="app.fillAllSlotsWithActive()">Alle füllen</button>
@@ -369,10 +385,10 @@ Klicke auf einen Kreis, um dein aktuelles Cover dort zu platzieren.
 <!-- Footer -->
 <div class="footer-wrap">
 <div class="footer-nav">
-<a href="https://www.avery-zweckform.com" target="_blank">🏷️ Avery Zweckform</a>
-<a href="http://rfidfriend.com/" target="_blank">📡 RFIDfriend Tags</a>
-<a href="https://github.com/toniebox-reverse-engineering" target="_blank">🐙 Team RevvoX</a>
-<a href="https://github.com/stevenious" target="_blank">💻 GitHub</a>
+<a href="https://www.avery-zweckform.com" target="_blank" rel="noopener">🏷️ Avery Zweckform</a>
+<a href="http://rfidfriend.com/" target="_blank" rel="noopener">📡 RFIDfriend Tags</a>
+<a href="https://github.com/toniebox-reverse-engineering" target="_blank" rel="noopener">🐙 Team RevvoX</a>
+<a href="https://github.com/stevenious" target="_blank" rel="noopener">💻 GitHub</a>
 </div>
 <div class="footer-disclaimer">
 Dieses Open-Source Community-Tool steht in keinerlei rechtlicher oder geschäftlicher Verbindung zur Boxine GmbH.
@@ -383,9 +399,9 @@ Metadaten bereitgestellt durch das RevvoX Reverse-Engineering Projekt.
 </div>
 </div>
 </div>
-<!-- HIDDEN A4 PRINT LAYER -->
+<!-- A4 Print Host Layer -->
 <div id="printHost"></div>
-<!-- HELP MODAL -->
+<!-- Modal Hilfe -->
 <div class="modal-shade" id="helpModal" onclick="if(event.target===this) app.closeHelpModal()">
 <div class="modal-body">
 <h3>💡 Tipps & Druckanleitung</h3>
@@ -403,15 +419,33 @@ Metadaten bereitgestellt durch das RevvoX Reverse-Engineering Projekt.
 </div>
 </div>
 <script>
+// Crash-sichere Storage-Funktionen (funktionieren auch im privaten Safari-Modus)
+function safeStorageGet(key, fallback) {
+try {
+const val = localStorage.getItem(key);
+return val !== null ? val : fallback;
+} catch (e) {
+return fallback;
+}
+}
+function safeStorageSet(key, val) {
+try {
+localStorage.setItem(key, val);
+} catch (e) {}
+}
+// Sichere SVG-zu-Data-URI Konvertierung (100% RFC-konform, kein Safari-Crash)
+function svgToUri(rawSvg) {
+return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(rawSvg.trim());
+}
 const app = {
-theme: localStorage.getItem('tonie_theme') || 'light',
+theme: safeStorageGet('tonie_theme', 'light'),
 editorMode: 'simple',
 activeTab: 'db',
 db: [],
-favorites: JSON.parse(localStorage.getItem('tonie_favs') || '[]'),
+favorites: JSON.parse(safeStorageGet('tonie_favs', '[]')),
 selectedTonie: null,
 searchTimer: null,
-// Format Configurations
+// Formate
 currentSystem: 'avery',
 currentFormatKey: 'avery-40',
 formats: {
@@ -423,87 +457,89 @@ formats: {
 'raster-30': { system: 'raster', size: '30', count: 48, name: '30 mm – RFIDfriend & Token (48 Etiketten)' },
 'raster-25': { system: 'raster', size: '25', count: 60, name: '25 mm – Micro DIY Tags (60 Etiketten)' }
 },
-sheetSlots: [],
-// Offline Vector Library
+sheetSlots: new Array(24).fill(null),
+// Basisdatenbank mit URL-kodierten Vektoren
 fallbackLibrary: [
 {
 id: "01-0182",
-title: "TKKG Junior - Alarm im Freizeitpark",
+title: "Alarm im Freizeitpark",
 series: "TKKG Junior",
 audio_id: "1520593821",
-pic: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23C02741'/><circle cx='50' cy='50' r='42' fill='%23FFFFFF'/><path d='M32 45h36M50 45v30' stroke='%23C02741' stroke-width='6' stroke-linecap='round'/><text x='50' y='32' font-family='sans-serif' font-size='14' font-weight='bold' text-anchor='middle' fill='%23C02741'>TKKG</text></svg>"
+pic: svgToUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#C02741'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><path d='M32 45h36M50 45v30' stroke='#C02741' stroke-width='6' stroke-linecap='round'/><text x='50' y='32' font-family='sans-serif' font-size='14' font-weight='bold' text-anchor='middle' fill='#C02741'>TKKG</text></svg>")
 },
 {
 id: "01-0180",
-title: "TKKG - Das Phantom auf dem Feuerstuhl",
+title: "Das Phantom auf dem Feuerstuhl",
 series: "TKKG",
 audio_id: "1520593800",
-pic: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%231E293B'/><circle cx='50' cy='50' r='42' fill='%23FFFFFF'/><text x='50' y='58' font-family='sans-serif' font-size='20' font-weight='900' text-anchor='middle' fill='%231E293B'>TKKG</text></svg>"
+pic: svgToUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#1E293B'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><text x='50' y='58' font-family='sans-serif' font-size='20' font-weight='900' text-anchor='middle' fill='#1E293B'>TKKG</text></svg>")
 },
 {
 id: "01-0010",
 title: "Conni feiert Geburtstag",
 series: "Conni",
 audio_id: "1520593010",
-pic: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23F59E0B'/><circle cx='50' cy='50' r='42' fill='%23FFFFFF'/><path d='M30 40h40v30H30z' fill='%23E11D48'/><circle cx='50' cy='30' r='10' fill='%23FCD34D'/><text x='50' y='85' font-family='sans-serif' font-size='10' font-weight='bold' text-anchor='middle' fill='%23E11D48'>CONNI</text></svg>"
+pic: svgToUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#F59E0B'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><path d='M30 40h40v30H30z' fill='#E11D48'/><circle cx='50' cy='30' r='10' fill='#FCD34D'/><text x='50' y='85' font-family='sans-serif' font-size='10' font-weight='bold' text-anchor='middle' fill='#E11D48'>CONNI</text></svg>")
 },
 {
 id: "01-0305",
 title: "Die Olchis sind da",
 series: "Die Olchis",
 audio_id: "1520593305",
-pic: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%2384CC16'/><circle cx='50' cy='50' r='42' fill='%23FFFFFF'/><circle cx='38' cy='46' r='5' fill='%23000'/><circle cx='62' cy='46' r='5' fill='%23000'/><path d='M40 65q10 8 20 0' stroke='%23000' stroke-width='3' fill='none'/><text x='50' y='28' font-family='sans-serif' font-size='11' font-weight='bold' text-anchor='middle' fill='%234D7C0F'>OLCHIS</text></svg>"
+pic: svgToUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#84CC16'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><circle cx='38' cy='46' r='5' fill='#000'/><circle cx='62' cy='46' r='5' fill='#000'/><path d='M40 65q10 8 20 0' stroke='#000' stroke-width='3' fill='none'/><text x='50' y='28' font-family='sans-serif' font-size='11' font-weight='bold' text-anchor='middle' fill='#4D7C0F'>OLCHIS</text></svg>")
 },
 {
 id: "01-0412",
 title: "Bibi Blocksberg - Hexen hexen",
 series: "Bibi Blocksberg",
 audio_id: "1520593412",
-pic: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%2310B981'/><circle cx='50' cy='50' r='42' fill='%23FFFFFF'/><path d='M25 65l50-25' stroke='%23047857' stroke-width='4' stroke-linecap='round'/><text x='50' y='32' font-family='sans-serif' font-size='12' font-weight='bold' text-anchor='middle' fill='%23047857'>BIBI</text></svg>"
+pic: svgToUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#10B981'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><path d='M25 65l50-25' stroke='#047857' stroke-width='4' stroke-linecap='round'/><text x='50' y='32' font-family='sans-serif' font-size='12' font-weight='bold' text-anchor='middle' fill='#047857'>BIBI</text></svg>")
 },
 {
 id: "01-0910",
 title: "Kreativ-Tonie Rot",
 series: "Kreativ-Tonie",
 audio_id: "1520593910",
-pic: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23C02741'/><circle cx='50' cy='50' r='42' fill='%23FFFFFF'/><circle cx='50' cy='38' r='12' fill='%23C02741'/><path d='M35 72c0-10 7-18 15-18s15 8 15 18z' fill='%23C02741'/></svg>"
+pic: svgToUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#C02741'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><circle cx='50' cy='38' r='12' fill='#C02741'/><path d='M35 72c0-10 7-18 15-18s15 8 15 18z' fill='#C02741'/></svg>")
 },
 {
 id: "01-0920",
 title: "Die drei ??? - Das Gespensterschloss",
 series: "Die drei ???",
 audio_id: "1520593920",
-pic: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23000000'/><circle cx='50' cy='50' r='42' fill='%23FFFFFF'/><text x='35' y='58' font-family='sans-serif' font-size='22' font-weight='900' fill='%23FFFFFF'>?</text><text x='50' y='58' font-family='sans-serif' font-size='22' font-weight='900' fill='%23E11D48'>?</text><text x='65' y='58' font-family='sans-serif' font-size='22' font-weight='900' fill='%232563EB'>?</text></svg>"
+pic: svgToUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#000000'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><text x='35' y='58' font-family='sans-serif' font-size='22' font-weight='900' fill='#FFFFFF'>?</text><text x='50' y='58' font-family='sans-serif' font-size='22' font-weight='900' fill='#E11D48'>?</text><text x='65' y='58' font-family='sans-serif' font-size='22' font-weight='900' fill='#2563EB'>?</text></svg>")
 }
 ],
 init: function() {
 this.applyTheme(this.theme);
 this.updateFavCounterBadge();
-this.populateSizeDropdown();
-this.applyFormat(this.currentFormatKey);
-// 1. Instant Boot
+// 1. Sofortige Initialisierung mit Fallback
 this.db = this.fallbackLibrary;
 this.renderItemsGrid(this.db);
 this.selectTonieItem(this.db[0]);
-this.updateStatusText("Offline-Basis aktiv", false);
-// 2. Multi-Source Pipeline
+this.populateSizeDropdown();
+this.renderSheetMatrixUi();
+// 2. Asynchrone RevvoX-Datenbankverbindung
 this.fetchRevvoxDatabase();
 },
 applyTheme: function(theme) {
 this.theme = theme;
 document.documentElement.setAttribute('data-theme', theme);
-localStorage.setItem('tonie_theme', theme);
+safeStorageSet('tonie_theme', theme);
 const isLight = theme === 'light';
-document.getElementById('themeEmoji').innerText = isLight ? '🌙' : '☀️';
-document.getElementById('themeLabel').innerText = isLight ? 'Dark Mode' : 'Light Mode';
+const emojiEl = document.getElementById('themeEmoji');
+const labelEl = document.getElementById('themeLabel');
+if (emojiEl) emojiEl.innerText = isLight ? '🌙' : '☀️';
+if (labelEl) labelEl.innerText = isLight ? 'Dark Mode' : 'Light Mode';
 },
 toggleTheme: function() {
 this.applyTheme(this.theme === 'light' ? 'dark' : 'light');
 },
 updateStatusText: function(text, isOnline) {
-document.getElementById('dbStatusText').innerText = text;
-const dot = document.getElementById('dbStatusDot');
-dot.className = 'status-dot' + (isOnline ? ' active' : '');
+const textEl = document.getElementById('dbStatusText');
+const dotEl = document.getElementById('dbStatusDot');
+if (textEl) textEl.innerText = text;
+if (dotEl) dotEl.className = 'status-dot' + (isOnline ? ' active' : '');
 },
 fetchRevvoxDatabase: async function() {
 const sources = [
@@ -525,31 +561,37 @@ const mPic = String(item.pic || item.image || item.image_url || '');
 const mAudio = Array.isArray(item.audio_id) ? String(item.audio_id[0]) : String(item.audio_id || '');
 return { id: mId, title: mTitle, series: mSeries, pic: mPic, audio_id: mAudio };
 });
-this.updateStatusText(⁠${this.db.length} Tonies online bereit⁠, true);
-if (this.activeTab === 'db' && !document.getElementById('dbSearchInput').value.trim()) {
+this.updateStatusText(⁠${this.db.length} Tonies bereit⁠, true);
+const searchVal = document.getElementById('dbSearchInput')?.value.trim() || '';
+if (this.activeTab === 'db' && !searchVal) {
 this.renderItemsGrid(this.db.slice(0, 48));
 }
 return;
 }
 } catch (err) {
-console.warn(⁠Fetch notice for ${url}:⁠, err);
+console.warn(⁠Fetch notice:⁠, err);
 }
 }
-this.updateStatusText("Offline-Cache aktiv", false);
+this.updateStatusText("Offline-Basis aktiv", false);
 },
 setEditorMode: function(mode) {
 this.editorMode = mode;
-document.getElementById('btnModeSimple').className = 'mode-toggle-btn' + (mode === 'simple' ? ' active' : '');
-document.getElementById('btnModePro').className = 'mode-toggle-btn' + (mode === 'pro' ? ' active' : '');
-document.getElementById('proToolsPanel').style.display = mode === 'pro' ? 'block' : 'none';
+const btnSimple = document.getElementById('btnModeSimple');
+const btnPro = document.getElementById('btnModePro');
+const proPanel = document.getElementById('proToolsPanel');
+if (btnSimple) btnSimple.className = 'mode-toggle-btn' + (mode === 'simple' ? ' active' : '');
+if (btnPro) btnPro.className = 'mode-toggle-btn' + (mode === 'pro' ? ' active' : '');
+if (proPanel) proPanel.style.display = mode === 'pro' ? 'block' : 'none';
 },
 switchPickerTab: function(tab) {
 this.activeTab = tab;
-document.getElementById('tabDbBtn').className = 'tab-btn' + (tab === 'db' ? ' active' : '');
-document.getElementById('tabFavBtn').className = 'tab-btn' + (tab === 'fav' ? ' active' : '');
-document.getElementById('tabCustomBtn').className = 'tab-btn' + (tab === 'custom' ? ' active' : '');
-document.getElementById('tabDbView').style.display = tab === 'custom' ? 'none' : 'block';
-document.getElementById('tabCustomView').style.display = tab === 'custom' ? 'block' : 'none';
+document.getElementById('tabDbBtn')?.classList.toggle('active', tab === 'db');
+document.getElementById('tabFavBtn')?.classList.toggle('active', tab === 'fav');
+document.getElementById('tabCustomBtn')?.classList.toggle('active', tab === 'custom');
+const dbView = document.getElementById('tabDbView');
+const customView = document.getElementById('tabCustomView');
+if (dbView) dbView.style.display = tab === 'custom' ? 'none' : 'block';
+if (customView) customView.style.display = tab === 'custom' ? 'block' : 'none';
 if (tab === 'db') this.handleSearchDebounced();
 if (tab === 'fav') this.renderFavoritesList();
 },
@@ -558,24 +600,26 @@ clearTimeout(this.searchTimer);
 this.searchTimer = setTimeout(() => this.filterAndRenderSearch(), 120);
 },
 filterAndRenderSearch: function() {
-const query = document.getElementById('dbSearchInput').value.toLowerCase().trim();
+const query = (document.getElementById('dbSearchInput')?.value || '').toLowerCase().trim();
 let results = this.db;
 if (query) {
 results = this.db.filter(t =>
-t.title.toLowerCase().includes(query) ||
-t.series.toLowerCase().includes(query) ||
-t.id.toLowerCase().includes(query) ||
+(t.title && t.title.toLowerCase().includes(query)) ||
+(t.series && t.series.toLowerCase().includes(query)) ||
+(t.id && t.id.toLowerCase().includes(query)) ||
 (t.audio_id && t.audio_id.includes(query))
 );
 }
-document.getElementById('dbResultCounter').innerText = ⁠${results.length} Motive⁠;
+const counterEl = document.getElementById('dbResultCounter');
+if (counterEl) counterEl.innerText = ⁠${results.length} Motive⁠;
 this.renderItemsGrid(results.slice(0, 60));
 },
 renderItemsGrid: function(items) {
 const grid = document.getElementById('toniesGrid');
+if (!grid) return;
 grid.innerHTML = '';
 if (!items || items.length === 0) {
-grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 25px 0; font-size: 13px;">Kein Motiv gefunden. Versuche einen anderen Begriff.</div>';
+grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 25px 0; font-size: 13px;">Kein Motiv gefunden.</div>';
 return;
 }
 items.forEach(tonie => {
@@ -583,13 +627,15 @@ const isFav = this.favorites.includes(tonie.id);
 const card = document.createElement('div');
 card.className = 'grid-card' + (this.selectedTonie && this.selectedTonie.id === tonie.id ? ' selected' : '');
 card.onclick = () => this.selectTonieItem(tonie);
-card.innerHTML = ⁠<span class="fav-star-btn ${isFav ? 'is-fav' : ''}" onclick="app.toggleFavoriteItem(event, '${tonie.id}')">★</span> <img class="grid-thumb" src="${tonie.pic || this.makeDefaultAvatarSvg(tonie.title)}" onerror="this.src='${this.makeDefaultAvatarSvg(tonie.title)}'" alt="${this.escapeXml(tonie.title)}"> <div class="grid-series">${this.escapeXml(tonie.series)}</div> <div class="grid-title">${this.escapeXml(tonie.title)}</div> <div class="grid-id">${this.escapeXml(tonie.id)}</div>⁠;
+const imgFallback = this.makeDefaultAvatarSvg(tonie.title);
+const imgSrc = tonie.pic || imgFallback;
+card.innerHTML = ⁠<span class="fav-star-btn ${isFav ? 'is-fav' : ''}" onclick="app.toggleFavoriteItem(event, '${tonie.id}')">★</span> <img class="grid-thumb" src="${imgSrc}" onerror="this.src='${imgFallback}'" alt="${this.escapeXml(tonie.title)}"> <div class="grid-series">${this.escapeXml(tonie.series)}</div> <div class="grid-title">${this.escapeXml(tonie.title)}</div> <div class="grid-id">${this.escapeXml(tonie.id)}</div>⁠;
 grid.appendChild(card);
 });
 },
 makeDefaultAvatarSvg: function(title) {
 const initial = (title || 'T').charAt(0).toUpperCase();
-return ⁠data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='%23E2E8F0'/><text x='50' y='58' font-family='sans-serif' font-size='28' font-weight='bold' text-anchor='middle' fill='%2364748B'>${initial}</text></svg>⁠;
+return svgToUri(⁠<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#E2E8F0'/><text x='50' y='58' font-family='sans-serif' font-size='28' font-weight='bold' text-anchor='middle' fill='#64748B'>${initial}</text></svg>⁠);
 },
 toggleFavoriteItem: function(e, tonieId) {
 e.stopPropagation();
@@ -598,17 +644,19 @@ this.favorites = this.favorites.filter(id => id !== tonieId);
 } else {
 this.favorites.push(tonieId);
 }
-localStorage.setItem('tonie_favs', JSON.stringify(this.favorites));
+safeStorageSet('tonie_favs', JSON.stringify(this.favorites));
 this.updateFavCounterBadge();
 if (this.activeTab === 'fav') this.renderFavoritesList();
 else this.filterAndRenderSearch();
 },
 updateFavCounterBadge: function() {
-document.getElementById('favQty').innerText = this.favorites.length;
+const badge = document.getElementById('favQty');
+if (badge) badge.innerText = this.favorites.length;
 },
 renderFavoritesList: function() {
 const favItems = this.db.filter(t => this.favorites.includes(t.id));
-document.getElementById('dbResultCounter').innerText = ⁠${favItems.length} Favoriten⁠;
+const counterEl = document.getElementById('dbResultCounter');
+if (counterEl) counterEl.innerText = ⁠${favItems.length} Favoriten⁠;
 this.renderItemsGrid(favItems);
 },
 selectRandomItem: function() {
@@ -632,7 +680,6 @@ this.selectTonieItem(customTonie);
 };
 reader.readAsDataURL(file);
 },
-// --- 3-Felder System: Titel / Album / ID ---
 selectTonieItem: function(tonie) {
 this.selectedTonie = tonie;
 let serie = (tonie.series || '').trim();
@@ -645,16 +692,20 @@ const parts = album.split(' - ');
 serie = parts[0].trim();
 album = parts.slice(1).join(' - ').trim();
 }
-document.getElementById('inputTitle').value = serie || album || 'Tonie';
-document.getElementById('inputAlbum').value = album !== serie ? album : '';
-document.getElementById('inputBottomId').value = tonie.id || '';
-document.getElementById('dumpAudioIdLabel').innerText = tonie.audio_id || 'Keine ID';
-const cards = document.querySelectorAll('.grid-card');
-cards.forEach(c => c.classList.remove('selected'));
+const inputTitle = document.getElementById('inputTitle');
+const inputAlbum = document.getElementById('inputAlbum');
+const inputBottomId = document.getElementById('inputBottomId');
+const dumpAudioIdLabel = document.getElementById('dumpAudioIdLabel');
+if (inputTitle) inputTitle.value = serie || album || 'Tonie';
+if (inputAlbum) inputAlbum.value = album !== serie ? album : '';
+if (inputBottomId) inputBottomId.value = tonie.id || '';
+if (dumpAudioIdLabel) dumpAudioIdLabel.innerText = tonie.audio_id || 'Keine ID';
+document.querySelectorAll('.grid-card').forEach(c => c.classList.remove('selected'));
 this.refreshPreview();
 },
 applyPreset: function(text) {
-document.getElementById('inputAlbum').value = text;
+const inputAlbum = document.getElementById('inputAlbum');
+if (inputAlbum) inputAlbum.value = text;
 this.refreshPreview();
 },
 copyAudioId: function() {
@@ -662,25 +713,20 @@ if (!this.selectedTonie || !this.selectedTonie.audio_id) return;
 navigator.clipboard.writeText(this.selectedTonie.audio_id);
 alert(⁠Audio-ID "${this.selectedTonie.audio_id}" kopiert!⁠);
 },
-// --- Dynamic Curved-Text SVG Generator ---
 buildCurvedStickerSvg: function() {
 if (!this.selectedTonie) return '';
-const titleTxt = (document.getElementById('inputTitle').value || '').trim();
-const albumTxt = (document.getElementById('inputAlbum').value || '').trim();
-const idTxt = (document.getElementById('inputBottomId').value || '').trim();
-const showId = document.getElementById('toggleShowId').checked;
-const zoom = (document.getElementById('sliderZoom').value || 100) / 100;
-const rotation = document.getElementById('sliderRotation').value || 0;
+const titleTxt = (document.getElementById('inputTitle')?.value || '').trim();
+const albumTxt = (document.getElementById('inputAlbum')?.value || '').trim();
+const idTxt = (document.getElementById('inputBottomId')?.value || '').trim();
+const showId = document.getElementById('toggleShowId')?.checked ?? true;
+const zoom = (parseFloat(document.getElementById('sliderZoom')?.value || 100)) / 100;
+const rotation = document.getElementById('sliderRotation')?.value || 0;
 const imgUrl = this.selectedTonie.pic || this.makeDefaultAvatarSvg(titleTxt || albumTxt);
 let topString = '';
 let bottomString = '';
 let isBottomId = false;
 if (showId && idTxt) {
-if (titleTxt && albumTxt) {
-topString = ⁠${titleTxt} – ${albumTxt}⁠;
-} else {
-topString = titleTxt || albumTxt;
-}
+topString = (titleTxt && albumTxt) ? ⁠${titleTxt} – ${albumTxt}⁠ : (titleTxt || albumTxt);
 bottomString = idTxt;
 isBottomId = true;
 } else {
@@ -691,16 +737,17 @@ isBottomId = false;
 const bottomColor = isBottomId ? "#C02741" : "#0F172A";
 const bottomFont = isBottomId ? "monospace" : "-apple-system, sans-serif";
 const bottomSize = isBottomId ? "10.5" : "10";
-return ⁠<svg viewBox="0 0 160 160" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"> <defs> <clipPath id="circleMask"><circle cx="80" cy="80" r="79" /></clipPath> <path id="topArc" d="M 22 80 A 58 58 0 0 1 138 80" fill="transparent" /> <path id="bottomArc" d="M 22 80 A 58 58 0 0 0 138 80" fill="transparent" /> </defs> <circle cx="80" cy="80" r="80" fill="#FFFFFF" /> <g clip-path="url(#circleMask)"> <image href="${imgUrl}" x="${80 - (62 * zoom)}" y="${80 - (62 * zoom)}" width="${124 * zoom}" height="${124 * zoom}" preserveAspectRatio="xMidYMid slice" transform="rotate(${rotation} 80 80)" opacity="0.96" /> </g> <text font-family="-apple-system, sans-serif" font-weight="800" font-size="11" fill="#0F172A"> <textPath href="#topArc" startOffset="50%" text-anchor="middle">${this.escapeXml(topString)}</textPath> </text> <text font-family="${bottomFont}" font-weight="700" font-size="${bottomSize}" fill="${bottomColor}"> <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">${this.escapeXml(bottomString)}</textPath> </text> </svg>⁠;
+return ⁠<svg viewBox="0 0 160 160" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"> <defs> <clipPath id="circleMask"><circle cx="80" cy="80" r="79" /></clipPath> <path id="topArc" d="M 22 80 A 58 58 0 0 1 138 80" fill="transparent" /> <path id="bottomArc" d="M 22 80 A 58 58 0 0 0 138 80" fill="transparent" /> </defs> <circle cx="80" cy="80" r="80" fill="#FFFFFF" /> <g clip-path="url(#circleMask)"> <image href="${imgUrl}" x="${80 - (62 * zoom)}" y="${80 - (62 * zoom)}" width="${124 * zoom}" height="${124 * zoom}" preserveAspectRatio="xMidYMid slice" transform="rotate(${rotation} 80 80)" opacity="0.96" /> </g> <text font-family="-apple-system, sans-serif" font-weight="800" font-size="11" fill="#0F172A"> <textPath href="#topArc" startOffset="50%" text-anchor="middle">${this.escapeXml(topString)}</textPath> </text> <text font-family="${bottomFont}" font-weight="700" font-size="${bottomSize}" fill="${bottomColor}"> <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">${this.escapeXml(bottomString)}</textPath> </text> </svg>⁠.trim();
 },
 escapeXml: function(str) {
 return String(str).replace(/[&<>"']/g, c => ({ '&': '&', '<': '<', '>': '>', '"': '"', "'": ''' }[c]));
 },
 refreshPreview: function() {
 const svg = this.buildCurvedStickerSvg();
-document.getElementById('masterStickerPreview').innerHTML = svg;
+const stage = document.getElementById('masterStickerPreview');
+if (stage) stage.innerHTML = svg;
 },
-// --- Zweistufige Format-Auswahl: System & Größe ---
+// Format & Bogen-Manager
 onSystemChange: function() {
 this.currentSystem = document.getElementById('selectPrintSystem').value;
 this.populateSizeDropdown();
@@ -708,6 +755,7 @@ this.onSizeChange();
 },
 populateSizeDropdown: function() {
 const sizeSelect = document.getElementById('selectPrintSize');
+if (!sizeSelect) return;
 sizeSelect.innerHTML = '';
 const system = this.currentSystem;
 const matchingKeys = Object.keys(this.formats).filter(k => this.formats[k].system === system);
@@ -723,17 +771,18 @@ this.currentFormatKey = matchingKeys[0];
 }
 },
 onSizeChange: function() {
-this.currentFormatKey = document.getElementById('selectPrintSize').value;
+const sizeSelect = document.getElementById('selectPrintSize');
+if (!sizeSelect) return;
+this.currentFormatKey = sizeSelect.value;
 this.applyFormat(this.currentFormatKey);
 },
 applyFormat: function(formatKey) {
 const fmt = this.formats[formatKey];
 if (!fmt) return;
-document.getElementById('sheetSlotCountBadge').innerText = ⁠${fmt.count} Etiketten⁠;
-// Update sheet matrix class
+const badge = document.getElementById('sheetSlotCountBadge');
+if (badge) badge.innerText = ⁠${fmt.count} Etiketten⁠;
 const matrix = document.getElementById('sheetMatrixUi');
-matrix.className = ⁠sheet-matrix matrix-${formatKey}⁠;
-// Preserve slots or adjust size
+if (matrix) matrix.className = ⁠sheet-matrix matrix-${formatKey}⁠;
 const prevSlots = [...this.sheetSlots];
 this.sheetSlots = new Array(fmt.count).fill(null);
 for (let i = 0; i < Math.min(prevSlots.length, fmt.count); i++) {
@@ -743,6 +792,7 @@ this.renderSheetMatrixUi();
 },
 renderSheetMatrixUi: function() {
 const matrix = document.getElementById('sheetMatrixUi');
+if (!matrix) return;
 matrix.innerHTML = '';
 const count = this.sheetSlots.length;
 for (let i = 0; i < count; i++) {
@@ -760,7 +810,7 @@ matrix.appendChild(slot);
 },
 assignActiveStickerToSlot: function(index) {
 if (!this.selectedTonie) {
-alert("Bitte wähle zuerst ein Motiv in Schritt 1 aus!");
+alert("Bitte wähle zuerst ein Motiv aus!");
 return;
 }
 this.sheetSlots[index] = this.buildCurvedStickerSvg();
@@ -768,7 +818,7 @@ this.renderSheetMatrixUi();
 },
 fillAllSlotsWithActive: function() {
 if (!this.selectedTonie) {
-alert("Bitte wähle zuerst ein Motiv in Schritt 1 aus!");
+alert("Bitte wähle zuerst ein Motiv aus!");
 return;
 }
 const svg = this.buildCurvedStickerSvg();
@@ -779,7 +829,6 @@ clearSheetSlots: function() {
 this.sheetSlots.fill(null);
 this.renderSheetMatrixUi();
 },
-// --- High-Resolution 300 DPI Export ---
 exportHighResPng: function() {
 if (!this.selectedTonie) {
 alert("Bitte erst ein Motiv auswählen!");
@@ -805,13 +854,13 @@ a.click();
 };
 img.src = url;
 },
-// --- A4 Print Engine ---
 triggerA4Print: function() {
 const hasStickers = this.sheetSlots.some(s => s !== null);
 if (!hasStickers) {
 this.fillAllSlotsWithActive();
 }
 const printHost = document.getElementById('printHost');
+if (!printHost) return;
 printHost.innerHTML = '';
 printHost.className = 'print-format-' + this.currentFormatKey;
 this.sheetSlots.forEach(svgString => {
@@ -822,12 +871,16 @@ printHost.appendChild(cell);
 });
 window.print();
 },
-// Modals
 openHelpModal: function() { document.getElementById('helpModal').style.display = 'flex'; },
 closeHelpModal: function() { document.getElementById('helpModal').style.display = 'none'; },
-openDonateModal: function() { alert("Vielen Dank für deine Unterstützung der Community! Ein Klick auf GitHub Star hilft uns riesig."); }
+openDonateModal: function() { alert("Vielen Dank für deine Unterstützung des Community-Tools!"); }
 };
+// Direkter, ausfallsicherer App-Start
+if (document.readyState === 'loading') {
 document.addEventListener('DOMContentLoaded', () => app.init());
+} else {
+app.init();
+}
 </script>
 </body>
 </html>
