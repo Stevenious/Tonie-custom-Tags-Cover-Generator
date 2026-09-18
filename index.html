@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tonie & Tag Cover Hub V3.1</title>
+    <title>Tonie & Tag Cover Hub V3.2</title>
     <!-- 
-      V3.1 - Agent Validated Master Architecture
-      - Fix: Absolute 1-Page Print Guard (display:none vs visibility:hidden)
-      - Fix: Curved Text SVG Radius Adjusted (No touching edges)
-      - Fix: Robust Image Fallback (No blue question marks)
-      - Fix: Eliminated all text leaks
+      V3.2 - The Functional Master Rebuild
+      - Fix: Dual-Fetch Engine for GitHub Pages (Relative + Raw Fallback)
+      - Fix: Safe DOM Event Binding (Grid Clicks 100% reliable)
+      - Fix: Async Image Pre-Loader (Prevents SVG crashes & blue question marks)
+      - UI: Retained V3.1 Design ("Grafisch Top")
     -->
     <style>
         :root {
@@ -64,16 +64,18 @@
         .search-wrap { position: relative; margin-bottom: 15px; }
         .search-input { width: 100%; padding: 12px 16px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-main); font-size: 14px; outline: none; transition: 0.2s; }
         .search-input:focus { border-color: var(--tonie-red); box-shadow: 0 0 0 3px rgba(192,39,65,0.2); }
-        .search-status { font-size: 11px; color: var(--tonie-red); font-weight: 600; position: absolute; right: 12px; top: 14px; }
+        .search-status { font-size: 11px; font-weight: 600; position: absolute; right: 12px; top: 14px; transition: color 0.3s; }
+        .status-online { color: #4CAF50; }
+        .status-offline { color: var(--tonie-red); }
         
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; max-height: 250px; overflow-y: auto; padding-right: 5px; }
         .grid::-webkit-scrollbar { width: 6px; }
         .grid::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
         
-        .grid-item { background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 5px; text-align: center; cursor: pointer; transition: 0.2s; position: relative; }
+        .grid-item { background: var(--input-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 5px; text-align: center; cursor: pointer; transition: 0.2s; position: relative; display: flex; flex-direction: column; align-items: center; }
         .grid-item:hover { border-color: var(--tonie-red); transform: translateY(-2px); }
         .grid-item img { width: 60px; height: 60px; object-fit: contain; border-radius: 50%; background: #fff; margin-bottom: 5px; padding: 2px; }
-        .grid-item .t-title { font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .grid-item .t-title { font-size: 11px; font-weight: 700; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .grid-item .t-id { font-size: 9px; color: var(--text-muted); font-family: monospace; }
 
         .editor-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
@@ -99,14 +101,11 @@
         /* --- PRINT ENGINE V3.1 (STRICT 1-PAGE LOCKDOWN) --- */
         #printSheet { display: none; }
         @media print {
-            /* 1. Completely remove UI from document flow so it uses ZERO space */
             body, html { background: white !important; margin: 0 !important; padding: 0 !important; height: 100%; }
             .container, .modal-overlay, .top-bar, .header, .card, .footer { display: none !important; }
             
-            /* 2. Activate ONLY the print sheet */
             #printSheet { display: block !important; position: absolute; top: 0; left: 0; width: 210mm; height: 297mm; background: white; z-index: 99999; }
             
-            /* Layouts */
             .layout-avery { display: grid; grid-template-columns: repeat(3, 40mm); grid-template-rows: repeat(8, 40mm); gap: 0; justify-content: center; align-content: start; padding-top: 12mm; }
             .layout-raster { display: flex; flex-wrap: wrap; gap: 10mm; padding: 15mm; align-content: flex-start; justify-content: flex-start; }
             
@@ -148,7 +147,7 @@
             </g>
         </svg>
         <div class="title">Tonie & Tag <span>Cover Hub</span></div>
-        <div class="subtitle">Der perfekte Designer für Münzkapseln & Avery Etiketten (V3.1)</div>
+        <div class="subtitle">Der perfekte Designer für Münzkapseln & Avery Etiketten (V3.2)</div>
     </div>
 
     <div class="card">
@@ -158,7 +157,7 @@
         </div>
         <div class="search-wrap">
             <input type="text" id="searchInput" class="search-input" placeholder="Nach Titel, Serie oder ID suchen..." onkeyup="app.search()">
-            <span class="search-status" id="searchStatus"></span>
+            <span class="search-status" id="searchStatus">Initialisiere...</span>
         </div>
         <div class="grid" id="tonieGrid"></div>
     </div>
@@ -188,7 +187,7 @@
     </div>
 
     <div class="footer">
-        <div>Tonie & Tag Cover Hub V3.1 • <a href="https://stevenious.github.io/" target="_blank">GitHub</a></div>
+        <div>Tonie & Tag Cover Hub V3.2 • <a href="https://stevenious.github.io/" target="_blank">GitHub</a></div>
         <div class="disclaimer">
             Dieses Open-Source Community-Tool steht in keinerlei rechtlicher oder geschäftlicher Verbindung zur Boxine GmbH.<br>
             "Tonie", "Tonies" und "Toniebox" sind eingetragene Marken der Boxine GmbH.
@@ -219,31 +218,41 @@ const app = {
     db: [],
     selectedTonie: null,
     validImageUrl: '',
+    
+    // Robust Base64 Placeholder (Prevents broken image icons)
+    placeholderImg: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNjAiIGhlaWdodD0iMTYwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjRTBFMEUwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmb250LXdlaWdodD0iYm9sZCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkN1c3RvbTwvdGV4dD48L3N2Zz4=',
 
     fallbackDb: [
-        { id: "01-0010", title: "Conni feiert Geburtstag", series: "Conni" },
-        { id: "01-0182", title: "TKKG Junior - Alarm", series: "TKKG" },
-        { id: "01-0305", title: "Die Olchis sind da", series: "Die Olchis" }
+        { id: "01-0010", title: "Conni feiert Geburtstag", series: "Conni", image_url: "https://images.tonies.de/ii/01-0010/conni.png" },
+        { id: "01-0182", title: "TKKG Junior - Alarm", series: "TKKG", image_url: "https://images.tonies.de/ii/01-0182/tkkg.png" },
+        { id: "01-0305", title: "Die Olchis sind da", series: "Die Olchis", image_url: "https://images.tonies.de/ii/01-0305/olchis.png" }
     ],
-    placeholderImg: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNjAiIGhlaWdodD0iMTYwIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjRTBFMEUwIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmb250LXNpemU9IjE0IiBmaWxsPSIjOThhYmFjIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBkeT0iLjNlbSI+S2VpbiBCaWxkPC90ZXh0Pjwvc3ZnPg==',
 
     init: async function() {
         document.body.setAttribute('data-theme', this.theme);
+        const statusEl = document.getElementById('searchStatus');
         
         try {
-            const res = await fetch('https://stevenious.github.io/tonies.json');
+            // Intelligent Dual-Fetch: Try relative first (Github Pages standard), then raw absolute
+            let res = await fetch('./tonies.json');
+            if(!res.ok) {
+                res = await fetch('https://raw.githubusercontent.com/Stevenious/Tonie-custom-Tags-Cover-Generator/main/tonies.json');
+            }
             if(!res.ok) throw new Error("Fetch failed");
+            
             this.db = await res.json();
-            document.getElementById('searchStatus').innerText = "Online";
+            statusEl.innerText = "Online";
+            statusEl.className = "search-status status-online";
         } catch(e) {
-            console.warn("Online fetch failed, using offline fallback.", e);
+            console.warn("Fetch failed, using offline fallback.", e);
             this.db = this.fallbackDb;
-            document.getElementById('searchStatus').innerText = "Offline Cache";
+            statusEl.innerText = "Offline Cache";
+            statusEl.className = "search-status status-offline";
         }
         
         document.getElementById('dbCount').innerText = `${this.db.length} Tonies geladen`;
         this.renderGrid(this.db.slice(0, 40)); 
-        if(this.db.length > 0) this.selectTonie(this.db[0], null);
+        if(this.db.length > 0) this.selectTonie(this.db[0]);
     },
 
     search: function() {
@@ -267,49 +276,49 @@ const app = {
             const div = document.createElement('div');
             div.className = 'grid-item';
             
-            // Generate robust image tag with native onerror fallback
-            const img = document.createElement('img');
-            img.src = t.image_url || this.placeholderImg;
-            img.onerror = function() { this.src = app.placeholderImg; };
-            
-            div.appendChild(img);
-            div.innerHTML += `
+            // Safe DOM Construction (Prevents click event bugs)
+            div.innerHTML = `
+                <img src="${t.image_url || this.placeholderImg}" onerror="this.src='${this.placeholderImg}'" alt="${t.title || 'Cover'}">
                 <div class="t-title">${t.title || 'Ohne Titel'}</div>
                 <div class="t-id">${t.id || 'N/A'}</div>
             `;
             
-            div.onclick = () => this.selectTonie(t, img.src);
+            // Explicit Event Binding
+            div.onclick = () => this.selectTonie(t);
             grid.appendChild(div);
         });
     },
 
-    selectTonie: function(tonie, resolvedImgSrc) {
+    selectTonie: function(tonie) {
         this.selectedTonie = tonie;
         document.getElementById('manualId').value = tonie.id || '';
-        // If grid passed a resolved src (even fallback), use it. Otherwise test it.
-        this.validImageUrl = resolvedImgSrc || tonie.image_url || this.placeholderImg;
-        this.updatePreview();
+        
+        // Async Image Pre-Loader: Validates URL before SVG injection
+        const img = new Image();
+        img.onload = () => {
+            this.validImageUrl = img.src;
+            this.updatePreview();
+        };
+        img.onerror = () => {
+            this.validImageUrl = this.placeholderImg;
+            this.updatePreview();
+        };
+        img.src = tonie.image_url || this.placeholderImg;
     },
 
     generateSvgLabel: function(imgUrl, topText, bottomText) {
-        // Radius shrunk from 65 to 58 to prevent text from touching the edge
         return `
         <svg viewBox="0 0 160 160" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
             <defs>
-                <clipPath id="circleClip">
-                    <circle cx="80" cy="80" r="80" />
-                </clipPath>
+                <clipPath id="circleClip"><circle cx="80" cy="80" r="80" /></clipPath>
                 <path id="topCurve" d="M 22 80 A 58 58 0 0 1 138 80" fill="transparent" />
                 <path id="bottomCurve" d="M 22 80 A 58 58 0 0 0 138 80" fill="transparent" />
             </defs>
-            
             <circle cx="80" cy="80" r="80" fill="#ffffff" />
             <image href="${imgUrl}" x="15" y="15" width="130" height="130" clip-path="url(#circleClip)" preserveAspectRatio="xMidYMid slice" opacity="0.9" />
-            
             <text font-family="-apple-system, sans-serif" font-weight="bold" font-size="12" fill="#000">
                 <textPath href="#topCurve" startOffset="50%" text-anchor="middle">${topText || ''}</textPath>
             </text>
-            
             <text font-family="monospace" font-weight="bold" font-size="11" fill="#C02741">
                 <textPath href="#bottomCurve" startOffset="50%" text-anchor="middle">${bottomText || ''}</textPath>
             </text>
@@ -326,7 +335,6 @@ const app = {
 
     print: function() {
         if(!this.selectedTonie) { alert("Bitte erst ein Motiv auswählen!"); return; }
-        
         const format = document.getElementById('formatSelect').value;
         const sheet = document.getElementById('printSheet');
         const manualId = document.getElementById('manualId').value;
@@ -335,14 +343,12 @@ const app = {
         sheet.innerHTML = ''; 
         sheet.className = format === 'avery' ? 'layout-avery' : 'layout-raster';
         
-        const count = 24; 
-        for(let i=0; i<count; i++) {
+        for(let i=0; i<24; i++) {
             const sticker = document.createElement('div');
             sticker.className = 'print-sticker';
             sticker.innerHTML = svgContent;
             sheet.appendChild(sticker);
         }
-        
         window.print();
     },
 
