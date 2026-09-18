@@ -7,6 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --tonie-red: #C02741;
@@ -51,7 +52,6 @@
             transition: background-color 0.3s, color 0.3s;
         }
 
-        /* Header */
         header {
             background: var(--panel-bg);
             padding: 15px 30px;
@@ -70,7 +70,6 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            color: var(--text-main);
         }
 
         .header-controls {
@@ -101,7 +100,6 @@
         .btn-outline { background: transparent; border: 2px solid var(--border-color); color: var(--text-main); }
         .btn-outline:hover { border-color: var(--text-main); background: rgba(0,0,0,0.02); }
 
-        /* Guided Stepper / Wizard Bar */
         .wizard-bar {
             background: var(--panel-bg);
             padding: 10px 30px;
@@ -138,7 +136,6 @@
             color: white;
         }
 
-        /* Workspace Grid */
         .workspace {
             display: grid;
             grid-template-columns: 350px 350px 1fr;
@@ -192,7 +189,6 @@
         ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
 
-        /* Tabs */
         .tab-bar { display: flex; gap: 6px; background: var(--slot-empty); padding: 4px; border-radius: 10px; margin-bottom: 15px; border: 1px solid var(--border-color); }
         .tab-btn { flex: 1; padding: 8px; border: none; background: transparent; border-radius: 8px; font-size: 0.85rem; font-weight: 800; color: var(--text-muted); cursor: pointer; text-align: center; }
         .tab-btn.active { background: var(--panel-bg); color: var(--text-main); box-shadow: var(--shadow-sm); }
@@ -233,10 +229,9 @@
         }
         [data-theme="dark"] .tile-overlay { background: rgba(45, 55, 72, 0.9); color: #f7fafc; }
 
-        /* 1-Click Quick Add Button on Tiles */
         .tile-quick-add {
             position: absolute; top: 6px; right: 6px;
-            background: var(--tonie-red); color: white;
+            background: var(--tonie-blue); color: white;
             border: none; border-radius: 50%; width: 28px; height: 28px;
             font-size: 16px; font-weight: 900; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
@@ -248,7 +243,7 @@
         .tile:hover .tile-quick-add {
             opacity: 1; transform: scale(1);
         }
-        .tile-quick-add:hover { background: var(--tonie-red-hover); transform: scale(1.1); }
+        .tile-quick-add:hover { background: var(--tonie-blue-hover); transform: scale(1.1); }
 
         .editor-form { display: flex; flex-direction: column; gap: 12px; }
         
@@ -333,7 +328,6 @@
         #a4-sheet .sticker:hover .delete-btn { display: flex; }
         @media (max-width: 768px) { #a4-sheet .sticker .delete-btn { display: flex; opacity: 0.8; } }
 
-        /* Print Toolbar Workspace */
         .print-toolbar {
             background: var(--slot-empty);
             border: 1px solid var(--border-color);
@@ -414,7 +408,6 @@
         .slot .sticker { width: 100%; height: 100%; cursor: grab; box-shadow: none; }
         .slot .sticker:active { cursor: grabbing; }
 
-        /* Toast Container */
         #toast-container {
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
             z-index: 9999; display: flex; flex-direction: column; gap: 10px; pointer-events: none;
@@ -428,7 +421,6 @@
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeOut { to { opacity: 0; } }
 
-        /* Pre-Print Confidence Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
@@ -473,7 +465,6 @@
 
     <div id="toast-container"></div>
 
-    <!-- Pre-Print Confidence Modal -->
     <div class="modal-overlay" id="printModal">
         <div class="modal-card">
             <div class="modal-title">🖨️ Druck-Sicherheitscheck</div>
@@ -482,7 +473,7 @@
                 <ul>
                     <li><b>Skalierung:</b> Unbedingt auf exakt <b>100%</b> oder "Tatsächliche Größe" stellen (nicht "An Seite anpassen").</li>
                     <li><b>Randlos / Ränder:</b> Seitenränder im Browser-Dialog auf <b>Standard</b> oder <b>Keine</b> belassen.</li>
-                    <li><b>Papier:</b> Lege Avery Zweckform-Etiketten oder Klebepapier seitenrichtig in das Einabefach.</li>
+                    <li><b>Papier:</b> Lege Avery Zweckform-Etiketten oder Klebepapier seitenrichtig in das Eingabefach.</li>
                 </ul>
             </div>
             <div class="modal-actions">
@@ -519,7 +510,7 @@
             </svg>
             <div style="display: flex; align-items: baseline; gap: 6px;">
                 <span style="color: var(--tonie-red); font-weight: 900;">TagGen</span>
-                <span style="color: var(--text-main); font-weight: 900;">Studio</span>
+                <span style="color: var(--text-main); font-weight: 300;">Studio</span>
             </div>
         </h1>
         <div class="header-controls">
@@ -529,7 +520,6 @@
         </div>
     </header>
 
-    <!-- Guided Journey Wizard Bar -->
     <div class="wizard-bar">
         <div class="wizard-step active" id="step1-ind"><span>1</span> Motiv auswählen</div>
         <div class="wizard-step" id="step2-ind"><span>2</span> Cover anpassen</div>
@@ -541,7 +531,7 @@
         <ul style="margin-left: 20px; line-height: 1.6; color: var(--text-main);">
             <li><b>1. Motiv wählen:</b> Nutze die Live-Suche (1-Klick "+" direkt auf den Kacheln zum schnellen Hinzufügen) oder lade ein eigenes Foto hoch.</li>
             <li><b>2. Cover Editor:</b> Passe Serie & Titel an. Aktiviere <b>PRO</b> für Feintuning, Zoom & UIDs.</li>
-            <li><b>3. Druckbogen:</b> Wähle deine physischen Medien (🪙 Münzkapseln oder 📄 Avery Zweckform Bögen). Nutzen Sie "Bogen vollmachen" für schnelles Tiling.</li>
+            <li><b>3. Druckbogen:</b> Wähle dein Format (Freies Raster für Münzkapseln oder vorgestanzte Avery Zweckform Bögen). Nutze "Bogen vollmachen" für schnelles Tiling.</li>
         </ul>
     </div>
 
@@ -551,17 +541,16 @@
         <section class="panel" id="panel-choose">
             <div class="panel-header">
                 <span>1. Motiv wählen</span>
-                <span style="font-size:0.75rem; color:var(--tonie-red); font-weight:900;">WIZARD STEP 1</span>
             </div>
             <div class="panel-content">
                 <div class="tab-bar">
-                    <button class="tab-btn active" id="tabDb" onclick="switchTab('db')">📚 Community DB</button>
+                    <button class="tab-btn active" id="tabDb" onclick="switchTab('db')">📚 Datenbank</button>
                     <button class="tab-btn" id="tabCustom" onclick="switchTab('custom')">📷 Eigenes Foto</button>
                 </div>
 
                 <div id="sectionDb">
                     <div class="search-bar">
-                        <input type="text" id="search-input" placeholder="TKKG, Die drei ???, ID..." disabled>
+                        <input type="text" id="search-input" placeholder="Serie, Titel, ID eingeben..." disabled>
                         <button class="btn btn-secondary" id="btn-random" title="Zufälliger Tonie" disabled>🎲</button>
                     </div>
                     <div class="results-grid" id="results-grid"></div>
@@ -579,7 +568,7 @@
         <!-- Step 2 Panel -->
         <section class="panel" id="panel-style">
             <div class="panel-header">
-                <span>2. Cover anpassen</span>
+                <span>2. Cover Editor</span>
                 <label class="checkbox-group" style="font-size: 0.75rem; font-weight: 800; background: var(--tonie-blue); color: white; padding: 4px 10px; border-radius: 12px; margin: 0;">
                     <input type="checkbox" id="toggle-pro"> PRO-Modus
                 </label>
@@ -587,11 +576,11 @@
             <div class="panel-content" style="display: flex; flex-direction: column;">
                 <div class="editor-form">
                     <div class="input-group">
-                        <label>Serie (Oben gebogen)</label>
+                        <label>Serie (Oben)</label>
                         <input type="text" id="edit-series" placeholder="z.B. TKKG">
                     </div>
                     <div class="input-group">
-                        <label>Titel (Unten gebogen)</label>
+                        <label>Titel (Unten)</label>
                         <input type="text" id="edit-title" placeholder="z.B. Folge 1">
                     </div>
                     
@@ -640,7 +629,7 @@
         <!-- Step 3 Panel -->
         <section class="panel col-print" id="panel-print">
             <div class="panel-header">
-                <span>3. Arrange & Print (Druckbogen)</span>
+                <span>3. A4 Druck & Export</span>
                 <span id="slot-counter" style="font-size: 0.85rem; font-weight: 800; color: var(--text-muted);">0 / 24</span>
             </div>
             <div class="panel-content" style="display: flex; flex-direction: column;">
@@ -648,8 +637,8 @@
                 <div class="print-toolbar">
                     <div class="toolbar-top">
                         <select id="format-type-select">
-                            <option value="free">🪙 1. Typ: Freies Raster (Münzkapseln)</option>
-                            <option value="avery">📄 1. Typ: Avery Zweckform (Etiketten)</option>
+                            <option value="free">1. Typ: Freies Raster (Schere/Stanzer)</option>
+                            <option value="avery">1. Typ: Avery Zweckform (Etiketten)</option>
                         </select>
                         <select id="format-size-select"></select>
                         <label class="checkbox-group" id="wrapper-cut-marks" style="background: var(--input-bg); padding: 0 15px; border: 1px solid var(--border-color); border-radius: 8px; justify-content: center; display: flex;">
@@ -701,14 +690,14 @@
 
         const sizeOptions = {
             'free': [
-                { value: '43', text: '🪙 2. Größe: 43mm (20 Stk)' },
-                { value: '40', text: '🪙 2. Größe: 40mm (24 Stk - Kapsel)' },
-                { value: '30', text: '🪙 2. Größe: 30mm (40 Stk)' },
-                { value: '25', text: '🪙 2. Größe: 25mm (54 Stk)' }
+                { value: '43', text: '2. Größe: 43mm (20 Stk)' },
+                { value: '40', text: '2. Größe: 40mm (24 Stk)' },
+                { value: '30', text: '2. Größe: 30mm (40 Stk)' },
+                { value: '25', text: '2. Größe: 25mm (54 Stk)' }
             ],
             'avery': [
-                { value: 'L3415', text: '📄 2. Größe: 40mm (Avery L3415 - 24 Stk)' },
-                { value: 'avery30', text: '📄 2. Größe: 30mm (Avery 30mm - 45 Stk)' }
+                { value: 'L3415', text: '2. Größe: 40mm (Avery L3415 - 24 Stk)' },
+                { value: 'avery30', text: '2. Größe: 30mm (Avery 30mm - 45 Stk)' }
             ]
         };
 
@@ -919,7 +908,6 @@
                     <button class="tile-quick-add" title="Sofort zum Bogen hinzufügen">+</button>
                 `;
                 
-                // 1-Click Quick Add Button functionality
                 const quickAddBtn = tile.querySelector('.tile-quick-add');
                 quickAddBtn.onclick = (e) => {
                     e.stopPropagation();
@@ -963,9 +951,14 @@
             return `
                 <svg viewBox="0 0 100 100" class="sticker-svg" style="--font-scale: ${fontScale}">
                     <defs>
-                        <path id="top_${uid}" d="M 14 50 A 36 36 0 0 1 86 50" />
-                        <path id="title_${uid}" d="M 86 55 A 36 36 0 0 0 14 55" />
-                        <path id="id_${uid}" d="M 90 61 A 40 40 0 0 0 10 61" />
+                        <!-- Oberer Bogen (Serie): Links nach Rechts (Uhrzeigersinn). Radius 38 -->
+                        <path id="top_${uid}" d="M 12 50 A 38 38 0 0 1 88 50" />
+                        
+                        <!-- Unterer Bogen (Titel): Links nach Rechts (Gegen den Uhrzeigersinn -> sweep-flag 0). Radius 40, aufrecht -->
+                        <path id="title_${uid}" d="M 10 50 A 40 40 0 0 0 90 50" />
+                        
+                        <!-- Unterer Bogen (ID): Noch weiter aussen. Radius 46 -->
+                        <path id="id_${uid}" d="M 4 50 A 46 46 0 0 0 96 50" />
                     </defs>
                     <text class="svg-series"><textPath href="#top_${uid}" startOffset="50%" text-anchor="middle">${sText}</textPath></text>
                     <text class="svg-title"><textPath href="#title_${uid}" startOffset="50%" text-anchor="middle">${tText}</textPath></text>
@@ -991,7 +984,6 @@
         ui.editUid.addEventListener('input', updatePreviewText);
 
         function applySliders() {
-            const fontScale = ui.sliders.font.value / 100;
             ui.vals.font.innerText = ui.sliders.font.value + '%';
             ui.vals.zoom.innerText = ui.sliders.zoom.value + '%';
             ui.preview.box.style.setProperty('--bg-scale', ui.sliders.zoom.value + '%');
@@ -1119,7 +1111,6 @@
             setWizardStep(3);
         });
 
-        // Auto-Fill Feature ("Bogen vollmachen")
         ui.btnAutoFill.addEventListener('click', () => {
             if(!currentItem) { showToast("Bitte wähle zuerst ein Motiv aus!"); return; }
             const emptySlots = Array.from(ui.sheet.querySelectorAll('.slot')).filter(s => s.children.length === 0);
@@ -1141,7 +1132,6 @@
 
         ui.btnClear.addEventListener('click', () => { initSheet(); queuedItems = []; showToast("Bogen geleert"); });
         
-        // Pre-Print Confidence Modal Handling
         let pendingPrintAction = null;
 
         function openPrintModal(action) {
@@ -1213,7 +1203,8 @@
         });
 
         function initPWA() {
-            const appIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><defs><filter id="shadowSheetPWA" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.15"/></filter><filter id="shadowPeelPWA" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="3" dy="5" stdDeviation="4" flood-color="#000" flood-opacity="0.3"/></filter><filter id="shadowFlapPWA" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="-2" dy="-2" stdDeviation="2" flood-color="#000" flood-opacity="0.2"/></filter><clipPath id="cutCornerPWA"><polygon points="-20,-20 84,-20 84,0 0,84 -20,84"/></clipPath></defs><rect x="15" y="15" width="90" height="90" rx="8" fill="#ffffff" stroke="#cbd5e0" stroke-width="3" filter="url(#shadowSheetPWA)"/><line x1="15" y1="60" x2="105" y2="60" stroke="#cbd5e0" stroke-width="2" stroke-dasharray="6 6"/><line x1="60" y1="15" x2="60" y2="105" stroke="#cbd5e0" stroke-width="2" stroke-dasharray="6 6"/><circle cx="82.5" cy="82.5" r="16" fill="#f8fafc" stroke="#cbd5e0" stroke-width="1.5" stroke-dasharray="4 4"/><circle cx="37.5" cy="82.5" r="16" fill="#f8fafc" stroke="#cbd5e0" stroke-width="1.5" stroke-dasharray="4 4"/><circle cx="82.5" cy="37.5" r="16" fill="#f8fafc" stroke="#cbd5e0" stroke-width="1.5" stroke-dasharray="4 4"/><circle cx="37.5" cy="37.5" r="16" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 4"/><path d="M 27 37.5 A 10.5 10.5 0 0 1 48 37.5" fill="none" stroke="#cbd5e0" stroke-width="1.5" stroke-dasharray="2 2"/><g transform="translate(20, 3) rotate(-8)" filter="url(#shadowPeelPWA)"><circle cx="30" cy="30" r="24" fill="#C02741" clip-path="url(#cutCornerPWA)"/><path d="M 20 28 A 12 12 0 0 1 40 28" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/><path d="M 14 20 A 21 21 0 0 1 46 20" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/><circle cx="30" cy="35" r="3.5" fill="#ffffff"/><path d="M 54 30 L 30 54 Q 38 38 54 30 Z" fill="#e2e8f0" filter="url(#shadowFlapPWA)"/></g></svg>`;
+            const appIconSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><defs><filter id="shadowSheetPWA" x="-10%" y="-10%" width="120%" height="120%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000" flood-opacity="0.15"/></filter><filter id="shadowPeelPWA" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="3" dy="5" stdDeviation="4" flood-color="#000" flood-opacity="0.3"/></filter><filter id="shadowFlapPWA" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="-2" dy="-2" stdDeviation="2" flood-color="#000" flood-opacity="0.2"/></filter><clipPath id="cutCornerPWA"><polygon points="-20,-20 84,-20 84,0 0,84 -20,84"/></clipPath></defs><rect x="15" y="15" width="90" height="90" rx="8" fill="#ffffff" stroke="#cbd5e0" stroke-width="3" filter="url(#shadowSheetPWA)"/><line x1="15" y1="60" x2="105" y2="60" stroke="#cbd5e0" stroke-width="2" stroke-dasharray="6 6"/><line x1="60" y1="15" x2="60" y2="105" stroke="#cbd5e0" stroke-width="2" stroke-dasharray="6 6"/><circle cx="82.5" cy="82.5" r="16" fill="#f8fafc" stroke="#cbd5e0" stroke-width="1.5" stroke-dasharray="4 4"/><circle cx="37.5" cy="82.5" r="16" fill="#f8fafc" stroke="#cbd5e0" stroke-width="1.5" stroke-dasharray="4 4"/><circle cx="82.5" cy="37.5" r="16" fill="#f8fafc" stroke="#cbd5e0" stroke-width="1.5" stroke-dasharray="4 4"/><circle cx="37.5" cy="37.5" r="16" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4 4"/><path d="M 27 37.5 A 10.5 10.5 0 0 1 48 37.5" fill="none" stroke="#cbd5e0" stroke-width="1.5" stroke-dasharray="2 2"/><g transform="translate(20, 3) rotate(-8)" filter="url(#shadowPeelPWA)"><circle cx="30" cy="30" r="24" fill="#C02741" clip-path="url(#cutCornerPWA)"/><path d="M 20 28 A 12 12 0 0 1 40 28" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/><path d="M 14 20 A 21 21 0 0 1 46 20" fill="none" stroke="#ffffff" stroke-width="3" stroke-linecap="round"/><circle cx="30" cy="35" r="3.5" fill="#ffffff"/>
+            <path d="M 54 30 L 30 54 Q 38 38 54 30 Z" fill="#e2e8f0" filter="url(#shadowFlapPWA)"/></g></svg>`;
             const manifest = { name: "TagGen Studio", short_name: "TagGen", start_url: window.location.href, display: "standalone", background_color: "#f4f7f6", theme_color: "#C02741", icons: [{ src: "data:image/svg+xml;base64," + btoa(appIconSVG), sizes: "192x192 512x512", type: "image/svg+xml" }] };
             const link = document.createElement('link'); link.rel = 'manifest'; link.href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], {type: 'application/manifest+json'}));
             document.head.appendChild(link);
