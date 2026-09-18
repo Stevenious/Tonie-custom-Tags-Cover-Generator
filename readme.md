@@ -6,7 +6,7 @@ TagGen Studio ist eine rasante, browserbasierte Single-Page-Application (SPA), m
 
 ![TagGen Studio UI](image_239928.png)
 
-🔗 [**Hier geht's zur Live-Version (Live Demo)**](#) *(<-- Trage hier deinen Netlify oder GitHub Pages Link ein)*
+🔗 [**[Hier geht's zur Live-Version (Live Demo)](https://stevenious.github.io/Tonie-custom-Tags-Cover-Generator/)**](#) 
 
 ---
 
