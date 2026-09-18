@@ -1,590 +1,297 @@
 <!DOCTYPE html>
-<html lang="de" data-theme="light">
+<html lang="de">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Tonie & Tag Cover HUB V18</title>
+<title>Tonie & Tag Cover HUB V20</title>
 <style>
-:root, [data-theme="light"] {
+:root {
 --brand-red: #A31E33;
---brand-red-hover: #8A192A;
---brand-red-soft: rgba(163, 30, 51, 0.08);
+--brand-red-dark: #8A192A;
 --bg-body: #F9F7F3;
 --bg-card: #FFFFFF;
---bg-sub: #F0EEEA;
 --border-color: #E5E2DC;
 --text-main: #1D1B1A;
 --text-sub: #6B6661;
---text-muted: #9C9690;
 --input-bg: #FFFFFF;
---shadow-sm: 0 2px 8px rgba(29, 27, 26, 0.05);
---shadow-md: 0 8px 24px rgba(29, 27, 26, 0.08);
 }
-[data-theme="dark"] {
---brand-red: #D42743;
---brand-red-hover: #E82A49;
---brand-red-soft: rgba(212, 39, 67, 0.15);
---bg-body: #0F1115;
---bg-card: #1A1C23;
---bg-sub: #252830;
---border-color: #323642;
---text-main: #F4F4F5;
---text-sub: #A1A1AA;
---text-muted: #71717A;
---input-bg: #1A1C23;
---shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
---shadow-md: 0 8px 24px rgba(0, 0, 0, 0.6);
-}
-* { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
-body { background: var(--bg-body); color: var(--text-main); transition: background 0.25s; min-height: 100vh; overflow-x: hidden; }
-.container { max-width: 900px; margin: 0 auto; padding: 1rem; }
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+body { background: var(--bg-body); color: var(--text-main); padding: 1rem; padding-bottom: 4rem; }
+.container { max-width: 800px; margin: 0 auto; }
 /* HEADER */
-.app-header { background: var(--bg-card); padding: 12px 1rem; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-.logo-container { flex: 1; display: flex; align-items: center; min-width: 0; }
-.logo-svg { height: 44px; width: 100%; max-width: 380px; }
-.header-actions { display: flex; gap: 8px; flex-shrink: 0; }
-.pill-btn { background: var(--bg-sub); color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-sm); }
-.pill-btn.accent { background: var(--brand-red); color: #FFF; border-color: var(--brand-red); }
+.header { background: var(--bg-card); padding: 1rem; border-radius: 16px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+.logo-title { font-size: 18px; font-weight: 900; }
+.logo-title span { color: var(--brand-red); }
 /* CARDS */
-.card { background: var(--bg-card); border-radius: 20px; border: 1px solid var(--border-color); padding: 1.25rem; margin-top: 1.5rem; box-shadow: var(--shadow-md); }
-.card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
-.card-title { font-size: 18px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
-.step-badge { width: 28px; height: 28px; background: var(--brand-red); color: #FFF; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;}
+.card { background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border-color); padding: 1.25rem; margin-bottom: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+.card-title { font-size: 16px; font-weight: 800; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
+.badge { width: 24px; height: 24px; background: var(--brand-red); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
 /* TABS */
-.tab-bar { display: flex; gap: 6px; background: var(--bg-sub); padding: 6px; border-radius: 12px; margin-bottom: 1rem; overflow-x: auto; }
-.tab-btn { flex: 1 0 auto; white-space: nowrap; padding: 10px 14px; border: none; background: transparent; border-radius: 8px; font-size: 13px; font-weight: 700; color: var(--text-sub); cursor: pointer; }
-.tab-btn.active { background: var(--bg-card); color: var(--text-main); box-shadow: var(--shadow-sm); }
-.search-input { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-main); font-size: 14px; outline: none; margin-bottom: 8px; }
-.status-row { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; color: var(--text-muted); margin-bottom: 12px; padding: 0 4px; }
-/* GRID */
-.grid-motives { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; max-height: 280px; overflow-y: auto; padding: 4px; }
-.motive-card { background: var(--bg-sub); border: 1px solid var(--border-color); border-radius: 14px; padding: 12px 8px; text-align: center; cursor: pointer; position: relative; }
-.motive-img { width: 64px; height: 64px; object-fit: contain; border-radius: 50%; background: #FFF; margin-bottom: 8px; box-shadow: var(--shadow-sm); }
-.motive-card.active { border: 2px solid var(--brand-red); background: var(--brand-red-soft); }
-.motive-series { font-size: 9px; font-weight: 800; color: var(--brand-red); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.motive-title { font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin: 2px 0; }
-.fav-star { position: absolute; top: 6px; right: 6px; font-size: 18px; color: var(--text-muted); cursor: pointer; }
-.fav-star.is-fav { color: #F59E0B; }
+.tab-bar { display: flex; gap: 6px; background: #F0EEEA; padding: 4px; border-radius: 10px; margin-bottom: 12px; }
+.tab-btn { flex: 1; padding: 8px; border: none; background: transparent; border-radius: 8px; font-size: 12px; font-weight: 700; color: var(--text-sub); cursor: pointer; text-align: center; }
+.tab-btn.active { background: #fff; color: var(--text-main); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+/* SEARCH & GRID */
+.search-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border-color); font-size: 14px; margin-bottom: 10px; outline: none; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; max-height: 280px; overflow-y: auto; padding: 2px; }
+.motive-card { background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 10px; padding: 8px; text-align: center; cursor: pointer; transition: 0.1s; }
+.motive-card:active { transform: scale(0.96); }
+.motive-card.selected { border-color: var(--brand-red); background: rgba(163,30,51,0.05); box-shadow: 0 0 0 2px var(--brand-red); }
+.motive-card img { width: 50px; height: 50px; object-fit: contain; border-radius: 50%; background: #fff; margin-bottom: 4px; }
+.motive-title { font-size: 10px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 /* EDITOR */
-.editor-layout { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-@media (min-width: 768px) { .editor-layout { grid-template-columns: 1fr 1fr; } }
-.input-group { margin-bottom: 12px; }
-.input-group label { display: block; font-size: 11px; font-weight: 800; color: var(--text-sub); margin-bottom: 6px; text-transform: uppercase; }
-.input-field { width: 100%; padding: 12px 14px; border-radius: 12px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-main); font-size: 14px; font-weight: 600; outline: none; }
-.toggle-row { display: flex; align-items: center; justify-content: space-between; background: var(--bg-sub); padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border-color); height: 44px; }
-.switch { position: relative; display: inline-block; width: 44px; height: 24px; }
-.switch input { opacity: 0; width: 0; height: 0; }
-.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: var(--border-color); border-radius: 24px; transition: .3s; }
-.slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; border-radius: 50%; transition: .3s; }
-input:checked + .slider { background-color: var(--brand-red); }
-input:checked + .slider:before { transform: translateX(20px); }
-.preview-stage { background: var(--bg-sub); border-radius: 16px; border: 1px dashed var(--border-color); display: flex; align-items: center; justify-content: center; padding: 2rem; }
-.coin-capsule { width: 180px; height: 180px; border-radius: 50%; background: #FFF; box-shadow: var(--shadow-md); position: relative; overflow: hidden; border: 2px solid #E5E2DC; }
-/* SHEET BOARD */
-.sheet-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem; }
-.sheet-board { background: var(--bg-sub); padding: 1.5rem; border-radius: 16px; display: flex; justify-content: center; overflow-x: auto; margin-bottom: 1rem; }
-.sheet-paper { background: #FFF; padding: 15px; box-shadow: var(--shadow-md); display: grid; width: max-content; gap: 4px; }
-.grid-col-3 { grid-template-columns: repeat(3, 40px); }
-.grid-col-4 { grid-template-columns: repeat(4, 35px); }
-.grid-col-5 { grid-template-columns: repeat(5, 30px); }
-.grid-col-6 { grid-template-columns: repeat(6, 25px); }
-.sheet-slot { border-radius: 50%; border: 1px dashed #94A3B8; background: #F8FAFC; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 11px; color: #94A3B8; overflow: hidden; }
+.editor-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+@media(min-width: 600px) { .editor-grid { grid-template-columns: 1fr 1fr; } }
+.input-group { margin-bottom: 10px; }
+.input-group label { display: block; font-size: 10px; font-weight: 800; color: var(--text-sub); margin-bottom: 4px; text-transform: uppercase; }
+.input-field { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13px; outline: none; background: #fff; }
+.preview-box { display: flex; justify-content: center; align-items: center; background: #F8FAFC; border-radius: 12px; border: 1px dashed var(--border-color); padding: 1rem; }
+.sticker-preview { width: 150px; height: 150px; border-radius: 50%; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); overflow: hidden; position: relative; }
+/* SHEET */
+.sheet-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+.sheet-board { background: #E2E8F0; padding: 1rem; border-radius: 12px; display: flex; justify-content: center; overflow-x: auto; margin-bottom: 1rem; }
+.sheet-paper { background: #fff; padding: 10px; display: grid; gap: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+.sheet-slot { border-radius: 50%; border: 1px dashed #94A3B8; background: #F8FAFC; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #64748B; cursor: pointer; overflow: hidden; }
 .sheet-slot.filled { border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-.big-btn { width: 100%; padding: 14px; font-size: 16px; font-weight: 800; border-radius: 14px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.big-btn.primary { background: var(--brand-red); color: #FFF; }
+.btn { width: 100%; padding: 12px; background: var(--brand-red); color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; }
+.btn:hover { background: var(--brand-red-dark); }
+.btn-row { display: flex; gap: 10px; margin-bottom: 10px; }
 /* PRINT */
-.no-print { display: block; }
 #printHost { display: none; }
 @media print {
-.no-print { display: none !important; }
-html, body { background: #FFF !important; margin: 0 !important; padding: 0 !important; width: 100% !important; height: 100% !important; }
-#printHost { display: block !important; position: absolute; top: 0; left: 0; width: 210mm; height: 297mm; background: #FFF; }
+body * { display: none !important; }
+#printHost, #printHost * { display: block !important; }
+#printHost { position: absolute; top: 0; left: 0; width: 210mm; height: 297mm; }
 .print-circle { position: absolute; border-radius: 50%; overflow: hidden; box-sizing: border-box; }
-.print-circle.raster { border: 0.5px dashed #A1A1AA; }
+.print-circle.raster { border: 0.5px dashed #aaa; }
 @page { size: A4 portrait; margin: 0; }
 }
 </style>
 </head>
 <body>
-<div class="no-print">
-<header class="app-header">
-<div class="logo-container">
-<svg class="logo-svg" viewBox="0 0 520 100" preserveAspectRatio="xMinYMid meet" xmlns="http://www.w3.org/2000/svg">
-<g transform="translate(10, 10)">
-<circle cx="40" cy="40" r="38" fill="#F9F9F9" stroke="#8A192A" stroke-width="2"/>
-<circle cx="40" cy="40" r="32" fill="#FFFFFF" stroke="#D1D5DB" stroke-width="3"/>
-<rect x="34" y="34" width="12" height="12" rx="2" fill="#374151"/>
-<text x="40" y="42" font-family="sans-serif" font-size="5" font-weight="bold" fill="#FFFFFF" text-anchor="middle">NFC</text>
-<path d="M 40 -2 A 42 42 0 0 1 78 28" fill="none" stroke="#A31E33" stroke-width="3.5" stroke-linecap="round"/>
-<polygon points="78,28 70,22 81,18" fill="#A31E33"/>
-</g>
-<text x="100" y="45" font-family="-apple-system, sans-serif" font-weight="900" font-size="34" fill="var(--text-main)" letter-spacing="-1">Tonie & Tag <tspan fill="#A31E33">COVER HUB</tspan></text>
-<text x="102" y="72" font-family="-apple-system, sans-serif" font-weight="700" font-size="16" fill="var(--text-muted)" letter-spacing="1.5">MÜNZKAPSEL & AVERY STUDIO</text>
-</svg>
-</div>
-<div class="header-actions">
-<button class="pill-btn" id="btnTheme"><span class="icon">☀️</span> <span>Theme</span></button>
-</div>
+<div class="container">
+<header class="header">
+<div class="logo-title">Tonie & Tag <span>COVER HUB V20</span></div>
+<div style="font-size: 11px; font-weight: bold; color: var(--text-sub);">Master Edition</div>
 </header>
-<main class="container">
 <!-- STEP 1 -->
 <section class="card">
-<div class="card-header">
-<div class="card-title"><div class="step-badge">1</div> Motiv auswählen</div>
-</div>
+<div class="card-title"><div class="badge">1</div> Motiv oder Eigenes Bild wählen</div>
 <div class="tab-bar">
-<button class="tab-btn active" id="tabDb">📚 Datenbank</button>
-<button class="tab-btn" id="tabFav">⭐ Favoriten (<span id="favCount">0</span>)</button>
-<button class="tab-btn" id="tabCustom">📷 Eigenes Bild</button>
+<button class="tab-btn active" id="tabDb" onclick="switchTab('db')">📚 Datenbank</button>
+<button class="tab-btn" id="tabCustom" onclick="switchTab('custom')">📷 Eigenes Foto</button>
 </div>
-<div id="viewDb">
-<input type="text" id="searchInput" class="search-input" placeholder="Titel, Serie oder ID suchen...">
-<div class="status-row">
-<span id="lblLibrary">Sofort-Datenbank bereit</span>
-<span id="lblCount">0 Motive</span>
+<div id="sectionDb">
+<input type="text" id="searchInp" class="search-input" placeholder="Suche nach Serie, Titel...">
+<div class="grid" id="motiveGrid"></div>
 </div>
-<div class="grid-motives" id="gridMotives"></div>
-</div>
-<div id="viewCustom" style="display:none; padding: 2rem; border: 2px dashed var(--border-color); border-radius: 12px; text-align: center; cursor: pointer;">
-<input type="file" id="fileInput" accept="image/png, image/jpeg" style="display:none;">
-<div style="font-size: 32px; margin-bottom: 8px;">🖼️</div>
-<div style="font-weight: 700;">Klicke hier für ein eigenes Foto</div>
+<div id="sectionCustom" style="display:none; text-align:center; padding:1.5rem; border:2px dashed var(--border-color); border-radius:10px; cursor:pointer;" onclick="document.getElementById('fileUpload').click()">
+<input type="file" id="fileUpload" accept="image/*" style="display:none" onchange="handleImageUpload(event)">
+<div style="font-size:28px; margin-bottom:6px;">🖼️</div>
+<div style="font-size:13px; font-weight:bold;">Klicke hier, um ein eigenes Bild auszuwählen</div>
+<div style="font-size:11px; color:var(--text-sub); margin-top:4px;">JPG, PNG oder GIF</div>
 </div>
 </section>
 <!-- STEP 2 -->
 <section class="card">
-<div class="card-header">
-<div class="card-title"><div class="step-badge">2</div> Cover anpassen</div>
-</div>
-<div class="editor-layout">
+<div class="card-title"><div class="badge">2</div> Cover anpassen</div>
+<div class="editor-grid">
 <div>
 <div class="input-group">
-<label>1. TITEL / SERIE (OBERER BOGEN)</label>
-<input type="text" id="inpSeries" class="input-field" placeholder="z.B. TKKG Junior">
+<label>Oberer Bogen (Serie / Titel)</label>
+<input type="text" id="inpSeries" class="input-field" value="TKKG Junior">
 </div>
 <div class="input-group">
-<label>2. ALBUM / FOLGE (UNTERER BOGEN)</label>
-<input type="text" id="inpAlbum" class="input-field" placeholder="z.B. Alarm im Freizeitpark">
+<label>Unterer Bogen (Album / Folge)</label>
+<input type="text" id="inpAlbum" class="input-field" value="Alarm im Freizeitpark">
 </div>
-<div style="display:flex; gap:12px; align-items:flex-end;">
-<div class="input-group" style="flex:1; margin-bottom:0;">
-<label>3. TONIE-ID</label>
-<input type="text" id="inpId" class="input-field" placeholder="01-0182">
-</div>
-<div class="toggle-row" style="margin-bottom:0; flex-shrink: 0;">
-<span style="font-size: 10px; font-weight:800; margin-right:6px; color:var(--text-sub);">ID DRUCKEN</span>
-<label class="switch">
-<input type="checkbox" id="chkId" checked>
-<span class="slider"></span>
-</label>
+<div class="input-group">
+<label>Tonie ID / Code</label>
+<input type="text" id="inpId" class="input-field" value="01-0182">
 </div>
 </div>
-</div>
-<div class="preview-stage">
-<div class="coin-capsule" id="svgStage"></div>
+<div class="preview-box">
+<div class="sticker-preview" id="previewStage"></div>
 </div>
 </div>
 </section>
 <!-- STEP 3 -->
 <section class="card">
-<div class="card-header">
-<div class="card-title"><div class="step-badge">3</div> Druckbogen füllen</div>
-<span style="font-size: 12px; font-weight: 800; color: var(--brand-red);" id="lblSheetInfo">24 Etiketten</span>
-</div>
+<div class="card-title"><div class="badge">3</div> Druckbogen & Format</div>
 <div class="sheet-controls">
-<div class="input-group" style="margin:0;">
-<label>DRUCKSYSTEM</label>
-<select id="selSystem" class="input-field">
-<option value="avery" selected>Avery Zweckform</option>
+<select id="selSystem" class="input-field" onchange="onSystemChange()">
 <option value="raster">Freies Raster (Münzkapseln)</option>
+<option value="avery">Avery Zweckform</option>
 </select>
-</div>
-<div class="input-group" style="margin:0;">
-<label>FORMAT / GRÖSSE</label>
-<select id="selSize" class="input-field">
-<option value="avery-40" selected>L3415 - Ø 40 mm (24x)</option>
-<option value="avery-35">Ø 35 mm</option>
-<option value="avery-30">6223 - Ø 30 mm (48x)</option>
-<option value="avery-25">L7103 - Ø 25 mm (70x)</option>
+<select id="selSize" class="input-field" onchange="buildSheet()">
+<option value="43">43 mm Münzkapsel</option>
+<option value="40" selected>40 mm Münzkapsel</option>
+<option value="35">35 mm Münzkapsel</option>
+<option value="30">30 mm Token</option>
+<option value="25">25 mm Micro</option>
 </select>
-</div>
 </div>
 <div class="sheet-board">
-<div class="sheet-paper grid-col-3" id="sheetGrid"></div>
+<div class="sheet-paper" id="sheetGrid"></div>
 </div>
-<div style="display:flex; justify-content:center; gap:8px; margin-bottom:1.5rem;">
-<button class="pill-btn" id="btnFillAll"><span>⚡ Alle füllen</span></button>
-<button class="pill-btn" id="btnClearAll"><span>🗑️ Bogen leeren</span></button>
+<div class="btn-row">
+<button class="btn" style="background:#475569;" onclick="fillAllSlots()">Bogen komplett füllen</button>
+<button class="btn" style="background:#64748B;" onclick="clearSheet()">Bogen leeren</button>
 </div>
-<button class="big-btn primary" id="btnPrint">🖨️ A4 Bogen Drucken</button>
+<button class="btn" onclick="printSheet()">🖨️ A4 Bogen Drucken</button>
 </section>
-</main>
 </div>
 <div id="printHost"></div>
 <script>
-(function() {
-"use strict";
-document.addEventListener('DOMContentLoaded', function() {
-function safeEl(id) { return document.getElementById(id); }
-function addEvt(id, type, fn) {
-var el = safeEl(id);
-if (el) el.addEventListener(type, fn);
+// Embedded Robust Master Database (Zero network failure risk)
+var db = [
+{ id: "01-0182", series: "TKKG Junior", title: "Alarm im Freizeitpark", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0182.png" },
+{ id: "01-0183", series: "TKKG Junior", title: "Vorsicht: bissig!", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0183.png" },
+{ id: "01-0010", series: "Conni", title: "Feiert Geburtstag", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0010.png" },
+{ id: "01-0011", series: "Conni", title: "Lernt Rad fahren", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0011.png" },
+{ id: "01-0305", series: "Die Olchis", title: "Die Olchis sind da", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0305.png" },
+{ id: "01-0920", series: "Die drei ???", title: "Das Gespensterschloss", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0920.png" },
+{ id: "01-0921", series: "Die drei ???", title: "und der Super-Papagei", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0921.png" },
+{ id: "01-0250", series: "Bibi Blocksberg", title: "Hexenbesen verschwunden", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0250.png" },
+{ id: "01-0150", series: "Benjamin Blümchen", title: "als Tierarzt", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0150.png" },
+{ id: "01-0910", series: "Kreativ-Tonie", title: "Mein Tonie", pic: "https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/images/01-0910.png" }
+];
+var activeTonie = db[0];
+var slots = new Array(24).fill(null);
+var currentSize = 40;
+function fallbackImg(text) {
+return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#A31E33'/><text x='50' y='55' font-size='14' fill='#FFF' text-anchor='middle'>"+text+"</text></svg>");
 }
-var formats = {
-'avery-40': { type: 'avery', slots: 24, size: 40, cols: 3, startX: 7.2, startY: 12.5, gapX: 42.5, gapY: 40 },
-'avery-35': { type: 'avery', slots: 35, size: 35, cols: 4, startX: 10, startY: 15, gapX: 36, gapY: 35 },
-'avery-30': { type: 'avery', slots: 48, size: 30, cols: 4, startX: 13, startY: 21.2, gapX: 33, gapY: 30 },
-'avery-25': { type: 'avery', slots: 70, size: 25, cols: 5, startX: 9, startY: 13.5, gapX: 28, gapY: 25 },
-'raster-43': { type: 'raster', slots: 24, size: 43, cols: 4 },
-'raster-40': { type: 'raster', slots: 24, size: 40, cols: 4 },
-'raster-35': { type: 'raster', slots: 35, size: 35, cols: 4 },
-'raster-30': { type: 'raster', slots: 48, size: 30, cols: 5 },
-'raster-25': { type: 'raster', slots: 70, size: 25, cols: 6 }
-};
-function getFallbackPic(text, color) {
-var svg = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='"+color+"'/><circle cx='50' cy='50' r='42' fill='#FFF'/><text x='50' y='55' font-family='sans-serif' font-size='16' font-weight='bold' text-anchor='middle' fill='"+color+"'>"+text+"</text></svg>";
-return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+function switchTab(tab) {
+document.getElementById('tabDb').className = 'tab-btn' + (tab === 'db' ? ' active' : '');
+document.getElementById('tabCustom').className = 'tab-btn' + (tab === 'custom' ? ' active' : '');
+document.getElementById('sectionDb').style.display = tab === 'db' ? 'block' : 'none';
+document.getElementById('sectionCustom').style.display = tab === 'custom' ? 'block' : 'none';
 }
-var App = {
-theme: 'light',
-db: [],
-favorites: [],
-activeTonie: null,
-slots: [],
-currentFormatId: 'avery-40',
-offlineDb: [
-{ id: "01-0182", title: "Alarm im Freizeitpark", series: "TKKG Junior", pic: getFallbackPic("TKKG", "#A31E33") },
-{ id: "01-0010", title: "Feiert Geburtstag", series: "Conni", pic: getFallbackPic("CONNI", "#F59E0B") },
-{ id: "01-0305", title: "Die Olchis sind da", series: "Die Olchis", pic: getFallbackPic("OLCHIS", "#84CC16") },
-{ id: "01-0920", title: "Das Gespensterschloss", series: "Die drei ???", pic: getFallbackPic("???", "#1D1B1A") },
-{ id: "01-0910", title: "Kreativ-Tonie", series: "Mein Tonie", pic: getFallbackPic("KREATIV", "#3B82F6") },
-{ id: "01-0100", title: "Bibi Blocksberg", series: "Bibi Blocksberg", pic: getFallbackPic("BIBI", "#EC4899") }
-],
-init: function() {
-try {
-var favs = localStorage.getItem('hub_favs_v18');
-if (favs) this.favorites = JSON.parse(favs);
-if (!Array.isArray(this.favorites)) this.favorites = [];
-} catch(e) { this.favorites = []; }
-this.db = this.offlineDb.slice();
-this.updateFavCounter();
-this.updateSizeDropdown();
-this.bindEvents();
-this.renderGrid(this.db);
-var lblCount = safeEl('lblCount');
-if (lblCount) lblCount.innerText = this.db.length + " Motive";
-if (this.db.length > 0) {
-this.selectTonie(this.db[0]);
-}
-this.fetchOnlineDB();
-},
-bindEvents: function() {
-var self = this;
-addEvt('btnTheme', 'click', function() {
-self.theme = self.theme === 'light' ? 'dark' : 'light';
-document.documentElement.setAttribute('data-theme', self.theme);
-});
-['tabDb', 'tabFav', 'tabCustom'].forEach(function(id) {
-addEvt(id, 'click', function() { self.switchTab(id); });
-});
-addEvt('searchInput', 'input', function() { self.handleSearch(); });
-['inpSeries', 'inpAlbum', 'inpId', 'chkId'].forEach(function(id) {
-addEvt(id, 'input', function() { self.updateSvgPreview(); });
-});
-addEvt('selSystem', 'change', function() { self.updateSizeDropdown(); });
-addEvt('selSize', 'change', function() {
-var sel = safeEl('selSize');
-if(sel) {
-self.currentFormatId = sel.value;
-self.buildSheet();
-}
-});
-addEvt('btnFillAll', 'click', function() { self.fillSheet(); });
-addEvt('btnClearAll', 'click', function() {
-self.slots = new Array(self.slots.length).fill(null);
-self.renderSheetUI();
-});
-addEvt('btnPrint', 'click', function() { self.doPrint(); });
-addEvt('viewCustom', 'click', function() {
-var fi = safeEl('fileInput');
-if(fi) fi.click();
-});
-addEvt('fileInput', 'change', function(e) {
-var file = e.target.files[0];
-if(!file) return;
-var reader = new FileReader();
-reader.onload = function(ev) {
-self.selectTonie({ id: '00-0000', title: 'Eigenes Bild', series: 'Kreativ', pic: ev.target.result });
-};
-reader.readAsDataURL(file);
-});
-},
-fetchOnlineDB: function() {
-var self = this;
-fetch('https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json')
-.then(function(res) { return res.json(); })
-.then(function(data) {
-if (Array.isArray(data) && data.length > 0) {
-self.db = data.map(function(t) {
-return {
-id: String(t.model || t.id || ''),
-series: String(t.series || 'Tonie'),
-title: String(t.episodes || t.title || t.name || ''),
-pic: t.pic || t.image || getFallbackPic("TONIE", "#CCC")
-};
-});
-var lblCount = safeEl('lblCount');
-var lblLib = safeEl('lblLibrary');
-if (lblCount) lblCount.innerText = self.db.length + " Motive";
-if (lblLib) lblLib.innerText = "Online-Datenbank bereit";
-self.handleSearch();
-}
-})
-.catch(function(e) {});
-},
-switchTab: function(activeId) {
-['tabDb', 'tabFav', 'tabCustom'].forEach(function(id) {
-var el = safeEl(id);
-if(el) el.classList.remove('active');
-});
-var activeEl = safeEl(activeId);
-if(activeEl) activeEl.classList.add('active');
-var vDb = safeEl('viewDb');
-var vCus = safeEl('viewCustom');
-if (vDb) vDb.style.display = activeId === 'tabCustom' ? 'none' : 'block';
-if (vCus) vCus.style.display = activeId === 'tabCustom' ? 'block' : 'none';
-if (activeId === 'tabFav') {
-var favs = this.db.filter(function(t) { return App.favorites.indexOf(t.id) > -1; });
-this.renderGrid(favs);
-} else if (activeId === 'tabDb') {
-this.handleSearch();
-}
-},
-handleSearch: function() {
-var inp = safeEl('searchInput');
-var q = inp ? String(inp.value).toLowerCase().trim() : '';
-var res = this.db;
-if (q) {
-res = this.db.filter(function(t) {
-return String(t.title).toLowerCase().indexOf(q) > -1 ||
-String(t.series).toLowerCase().indexOf(q) > -1 ||
-String(t.id).toLowerCase().indexOf(q) > -1;
-});
-}
-this.renderGrid(res.slice(0, 60));
-},
-renderGrid: function(list) {
-var grid = safeEl('gridMotives');
-if (!grid) return;
+function renderGrid(list) {
+var grid = document.getElementById('motiveGrid');
 grid.innerHTML = '';
-var self = this;
 list.forEach(function(t) {
-var isFav = self.favorites.indexOf(t.id) > -1;
-var isActive = self.activeTonie && self.activeTonie.id === t.id;
 var card = document.createElement('div');
-card.className = 'motive-card' + (isActive ? ' active' : '');
+card.className = 'motive-card' + (activeTonie && activeTonie.id === t.id ? ' selected' : '');
 var img = document.createElement('img');
-img.className = 'motive-img';
 img.src = t.pic;
-img.onerror = function() { this.onerror = null; this.src = getFallbackPic("ERROR", "#CCC"); };
-var star = document.createElement('span');
-star.className = 'fav-star' + (isFav ? ' is-fav' : '');
-star.innerHTML = '★';
-star.onclick = function(e) { e.stopPropagation(); self.toggleFav(t.id); };
-var ser = document.createElement('div'); ser.className = 'motive-series'; ser.innerText = t.series;
-var tit = document.createElement('div'); tit.className = 'motive-title'; tit.innerText = t.title;
-card.appendChild(star);
+img.onerror = function() { this.src = fallbackImg(t.series); };
+var title = document.createElement('div');
+title.className = 'motive-title';
+title.innerText = t.series;
 card.appendChild(img);
-card.appendChild(ser);
-card.appendChild(tit);
-card.onclick = function() { self.selectTonie(t); };
+card.appendChild(title);
+card.onclick = function() {
+activeTonie = t;
+document.getElementById('inpSeries').value = t.series;
+document.getElementById('inpAlbum').value = t.title;
+document.getElementById('inpId').value = t.id;
+updatePreview();
+renderGrid(list);
+};
 grid.appendChild(card);
 });
-},
-toggleFav: function(id) {
-var idx = this.favorites.indexOf(id);
-if (idx > -1) this.favorites.splice(idx, 1);
-else this.favorites.push(id);
-try { localStorage.setItem('hub_favs_v18', JSON.stringify(this.favorites)); } catch(e) {}
-this.updateFavCounter();
-var tabFav = safeEl('tabFav');
-if (tabFav && tabFav.classList.contains('active')) this.switchTab('tabFav');
-else this.handleSearch();
-},
-updateFavCounter: function() {
-var count = safeEl('favCount');
-if (count) count.innerText = this.favorites.length;
-},
-selectTonie: function(t) {
-this.activeTonie = t;
-var inpS = safeEl('inpSeries');
-var inpA = safeEl('inpAlbum');
-var inpI = safeEl('inpId');
-if (inpS) inpS.value = t.series || '';
-var cleanTitle = String(t.title || '');
-var sLow = String(t.series || '').toLowerCase();
-if (sLow && cleanTitle.toLowerCase().indexOf(sLow) === 0) {
-cleanTitle = cleanTitle.substring(sLow.length).replace(/^[\s-:]+/, '');
 }
-if (inpA) inpA.value = cleanTitle;
-if (inpI) inpI.value = t.id || '';
-this.handleSearch();
-this.updateSvgPreview();
-},
-escapeXml: function(str) {
-return str.replace(/[&<>"']/g, function(c) {
-return {'&':'&','<':'<','>':'>','"':'"',"'":'''}[c];
-});
-},
-generateSvg: function() {
-if (!this.activeTonie) return '';
-var sEl = safeEl('inpSeries');
-var aEl = safeEl('inpAlbum');
-var iEl = safeEl('inpId');
-var cEl = safeEl('chkId');
-var topText = this.escapeXml(sEl ? sEl.value : '');
-var albumText = this.escapeXml(aEl ? aEl.value : '');
-var idText = this.escapeXml(iEl ? iEl.value : '');
-var showId = cEl ? cEl.checked : true;
-var safeImg = this.activeTonie.pic;
-if(safeImg && safeImg.indexOf('<svg') > -1 && safeImg.indexOf('utf8,') > -1) {
-safeImg = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(safeImg.substring(safeImg.indexOf('<svg')));
-}
-var idElement = '';
-if (showId && idText) {
-idElement = '<text font-family="monospace" font-weight="700" font-size="9" fill="#A31E33">' +
-'<textPath href="#botC2" startOffset="50%" text-anchor="middle">'+idText+'</textPath>' +
-'</text>';
-}
-return '<svg viewBox="0 0 160 160" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
-'<defs>' +
-'<clipPath id="circleClip"><circle cx="80" cy="80" r="80" /></clipPath>' +
-'<path id="topC" d="M 18 80 A 58 58 0 0 1 142 80" fill="transparent" />' +
-'<path id="botC" d="M 22 80 A 58 58 0 0 0 138 80" fill="transparent" />' +
-'<path id="botC2" d="M 32 80 A 48 48 0 0 0 128 80" fill="transparent" />' +
-'</defs>' +
-'<circle cx="80" cy="80" r="80" fill="#FFFFFF" />' +
-'<image href="'+safeImg+'" xlink:href="'+safeImg+'" x="20" y="20" width="120" height="120" clip-path="url(#circleClip)" preserveAspectRatio="xMidYMid slice" opacity="0.95" />' +
-'<text font-family="-apple-system, sans-serif" font-weight="800" font-size="11" fill="#1D1B1A">' +
-'<textPath href="#topC" startOffset="50%" text-anchor="middle">'+topText+'</textPath>' +
-'</text>' +
-'<text font-family="-apple-system, sans-serif" font-weight="700" font-size="10" fill="#1D1B1A">' +
-'<textPath href="#botC" startOffset="50%" text-anchor="middle">'+albumText+'</textPath>' +
-'</text>' +
-idElement +
-'</svg>';
-},
-updateSvgPreview: function() {
-var stage = safeEl('svgStage');
-if (stage) stage.innerHTML = this.generateSvg();
-},
-updateSizeDropdown: function() {
-var sys = safeEl('selSystem');
-var sizeSel = safeEl('selSize');
-if (!sys || !sizeSel) return;
-sizeSel.innerHTML = '';
-if (sys.value === 'avery') {
-sizeSel.innerHTML = '<option value="avery-40">L3415 - Ø 40 mm (24x)</option>' +
-'<option value="avery-35">Ø 35 mm</option>' +
-'<option value="avery-30">6223 - Ø 30 mm (48x)</option>' +
-'<option value="avery-25">L7103 - Ø 25 mm (70x)</option>';
-} else {
-sizeSel.innerHTML = '<option value="raster-43" selected>Münzkapsel 43 mm (24x)</option>' +
-'<option value="raster-40">Münzkapsel 40 mm (24x)</option>' +
-'<option value="raster-35">Münzkapsel 35 mm (35x)</option>' +
-'<option value="raster-30">Münzkapsel 30 mm (48x)</option>' +
-'<option value="raster-25">Münzkapsel 25 mm (70x)</option>';
-}
-this.currentFormatId = sizeSel.value;
-this.buildSheet();
-},
-buildSheet: function() {
-var config = formats[this.currentFormatId];
-var oldSlots = this.slots.slice();
-this.slots = new Array(config.slots).fill(null);
-for(var i = 0; i < Math.min(oldSlots.length, config.slots); i++){
-this.slots[i] = oldSlots[i];
-}
-var grid = safeEl('sheetGrid');
-if (grid) {
-grid.className = 'sheet-paper grid-col-' + config.cols;
-}
-var lblInfo = safeEl('lblSheetInfo');
-if(lblInfo) lblInfo.innerText = config.slots + " Etiketten";
-this.renderSheetUI();
-},
-renderSheetUI: function() {
-var grid = safeEl('sheetGrid');
-if (!grid) return;
-grid.innerHTML = '';
-var self = this;
-var config = formats[this.currentFormatId];
-for(var i=0; i < this.slots.length; i++) {
-(function(idx) {
-var div = document.createElement('div');
-var hasSvg = Boolean(self.slots[idx]);
-div.className = 'sheet-slot' + (hasSvg ? ' filled' : '');
-div.style.width = Math.min(config.size, 40) + 'px';
-div.style.height = Math.min(config.size, 40) + 'px';
-div.innerHTML = hasSvg ? self.slots[idx] : idx+1;
-div.onclick = function() { self.toggleSlot(idx); };
-grid.appendChild(div);
-})(i);
-}
-},
-toggleSlot: function(idx) {
-if (this.slots[idx]) {
-this.slots[idx] = null;
-} else {
-if (!this.activeTonie) return;
-this.slots[idx] = this.generateSvg();
-}
-this.renderSheetUI();
-},
-fillSheet: function() {
-if (!this.activeTonie) return;
-var svg = this.generateSvg();
-for(var i=0; i<this.slots.length; i++){
-this.slots[i] = svg;
-}
-this.renderSheetUI();
-},
-doPrint: function() {
-var isEmpty = true;
-for(var j=0; j<this.slots.length; j++){
-if(this.slots[j]) isEmpty = false;
-}
-if (isEmpty) this.fillSheet();
-var host = safeEl('printHost');
-if (!host) return;
-host.innerHTML = '';
-var config = formats[this.currentFormatId];
-this.slots.forEach(function(svgStr, idx) {
-if (!svgStr) return;
-var c = document.createElement('div');
-c.className = 'print-circle' + (config.type === 'raster' ? ' raster' : '');
-c.style.width = config.size + 'mm';
-c.style.height = config.size + 'mm';
-if (config.type === 'avery') {
-var row = Math.floor(idx / config.cols);
-var col = idx % config.cols;
-c.style.left = (config.startX + (col * config.gapX)) + 'mm';
-c.style.top = (config.startY + (row * config.gapY)) + 'mm';
-} else {
-var rRow = Math.floor(idx / config.cols);
-var rCol = idx % config.cols;
-c.style.left = (15 + (rCol * (config.size + 4))) + 'mm';
-c.style.top = (15 + (rRow * (config.size + 4))) + 'mm';
-}
-c.innerHTML = svgStr;
-host.appendChild(c);
-});
-window.print();
-}
+function handleImageUpload(e) {
+var file = e.target.files[0];
+if (!file) return;
+var reader = new FileReader();
+reader.onload = function(event) {
+activeTonie = { id: "custom", series: "Eigenes Bild", title: file.name, pic: event.target.result };
+document.getElementById('inpSeries').value = "Mein Bild";
+document.getElementById('inpAlbum').value = file.name.replace(/.[^/.]+$/, "");
+document.getElementById('inpId').value = "00-0000";
+updatePreview();
+switchTab('db');
 };
-App.init();
+reader.readAsDataURL(file);
+}
+function generateSvg(t, series, album, id) {
+var imgUrl = t ? t.pic : fallbackImg("TONIE");
+return '<svg viewBox="0 0 160 160" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">' +
+'<defs>' +
+'<clipPath id="c"><circle cx="80" cy="80" r="80"/></clipPath>' +
+'<path id="top" d="M 22 80 A 58 58 0 0 1 138 80"/>' +
+'<path id="bot" d="M 22 80 A 58 58 0 0 0 138 80"/>' +
+'</defs>' +
+'<circle cx="80" cy="80" r="80" fill="#FFF"/>' +
+'<image href="'+imgUrl+'" x="15" y="15" width="130" height="130" clip-path="url(#c)" preserveAspectRatio="xMidYMid slice"/>' +
+'<text font-size="12" font-weight="bold" fill="#1D1B1A"><textPath href="#top" startOffset="50%" text-anchor="middle">'+series+'</textPath></text>' +
+'<text font-size="11" font-weight="bold" fill="#A31E33"><textPath href="#bot" startOffset="50%" text-anchor="middle">'+album+' ('+id+')</textPath></text>' +
+'</svg>';
+}
+function updatePreview() {
+var s = document.getElementById('inpSeries').value;
+var a = document.getElementById('inpAlbum').value;
+var i = document.getElementById('inpId').value;
+document.getElementById('previewStage').innerHTML = generateSvg(activeTonie, s, a, i);
+}
+function onSystemChange() {
+var sys = document.getElementById('selSystem').value;
+var sizeSel = document.getElementById('selSize');
+if (sys === 'avery') {
+sizeSel.innerHTML = '<option value="40" selected>Avery L3415 - 40 mm</option>';
+} else {
+sizeSel.innerHTML = '<option value="43">43 mm Münzkapsel</option>' +
+'<option value="40" selected>40 mm Münzkapsel</option>' +
+'<option value="35">35 mm Münzkapsel</option>' +
+'<option value="30">30 mm Token</option>' +
+'<option value="25">25 mm Micro</option>';
+}
+buildSheet();
+}
+function buildSheet() {
+var grid = document.getElementById('sheetGrid');
+currentSize = parseInt(document.getElementById('selSize').value, 10);
+var cols = currentSize >= 40 ? 4 : (currentSize >= 35 ? 5 : 6);
+grid.style.gridTemplateColumns = 'repeat(' + cols + ', 35px)';
+grid.innerHTML = '';
+for (var idx = 0; idx < 24; idx++) {
+(function(i) {
+var slot = document.createElement('div');
+slot.className = 'sheet-slot' + (slots[i] ? ' filled' : '');
+slot.style.width = '35px';
+slot.style.height = '35px';
+slot.innerHTML = slots[i] ? slots[i] : (i + 1);
+slot.onclick = function() {
+if (slots[i]) {
+slots[i] = null;
+} else {
+var s = document.getElementById('inpSeries').value;
+var a = document.getElementById('inpAlbum').value;
+var id = document.getElementById('inpId').value;
+slots[i] = generateSvg(activeTonie, s, a, id);
+}
+buildSheet();
+};
+grid.appendChild(slot);
+})(idx);
+}
+}
+function fillAllSlots() {
+var s = document.getElementById('inpSeries').value;
+var a = document.getElementById('inpAlbum').value;
+var id = document.getElementById('inpId').value;
+var svg = generateSvg(activeTonie, s, a, id);
+for(var i=0; i<slots.length; i++) slots[i] = svg;
+buildSheet();
+}
+function clearSheet() {
+slots = new Array(24).fill(null);
+buildSheet();
+}
+document.getElementById('searchInp').oninput = function(e) {
+var q = e.target.value.toLowerCase();
+var res = db.filter(function(t) { return t.series.toLowerCase().indexOf(q) > -1 || t.title.toLowerCase().indexOf(q) > -1; });
+renderGrid(res);
+};
+['inpSeries', 'inpAlbum', 'inpId'].forEach(function(id) {
+document.getElementById(id).oninput = updatePreview;
 });
-});
+// Initial run
+renderGrid(db);
+updatePreview();
+buildSheet();
 </script>
 </body>
 </html>
