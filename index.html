@@ -9,13 +9,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Authentic Tonie Colors */
             --tonie-red: #C02741;
             --tonie-red-hover: #A01F33;
             --tonie-blue: #00a0e9;
             --tonie-blue-hover: #0088c7;
             
-            /* Light Theme Defaults */
             --bg-color: #f4f7f6;
             --panel-bg: #ffffff;
             --text-main: #2d3748;
@@ -66,7 +64,7 @@
         }
 
         header h1 {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 900;
             letter-spacing: 0.5px;
             display: flex;
@@ -81,7 +79,6 @@
             align-items: center;
         }
 
-        /* Buttons & Badges */
         .badge {
             background: #e6fffa; color: #319795;
             padding: 5px 12px; border-radius: 20px;
@@ -104,6 +101,7 @@
         .btn-outline { background: transparent; border: 2px solid var(--border-color); color: var(--text-main); }
         .btn-outline:hover { border-color: var(--text-main); background: rgba(0,0,0,0.02); }
 
+        /* Workspace Grid */
         .workspace {
             display: grid;
             grid-template-columns: 350px 350px 1fr;
@@ -150,12 +148,16 @@
             overflow-y: auto;
             flex: 1;
         }
-        
-        /* Custom Scrollbar */
+
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+        /* Tabs für Datenbank vs Custom Upload */
+        .tab-bar { display: flex; gap: 6px; background: var(--slot-empty); padding: 4px; border-radius: 10px; margin-bottom: 15px; border: 1px solid var(--border-color); }
+        .tab-btn { flex: 1; padding: 8px; border: none; background: transparent; border-radius: 8px; font-size: 0.85rem; font-weight: 800; color: var(--text-muted); cursor: pointer; text-align: center; }
+        .tab-btn.active { background: var(--panel-bg); color: var(--text-main); box-shadow: var(--shadow-sm); }
 
         .search-bar { display: flex; gap: 10px; margin-bottom: 15px; }
         .search-bar input {
@@ -218,7 +220,6 @@
         }
         .checkbox-group input { width: 18px; height: 18px; accent-color: var(--tonie-red); }
 
-        /* Pro Mode Wrapper */
         .pro-features {
             display: none;
             flex-direction: column; gap: 12px;
@@ -248,7 +249,6 @@
             background-repeat: no-repeat;
         }
         
-        /* Inner SVG for Curved Text */
         .sticker-svg {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none;
@@ -262,12 +262,10 @@
             font-family: 'Nunito', sans-serif;
         }
 
-        /* SVG Text Sizing */
         .svg-series { fill: var(--tonie-red); font-weight: 900; font-size: calc(7px * var(--font-scale)); text-transform: uppercase; }
         .svg-title { fill: #1a202c; font-weight: 800; font-size: calc(5.5px * var(--font-scale)); }
         .svg-id { fill: #718096; font-weight: 700; font-size: calc(3.5px * var(--font-scale)); font-family: monospace; letter-spacing: 1px; }
 
-        /* Delete Button */
         .delete-btn {
             position: absolute; top: 5%; right: 5%;
             background: var(--tonie-red); color: white;
@@ -280,7 +278,7 @@
         #a4-sheet .sticker:hover .delete-btn { display: flex; }
         @media (max-width: 768px) { #a4-sheet .sticker .delete-btn { display: flex; opacity: 0.8; } }
 
-        /* --- PRINT UI SECTIONS --- */
+        /* Print Toolbar Workspace */
         .print-toolbar {
             background: var(--slot-empty);
             border: 1px solid var(--border-color);
@@ -323,7 +321,6 @@
             box-shadow: 0 6px 16px rgba(192, 39, 65, 0.4);
         }
 
-        /* CUT MARKS CSS */
         .a4-sheet.show-cut-marks .sticker {
             border: 1pt dashed #cbd5e0 !important;
         }
@@ -331,7 +328,6 @@
             border: 1pt dashed #a0aec0 !important;
         }
 
-        /* Schneidematten-Look */
         .a4-wrapper {
             background-color: var(--bg-color);
             background-image: radial-gradient(var(--border-color) 1px, transparent 1px);
@@ -343,7 +339,6 @@
             box-shadow: inset 0 4px 10px rgba(0,0,0,0.05);
         }
 
-        /* The simulated A4 Sheet */
         .a4-sheet {
             background: white;
             width: 210mm; min-height: 297mm;
@@ -362,7 +357,6 @@
         .slot .sticker { width: 100%; height: 100%; cursor: grab; box-shadow: none; }
         .slot .sticker:active { cursor: grabbing; }
 
-        /* Toast Notifications */
         #toast-container {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
             z-index: 9999; display: flex; flex-direction: column; gap: 10px;
@@ -400,7 +394,6 @@
 
     <svg style="width: 0; height: 0; position: absolute;" aria-hidden="true">
         <defs>
-            <!-- Volle 360 Grad Kreise, damit lange Texte endlos weiterlaufen -->
             <path id="global-arc-top" d="M 50 12 A 38 38 0 1 1 50 88 A 38 38 0 1 1 50 12" />
             <path id="global-arc-title" d="M 50 88 A 42 42 0 1 0 50 12 A 42 42 0 1 0 50 88" />
             <path id="global-arc-id" d="M 50 92 A 46 46 0 1 0 50 8 A 46 46 0 1 0 50 92" />
@@ -457,24 +450,36 @@
     <div id="help-section" style="display: none; background: var(--panel-bg); padding: 20px; margin: 20px auto 0; max-width: 1920px; width: calc(100% - 40px); border-radius: var(--radius); border: 1px solid var(--border-color); box-shadow: var(--shadow-sm);">
         <h3 style="color: var(--tonie-red); margin-bottom: 10px;">ℹ️ Bedienungshilfe & Druckhinweise</h3>
         <ul style="margin-left: 20px; line-height: 1.6; color: var(--text-main);">
-            <li><b>1. Suchen:</b> Finde dein gewünschtes Motiv. Klicke auf eine Kachel, um es in den Editor zu laden.</li>
-            <li><b>2. Editor:</b> Passe Titel und Serie an. Aktiviere im Editor den <b>PRO-Modus</b> Schalter, um Bild-Position (X/Y), Zoom und Schriftgröße anzupassen.</li>
-            <li><b>3. Druckbogen:</b> Wähle zuerst den Bogen-Typ (Freies Raster für Kapseln, Avery für Etiketten) und danach die gewünschte Größe. Du kannst fertige Sticker mit der Maus frei auf leere Felder ziehen.</li>
-            <li><b>🖨️ Wichtig beim Drucken:</b> Achte im Browser-Druckdialog darauf, dass die Skalierung auf exakt <b>100%</b> (bzw. "Tatsächliche Größe") eingestellt ist und Seitenränder auf "Keine" stehen!</li>
+            <li><b>1. Suchen oder Foto:</b> Wähle zwischen der Community-Datenbank (Live-Suche) oder lade ein eigenes Bild hoch.</li>
+            <li><b>2. Editor:</b> Passe Titel und Serie an. Aktiviere den <b>PRO-Modus</b>, um Bild-Position (X/Y), Zoom und Schriftgröße anzupassen.</li>
+            <li><b>3. Druckbogen:</b> Wähle den Typ und die Größe. Ziehe fertige Sticker per Drag & Drop auf leere Felder.</li>
+            <li><b>🖨️ Wichtig beim Drucken:</b> Achte im Browser-Druckdialog darauf, dass die Skalierung auf exakt <b>100%</b> steht!</li>
         </ul>
     </div>
 
     <main class="workspace" id="main-workspace">
         
         <section class="panel">
-            <div class="panel-header">1. Suchen & Finden</div>
+            <div class="panel-header">1. Motiv wählen</div>
             <div class="panel-content">
-                <div class="search-bar">
-                    <input type="text" id="search-input" placeholder="Serie, Titel, ID eingeben..." disabled>
-                    <button class="btn btn-secondary" id="btn-random" title="Zufälliger Tonie" disabled>🎲</button>
+                <div class="tab-bar">
+                    <button class="tab-btn active" id="tabDb" onclick="switchTab('db')">📚 Datenbank</button>
+                    <button class="tab-btn" id="tabCustom" onclick="switchTab('custom')">📷 Eigenes Foto</button>
                 </div>
-                <div class="results-grid" id="results-grid">
-                    <!-- Tiles injected here -->
+
+                <div id="sectionDb">
+                    <div class="search-bar">
+                        <input type="text" id="search-input" placeholder="Serie, Titel, ID eingeben..." disabled>
+                        <button class="btn btn-secondary" id="btn-random" title="Zufälliger Tonie" disabled>🎲</button>
+                    </div>
+                    <div class="results-grid" id="results-grid"></div>
+                </div>
+
+                <div id="sectionCustom" style="display:none; text-align:center; padding:2rem 1rem; border:2px dashed var(--border-color); border-radius:10px; cursor:pointer;" onclick="document.getElementById('fileUpload').click()">
+                    <input type="file" id="fileUpload" accept="image/*" style="display:none" onchange="handleImageUpload(event)">
+                    <div style="font-size:28px; margin-bottom:6px;">🖼️</div>
+                    <div style="font-size:13px; font-weight:bold;">Eigenes Bild hochladen</div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">JPG, PNG oder GIF</div>
                 </div>
             </div>
         </section>
@@ -497,7 +502,6 @@
                         <input type="text" id="edit-title" placeholder="z.B. Folge 1">
                     </div>
                     
-                    <!-- Pro Mode Features -->
                     <div class="pro-features">
                         <label class="checkbox-group">
                             <input type="checkbox" id="edit-show-id" checked>
@@ -551,16 +555,13 @@
             </div>
             <div class="panel-content" style="display: flex; flex-direction: column;">
                 
-                <!-- Styled Toolbar -->
                 <div class="print-toolbar">
                     <div class="toolbar-top">
                         <select id="format-type-select">
                             <option value="free">1. Typ: Freies Raster (Schere/Stanzer)</option>
                             <option value="avery">1. Typ: Avery Zweckform (Etiketten)</option>
                         </select>
-                        <select id="format-size-select">
-                            <!-- Options injected by JS -->
-                        </select>
+                        <select id="format-size-select"></select>
                         <label class="checkbox-group" id="wrapper-cut-marks" style="background: var(--input-bg); padding: 0 15px; border: 1px solid var(--border-color); border-radius: 8px; justify-content: center; display: flex;">
                             <input type="checkbox" id="check-cut-marks" checked>
                             ✂️ Schnittlinien
@@ -572,19 +573,16 @@
                             <button class="btn btn-outline" id="btn-export-flipper" style="display: none;" title="Liste als JSON speichern">💾 Für später speichern (JSON)</button>
                         </div>
                         <div class="action-group">
-                            <button class="btn btn-secondary" id="btn-png" style="background-color: #2b6cb0;" title="Als hochauflösendes 300dpi Bild speichern">🖼️ PNG Export</button>
-                            <button class="btn btn-secondary" id="btn-pdf" title="Als PDF Datei speichern">📄 PDF Export</button>
+                            <button class="btn btn-secondary" id="btn-png" style="background-color: #2b6cb0;" title="300dpi PNG Export">🖼️ PNG Export</button>
+                            <button class="btn btn-secondary" id="btn-pdf" title="PDF Export">📄 PDF Export</button>
                             <div class="divider"></div>
                             <button class="btn btn-primary" id="btn-print">🖨️ A4 Drucken</button>
                         </div>
                     </div>
                 </div>
 
-                <!-- Dot Grid Workspace -->
                 <div class="a4-wrapper">
-                    <div class="a4-sheet" id="a4-sheet">
-                        <!-- Grid dynamically generated -->
-                    </div>
+                    <div class="a4-sheet" id="a4-sheet"></div>
                 </div>
             </div>
         </section>
@@ -711,6 +709,31 @@
             setTimeout(() => { if(container.contains(toast)) toast.remove(); }, 3800);
         }
 
+        function switchTab(tab) {
+            document.getElementById('tabDb').classList.toggle('active', tab === 'db');
+            document.getElementById('tabCustom').classList.toggle('active', tab === 'custom');
+            document.getElementById('sectionDb').style.display = tab === 'db' ? 'block' : 'none';
+            document.getElementById('sectionCustom').style.display = tab === 'custom' ? 'block' : 'none';
+        }
+
+        function handleImageUpload(e) {
+            const file = e.target.files[0];
+            if(file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    loadIntoEditor({
+                        title: "Eigenes Cover",
+                        series: "Custom",
+                        id: "CUSTOM-TAG",
+                        pic: event.target.result
+                    });
+                    switchTab('db');
+                    showToast("Bild geladen!");
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
         function processData(rawData) {
             let items = Array.isArray(rawData) ? rawData : Object.values(rawData).flat();
             return items.map(item => {
@@ -755,7 +778,7 @@
                     localStorage.setItem(CACHE_KEY, JSON.stringify(toniesData));
                     localStorage.setItem(CACHE_TIME, now.toString());
                 } catch (e) {
-                    console.warn("Storage voll, leere Cache", e); localStorage.clear();
+                    console.warn("Storage voll", e); localStorage.clear();
                 }
                 
                 ui.search.disabled = false; ui.btnRandom.disabled = false;
@@ -808,8 +831,7 @@
                 else t = t.replace(new RegExp(s, 'ig'), '').replace(/^[\s\-–:]+|[\s\-–:]+$/g, '');
             }
             
-            const cleanT = t.replace(/(?:Folge|Teil|Vol\.?|Episode)\s*\d+[\s\-–:]*/ig, '').trim();
-            if (cleanT.length > 0) t = cleanT;
+            t = t.replace(/(?:Folge|Teil|Vol\.?|Episode)\s*\d+[\s\-–:]*/ig, '').trim();
             
             ui.editSeries.value = s;
             ui.editTitle.value = t;
@@ -962,7 +984,7 @@
         
         ui.btnPrint.addEventListener('click', () => { 
             if(ui.sheet.querySelectorAll('.sticker').length) {
-                showToast("🖨️ Tipp: Im Druckdialog Skalierung auf 100% stellen!");
+                showToast("🖨️ Hinweis: Bitte Skalierung im Druck auf 100% stellen!");
                 setTimeout(() => window.print(), 800);
             } else {
                 showToast("Bogen ist leer!"); 
@@ -998,7 +1020,7 @@
             const exportData = queuedItems.filter(i => i.uid).map(i => ({ name: i.name || "Custom Tag", uid: i.uid }));
             if(!exportData.length) { showToast("Keine IDs auf dem Bogen."); return; }
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportData, null, 2));
-            const a = document.createElement('a'); a.href = dataStr; a.download = "taggen_flipper_export.json";
+            const a = document.createElement('a'); a.href = dataStr; a.download = "taggen_export.json";
             document.body.appendChild(a); a.click(); a.remove(); showToast("Export gespeichert!");
         });
 
