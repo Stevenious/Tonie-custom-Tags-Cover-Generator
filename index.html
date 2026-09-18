@@ -1,127 +1,407 @@
-    .header { background: var(--bg-card); padding: 1rem; border-radius: 16px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    .logo-title { font-size: 18px; font-weight: 900; }
-    .logo-title span { color: var(--brand-red); }
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tag Code Generator Next Generation</title>
+    <style>
+        /* --- Tonies Theme Colors & Base --- */
+        :root {
+            --tonie-red: #e3000b;
+            --tonie-blue: #00a0e9;
+            --tonie-light: #f5f7fa;
+            --text-dark: #2c3e50;
+        }
+        
+        body {
+            font-family: 'Nunito', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--tonie-light);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+        }
 
-    .card { background: var(--bg-card); border-radius: 16px; border: 1px solid var(--border-color); padding: 1.25rem; margin-bottom: 1.5rem; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-    .card-title { font-size: 16px; font-weight: 800; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; }
-    .badge { width: 24px; height: 24px; background: var(--brand-red); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+        h1 {
+            color: var(--tonie-red);
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-    .tab-bar { display: flex; gap: 6px; background: #F0EEEA; padding: 4px; border-radius: 10px; margin-bottom: 12px; }
-    .tab-btn { flex: 1; padding: 8px; border: none; background: transparent; border-radius: 8px; font-size: 12px; font-weight: 700; color: var(--text-sub); cursor: pointer; text-align: center; }
-    .tab-btn.active { background: #fff; color: var(--text-main); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
 
-    .search-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border-color); font-size: 14px; margin-bottom: 10px; outline: none; background: #fff; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; max-height: 280px; overflow-y: auto; padding: 2px; }
-    .motive-card { background: #F8FAFC; border: 1px solid var(--border-color); border-radius: 10px; padding: 8px; text-align: center; cursor: pointer; transition: 0.1s; }
-    .motive-card:active { transform: scale(0.96); }
-    .motive-card.selected { border-color: var(--brand-red); background: rgba(163,30,51,0.05); box-shadow: 0 0 0 2px var(--brand-red); }
-    .motive-card img { width: 50px; height: 50px; object-fit: contain; border-radius: 50%; background: #fff; margin-bottom: 4px; }
-    .motive-title { font-size: 10px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        /* --- UI Sections --- */
+        .panel {
+            border: 2px solid #eef2f5;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
 
-    .editor-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
-    @media(min-width: 600px) { .editor-grid { grid-template-columns: 1fr 1fr; } }
-    .input-group { margin-bottom: 10px; }
-    .input-group label { display: block; font-size: 10px; font-weight: 800; color: var(--text-sub); margin-bottom: 4px; text-transform: uppercase; }
-    .input-field { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); font-size: 13px; outline: none; background: #fff; }
-    
-    .preview-box { display: flex; flex-direction: column; justify-content: center; align-items: center; background: #F8FAFC; border-radius: 12px; border: 1px dashed var(--border-color); padding: 1rem; gap: 10px; }
-    .sticker-preview { width: 150px; height: 150px; border-radius: 50%; background: #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.1); overflow: hidden; position: relative; }
+        .panel h2 {
+            margin-top: 0;
+            color: var(--tonie-blue);
+            font-size: 1.2em;
+        }
 
-    .sheet-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
-    .sheet-board { background: #E2E8F0; padding: 1rem; border-radius: 12px; display: flex; justify-content: center; overflow-x: auto; margin-bottom: 1rem; }
-    .sheet-paper { background: #fff; padding: 10px; display: grid; gap: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-    .sheet-slot { border-radius: 50%; border: 1px dashed #94A3B8; background: #F8FAFC; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #64748B; cursor: pointer; overflow: hidden; }
-    .sheet-slot.filled { border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        input[type="text"], input[type="file"], select, button {
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+        }
 
-    .btn { width: 100%; padding: 12px; background: var(--brand-red); color: #fff; border: none; border-radius: 10px; font-size: 14px; font-weight: bold; cursor: pointer; }
-    .btn:hover { background: var(--brand-red-dark); }
-    .btn-row { display: flex; gap: 10px; margin-bottom: 10px; }
+        input[type="text"] { width: 100%; box-sizing: border-box; }
 
-    .pro-toolbar { display: flex; gap: 8px; margin-top: 8px; width: 100%; }
-    .pro-btn { flex: 1; padding: 8px; font-size: 11px; background: #334155; color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-    .pro-btn:hover { background: #1E293B; }
-    
-    .disclaimer { font-size: 11px; color: var(--text-sub); text-align: center; margin-top: 2rem; line-height: 1.4; border-top: 1px solid var(--border-color); padding-top: 1rem; }
-</style>
+        button {
+            background-color: var(--tonie-red);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
 
+        button:hover { background-color: #c2000a; }
+        button.secondary { background-color: var(--tonie-blue); }
+        button.secondary:hover { background-color: #0088c7; }
 
-<!-- STEP 1 -->
-<section class="card">
-    <div class="card-title"><div class="badge">1</div> Motiv oder Eigenes Bild wählen</div>
-    
-    <div class="tab-bar">
-        <button class="tab-btn active" id="tabDb" onclick="switchTab('db')">📚 Datenbank</button>
-        <button class="tab-btn" id="tabCustom" onclick="switchTab('custom')">📷 Eigenes Foto</button>
-    </div>
+        /* --- Search Results --- */
+        .results-box {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
 
-    <div id="sectionDb">
-        <input type="text" id="searchInp" class="search-input" placeholder="Suche nach Serie, Titel...">
-        <div class="grid" id="motiveGrid"></div>
-    </div>
+        .result-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    <div id="sectionCustom" style="display:none; text-align:center; padding:1.5rem; border:2px dashed var(--border-color); border-radius:10px; cursor:pointer;" onclick="document.getElementById('fileUpload').click()">
-        <input type="file" id="fileUpload" accept="image/*" style="display:none" onchange="handleImageUpload(event)">
-        <div style="font-size:28px; margin-bottom:6px;">🖼️</div>
-        <div style="font-size:13px; font-weight:bold;">Klicke hier, um ein eigenes Bild auszuwählen</div>
-        <div style="font-size:11px; color:var(--text-sub); margin-top:4px;">JPG, PNG oder GIF</div>
-    </div>
-</section>
+        .result-item:hover { background-color: var(--tonie-light); }
 
-<!-- STEP 2 -->
-<section class="card">
-    <div class="card-title"><div class="badge">2</div> Cover anpassen & Pro-Export</div>
-    <div class="editor-grid">
-        <div>
-            <div class="input-group">
-                <label>Oberer Bogen (Serie / Titel)</label>
-                <input type="text" id="inpSeries" class="input-field" value="TKKG Junior">
-            </div>
-            <div class="input-group">
-                <label>Unterer Bogen (Album / Folge)</label>
-                <input type="text" id="inpAlbum" class="input-field" value="Alarm im Freizeitpark">
-            </div>
-            <div class="input-group">
-                <label>Tonie ID / Code (UID)</label>
-                <input type="text" id="inpId" class="input-field" value="01-0182">
+        /* --- Editor & Preview --- */
+        .editor-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .preview-circle {
+            background-color: #eee;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.2);
+            /* Standard-Vorschau in 43mm für Münzkapseln */
+            width: 162px; /* ca. 43mm auf Standard-Monitoren */
+            height: 162px;
+            margin: 0 auto;
+        }
+
+        .preview-text {
+            background: rgba(255, 255, 255, 0.85);
+            width: 100%;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            padding: 5px 0;
+        }
+
+        /* --- Print Queue --- */
+        #print-queue {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .queue-item {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            border: 2px solid var(--tonie-blue);
+        }
+
+        /* --- PRINT STYLES --- */
+        @media screen {
+            #print-layout { display: none; }
+        }
+
+        @media print {
+            body * { visibility: hidden; margin: 0; padding: 0; }
+            #print-layout, #print-layout * { visibility: visible; }
+            #print-layout {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 2mm; /* Standard Abstand */
+            }
+
+            /* Exakte mm Angaben für den Druck */
+            .print-circle {
+                border-radius: 50%;
+                background-size: cover;
+                background-position: center;
+                position: relative;
+                overflow: hidden;
+                box-sizing: border-box;
+                page-break-inside: avoid;
+            }
+
+            /* Spezifische Formate */
+            .format-30 { width: 30mm; height: 30mm; }
+            .format-40 { width: 40mm; height: 40mm; }
+            .format-43 { width: 43mm; height: 43mm; } /* Perfekt für Münzkapseln */
+            
+            /* Avery Zweckform Layouts (Grid für DIN A4 Bögen) */
+            .format-avery30 {
+                width: 30mm; height: 30mm;
+                margin-right: 2.5mm; margin-bottom: 2.5mm;
+            }
+            .format-avery40 {
+                width: 40mm; height: 40mm;
+                margin-right: 3mm; margin-bottom: 3mm;
+            }
+
+            .print-text {
+                position: absolute;
+                bottom: 10%;
+                width: 100%;
+                text-align: center;
+                background: rgba(255,255,255,0.9);
+                font-size: 8pt;
+                font-family: sans-serif;
+                font-weight: bold;
+                padding: 1mm 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Tag Code Generator Next Generation</h1>
+
+        <!-- Schritt 1: Datenquelle -->
+        <div class="panel">
+            <h2>1. Tonies.json laden (V1 oder V2)</h2>
+            <p style="font-size: 0.9em; color: #666;">Lade hier die Community JSON-Datei(en) rein. Sie werden lokal im Browser verarbeitet.</p>
+            <input type="file" id="json-upload" accept=".json" multiple>
+            <span id="load-status" style="margin-left: 10px; color: var(--tonie-blue); font-weight: bold;"></span>
+        </div>
+
+        <!-- Schritt 2: Suchen -->
+        <div class="panel">
+            <h2>2. Suchen (z.B. "tkkg", "ID Nummer" oder "Titel")</h2>
+            <input type="text" id="search-input" placeholder="Suchbegriff eingeben..." disabled>
+            <div class="results-box" id="results-box">
+                <!-- Ergebnisse landen hier -->
             </div>
         </div>
-        <div class="preview-box">
-            <div class="sticker-preview" id="previewStage"></div>
-            <div class="pro-toolbar">
-                <button class="pro-btn" onclick="copyId()">ID kopieren</button>
-                <button class="pro-btn" onclick="shareId()">ID teilen</button>
+
+        <!-- Schritt 3: Cover Editor -->
+        <div class="panel editor-grid">
+            <div>
+                <h2>3. Cover Editor</h2>
+                <label>Benutzerdefinierter Text auf dem Cover:</label>
+                <input type="text" id="cover-text" placeholder="z.B. TKKG Folge 1">
+                
+                <label>Hintergrundbild URL (wird auto-befüllt):</label>
+                <input type="text" id="cover-img-url">
+                
+                <label>Druckformat für die Warteschlange wählen:</label>
+                <select id="format-select">
+                    <option value="format-43">43mm (Münzkapseln)</option>
+                    <option value="format-40">40mm (Standard Rund)</option>
+                    <option value="format-30">30mm (Klein)</option>
+                    <option value="format-avery40">Avery Zweckform 40mm</option>
+                    <option value="format-avery30">Avery Zweckform 30mm</option>
+                </select>
+
+                <button onclick="addToQueue()" style="width: 100%; margin-top: 15px;">Zur Druck-Warteschlange hinzufügen</button>
+            </div>
+            <div>
+                <h2 style="text-align: center;">Vorschau</h2>
+                <div class="preview-circle" id="preview-circle">
+                    <div class="preview-text" id="preview-text-display">Tag Name</div>
+                </div>
             </div>
         </div>
-    </div>
-</section>
 
-<!-- STEP 3 -->
-<section class="card">
-    <div class="card-title"><div class="badge">3</div> Druckbogen & Format</div>
-    <div class="sheet-controls">
-        <select id="selSystem" class="input-field" onchange="onSystemChange()">
-            <option value="raster">Freies Raster (Münzkapseln)</option>
-            <option value="avery">Avery Zweckform</option>
-        </select>
-        <select id="selSize" class="input-field" onchange="buildSheet()">
-            <option value="43">43 mm Münzkapsel</option>
-            <option value="40" selected>40 mm Münzkapsel</option>
-            <option value="35">35 mm Münzkapsel</option>
-            <option value="30">30 mm Token</option>
-            <option value="25">25 mm Micro</option>
-        </select>
+        <!-- Schritt 4: Drucken -->
+        <div class="panel">
+            <h2>4. Druck-Warteschlange (<span id="queue-count">0</span>)</h2>
+            <div id="print-queue"></div>
+            <button class="secondary" onclick="window.print()" style="margin-top: 15px; width: 100%;">🖨️ Aufkleber Drucken</button>
+            <button onclick="clearQueue()" style="background-color: #999; margin-top: 5px; width: 100%;">Warteschlange leeren</button>
+        </div>
     </div>
-    <div class="sheet-board">
-        <div class="sheet-paper" id="sheetGrid"></div>
-    </div>
-    <div class="btn-row">
-        <button class="btn" style="background:#475569;" onclick="fillAllSlots()">Bogen komplett füllen</button>
-        <button class="btn" style="background:#64748B;" onclick="clearSheet()">Bogen leeren</button>
-    </div>
-    <button class="btn" onclick="printSheet()">🖨️ A4 Bogen Drucken</button>
-</section>
 
-<div class="disclaimer">
-    Dieses Open-Source Community-Tool steht in keinerlei rechtlicher oder geschäftlicher Verbindung zur Boxine GmbH.<br>
-    "Tonie", "Tonies" und "Toniebox" sind eingetragene Marken der Boxine GmbH.
-</div>
+    <!-- Unsichtbarer Container für den echten Druck -->
+    <div id="print-layout"></div>
+
+    <script>
+        let tonieData = [];
+        let printQueue = [];
+
+        // 1. JSON Dateien lokal einlesen und normalisieren
+        document.getElementById('json-upload').addEventListener('change', function(e) {
+            const files = e.target.files;
+            if (files.length === 0) return;
+
+            document.getElementById('load-status').innerText = "Lade...";
+            tonieData = []; // Reset
+
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const json = JSON.parse(event.target.result);
+                        
+                        // Normalisierung: V1 (Array) vs V2 (Objekt mit Hashes oder verschachtelt)
+                        let parsedItems = [];
+                        if (Array.isArray(json)) {
+                            parsedItems = json;
+                        } else {
+                            // Falls es ein Objekt ist (z.B. V2), extrahiere die Werte
+                            parsedItems = Object.values(json).flat(); 
+                        }
+
+                        // Mappe die wichtigsten Felder, da V1 und V2 oft unterschiedliche Keys haben
+                        parsedItems.forEach(item => {
+                            tonieData.push({
+                                title: item.title || item.name || 'Unbekannt',
+                                series: item.series || '',
+                                id: item.id || item.audio_id || item.hash || '',
+                                pic: item.pic || item.picture || item.image || ''
+                            });
+                        });
+
+                        document.getElementById('load-status').innerText = `${tonieData.length} Einträge geladen!`;
+                        document.getElementById('search-input').disabled = false;
+                    } catch (err) {
+                        alert("Fehler beim Parsen der JSON: " + err.message);
+                    }
+                };
+                reader.readAsText(file);
+            });
+        });
+
+        // 2. Echtzeit-Suche
+        document.getElementById('search-input').addEventListener('input', function(e) {
+            const query = e.target.value.toLowerCase();
+            const resultsBox = document.getElementById('results-box');
+            resultsBox.innerHTML = '';
+
+            if (query.length < 2) return; // Erst ab 2 Zeichen suchen
+
+            const filtered = tonieData.filter(item => 
+                item.title.toLowerCase().includes(query) || 
+                item.series.toLowerCase().includes(query) ||
+                String(item.id).toLowerCase().includes(query)
+            ).slice(0, 50); // Max 50 Ergebnisse für Performance
+
+            filtered.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'result-item';
+                // Aufbau des Suchergebnisses wie gewünscht: tkkg-TKKG - ID nummer
+                div.innerHTML = `
+                    <span><b>${item.series} - ${item.title}</b> <br><small style="color:#666;">ID: ${item.id}</small></span>
+                `;
+                div.onclick = () => loadIntoEditor(item);
+                resultsBox.appendChild(div);
+            });
+        });
+
+        // 3. Editor befüllen
+        function loadIntoEditor(item) {
+            const displayName = item.series ? `${item.series} - ${item.title}` : item.title;
+            document.getElementById('cover-text').value = displayName;
+            document.getElementById('cover-img-url').value = item.pic;
+            updatePreview();
+        }
+
+        // Live-Updates im Editor
+        document.getElementById('cover-text').addEventListener('input', updatePreview);
+        document.getElementById('cover-img-url').addEventListener('input', updatePreview);
+
+        function updatePreview() {
+            const text = document.getElementById('cover-text').value;
+            const imgUrl = document.getElementById('cover-img-url').value;
+            
+            document.getElementById('preview-text-display').innerText = text;
+            if(imgUrl) {
+                document.getElementById('preview-circle').style.backgroundImage = `url('${imgUrl}')`;
+            } else {
+                document.getElementById('preview-circle').style.backgroundImage = 'none';
+            }
+        }
+
+        // 4. Zur Warteschlange & zum Druck-Layout hinzufügen
+        function addToQueue() {
+            const text = document.getElementById('cover-text').value;
+            const imgUrl = document.getElementById('cover-img-url').value;
+            const format = document.getElementById('format-select').value;
+
+            if (!text && !imgUrl) {
+                alert("Bitte wähle zuerst einen Tag aus oder füge ein Bild/Text ein.");
+                return;
+            }
+
+            // Mini-Vorschau in der UI
+            const queueDiv = document.createElement('div');
+            queueDiv.className = 'queue-item';
+            queueDiv.style.backgroundImage = `url('${imgUrl}')`;
+            document.getElementById('print-queue').appendChild(queueDiv);
+
+            // Echtes Druck-Element anlegen
+            const printElement = document.createElement('div');
+            printElement.className = `print-circle ${format}`;
+            printElement.style.backgroundImage = `url('${imgUrl}')`;
+            
+            if (text) {
+                const textElement = document.createElement('div');
+                textElement.className = 'print-text';
+                textElement.innerText = text;
+                printElement.appendChild(textElement);
+            }
+
+            document.getElementById('print-layout').appendChild(printElement);
+            
+            // Counter updaten
+            const count = document.querySelectorAll('.queue-item').length;
+            document.getElementById('queue-count').innerText = count;
+        }
+
+        function clearQueue() {
+            document.getElementById('print-queue').innerHTML = '';
+            document.getElementById('print-layout').innerHTML = '';
+            document.getElementById('queue-count').innerText = '0';
+        }
+    </script>
+</body>
+</html>
