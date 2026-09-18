@@ -1,70 +1,76 @@
-# 🎨 TagGen Studio
+<div align="center">
 
-**Der Next-Generation Cover-Generator für Custom NFC-Tags & Magic Tags.**
+  <h1>🏷️ TagGen Studio V2 – Phoenix</h1>
+  <p><strong>Das professionelle, webbasierte Cover- und Etiketten-Studio für Tonies-Tags.</strong></p>
 
-TagGen Studio ist eine rasante, browserbasierte Single-Page-Application (SPA), mit der du im Handumdrehen perfekte, runde Aufkleber für deine selbstgemachten NFC-Tags erstellen, anordnen und ausdrucken kannst. Speziell entwickelt für die Maker- und Tonie-Community, 100% offline-fähig (PWA) und komplett ohne nervige Backend-Abhängigkeiten.
+  <p>
+    <a href="#features">Features</a> •
+    <a href="#architektur">Architektur</a> •
+    <a href="#installation--hosting">Hosting</a> •
+    <a href="#lizenz">Lizenz</a>
+  </p>
 
-![TagGen Studio UI](image_239928.png)
-
-🔗 [**[Hier geht's zur Live-Version (Live Demo)](https://stevenious.github.io/Tonie-custom-Tags-Cover-Generator/)**](#) 
-
----
-
-## ✨ Features
-
-* **⚡️ Live-Datenbank:** Zieht sich die aktuellste Community-JSON (V2) automatisch aus dem GitHub-Repo und cacht sie ressourcenschonend im Browser, um Ladezeiten zu minimieren.
-* **🎛️ Simpel- & Pro-Modus:**
-  * *Simpel:* Motiv suchen, anklicken, auf den Bogen legen – ideal für den schnellen Druck.
-  * *Pro:* Bildausschnitt präzise verschieben (X/Y), stufenloser Zoom, Schriftgrößen-Anpassung und eigene Custom-UIDs eintragen.
-* **🔄 Mathematisch gekrümmter SVG-Text:** Titel und Seriennamen schmiegen sich perfekt an die runde Kante des Aufklebers an (inkl. intelligentem Filter für redundante Folgentitel).
-* **📐 Intelligente Druck-Engine & Schnittlinien:**
-  * **Freies Raster:** 25mm, 30mm, 40mm und 43mm (perfekt für Münzkapseln) mit optionalen, zuschaltbaren Schnittmarken.
-  * **Avery Zweckform:** Exakt abgestimmte Margins für vorgestanzte DIN-A4 Bögen (z. B. 30mm & 40mm Etiketten).
-* **🖱️ Drag & Drop Workspace:** Ziehe fertig generierte Sticker frei auf dem virtuellen Druckbogen umher – ideal, um angefangene Klebebögen wirtschaftlich weiterzuverwendet.
-* **💾 Multi-Export:**
-  * Direkter, maßstabsgetreuer Browser-Druck (inkl. Skalierungs-Hinweis).
-  * Hochauflösender **300dpi PNG-Export**.
-  * Vektorbasiertes **PDF**.
-  * **JSON-Export** für gespeicherte Tags.
-* **📱 PWA Ready:** Installiere TagGen Studio als native App auf deinem Smartphone oder Desktop. Einmal geladen, funktioniert das Tool komplett offline!
-* **🌗 Ergonomisches Design:** Integrierter Light- und Dark-Mode mit originaler Tonie-Farbpalette.
+  <img src="https://img.shields.io/badge/status-production%20ready-brightgreen?style=flat-square" alt="Status">
+  <img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License">
+  <img src="https://img.shields.io/badge/tech-HTML5%20%2F%20TailwindCSS%20%2F%20VanillaJS-orange?style=flat-square" alt="Tech">
+</div>
 
 ---
 
-## 🚀 Quick Start / Benutzung
+## ⚡ Über das Projekt
 
-Da TagGen Studio komplett im Client (deinem Browser) läuft, gibt es keinen komplizierten Installationsprozess.
+**TagGen Studio V2 (Phoenix)** ist der ultimative, plattformunabhängige Nachfolger für alle Kreativ-Tonies und Maker. Entwickelt als pfeilschnelle Single-Page-Applikation verbindet es eine Figma/Canva-inspirierte Studio-Oberfläche mit einer robusten Live-Datenbank aus den offiziellen `tonies.json`-Quellen.
 
-### Option 1: Live nutzen
-Klicke einfach auf den Link zur Live-Demo. Du kannst die Seite auf deinem Smartphone über das Browser-Menü auch direkt *"Zum Startbildschirm hinzufügen"* (PWA-Installation).
-
-### Option 2: Lokal hosten / Forken
-1. Lade dir die `index.html` aus diesem Repository herunter.
-2. Mache einen Doppelklick darauf – die App öffnet sich sofort in deinem Browser.
-3. Alternativ: Forke das Repository und aktiviere **GitHub Pages** in den Repo-Einstellungen, um deine eigene Instanz zu hosten.
+Egal ob runde Kapseln, Token oder genormte Avery-Zweckform-Etiketten: TagGen Studio V2 bringt Ordnung auf deine A4-Druckbögen – komplett im Browser und ohne Installation.
 
 ---
 
-## 📖 Anleitung: In 3 Schritten zum perfekten Bogen
+## 🎨 Key Features
 
-1. **Motiv wählen:** Nutze die Live-Suche in der Community-Datenbank (Filter nach Serie, Titel oder ID) oder lade ein eigenes Foto hoch.
-2. **Cover Editor:** Passe Serie und Titel an. Aktiviere den blauen **PRO-Modus**, um das Hintergrundbild zu skalieren, zu zentrieren oder eine Audio-ID aufzudrucken. Klicke auf *"+ Auf den Druckbogen legen"*.
-3. **Druckbogen anpassen & Exportieren:** Wähle zwischen *Freiem Raster* (inkl. Schnittlinien) oder *Avery Zweckform*. Exportiere das Ergebnis als PDF, PNG oder drucke direkt aus dem Browser. 
-   > 🖨️ **Wichtig beim Drucken:** Achte darauf, dass die Skalierung in den Druckereinstellungen auf exakt **100%** bzw. **"Tatsächliche Größe"** steht!
+*   **Intelligente Live-Datenbank:** Nahtlose Anbindung an die offizielle Tonies-Datenbank mit Echtzeit-Suche, Kategorie-Filtern und lokalem Favoritensystem (`★`).
+*   **Figma-inspiriertes Studio & Focus-Mode:** Aufgeräumte 3-Spalten-Architektur, die bei der Motivwahl oder im Druckmodus automatisch in den Vollbildmodus umschaltet.
+*   **Präziser Canvas-Editor:** 
+    *   Stufenloser Zoom- und Positions-Regler (`X/Y`) für perfekte Bildausrichtung.
+    *   **Drag & Drop:** Eigene Bilddateien können direkt per Drag & Drop auf den Editor gezogen werden.
+    *   Optional ein-/ausblendbare Typografie für Serie, Titel und Audiocode (UID).
+*   **Fehlerfreies SVG-Text-Rendering:** Mathematisch optimierte, aufrechte Textbögen auf der Unterseite – garantiert ohne ineinander gequetschte oder gespiegelte Buchstaben.
+*   **Profi Print Studio:**
+    *   Unterstützung für freie Raster (Schere/Stanzer) und Avery Zweckform Etiketten.
+    *   **Direkte Sticker-Aktionen:** Hover-Buttons direkt auf dem Bogen zum sekundenschnellen Duplizieren (`+`) oder Löschen (`✕`).
+    *   Batch-Fill-Funktion zum automatischen Füllen des gesamten A4-Bogens.
+*   **Export & Print:** Hochauflösender PNG-Export (300 DPI) und direkter A4-PDF/Druckmodus mit millimetergenauer Skalierungshilfe.
 
 ---
 
-## 🛠️ Tech-Stack
+## 🧩 Technische Architektur
 
-* **HTML5 / CSS3 / Vanilla JavaScript:** Keine schweren Frameworks wie React oder Vue – eine einzige, pfeilschnelle und autarke Datei.
-* **html2pdf.js & html2canvas:** Für hochauflösenden PDF- und 300dpi PNG-Export.
-* **SVG Paths:** Für verlustfreie, kreisrunde Text-Krümmung.
+Entgegen herkömmlicher, schwerfälliger Frameworks setzt TagGen Studio V2 auf eine extrem saubere **modulare Vanilla-JavaScript-Architektur**, gekapselt in klare Namespaces (`App`, `Library`, `Editor`, `PrintStudio`, `Export`). 
+
+*   Kein schwerer Build-Step (Webpack/Vite) notwendig.
+*   Läuft zu 100% statisch und offlinefähig.
+*   Kann bei Bedarf in Sekundenschnelle in separate `.js`- und `.css`-Dateien aufgeteilt werden.
 
 ---
 
-## 🤝 Mitwirken (Contributing)
+## 🚀 Installation & GitHub Pages Hosting
 
-Feedback, Bug-Reports und Pull Requests sind jederzeit willkommen! 
-Wenn du ein neues Druckformat hinzufügen möchtest, kannst du einfach die `formatConfigs` in der `index.html` erweitern.
+Da die Applikation vollständig statisch ist, lässt sie sich in weniger als einer Minute kostenlos über **GitHub Pages** hosten:
 
-*Haftungsausschluss: Dieses Tool ist ein inoffizielles Community-Projekt und steht in keinerlei Verbindung zur Boxine GmbH.*
+1. Erstelle ein neues Repository auf GitHub (z.B. `taggen-studio`).
+2. Lade die finale `index.html` direkt in das Hauptverzeichnis des Repositories hoch.
+3. Gehe in deinem Repository auf **Settings** ➔ **Pages**.
+4. Wähle unter *Build and deployment* den Branch `main` (oder `master`) als Quelle aus und klicke auf **Save**.
+5. Nach wenigen Sekunden ist deine Instanz unter `https://<dein-username>.github.io/taggen-studio/` live!
+
+---
+
+## 💡 Lokale Verwendung
+
+Lade dir einfach die aktuelle `index.html` herunter und öffne sie per Doppelklick in einem beliebigen modernen Browser (Chrome, Firefox, Safari, Edge). Es ist kein Node.js-Server oder Webserver erforderlich!
+
+---
+
+## 📜 Lizenz
+
+Veröffentlicht unter der [MIT License](LICENSE). 
+Frei zur privaten Nutzung, Weiterentwicklung und Anpassung.
