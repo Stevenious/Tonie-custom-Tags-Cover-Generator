@@ -481,27 +481,33 @@ var topText = this.escapeXml(sEl ? sEl.value : '');
 var albumText = this.escapeXml(aEl ? aEl.value : '');
 var idText = this.escapeXml(iEl ? iEl.value : '');
 var showId = cEl ? cEl.checked : true;
-var bottomText = showId ? idText : albumText;
-var bottomFont = showId ? 'monospace' : '-apple-system, sans-serif';
-var bottomColor = showId ? '#A31E33' : '#1D1B1A';
 var safeImg = this.activeTonie.pic;
 if(safeImg && safeImg.indexOf('<svg') > -1 && safeImg.indexOf('utf8,') > -1) {
 safeImg = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(safeImg.substring(safeImg.indexOf('<svg')));
+}
+// ID ON: We add an extra inner curved path or a crisp bottom text below album, without replacing it!
+var idElement = '';
+if (showId && idText) {
+idElement = '<text font-family="monospace" font-weight="700" font-size="9" fill="#A31E33">' +
+'<textPath href="#botC2" startOffset="50%" text-anchor="middle">'+idText+'</textPath>' +
+'</text>';
 }
 return '<svg viewBox="0 0 160 160" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">' +
 '<defs>' +
 '<clipPath id="circleClip"><circle cx="80" cy="80" r="80" /></clipPath>' +
 '<path id="topC" d="M 18 80 A 62 62 0 0 1 142 80" fill="transparent" />' +
-'<path id="botC" d="M 18 80 A 62 62 0 0 0 142 80" fill="transparent" />' +
+'<path id="botC" d="M 22 80 A 58 58 0 0 0 138 80" fill="transparent" />' +
+'<path id="botC2" d="M 30 80 A 50 50 0 0 0 130 80" fill="transparent" />' +
 '</defs>' +
 '<circle cx="80" cy="80" r="80" fill="#FFFFFF" />' +
-'<image href="'+safeImg+'" xlink:href="'+safeImg+'" x="15" y="15" width="130" height="130" clip-path="url(#circleClip)" preserveAspectRatio="xMidYMid slice" opacity="0.95" />' +
-'<text font-family="-apple-system, sans-serif" font-weight="800" font-size="12" fill="#1D1B1A">' +
+'<image href="'+safeImg+'" xlink:href="'+safeImg+'" x="20" y="20" width="120" height="120" clip-path="url(#circleClip)" preserveAspectRatio="xMidYMid slice" opacity="0.95" />' +
+'<text font-family="-apple-system, sans-serif" font-weight="800" font-size="11" fill="#1D1B1A">' +
 '<textPath href="#topC" startOffset="50%" text-anchor="middle">'+topText+'</textPath>' +
 '</text>' +
-'<text font-family="'+bottomFont+'" font-weight="700" font-size="11" fill="'+bottomColor+'">' +
-'<textPath href="#botC" startOffset="50%" text-anchor="middle">'+bottomText+'</textPath>' +
+'<text font-family="-apple-system, sans-serif" font-weight="700" font-size="10" fill="#1D1B1A">' +
+'<textPath href="#botC" startOffset="50%" text-anchor="middle">'+albumText+'</textPath>' +
 '</text>' +
+idElement +
 '</svg>';
 },
 updateSvgPreview: function() {
@@ -590,7 +596,6 @@ this.slots.forEach(function(svgStr, idx) {
 if (!svgStr) return;
 var c = document.createElement('div');
 c.className = 'print-circle' + (config.type === 'raster' ? ' raster' : '');
-// ABSOLUTE POSITIONING FIX FOR SAFARI iOS
 c.style.width = config.size + 'mm';
 c.style.height = config.size + 'mm';
 if (config.type === 'avery') {
@@ -599,10 +604,8 @@ var col = idx % config.cols;
 c.style.left = (config.startX + (col * config.gapX)) + 'mm';
 c.style.top = (config.startY + (row * config.gapY)) + 'mm';
 } else {
-// Raster: Flow layout relative to a grid calculation
 var rRow = Math.floor(idx / config.cols);
 var rCol = idx % config.cols;
-// 15mm padding + gap calculations
 c.style.left = (15 + (rCol * (config.size + 4))) + 'mm';
 c.style.top = (15 + (rRow * (config.size + 4))) + 'mm';
 }
