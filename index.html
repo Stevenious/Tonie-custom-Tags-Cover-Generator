@@ -4,391 +4,514 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<title>Tonie & Tag Cover Hub V6.6</title>
+<title>Tonie & Tag Cover Hub – Das Münzkapsel & Etiketten Studio</title>
 <style>
+/* ==========================================================================
+1. THEME VARIABLES (Tonies.com Inspired Palette)
+========================================================================== */
 :root, [data-theme="light"] {
 --tonie-red: #C02741;
 --tonie-red-hover: #A01F35;
 --tonie-red-soft: rgba(192, 39, 65, 0.08);
+--tonie-red-glow: rgba(192, 39, 65, 0.22);
 --tonie-gold: #F59E0B;
 --tonie-emerald: #10B981;
---bg-color: #F8FAFC;
---card-bg: #FFFFFF;
---card-bg-sub: #F1F5F9;
---text-main: #0F172A;
---text-muted: #64748B;
---border-color: #CBD5E1;
+--tonie-cyan: #06B6D4;
+--bg-canvas: #FBF9F5;
+--surface-card: #FFFFFF;
+--surface-sub: #F3EFE6;
+--surface-border: #E5DFC9;
+--text-primary: #1C1917;
+--text-secondary: #78716C;
+--text-muted: #A8A29E;
 --input-bg: #FFFFFF;
---shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
---shadow-md: 0 4px 14px rgba(0, 0, 0, 0.08);
---shadow-float: 0 12px 28px rgba(0, 0, 0, 0.16);
+--shadow-subtle: 0 2px 8px rgba(28, 25, 23, 0.04);
+--shadow-card: 0 8px 24px rgba(28, 25, 23, 0.07);
+--shadow-capsule: 0 14px 32px rgba(28, 25, 23, 0.16);
 }
 [data-theme="dark"] {
---bg-color: #0B1120;
---card-bg: #161F33;
---card-bg-sub: #111827;
---text-main: #F8FAFC;
---text-muted: #94A3B8;
---border-color: rgba(255, 255, 255, 0.12);
---input-bg: rgba(0, 0, 0, 0.35);
---shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
---shadow-md: 0 4px 14px rgba(0, 0, 0, 0.45);
---shadow-float: 0 12px 28px rgba(0, 0, 0, 0.6);
+--tonie-red: #E11D48;
+--tonie-red-hover: #BE123C;
+--tonie-red-soft: rgba(225, 29, 72, 0.14);
+--tonie-red-glow: rgba(225, 29, 72, 0.35);
+--tonie-gold: #FBBF24;
+--tonie-emerald: #34D399;
+--tonie-cyan: #22D3EE;
+--bg-canvas: #0F172A;
+--surface-card: #1E293B;
+--surface-sub: #141E33;
+--surface-border: #334155;
+--text-primary: #F8FAFC;
+--text-secondary: #94A3B8;
+--text-muted: #64748B;
+--input-bg: #0F172A;
+--shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.3);
+--shadow-card: 0 8px 24px rgba(0, 0, 0, 0.45);
+--shadow-capsule: 0 14px 32px rgba(0, 0, 0, 0.65);
 }
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
-body { background: var(--bg-color); color: var(--text-main); transition: background 0.2s ease, color 0.2s ease; line-height: 1.5; padding-bottom: 3rem; overflow-x: hidden; }
-.container { max-width: 820px; margin: 0 auto; padding: 1rem; }
-.top-bar { display: flex; justify-content: center; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; }
-.btn-pill { background: var(--card-bg); color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 15px; border-radius: 20px; font-size: 13px; font-weight: 600; cursor: pointer; transition: 0.15s; display: inline-flex; align-items: center; gap: 6px; box-shadow: var(--shadow-sm); user-select: none; }
-.btn-pill:hover, .btn-pill:active { border-color: var(--tonie-red); color: var(--tonie-red); }
-.btn-accent { background: var(--tonie-red); color: #FFFFFF !important; border: none; }
-.btn-accent:hover, .btn-accent:active { background: var(--tonie-red-hover); color: #FFFFFF; }
-.header { text-align: center; margin-bottom: 1.75rem; display: flex; flex-direction: column; align-items: center; }
-.brand-logo-wrap { width: 140px; height: 70px; margin-bottom: 8px; filter: drop-shadow(0 4px 10px rgba(192, 39, 65, 0.15)); }
-.brand-title { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.15; margin-bottom: 4px; }
-.brand-title span { color: var(--tonie-red); text-transform: uppercase; }
-.brand-subtitle { font-size: 13px; color: var(--text-muted); max-width: 520px; line-height: 1.4; margin: 0 auto; }
-.step-card { background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border-color); padding: 1.2rem; margin-bottom: 1.5rem; box-shadow: var(--shadow-md); }
-.step-header { font-size: 15px; font-weight: 700; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); padding-bottom: 10px; }
-.step-badge { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; background: var(--tonie-red); color: #FFFFFF; border-radius: 50%; font-size: 12px; font-weight: 800; margin-right: 8px; }
-.tab-bar { display: flex; gap: 4px; margin-bottom: 12px; background: var(--card-bg-sub); padding: 4px; border-radius: 12px; border: 1px solid var(--border-color); width: 100%; }
-.tab-btn { flex: 1 1 0; min-width: 0; padding: 8px 4px; font-size: 12px; font-weight: 700; border: none; border-radius: 8px; background: transparent; color: var(--text-muted); cursor: pointer; transition: 0.15s; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: flex; align-items: center; justify-content: center; gap: 4px; }
-.tab-btn.active { background: var(--card-bg); color: var(--text-main); box-shadow: var(--shadow-sm); }
-.search-row { display: flex; gap: 8px; margin-bottom: 10px; position: relative; }
-.search-field { flex: 1; padding: 11px 36px 11px 14px; border-radius: 10px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-main); font-size: 14px; outline: none; }
-.search-field:focus { border-color: var(--tonie-red); box-shadow: 0 0 0 3px var(--tonie-red-soft); }
-.search-clear-btn { position: absolute; right: 54px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 16px; color: var(--text-muted); cursor: pointer; display: none; padding: 4px; }
-.search-btn-icon { width: 44px; background: var(--card-bg-sub); border: 1px solid var(--border-color); border-radius: 10px; font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.status-row { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; padding: 0 4px; }
-.status-indicator { display: inline-flex; align-items: center; gap: 6px; }
-.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--tonie-gold); }
-.status-dot.active { background: var(--tonie-emerald); }
-.items-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(115px, 1fr)); gap: 10px; max-height: 310px; overflow-y: auto; padding-right: 4px; min-height: 120px; }
-.items-grid::-webkit-scrollbar { width: 5px; }
-.items-grid::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
-.grid-card { background: var(--card-bg-sub); border: 1px solid var(--border-color); border-radius: 12px; padding: 10px 6px; text-align: center; cursor: pointer; transition: 0.15s; position: relative; display: flex; flex-direction: column; align-items: center; }
-.grid-card:hover { border-color: var(--tonie-red); transform: translateY(-2px); }
-.grid-card.selected { border-color: var(--tonie-red); background: var(--tonie-red-soft); box-shadow: 0 0 0 1.5px var(--tonie-red); }
-.grid-thumb { width: 62px; height: 62px; border-radius: 50%; object-fit: contain; background: #FFFFFF; margin-bottom: 6px; padding: 2px; border: 1px solid var(--border-color); }
-.grid-series { font-size: 9px; font-weight: 800; color: var(--tonie-red); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
-.grid-title { font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; margin-bottom: 2px; }
-.grid-id { font-size: 9px; color: var(--text-muted); font-family: monospace; }
-.fav-star-btn { position: absolute; top: 6px; right: 6px; font-size: 15px; color: #CBD5E1; cursor: pointer; padding: 2px; z-index: 3; }
-.fav-star-btn.is-fav { color: var(--tonie-gold); }
-.upload-dropzone { display: none; padding: 28px 16px; border: 2px dashed var(--border-color); border-radius: 12px; text-align: center; cursor: pointer; background: var(--card-bg-sub); }
-.mode-switch-wrap { display: flex; background: var(--card-bg-sub); padding: 4px; border-radius: 10px; margin-bottom: 14px; border: 1px solid var(--border-color); }
-.mode-toggle-btn { flex: 1; padding: 7px; font-size: 12px; font-weight: 700; border: none; background: transparent; color: var(--text-muted); border-radius: 7px; cursor: pointer; }
-.mode-toggle-btn.active { background: var(--tonie-red); color: #FFFFFF; }
-.form-row-fields { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 10px; }
-@media(min-width: 520px) { .form-row-fields { grid-template-columns: 1fr 1fr; } }
-.field-group { display: flex; flex-direction: column; gap: 4px; }
-.field-label { font-size: 10.5px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; }
-.field-input { padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--input-bg); color: var(--text-main); font-size: 13px; outline: none; width: 100%; }
-.field-input:focus { border-color: var(--tonie-red); }
-.id-control-row { display: flex; align-items: flex-end; gap: 10px; margin-bottom: 12px; }
-.id-input-wrap { flex: 1; }
-.switch-container { display: flex; align-items: center; gap: 8px; background: var(--card-bg-sub); padding: 7px 12px; border-radius: 8px; border: 1px solid var(--border-color); height: 38px; cursor: pointer; user-select: none; }
-.switch-label-text { font-size: 12px; font-weight: 700; color: var(--text-main); cursor: pointer; }
-.toggle-switch { position: relative; width: 36px; height: 20px; display: inline-block; }
-.toggle-switch input { opacity: 0; width: 0; height: 0; }
-.toggle-slider { position: absolute; cursor: pointer; inset: 0; background-color: #CBD5E1; transition: .2s; border-radius: 20px; }
-.toggle-slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .2s; border-radius: 50%; }
-input:checked + .toggle-slider { background-color: var(--tonie-red); }
-input:checked + .toggle-slider:before { transform: translateX(16px); }
-.preset-pills-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
-.preset-badge { font-size: 11px; padding: 4px 10px; border-radius: 12px; background: var(--card-bg-sub); border: 1px solid var(--border-color); cursor: pointer; color: var(--text-muted); font-weight: 600; }
-.preset-badge:hover { border-color: var(--tonie-red); color: var(--tonie-red); }
-.pro-controls { display: none; background: var(--card-bg-sub); padding: 12px; border-radius: 10px; border: 1px dashed var(--border-color); margin-bottom: 14px; }
-.slider-control { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-.slider-name { width: 65px; font-size: 11px; font-weight: 600; color: var(--text-muted); }
-.slider-range { flex: 1; accent-color: var(--tonie-red); }
-.preview-canvas-box { display: flex; justify-content: center; padding: 18px; background: var(--card-bg-sub); border-radius: 12px; border: 1px solid var(--border-color); }
-.sticker-stage { width: 160px; height: 160px; border-radius: 50%; box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12); background: #FFFFFF; position: relative; overflow: hidden; }
-.sheet-interactive-wrap { background: #E2E8F0; padding: 16px; border-radius: 12px; display: flex; justify-content: center; overflow-x: auto; box-shadow: inset 0 2px 8px rgba(0,0,0,0.08); margin: 12px 0; }
-.sheet-matrix { display: grid; background: #FFFFFF; padding: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.12); width: max-content; }
-.sheet-matrix.matrix-avery-40 { grid-template-columns: repeat(3, 40px); grid-template-rows: repeat(8, 40px); gap: 4px; }
-.sheet-matrix.matrix-avery-30 { grid-template-columns: repeat(4, 32px); grid-template-rows: repeat(12, 32px); gap: 3px; }
-.sheet-matrix.matrix-avery-25 { grid-template-columns: repeat(5, 26px); grid-template-rows: repeat(14, 26px); gap: 2px; }
-.sheet-matrix.matrix-raster-43 { grid-template-columns: repeat(4, 42px); grid-template-rows: repeat(5, 42px); gap: 4px; }
-.sheet-matrix.matrix-raster-40 { grid-template-columns: repeat(4, 40px); grid-template-rows: repeat(6, 40px); gap: 4px; }
-.sheet-matrix.matrix-raster-30 { grid-template-columns: repeat(6, 32px); grid-template-rows: repeat(8, 32px); gap: 3px; }
-.sheet-matrix.matrix-raster-25 { grid-template-columns: repeat(6, 26px); grid-template-rows: repeat(10, 26px); gap: 2px; }
-.sheet-slot-node { border-radius: 50%; border: 1px dashed #94A3B8; cursor: pointer; transition: 0.15s; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; background: #F8FAFC; }
-.sheet-slot-node:hover { border-color: var(--tonie-red); background: var(--tonie-red-soft); transform: scale(1.06); z-index: 2; }
-.sheet-slot-node.has-content { border: none; box-shadow: 0 2px 4px rgba(0,0,0,0.18); }
-.sheet-slot-node svg { width: 100%; height: 100%; }
-.matrix-avery-40 .sheet-slot-node { width: 40px; height: 40px; }
-.matrix-avery-30 .sheet-slot-node { width: 32px; height: 32px; font-size: 10px; }
-.matrix-avery-25 .sheet-slot-node { width: 26px; height: 26px; font-size: 9px; }
-.matrix-raster-43 .sheet-slot-node { width: 42px; height: 42px; }
-.matrix-raster-40 .sheet-slot-node { width: 40px; height: 40px; }
-.matrix-raster-30 .sheet-slot-node { width: 32px; height: 32px; font-size: 10px; }
-.matrix-raster-25 .sheet-slot-node { width: 26px; height: 26px; font-size: 9px; }
-.sheet-slot-number { font-size: 11px; color: #94A3B8; font-weight: 700; user-select: none; }
-.sheet-btn-bar { display: flex; justify-content: center; gap: 8px; margin-bottom: 12px; }
-.action-actions-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 10px; }
-@media(min-width: 520px) { .action-actions-grid { grid-template-columns: 1fr 1fr; } }
-.btn-print-large { background: var(--tonie-red); color: #FFFFFF; padding: 13px; font-size: 14px; font-weight: 700; border-radius: 10px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.btn-export-png { background: var(--card-bg-sub); color: var(--text-main); border: 1px solid var(--border-color); padding: 13px; font-size: 13px; font-weight: 700; border-radius: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-.footer-wrap { text-align: center; margin-top: 2.5rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem; }
-.footer-nav { display: flex; justify-content: center; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
-.footer-nav a { color: var(--tonie-red); text-decoration: none; font-size: 12px; font-weight: 600; }
-.footer-disclaimer { font-size: 10px; color: var(--text-muted); opacity: 0.8; max-width: 620px; margin: 0 auto; line-height: 1.4; }
-.modal-shade { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 99999; padding: 15px; cursor: pointer; }
-.modal-shade.is-open { display: flex !important; }
-.modal-body { background: var(--card-bg); width: 100%; max-width: 460px; border-radius: 16px; border: 1px solid var(--border-color); padding: 24px; box-shadow: var(--shadow-float); cursor: default; }
-.modal-body h3 { font-size: 18px; color: var(--tonie-red); margin-bottom: 12px; }
-.modal-body p, .modal-body li { font-size: 13px; color: var(--text-main); margin-bottom: 8px; line-height: 1.45; }
-.modal-body ul { padding-left: 18px; margin-bottom: 14px; }
-.modal-close-btn { width: 100%; padding: 11px; border-radius: 8px; background: var(--tonie-red); color: #FFFFFF; font-weight: 700; border: none; cursor: pointer; font-size: 13px; }
-#printHost { display: none; }
+body { background: var(--bg-canvas); color: var(--text-primary); transition: background 0.25s ease, color 0.25s ease; min-height: 100vh; display: flex; flex-direction: column; overflow-x: hidden; }
+/* ==========================================================================
+2. NAVIGATION & TOP BAR
+========================================================================== */
+.app-header { background: var(--surface-card); border-bottom: 1px solid var(--surface-border); position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-subtle); }
+.header-inner { max-width: 960px; margin: 0 auto; padding: 0.75rem 1rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.brand-cluster { display: flex; align-items: center; gap: 10px; cursor: pointer; text-decoration: none; }
+.brand-logo-svg { width: 44px; height: 44px; filter: drop-shadow(0 3px 6px var(--tonie-red-glow)); }
+.brand-titles { display: flex; flex-direction: column; }
+.brand-name { font-size: 19px; font-weight: 900; letter-spacing: -0.5px; line-height: 1.1; color: var(--text-primary); }
+.brand-name span { color: var(--tonie-red); }
+.brand-tagline { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+.header-actions { display: flex; align-items: center; gap: 8px; }
+.pill-btn { border: 1px solid var(--surface-border); background: var(--surface-sub); color: var(--text-primary); padding: 7px 13px; border-radius: 999px; font-size: 12.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease; box-shadow: var(--shadow-subtle); }
+.pill-btn:hover { border-color: var(--tonie-red); color: var(--tonie-red); transform: translateY(-1px); }
+.pill-btn.accent { background: var(--tonie-red); color: #FFFFFF; border-color: var(--tonie-red); }
+.pill-btn.accent:hover { background: var(--tonie-red-hover); color: #FFFFFF; }
+/* ==========================================================================
+3. STUDIO WORKFLOW STEPPER TABS
+========================================================================== */
+.stepper-nav { background: var(--surface-card); border-bottom: 1px solid var(--surface-border); }
+.stepper-inner { max-width: 960px; margin: 0 auto; padding: 0.5rem 1rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.step-tab { border: none; background: transparent; padding: 10px 8px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px; font-weight: 800; color: var(--text-secondary); transition: all 0.2s ease; }
+.step-tab .step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--surface-sub); border: 1px solid var(--surface-border); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: var(--text-primary); }
+.step-tab.active { background: var(--tonie-red-soft); color: var(--tonie-red); }
+.step-tab.active .step-num { background: var(--tonie-red); color: #FFFFFF; border-color: var(--tonie-red); }
+@media(max-width: 600px) {
+.step-tab span.tab-text { display: none; }
+.step-tab { padding: 8px 4px; }
+}
+/* ==========================================================================
+4. MAIN CONTENT CONTAINER
+========================================================================== */
+.studio-main { max-width: 960px; margin: 1.5rem auto; padding: 0 1rem; width: 100%; flex: 1; }
+.view-section { display: none; }
+.view-section.active { display: block; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+.card-surface { background: var(--surface-card); border: 1px solid var(--surface-border); border-radius: 24px; padding: 1.5rem; box-shadow: var(--shadow-card); margin-bottom: 1.5rem; }
+.section-headline { font-size: 18px; font-weight: 800; margin-bottom: 4px; display: flex; align-items: center; justify-content: space-between; }
+.section-desc { font-size: 13px; color: var(--text-secondary); margin-bottom: 1.25rem; line-height: 1.4; }
+/* ==========================================================================
+5. SECTION 1: MOTIV AUSWÄHLEN (DATABASE & SEARCH)
+========================================================================== */
+.sub-tab-bar { display: flex; gap: 6px; background: var(--surface-sub); padding: 4px; border-radius: 14px; margin-bottom: 1rem; border: 1px solid var(--surface-border); }
+.sub-tab { flex: 1; border: none; background: transparent; padding: 8px; border-radius: 10px; font-size: 12.5px; font-weight: 700; color: var(--text-secondary); cursor: pointer; transition: 0.15s; }
+.sub-tab.active { background: var(--surface-card); color: var(--text-primary); box-shadow: var(--shadow-subtle); }
+.search-bar-wrap { display: flex; gap: 8px; margin-bottom: 10px; position: relative; }
+.search-input-field { flex: 1; padding: 12px 40px 12px 14px; border-radius: 14px; border: 1px solid var(--surface-border); background: var(--input-bg); color: var(--text-primary); font-size: 14.5px; font-weight: 500; outline: none; transition: border-color 0.2s; }
+.search-input-field:focus { border-color: var(--tonie-red); box-shadow: 0 0 0 3px var(--tonie-red-soft); }
+.search-clear-cross { position: absolute; right: 54px; top: 50%; transform: translateY(-50%); background: none; border: none; font-size: 16px; color: var(--text-muted); cursor: pointer; display: none; padding: 4px; }
+.icon-btn-square { width: 46px; height: 46px; border-radius: 14px; border: 1px solid var(--surface-border); background: var(--surface-sub); font-size: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+.icon-btn-square:hover { border-color: var(--tonie-red); transform: scale(1.05); }
+.status-strip { display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; color: var(--text-secondary); font-weight: 600; padding: 0 4px; margin-bottom: 12px; }
+.status-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--tonie-gold); margin-right: 5px; }
+.status-dot.online { background: var(--tonie-emerald); }
+.motives-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(125px, 1fr)); gap: 12px; max-height: 380px; overflow-y: auto; padding-right: 4px; min-height: 140px; }
+.motives-grid::-webkit-scrollbar { width: 6px; }
+.motives-grid::-webkit-scrollbar-thumb { background: var(--surface-border); border-radius: 4px; }
+.tonie-thumb-card { background: var(--surface-sub); border: 1px solid var(--surface-border); border-radius: 16px; padding: 12px 8px 8px; text-align: center; cursor: pointer; position: relative; display: flex; flex-direction: column; align-items: center; transition: all 0.15s ease; }
+.tonie-thumb-card:hover { border-color: var(--tonie-red); transform: translateY(-3px); box-shadow: var(--shadow-card); }
+.tonie-thumb-card.is-active { border-color: var(--tonie-red); background: var(--tonie-red-soft); box-shadow: 0 0 0 2px var(--tonie-red); }
+.thumb-avatar { width: 68px; height: 68px; border-radius: 50%; object-fit: contain; background: #FFFFFF; padding: 3px; border: 1px solid var(--surface-border); margin-bottom: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+.thumb-series { font-size: 9.5px; font-weight: 800; color: var(--tonie-red); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+.thumb-title { font-size: 11.5px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; margin: 1px 0; }
+.thumb-id { font-size: 9.5px; color: var(--text-muted); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+.card-fav-star { position: absolute; top: 6px; right: 8px; font-size: 16px; color: #CBD5E1; cursor: pointer; padding: 2px; }
+.card-fav-star.is-fav { color: var(--tonie-gold); }
+.dropzone-box { display: none; padding: 40px 16px; border: 2px dashed var(--surface-border); border-radius: 18px; text-align: center; cursor: pointer; background: var(--surface-sub); transition: border-color 0.2s; }
+.dropzone-box:hover { border-color: var(--tonie-red); }
+/* ==========================================================================
+6. SECTION 2: ETIKETT GESTALTEN (EDITOR & LIVE STAGE)
+========================================================================== */
+.editor-split-layout { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
+@media(min-width: 768px) { .editor-split-layout { grid-template-columns: 1.1fr 0.9fr; align-items: start; } }
+.mode-toggle-cluster { display: flex; background: var(--surface-sub); padding: 4px; border-radius: 14px; border: 1px solid var(--surface-border); margin-bottom: 1.25rem; }
+.mode-switch-btn { flex: 1; padding: 8px; border: none; border-radius: 10px; font-size: 12.5px; font-weight: 800; background: transparent; color: var(--text-secondary); cursor: pointer; transition: 0.15s; }
+.mode-switch-btn.active { background: var(--tonie-red); color: #FFFFFF; }
+.fields-grid { display: flex; flex-direction: column; gap: 12px; margin-bottom: 1.25rem; }
+.field-unit { display: flex; flex-direction: column; gap: 4px; }
+.field-unit label { font-size: 11px; font-weight: 800; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+.field-unit input { padding: 10px 14px; border-radius: 12px; border: 1px solid var(--surface-border); background: var(--input-bg); color: var(--text-primary); font-size: 13.5px; outline: none; transition: border-color 0.2s; }
+.field-unit input:focus { border-color: var(--tonie-red); }
+.id-switch-row { display: flex; align-items: flex-end; gap: 10px; }
+.toggle-switch-card { display: flex; align-items: center; gap: 8px; background: var(--surface-sub); border: 1px solid var(--surface-border); padding: 8px 12px; border-radius: 12px; height: 42px; cursor: pointer; user-select: none; }
+.switch-toggle-checkbox { position: relative; width: 36px; height: 20px; display: inline-block; }
+.switch-toggle-checkbox input { opacity: 0; width: 0; height: 0; }
+.switch-toggle-slider { position: absolute; inset: 0; cursor: pointer; background: #CBD5E1; border-radius: 20px; transition: 0.2s; }
+.switch-toggle-slider:before { content: ""; position: absolute; height: 14px; width: 14px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: 0.2s; }
+.switch-toggle-checkbox input:checked + .switch-toggle-slider { background: var(--tonie-red); }
+.switch-toggle-checkbox input:checked + .switch-toggle-slider:before { transform: translateX(16px); }
+.quick-presets-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1rem; }
+.preset-badge-btn { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; background: var(--surface-sub); border: 1px solid var(--surface-border); color: var(--text-secondary); cursor: pointer; transition: 0.15s; }
+.preset-badge-btn:hover { border-color: var(--tonie-red); color: var(--tonie-red); }
+.pro-settings-box { display: none; background: var(--surface-sub); border: 1px dashed var(--surface-border); border-radius: 16px; padding: 14px; margin-bottom: 1rem; }
+.pro-slider-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.pro-slider-row span { width: 70px; font-size: 11.5px; font-weight: 700; color: var(--text-secondary); }
+.pro-slider-row input[type="range"] { flex: 1; accent-color: var(--tonie-red); }
+/* Stage / Münzkapsel 3D Simulator */
+.capsule-stage-wrapper { background: var(--surface-sub); border: 1px solid var(--surface-border); border-radius: 20px; padding: 2rem 1rem; display: flex; flex-direction: column; align-items: center; justify-content: center; position: sticky; top: 85px; }
+.capsule-realistic-ring { width: 210px; height: 210px; border-radius: 50%; background: radial-gradient(circle, rgba(255,255,255,0.9) 0%, rgba(220,225,230,0.8) 70%, rgba(180,190,205,1) 100%); padding: 12px; box-shadow: var(--shadow-capsule), inset 0 2px 6px rgba(255,255,255,0.8); display: flex; align-items: center; justify-content: center; position: relative; }
+.capsule-inner-sticker { width: 100%; height: 100%; border-radius: 50%; background: #FFFFFF; overflow: hidden; box-shadow: inset 0 0 4px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; }
+/* ==========================================================================
+7. SECTION 3: DRUCKBOGEN BEFÜLLEN (MATRIX & EXPORT)
+========================================================================== */
+.format-selection-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 1.5rem; }
+@media(min-width: 600px) { .format-selection-grid { grid-template-columns: 1fr 1fr; } }
+.select-field { width: 100%; padding: 11px 14px; border-radius: 12px; border: 1px solid var(--surface-border); background: var(--input-bg); color: var(--text-primary); font-size: 13.5px; font-weight: 600; outline: none; cursor: pointer; }
+.select-field:focus { border-color: var(--tonie-red); }
+.sheet-board-area { background: #CBD5E1; padding: 20px; border-radius: 18px; display: flex; justify-content: center; overflow-x: auto; margin-bottom: 1.25rem; box-shadow: inset 0 2px 8px rgba(0,0,0,0.12); }
+.sheet-paper { background: #FFFFFF; padding: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.18); width: max-content; display: grid; }
+/* Matrix Grids */
+.sheet-paper.matrix-avery-40 { grid-template-columns: repeat(3, 40px); grid-template-rows: repeat(8, 40px); gap: 4px; }
+.sheet-paper.matrix-avery-30 { grid-template-columns: repeat(4, 32px); grid-template-rows: repeat(12, 32px); gap: 3px; }
+.sheet-paper.matrix-avery-25 { grid-template-columns: repeat(5, 26px); grid-template-rows: repeat(14, 26px); gap: 2px; }
+.sheet-paper.matrix-raster-43 { grid-template-columns: repeat(4, 42px); grid-template-rows: repeat(5, 42px); gap: 4px; }
+.sheet-paper.matrix-raster-40 { grid-template-columns: repeat(4, 40px); grid-template-rows: repeat(6, 40px); gap: 4px; }
+.sheet-paper.matrix-raster-30 { grid-template-columns: repeat(6, 32px); grid-template-rows: repeat(8, 32px); gap: 3px; }
+.sheet-paper.matrix-raster-25 { grid-template-columns: repeat(6, 26px); grid-template-rows: repeat(10, 26px); gap: 2px; }
+.sheet-cell-slot { border-radius: 50%; border: 1px dashed #94A3B8; background: #F8FAFC; cursor: pointer; transition: all 0.15s ease; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; }
+.sheet-cell-slot:hover { border-color: var(--tonie-red); transform: scale(1.08); z-index: 2; }
+.sheet-cell-slot.has-content { border: none; box-shadow: 0 1px 4px rgba(0,0,0,0.2); }
+.sheet-cell-slot svg { width: 100%; height: 100%; }
+.matrix-avery-40 .sheet-cell-slot { width: 40px; height: 40px; }
+.matrix-avery-30 .sheet-cell-slot { width: 32px; height: 32px; font-size: 10px; }
+.matrix-avery-25 .sheet-cell-slot { width: 26px; height: 26px; font-size: 9px; }
+.matrix-raster-43 .sheet-cell-slot { width: 42px; height: 42px; }
+.matrix-raster-40 .sheet-cell-slot { width: 40px; height: 40px; }
+.matrix-raster-30 .sheet-cell-slot { width: 32px; height: 32px; font-size: 10px; }
+.matrix-raster-25 .sheet-cell-slot { width: 26px; height: 26px; font-size: 9px; }
+.sheet-cell-num { font-size: 11px; font-weight: 800; color: #94A3B8; user-select: none; }
+.sheet-tools-bar { display: flex; justify-content: center; gap: 8px; margin-bottom: 1.5rem; }
+.action-exports-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+@media(min-width: 600px) { .action-exports-grid { grid-template-columns: 1.2fr 0.8fr; } }
+.big-action-btn { padding: 14px 20px; font-size: 14.5px; font-weight: 800; border-radius: 14px; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.15s ease; box-shadow: var(--shadow-subtle); }
+.big-action-btn:hover { transform: translateY(-2px); }
+.big-action-btn.print-btn { background: var(--tonie-red); color: #FFFFFF; }
+.big-action-btn.print-btn:hover { background: var(--tonie-red-hover); box-shadow: var(--shadow-card); }
+.big-action-btn.png-btn { background: var(--surface-sub); border: 1px solid var(--surface-border); color: var(--text-primary); }
+/* ==========================================================================
+8. MODAL GUIDES & OVERLAYS
+========================================================================== */
+.modal-shade { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 99999; padding: 16px; cursor: pointer; }
+.modal-shade.is-visible { display: flex !important; }
+.modal-dialog { background: var(--surface-card); width: 100%; max-width: 480px; border-radius: 20px; border: 1px solid var(--surface-border); padding: 24px; box-shadow: var(--shadow-capsule); cursor: default; }
+.modal-dialog h3 { font-size: 19px; color: var(--tonie-red); margin-bottom: 12px; font-weight: 800; }
+.modal-dialog p, .modal-dialog li { font-size: 13.5px; color: var(--text-primary); margin-bottom: 8px; line-height: 1.5; }
+.modal-dialog ul { padding-left: 20px; margin-bottom: 16px; }
+/* ==========================================================================
+9. FOOTER & LEGAL DISCLAIMER
+========================================================================== */
+.app-footer { margin-top: auto; border-top: 1px solid var(--surface-border); padding: 2rem 1rem; text-align: center; background: var(--surface-card); }
+.footer-links { display: flex; justify-content: center; gap: 16px; margin-bottom: 12px; flex-wrap: wrap; }
+.footer-links a { color: var(--tonie-red); text-decoration: none; font-size: 12.5px; font-weight: 700; }
+.footer-legal-disclaimer { font-size: 11px; color: var(--text-muted); max-width: 680px; margin: 0 auto; line-height: 1.5; }
+/* ==========================================================================
+10. PRINT ENGINE (Strict 1-Page A4 Lock)
+========================================================================== */
+#printContainer { display: none; }
 @media print {
-.no-print, .container, .modal-shade, body > *:not(#printHost) { display: none !important; }
+.app-header, .stepper-nav, .studio-main, .app-footer, .modal-shade { display: none !important; }
 html, body { background: #FFFFFF !important; margin: 0 !important; padding: 0 !important; width: 100% !important; height: 100% !important; }
-#printHost { display: block !important; position: absolute; top: 0; left: 0; width: 210mm; height: 297mm; background: #FFFFFF; z-index: 999999; overflow: hidden; margin: 0; padding: 0; box-sizing: border-box; }
-.print-format-avery-40 { display: grid; grid-template-columns: repeat(3, 40mm); grid-template-rows: repeat(8, 40mm); justify-content: center; align-content: start; padding-top: 12.5mm; }
-.print-format-avery-30 { display: grid; grid-template-columns: repeat(4, 30mm); grid-template-rows: repeat(12, 30mm); justify-content: center; align-content: start; padding-top: 10mm; }
-.print-format-avery-25 { display: grid; grid-template-columns: repeat(5, 25mm); grid-template-rows: repeat(14, 25mm); justify-content: center; align-content: start; padding-top: 8mm; }
-.print-format-raster-43, .print-format-raster-40, .print-format-raster-30, .print-format-raster-25 { display: flex; flex-wrap: wrap; padding: 10mm; align-content: flex-start; justify-content: center; }
-.print-format-raster-43 { gap: 4mm; }
-.print-format-raster-40 { gap: 4mm; }
-.print-format-raster-30 { gap: 3mm; }
-.print-format-raster-25 { gap: 3mm; }
-.print-cell { border-radius: 50%; box-sizing: border-box; overflow: hidden; position: relative; }
-.print-format-avery-40 .print-cell { width: 40mm; height: 40mm; border: none; }
-.print-format-avery-30 .print-cell { width: 30mm; height: 30mm; border: none; }
-.print-format-avery-25 .print-cell { width: 25mm; height: 25mm; border: none; }
-.print-format-raster-43 .print-cell { width: 43mm; height: 43mm; border: 0.5px dashed #94A3B8; }
-.print-format-raster-40 .print-cell { width: 40mm; height: 40mm; border: 0.5px dashed #94A3B8; }
-.print-format-raster-30 .print-cell { width: 30mm; height: 30mm; border: 0.5px dashed #94A3B8; }
-.print-format-raster-25 .print-cell { width: 25mm; height: 25mm; border: 0.5px dashed #94A3B8; }
+#printContainer { display: block !important; position: absolute; top: 0; left: 0; width: 210mm; height: 297mm; background: #FFFFFF; z-index: 999999; margin: 0; padding: 0; box-sizing: border-box; }
+.print-avery-40 { display: grid; grid-template-columns: repeat(3, 40mm); grid-template-rows: repeat(8, 40mm); justify-content: center; padding-top: 12.5mm; }
+.print-avery-30 { display: grid; grid-template-columns: repeat(4, 30mm); grid-template-rows: repeat(12, 30mm); justify-content: center; padding-top: 10mm; }
+.print-avery-25 { display: grid; grid-template-columns: repeat(5, 25mm); grid-template-rows: repeat(14, 25mm); justify-content: center; padding-top: 8mm; }
+.print-raster-43 { display: flex; flex-wrap: wrap; gap: 4mm; padding: 10mm; justify-content: center; }
+.print-raster-40 { display: flex; flex-wrap: wrap; gap: 4mm; padding: 10mm; justify-content: center; }
+.print-raster-30 { display: flex; flex-wrap: wrap; gap: 3mm; padding: 10mm; justify-content: center; }
+.print-raster-25 { display: flex; flex-wrap: wrap; gap: 3mm; padding: 10mm; justify-content: center; }
+.print-target-circle { border-radius: 50%; box-sizing: border-box; overflow: hidden; position: relative; }
+.print-avery-40 .print-target-circle { width: 40mm; height: 40mm; }
+.print-avery-30 .print-target-circle { width: 30mm; height: 30mm; }
+.print-avery-25 .print-target-circle { width: 25mm; height: 25mm; }
+.print-raster-43 .print-target-circle { width: 43mm; height: 43mm; border: 0.5px dashed #64748B; }
+.print-raster-40 .print-target-circle { width: 40mm; height: 40mm; border: 0.5px dashed #64748B; }
+.print-raster-30 .print-target-circle { width: 30mm; height: 30mm; border: 0.5px dashed #64748B; }
+.print-raster-25 .print-target-circle { width: 25mm; height: 25mm; border: 0.5px dashed #64748B; }
 @page { size: A4 portrait; margin: 0; }
 }
 </style>
 </head>
 <body>
-<div class="container no-print">
-<div class="top-bar">
-<button class="btn-pill" id="btnThemeToggle">
-<span id="themeEmoji">☀️</span> <span id="themeLabel">Dark Mode</span>
+<!-- Header Navigation -->
+<header class="app-header">
+<div class="header-inner">
+<div class="brand-cluster" id="btnLogoHome">
+<svg class="brand-logo-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="50" cy="50" r="48" fill="var(--surface-sub)" stroke="var(--tonie-red)" stroke-width="3"/>
+<circle cx="50" cy="50" r="38" fill="var(--surface-card)" stroke="#94A3B8" stroke-dasharray="3 3"/>
+<path d="M40 50C40 44.5 44.5 40 50 40C55.5 40 60 44.5 60 50" stroke="var(--tonie-red)" stroke-width="3" stroke-linecap="round"/>
+<path d="M33 50C33 40.6 40.6 33 50 33C59.4 33 67 40.6 67 50" stroke="var(--tonie-red)" stroke-width="2.5" stroke-linecap="round" opacity="0.6"/>
+<circle cx="50" cy="62" r="6" fill="var(--tonie-red)"/>
+</svg>
+<div class="brand-titles">
+<div class="brand-name">Tonie & Tag <span>Cover Hub</span></div>
+<div class="brand-tagline">Das Münzkapsel & Avery Studio</div>
+</div>
+</div>
+<div class="header-actions">
+<button class="pill-btn" id="btnThemeToggle" title="Design wechseln">
+<span id="themeIcon">☀️</span> <span id="themeLabel">Dark Mode</span>
 </button>
-<button class="btn-pill" id="btnHelpModal">
-<span>❓</span> Hilfe & Tipps
+<button class="pill-btn" id="btnHelp" title="Druckanleitung & Hilfe">
+<span>❓</span> Hilfe
 </button>
-<button class="btn-pill btn-accent" id="btnDonate">
+<button class="pill-btn accent" id="btnDonate">
 <span>☕</span> Spenden
 </button>
 </div>
-<div class="header">
-<svg class="brand-logo-wrap" viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="55" cy="50" r="36" fill="var(--card-bg)" stroke="#94A3B8" stroke-width="3"/>
-<circle cx="55" cy="50" r="28" fill="#1E293B"/>
-<path d="M46 50C46 45.029 50.029 41 55 41C59.971 41 64 45.029 64 50" stroke="#10B981" stroke-width="2.5" stroke-linecap="round"/>
-<path d="M38 50C38 40.611 45.611 33 55 33C64.389 33 72 40.611 72 50" stroke="#10B981" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
-<g transform="translate(112, 18) rotate(7)">
-<rect x="0" y="0" width="62" height="62" rx="8" fill="#FFFFFF" stroke="#C02741" stroke-width="2"/>
-<circle cx="16" cy="16" r="10" fill="#F1F5F9" stroke="#C02741" stroke-width="1" stroke-dasharray="2 2"/>
-<circle cx="46" cy="16" r="10" fill="#F1F5F9" stroke="#C02741" stroke-width="1" stroke-dasharray="2 2"/>
-<circle cx="16" cy="46" r="10" fill="#F1F5F9" stroke="#C02741" stroke-width="1" stroke-dasharray="2 2"/>
-<circle cx="46" cy="46" r="11" fill="#C02741" />
-<path d="M46 41V51M41 46H51" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round"/>
-</g>
-</svg>
-<div class="title">Tonie & Tag <span>Cover Hub</span></div>
-<div class="brand-subtitle">Der A4-Designer für Münzkapseln, Avery Etiketten & Kreativ-Tonies. (V6.6 Master)</div>
 </div>
-<!-- STEP 1 -->
-<div class="step-card">
-<div class="step-header">
-<div><span class="step-badge">1</span> Motiv auswählen</div>
+</header>
+<!-- Workflow Navigation Stepper -->
+<nav class="stepper-nav">
+<div class="stepper-inner">
+<button class="step-tab active" data-step="1">
+<span class="step-num">1</span>
+<span class="tab-text">Motiv wählen</span>
+</button>
+<button class="step-tab" data-step="2">
+<span class="step-num">2</span>
+<span class="tab-text">Cover gestalten</span>
+</button>
+<button class="step-tab" data-step="3">
+<span class="step-num">3</span>
+<span class="tab-text">Druckbogen befüllen</span>
+</button>
 </div>
-<div class="tab-bar">
-<button class="tab-btn active" id="tabDbBtn">📚 Datenbank</button>
-<button class="tab-btn" id="tabFavBtn">⭐ Favoriten (<span id="favQty">0</span>)</button>
-<button class="tab-btn" id="tabCustomBtn">🖼️ Eigenes Bild</button>
+</nav>
+<!-- Studio Main Workspace -->
+<main class="studio-main">
+<!-- ==========================================
+SCHRITT 1: MOTIV WÄHLEN
+========================================== -->
+<section class="view-section active" id="viewStep1">
+<div class="card-surface">
+<div class="section-headline">
+<span>1. Motiv auswählen</span>
+<span id="badgeCounter" style="font-size: 12px; font-weight: 700; color: var(--tonie-red);">Bereit</span>
 </div>
-<div id="tabDbView">
-<div class="search-row">
-<input type="text" id="dbSearchInput" class="search-field" placeholder="Titel, Serie oder ID suchen...">
-<button class="search-clear-btn" id="searchClearBtn">✕</button>
-<button class="search-btn-icon" id="btnRandomTonie" title="Zufälliges Motiv">🎲</button>
+<p class="section-desc">Durchsuche tausende Community-Tonies, greife auf Favoriten zu oder lade dein eigenes Foto hoch.</p>
+<div class="sub-tab-bar">
+<button class="sub-tab active" id="subTabDb">📚 Tonie-Datenbank</button>
+<button class="sub-tab" id="subTabFav">⭐ Favoriten (<span id="favCountBadge">0</span>)</button>
+<button class="sub-tab" id="subTabCustom">🖼️ Eigenes Bild / Kreativ</button>
 </div>
-<div class="status-row">
-<span class="status-indicator">
-<span class="status-dot active" id="dbStatusDot"></span>
-<span id="dbStatusText">Bereit</span>
-</span>
-<span id="dbResultCounter">Lade...</span>
+<!-- Database View -->
+<div id="subViewDb">
+<div class="search-bar-wrap">
+<input type="text" id="searchInput" class="search-input-field" placeholder="Titel, Serie oder ID suchen (z.B. Conni, TKKG, Olchis)...">
+<button class="search-clear-cross" id="searchClearBtn">✕</button>
+<button class="icon-btn-square" id="btnRandom" title="Zufälliges Motiv">🎲</button>
 </div>
-<div class="items-grid" id="toniesGrid"></div>
+<div class="status-strip">
+<span><span class="status-dot online" id="statusDot"></span><span id="statusLabel">Offline-Bibliothek bereit</span></span>
+<span id="resultCountLabel">6 Motive</span>
 </div>
-<div id="tabCustomView" class="upload-dropzone">
-<input type="file" id="imgFileInput" accept="image/*" style="display:none;">
-<div style="font-size: 32px; margin-bottom: 6px;">📸</div>
-<div style="font-weight: 700; color: var(--text-main);">Eigenes Foto oder Grafik hochladen</div>
-<div style="font-size: 12px; color: var(--text-muted); margin-top: 3px;">Perfekt für Kreativ-Tonies & individuelle Tags</div>
+<div class="motives-grid" id="motivesGrid"></div>
 </div>
-</div>
-<!-- STEP 2 -->
-<div class="step-card">
-<div class="step-header">
-<div><span class="step-badge">2</span> Etikett gestalten</div>
-</div>
-<div class="mode-switch-wrap">
-<button class="mode-toggle-btn active" id="btnModeSimple">⚡ Simpel (Papa Express)</button>
-<button class="mode-toggle-btn" id="btnModePro">🛠️ Pro (Nerd & Dumper)</button>
-</div>
-<div class="form-row-fields">
-<div class="field-group">
-<label class="field-label" for="inputTitle">1. Titel / Serie (Oben)</label>
-<input type="text" id="inputTitle" class="field-input" value="TKKG Junior" placeholder="z.B. Conni oder TKKG">
-</div>
-<div class="field-group">
-<label class="field-label" for="inputAlbum">2. Album / Folge</label>
-<input type="text" id="inputAlbum" class="field-input" value="Alarm im Freizeitpark" placeholder="z.B. feiert Geburtstag">
+<!-- Custom Upload View -->
+<div id="subViewCustom" class="dropzone-box">
+<input type="file" id="fileUploadInput" accept="image/*" style="display:none;">
+<div style="font-size: 38px; margin-bottom: 8px;">📷</div>
+<div style="font-size: 15px; font-weight: 800;">Eigenes Foto oder Grafik hochladen</div>
+<div style="font-size: 12.5px; color: var(--text-muted); margin-top: 4px;">Perfekt für selbst besprochene Kreativ-Tonies & individuelle Tags</div>
 </div>
 </div>
-<div class="id-control-row">
-<div class="field-group id-input-wrap">
-<label class="field-label" for="inputBottomId">3. Tonie-ID</label>
-<input type="text" id="inputBottomId" class="field-input" value="01-0182" placeholder="z.B. 01-0001">
+</section>
+<!-- ==========================================
+SCHRITT 2: COVER GESTALTEN
+========================================== -->
+<section class="view-section" id="viewStep2">
+<div class="card-surface">
+<div class="editor-split-layout">
+<!-- Left: Controls -->
+<div class="editor-form-col">
+<div class="section-headline">
+<span>2. Etikett anpassen</span>
 </div>
-<div class="switch-container" id="switchWrapId">
-<label class="toggle-switch">
-<input type="checkbox" id="toggleShowId" checked>
-<span class="toggle-slider"></span>
+<p class="section-desc">Passe Titel, Album und ID an oder wechsle in den Pro-Modus für Feinschliff & Dumper-IDs.</p>
+<div class="mode-toggle-cluster">
+<button class="mode-switch-btn active" id="btnModeSimple">⚡ Simpel (Papa Express)</button>
+<button class="mode-switch-btn" id="btnModePro">🛠️ Pro (Nerd & Dumper)</button>
+</div>
+<div class="fields-grid">
+<div class="field-unit">
+<label for="inputSeries">1. Titel / Serie (Oberer Bogen)</label>
+<input type="text" id="inputSeries" value="TKKG Junior" placeholder="z.B. Conni oder TKKG">
+</div>
+<div class="field-unit">
+<label for="inputAlbum">2. Album / Folge</label>
+<input type="text" id="inputAlbum" value="Alarm im Freizeitpark" placeholder="z.B. feiert Geburtstag">
+</div>
+<div class="id-switch-row">
+<div class="field-unit" style="flex:1;">
+<label for="inputId">3. Tonie-ID</label>
+<input type="text" id="inputId" value="01-0182" placeholder="z.B. 01-0001">
+</div>
+<div class="toggle-switch-card" id="toggleSwitchCard">
+<label class="switch-toggle-checkbox">
+<input type="checkbox" id="checkShowId" checked>
+<span class="switch-toggle-slider"></span>
 </label>
-<span class="switch-label-text">ID aufdrucken</span>
+<span style="font-size: 12px; font-weight: 800;">ID drucken</span>
 </div>
 </div>
-<div class="preset-pills-row">
-<span class="preset-badge" data-preset="Hörspiel">Hörspiel</span>
-<span class="preset-badge" data-preset="Kinderlieder">Kinderlieder</span>
-<span class="preset-badge" data-preset="Mein Tonie">Mein Tonie</span>
-<span class="preset-badge" data-preset="Kreativ">Kreativ</span>
-<span class="preset-badge" data-preset="Gute Nacht">Gute Nacht</span>
 </div>
-<div class="pro-controls" id="proToolsPanel">
-<div class="slider-control">
-<span class="slider-name">Zoom</span>
-<input type="range" id="sliderZoom" class="slider-range" min="60" max="140" value="100">
+<!-- Quick Presets -->
+<div class="quick-presets-row">
+<span class="preset-badge-btn" data-val="Hörspiel">Hörspiel</span>
+<span class="preset-badge-btn" data-val="Kinderlieder">Kinderlieder</span>
+<span class="preset-badge-btn" data-val="Mein Tonie">Mein Tonie</span>
+<span class="preset-badge-btn" data-val="Kreativ">Kreativ</span>
+<span class="preset-badge-btn" data-val="Gute Nacht">Gute Nacht</span>
 </div>
-<div class="slider-control">
-<span class="slider-name">Rotation</span>
-<input type="range" id="sliderRotation" class="slider-range" min="-180" max="180" value="0">
+<!-- Pro Controls Panel -->
+<div class="pro-settings-box" id="proSettingsPanel">
+<div class="pro-slider-row">
+<span>Zoom:</span>
+<input type="range" id="sliderZoom" min="60" max="140" value="100">
 </div>
-<div style="display: flex; justify-content: space-between; align-items: center; background: var(--input-bg); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-color); margin-top: 8px;">
-<span style="font-size: 10.5px; color: var(--text-muted); text-transform: uppercase;">Audio-ID / Dumper:</span>
-<span style="font-family: monospace; font-size: 11px; color: var(--tonie-red); font-weight: 700;" id="dumpAudioIdLabel">1520593821</span>
-<button class="btn-pill" id="btnCopyAudioId" style="padding: 3px 8px; font-size: 10px;">Kopieren</button>
+<div class="pro-slider-row">
+<span>Drehung:</span>
+<input type="range" id="sliderRotate" min="-180" max="180" value="0">
+</div>
+<div style="display:flex; justify-content:space-between; align-items:center; background:var(--input-bg); padding:8px 12px; border-radius:10px; border:1px solid var(--surface-border); margin-top:8px;">
+<span style="font-size:11px; font-weight:700; color:var(--text-muted);">AUDIO-ID (DUMPER / TEDDY):</span>
+<span style="font-family:monospace; font-size:11.5px; color:var(--tonie-red); font-weight:800;" id="labelAudioId">1520593821</span>
+<button class="pill-btn" id="btnCopyAudioId" style="padding:2px 8px; font-size:10.5px;">Kopieren</button>
 </div>
 </div>
-<div class="preview-canvas-box">
-<div class="sticker-stage" id="masterStickerPreview"></div>
+<button class="pill-btn accent" id="btnGoToSheet" style="width: 100%; justify-content: center; padding: 12px;">
+Weiter zu Schritt 3: Druckbogen befüllen ➔
+</button>
+</div>
+<!-- Right: Live Münzkapsel Stage -->
+<div class="capsule-stage-wrapper">
+<div style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 12px;">
+Echtzeit Münzkapsel-Vorschau
+</div>
+<div class="capsule-realistic-ring">
+<div class="capsule-inner-sticker" id="livePreviewStage"></div>
+</div>
+<div style="font-size: 11px; color: var(--text-secondary); margin-top: 12px; text-align: center;">
+Runde, mathematisch zentrierte SVG-Typografie
 </div>
 </div>
-<!-- STEP 3 -->
-<div class="step-card">
-<div class="step-header">
-<div><span class="step-badge">3</span> Druckbogen befüllen</div>
-<span id="sheetSlotCountBadge" style="font-size: 11px; font-weight: 700; color: var(--tonie-red);">24 Etiketten</span>
 </div>
-<div class="form-row-fields" style="margin-bottom: 12px;">
-<div class="field-group">
-<label class="field-label" for="selectPrintSystem">1. Drucksystem</label>
-<select id="selectPrintSystem" class="field-input">
+</div>
+</section>
+<!-- ==========================================
+SCHRITT 3: DRUCKBOGEN BEFÜLLEN
+========================================== -->
+<section class="view-section" id="viewStep3">
+<div class="card-surface">
+<div class="section-headline">
+<span>3. Druckbogen konfigurieren</span>
+<span id="sheetInfoBadge" style="font-size: 12px; font-weight: 700; color: var(--tonie-red);">24 Etiketten</span>
+</div>
+<p class="section-desc">Wähle dein Drucksystem. Klicke auf einzelne Kreise, um gezielt nur freie Stellen auf deinem Bogen zu bedrucken.</p>
+<div class="format-selection-grid">
+<div class="field-unit">
+<label for="selectSystem">1. Drucksystem</label>
+<select id="selectSystem" class="select-field">
 <option value="avery" selected>🏷️ Avery Zweckform (Vorgestanzt)</option>
 <option value="raster">✂️ Freies Raster (Münzkapseln & DIY)</option>
 </select>
 </div>
-<div class="field-group">
-<label class="field-label" for="selectPrintSize">2. Format & Größe</label>
-<select id="selectPrintSize" class="field-input"></select>
+<div class="field-unit">
+<label for="selectSize">2. Format & Größe</label>
+<select id="selectSize" class="select-field"></select>
 </div>
 </div>
-<p style="font-size: 12px; color: var(--text-muted); text-align: center; margin-bottom: 8px;">
-Klicke auf einen Kreis, um dein aktuelles Cover dort zu platzieren.
-</p>
-<div class="sheet-interactive-wrap">
-<div class="sheet-matrix matrix-avery-40" id="sheetMatrixUi"></div>
+<!-- Interactive Matrix Sheet -->
+<div class="sheet-board-area">
+<div class="sheet-paper matrix-avery-40" id="sheetPaperUi"></div>
 </div>
-<div class="sheet-btn-bar">
-<button class="btn-pill" id="btnFillAll">Alle füllen</button>
-<button class="btn-pill" id="btnClearSheet">Bogen leeren</button>
+<div class="sheet-tools-bar">
+<button class="pill-btn" id="btnFillSheet">Alle Kreise füllen</button>
+<button class="pill-btn" id="btnClearSheet">Bogen leeren</button>
 </div>
-<div class="action-actions-grid">
-<button class="btn-print-large" id="btnPrintA4">
-🖨️ A4 Bogen Drucken
+<div class="action-exports-grid">
+<button class="big-action-btn print-btn" id="btnPrintA4">
+🖨️ A4 Bogen Drucken (1 Seite)
 </button>
-<button class="btn-export-png" id="btnExportPng">
+<button class="big-action-btn png-btn" id="btnExportPng">
 💾 300 DPI Bild (Plotter/PNG)
 </button>
 </div>
 </div>
-<!-- Footer -->
-<div class="footer-wrap">
-<div class="footer-nav">
-<a href="https://www.avery-zweckform.com" target="_blank" rel="noopener">🏷️ Avery Zweckform</a>
-<a href="http://rfidfriend.com/" target="_blank" rel="noopener">📡 RFIDfriend Tags</a>
-<a href="https://github.com/toniebox-reverse-engineering" target="_blank" rel="noopener">🐙 Team RevvoX</a>
-<a href="https://github.com/stevenious" target="_blank" rel="noopener">💻 GitHub</a>
+</section>
+</main>
+<!-- Footer & Legal -->
+<footer class="app-footer">
+<div class="footer-links">
+<a href="https://www.avery-zweckform.com" target="_blank" rel="noopener">Avery Zweckform</a>
+<a href="http://rfidfriend.com/" target="_blank" rel="noopener">RFIDfriend Tags</a>
+<a href="https://github.com/toniebox-reverse-engineering" target="_blank" rel="noopener">Team RevvoX</a>
+<a href="https://github.com/stevenious" target="_blank" rel="noopener">GitHub</a>
 </div>
-<div class="footer-disclaimer">
+<div class="footer-legal-disclaimer">
 Dieses Open-Source Community-Tool steht in keinerlei rechtlicher oder geschäftlicher Verbindung zur Boxine GmbH.
 
 "Tonie", "Tonies" und "Toniebox" sind eingetragene Marken der Boxine GmbH.
 
-Metadaten bereitgestellt durch das RevvoX Reverse-Engineering Projekt.
+Metadaten bereitgestellt durch das offizielle RevvoX Reverse-Engineering Projekt.
 </div>
-</div>
-</div>
-<div id="printHost"></div>
+</footer>
+<!-- Print Host (Only displayed during Ctrl+P / print) -->
+<div id="printContainer"></div>
+<!-- Help & Guide Modal -->
 <div class="modal-shade" id="helpModal">
-<div class="modal-body" id="helpModalBody">
-<h3>💡 Tipps & Druckanleitung</h3>
-<p><b>Druckereinstellungen (Essentiell):</b></p>
+<div class="modal-dialog">
+<h3>💡 Druckanleitung & Profi-Tipps</h3>
+<p><b>Druckereinstellungen (Sehr wichtig):</b></p>
 <ul>
-<li>Skalierung im Druckdialog zwingend auf <b>100%</b> oder <b>"Tatsächliche Größe"</b> stellen!</li>
-<li>Niemals "An Seite anpassen" wählen, da sonst die Etiketten auf Avery-Bögen verrutschen.</li>
+<li>Skalierung im Druckdialog zwingend auf <b>100%</b> oder <b>"Tatsächliche Größe"</b> stellen.</li>
+<li>Niemals <i>"An Seite anpassen"</i> wählen – sonst verrutschen die Etiketten auf Avery-Bögen!</li>
 </ul>
 <p><b>Drucksysteme:</b></p>
 <ul>
-<li><b>Avery Zweckform:</b> Exakt auf vorgestanzte A4-Bögen kalibriert (z.B. L3415 à 40mm).</li>
-<li><b>Freies Raster:</b> Druckt feine Schnittlinien zum sauberen Ausschneiden für Münzkapseln (43mm, 40mm, 30mm, 25mm).</li>
+<li><b>Avery Zweckform:</b> Exakt auf vorgestanzte A4-Bögen (z.B. L3415 à 40mm) kalibriert.</li>
+<li><b>Freies Raster:</b> Druckt feine Schnittlinien für Schere oder Kreisschneider (43mm, 40mm, 30mm, 25mm).</li>
 </ul>
-<p><b>Plotter & Kopiershop:</b></p>
-<p>Nutze den Button <b>"300 DPI Bild"</b>, um eine verlustfreie Grafik für Schneideplotter oder Fotodrucker herunterzuladen.</p>
-<button class="modal-close-btn" id="btnCloseHelp">Verstanden</button>
+<p><b>Resteverwertung von Bögen:</b></p>
+<p>In Schritt 3 kannst du jeden Kreis einzeln anklicken. Wenn auf deinem Bogen die ersten 3 Etiketten fehlen, klicke einfach ab Kreis 4!</p>
+<button class="pill-btn accent" id="btnCloseHelp" style="width: 100%; justify-content: center; margin-top: 10px;">Verstanden</button>
 </div>
 </div>
+<!-- ==========================================================================
+JAVASCRIPT STUDIO ARCHITECTURE (100% BULLETPROOF)
+========================================================================== -->
 <script>
-function safeStorageGet(key, fallback) {
+(function() {
+"use strict";
+// Safe Storage Helpers
+function getStorage(key, fallback) {
 try {
 const val = localStorage.getItem(key);
 return (val !== null && val !== undefined) ? val : fallback;
-} catch (e) { return fallback; }
+} catch(e) { return fallback; }
 }
-function safeJsonParse(rawString, fallback) {
-if (!rawString || typeof rawString !== 'string') return fallback;
+function setStorage(key, val) {
+try { localStorage.setItem(key, typeof val === 'string' ? val : JSON.stringify(val)); } catch(e) {}
+}
+function parseJson(str, fallback) {
 try {
-const parsed = JSON.parse(rawString);
-return Array.isArray(fallback) ? (Array.isArray(parsed) ? parsed : fallback) : parsed;
-} catch (e) { return fallback; }
+const res = JSON.parse(str);
+return res || fallback;
+} catch(e) { return fallback; }
 }
-function safeStorageSet(key, val) {
-try { localStorage.setItem(key, typeof val === 'string' ? val : JSON.stringify(val)); } catch (e) {}
+function encodeSvgUri(svg) {
+return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg.trim());
 }
-function svgToUri(rawSvg) {
-return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(rawSvg.trim());
-}
-window.app = {
-theme: safeStorageGet('tonie_theme', 'light'),
+const AppStudio = {
+currentStep: 1,
+theme: getStorage('tonie_theme', 'light'),
 editorMode: 'simple',
-activeTab: 'db',
+activeSubTab: 'db',
 db: [],
-favorites: safeJsonParse(safeStorageGet('tonie_favs', '[]'), []),
+favorites: parseJson(getStorage('tonie_favs', '[]'), []),
 selectedTonie: null,
-searchTimer: null,
+searchDebounceTimer: null,
 currentSystem: 'avery',
 currentFormatKey: 'avery-40',
 formats: {
@@ -402,110 +525,128 @@ formats: {
 },
 sheetSlots: new Array(24).fill(null),
 fallbackLibrary: [
-{ id: "01-0182", title: "Alarm im Freizeitpark", series: "TKKG Junior", audio_id: "1520593821", pic: svgToUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#C02741'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><path d='M32 45h36M50 45v30' stroke='#C02741' stroke-width='6' stroke-linecap='round'/><text x='50' y='32' font-family='sans-serif' font-size='14' font-weight='bold' text-anchor='middle' fill='#C02741'>TKKG</text></svg>") },
-{ id: "01-0180", title: "Das Phantom auf dem Feuerstuhl", series: "TKKG", audio_id: "1520593800", pic: svgToUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#1E293B'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><text x='50' y='58' font-family='sans-serif' font-size='20' font-weight='900' text-anchor='middle' fill='#1E293B'>TKKG</text></svg>") },
-{ id: "01-0010", title: "Conni feiert Geburtstag", series: "Conni", audio_id: "1520593010", pic: svgToUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#F59E0B'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><path d='M30 40h40v30H30z' fill='#E11D48'/><circle cx='50' cy='30' r='10' fill='#FCD34D'/><text x='50' y='85' font-family='sans-serif' font-size='10' font-weight='bold' text-anchor='middle' fill='#E11D48'>CONNI</text></svg>") },
-{ id: "01-0305", title: "Die Olchis sind da", series: "Die Olchis", audio_id: "1520593305", pic: svgToUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#84CC16'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><circle cx='38' cy='46' r='5' fill='#000'/><circle cx='62' cy='46' r='5' fill='#000'/><path d='M40 65q10 8 20 0' stroke='#000' stroke-width='3' fill='none'/><text x='50' y='28' font-family='sans-serif' font-size='11' font-weight='bold' text-anchor='middle' fill='#4D7C0F'>OLCHIS</text></svg>") },
-{ id: "01-0412", title: "Hexen hexen", series: "Bibi Blocksberg", audio_id: "1520593412", pic: svgToUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#10B981'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><path d='M25 65l50-25' stroke='#047857' stroke-width='4' stroke-linecap='round'/><text x='50' y='32' font-family='sans-serif' font-size='12' font-weight='bold' text-anchor='middle' fill='#047857'>BIBI</text></svg>") },
-{ id: "01-0910", title: "Kreativ-Tonie Rot", series: "Kreativ-Tonie", audio_id: "1520593910", pic: svgToUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#C02741'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><circle cx='50' cy='38' r='12' fill='#C02741'/><path d='M35 72c0-10 7-18 15-18s15 8 15 18z' fill='#C02741'/></svg>") },
-{ id: "01-0920", title: "Das Gespensterschloss", series: "Die drei ???", audio_id: "1520593920", pic: svgToUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#000000'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><text x='35' y='58' font-family='sans-serif' font-size='22' font-weight='900' fill='#FFFFFF'>?</text><text x='50' y='58' font-family='sans-serif' font-size='22' font-weight='900' fill='#E11D48'>?</text><text x='65' y='58' font-family='sans-serif' font-size='22' font-weight='900' fill='#2563EB'>?</text></svg>") },
-{ id: "01-0001", title: "Oh, wie schön ist Panama", series: "Janosch", audio_id: "1520593001", pic: svgToUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#FBBF24'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><text x='50' y='58' font-family='sans-serif' font-size='12' font-weight='800' text-anchor='middle' fill='#B45309'>PANAMA</text></svg>") }
+{ id: "01-0182", title: "Alarm im Freizeitpark", series: "TKKG Junior", audio_id: "1520593821", pic: encodeSvgUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#C02741'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><path d='M32 45h36M50 45v30' stroke='#C02741' stroke-width='6' stroke-linecap='round'/><text x='50' y='32' font-family='sans-serif' font-size='14' font-weight='bold' text-anchor='middle' fill='#C02741'>TKKG</text></svg>") },
+{ id: "01-0180", title: "Das Phantom auf dem Feuerstuhl", series: "TKKG", audio_id: "1520593800", pic: encodeSvgUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#1E293B'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><text x='50' y='58' font-family='sans-serif' font-size='20' font-weight='900' text-anchor='middle' fill='#1E293B'>TKKG</text></svg>") },
+{ id: "01-0010", title: "Conni feiert Geburtstag", series: "Conni", audio_id: "1520593010", pic: encodeSvgUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#F59E0B'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><path d='M30 40h40v30H30z' fill='#E11D48'/><circle cx='50' cy='30' r='10' fill='#FCD34D'/><text x='50' y='85' font-family='sans-serif' font-size='10' font-weight='bold' text-anchor='middle' fill='#E11D48'>CONNI</text></svg>") },
+{ id: "01-0305", title: "Die Olchis sind da", series: "Die Olchis", audio_id: "1520593305", pic: encodeSvgUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#84CC16'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><circle cx='38' cy='46' r='5' fill='#000'/><circle cx='62' cy='46' r='5' fill='#000'/><path d='M40 65q10 8 20 0' stroke='#000' stroke-width='3' fill='none'/><text x='50' y='28' font-family='sans-serif' font-size='11' font-weight='bold' text-anchor='middle' fill='#4D7C0F'>OLCHIS</text></svg>") },
+{ id: "01-0920", title: "Das Gespensterschloss", series: "Die drei ???", audio_id: "1520593920", pic: encodeSvgUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#000000'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><text x='35' y='58' font-family='sans-serif' font-size='22' font-weight='900' fill='#FFFFFF'>?</text><text x='50' y='58' font-family='sans-serif' font-size='22' font-weight='900' fill='#E11D48'>?</text><text x='65' y='58' font-family='sans-serif' font-size='22' font-weight='900' fill='#2563EB'>?</text></svg>") },
+{ id: "01-0910", title: "Kreativ-Tonie Rot", series: "Kreativ-Tonie", audio_id: "1520593910", pic: encodeSvgUri("<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#C02741'/><circle cx='50' cy='50' r='42' fill='#FFFFFF'/><circle cx='50' cy='38' r='12' fill='#C02741'/><path d='M35 72c0-10 7-18 15-18s15 8 15 18z' fill='#C02741'/></svg>") }
 ],
 init: function() {
 this.applyTheme(this.theme);
-this.bindUiEvents();
-this.updateFavCounterBadge();
 this.db = [...this.fallbackLibrary];
-this.populateSizeDropdown();
-this.renderItemsGrid(this.db);
-this.selectTonieItem(this.db[0]);
-this.renderSheetMatrixUi();
-this.fetchRevvoxDatabaseWithTimeout();
-},
-bindUiEvents: function() {
-document.getElementById('btnThemeToggle')?.addEventListener('click', () => this.toggleTheme());
-document.getElementById('btnHelpModal')?.addEventListener('click', () => this.openHelpModal());
-document.getElementById('btnCloseHelp')?.addEventListener('click', () => this.closeHelpModal());
-document.getElementById('helpModal')?.addEventListener('click', (e) => {
-if (e.target.id === 'helpModal') this.closeHelpModal();
-});
-document.getElementById('btnDonate')?.addEventListener('click', () => {
-alert("Vielen Dank für deine Unterstützung des Tonie Community-Tools! ❤️");
-});
-document.getElementById('tabDbBtn')?.addEventListener('click', () => this.switchPickerTab('db'));
-document.getElementById('tabFavBtn')?.addEventListener('click', () => this.switchPickerTab('fav'));
-document.getElementById('tabCustomBtn')?.addEventListener('click', () => this.switchPickerTab('custom'));
-const dropzone = document.getElementById('tabCustomView');
-const fileInput = document.getElementById('imgFileInput');
-if (dropzone && fileInput) {
-dropzone.addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', (e) => this.handleCustomUpload(e));
-}
-const searchInput = document.getElementById('dbSearchInput');
-searchInput?.addEventListener('input', () => this.handleSearchDebounced());
-document.getElementById('searchClearBtn')?.addEventListener('click', () => this.clearSearchInput());
-document.getElementById('btnRandomTonie')?.addEventListener('click', () => this.selectRandomItem());
-document.getElementById('btnModeSimple')?.addEventListener('click', () => this.setEditorMode('simple'));
-document.getElementById('btnModePro')?.addEventListener('click', () => this.setEditorMode('pro'));
-document.getElementById('inputTitle')?.addEventListener('input', () => this.refreshPreview());
-document.getElementById('inputAlbum')?.addEventListener('input', () => this.refreshPreview());
-document.getElementById('inputBottomId')?.addEventListener('input', () => this.refreshPreview());
-document.getElementById('toggleShowId')?.addEventListener('change', () => this.refreshPreview());
-document.getElementById('sliderZoom')?.addEventListener('input', () => this.refreshPreview());
-document.getElementById('sliderRotation')?.addEventListener('input', () => this.refreshPreview());
-document.getElementById('btnCopyAudioId')?.addEventListener('click', () => this.copyAudioId());
-document.querySelectorAll('.preset-badge').forEach(badge => {
-badge.addEventListener('click', () => {
-const text = badge.getAttribute('data-preset');
-if (text) this.applyPreset(text);
-});
-});
-document.getElementById('selectPrintSystem')?.addEventListener('change', () => this.onSystemChange());
-document.getElementById('selectPrintSize')?.addEventListener('change', () => this.onSizeChange());
-document.getElementById('btnFillAll')?.addEventListener('click', () => this.fillAllSlotsWithActive());
-document.getElementById('btnClearSheet')?.addEventListener('click', () => this.clearSheetSlots());
-document.getElementById('btnPrintA4')?.addEventListener('click', () => this.triggerA4Print());
-document.getElementById('btnExportPng')?.addEventListener('click', () => this.exportHighResPng());
-document.addEventListener('keydown', (e) => {
-if (e.key === 'Escape') this.closeHelpModal();
-});
+this.bindEvents();
+this.updateFavBadge();
+this.populateSizes();
+this.renderMotives(this.db);
+this.selectTonie(this.db[0]);
+this.renderSheetMatrix();
+this.fetchOnlineRevvoxData();
 },
 applyTheme: function(theme) {
 this.theme = theme;
 document.documentElement.setAttribute('data-theme', theme);
-document.body.setAttribute('data-theme', theme);
-safeStorageSet('tonie_theme', theme);
+setStorage('tonie_theme', theme);
 const isLight = theme === 'light';
-const emojiEl = document.getElementById('themeEmoji');
-const labelEl = document.getElementById('themeLabel');
-if (emojiEl) emojiEl.innerText = isLight ? '☀️' : '🌙';
-if (labelEl) labelEl.innerText = isLight ? 'Dark Mode' : 'Light Mode';
+const icon = document.getElementById('themeIcon');
+const label = document.getElementById('themeLabel');
+if (icon) icon.innerText = isLight ? '☀️' : '🌙';
+if (label) label.innerText = isLight ? 'Dark Mode' : 'Light Mode';
 },
 toggleTheme: function() {
 this.applyTheme(this.theme === 'light' ? 'dark' : 'light');
 },
-updateStatusText: function(text, isOnline) {
-const textEl = document.getElementById('dbStatusText');
-const dotEl = document.getElementById('dbStatusDot');
-if (textEl) textEl.innerText = text;
-if (dotEl) dotEl.className = 'status-dot' + (isOnline ? ' active' : '');
+setStep: function(stepNum) {
+this.currentStep = stepNum;
+document.querySelectorAll('.step-tab').forEach(tab => {
+tab.classList.toggle('active', parseInt(tab.getAttribute('data-step')) === stepNum);
+});
+document.getElementById('viewStep1').classList.toggle('active', stepNum === 1);
+document.getElementById('viewStep2').classList.toggle('active', stepNum === 2);
+document.getElementById('viewStep3').classList.toggle('active', stepNum === 3);
+window.scrollTo({ top: 0, behavior: 'smooth' });
 },
-fetchRevvoxDatabaseWithTimeout: async function() {
-this.updateStatusText("Suche nach Tonies...", false);
-const sources = [
+bindEvents: function() {
+// Header buttons
+document.getElementById('btnLogoHome')?.addEventListener('click', () => this.setStep(1));
+document.getElementById('btnThemeToggle')?.addEventListener('click', () => this.toggleTheme());
+document.getElementById('btnHelp')?.addEventListener('click', () => this.toggleHelpModal(true));
+document.getElementById('btnCloseHelp')?.addEventListener('click', () => this.toggleHelpModal(false));
+document.getElementById('helpModal')?.addEventListener('click', (e) => {
+if (e.target.id === 'helpModal') this.toggleHelpModal(false);
+});
+document.getElementById('btnDonate')?.addEventListener('click', () => {
+alert("Vielen Dank für deine Unterstützung des Tonie Community-Tools! ❤️");
+});
+// Stepper tabs
+document.querySelectorAll('.step-tab').forEach(tab => {
+tab.addEventListener('click', () => {
+const step = parseInt(tab.getAttribute('data-step'));
+if (step) this.setStep(step);
+});
+});
+// Sub-tabs in Step 1
+document.getElementById('subTabDb')?.addEventListener('click', () => this.switchSubTab('db'));
+document.getElementById('subTabFav')?.addEventListener('click', () => this.switchSubTab('fav'));
+document.getElementById('subTabCustom')?.addEventListener('click', () => this.switchSubTab('custom'));
+// Upload
+const dropzone = document.getElementById('subViewCustom');
+const fileInput = document.getElementById('fileUploadInput');
+if (dropzone && fileInput) {
+dropzone.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', (e) => this.handleCustomUpload(e));
+}
+// Search
+const searchInput = document.getElementById('searchInput');
+searchInput?.addEventListener('input', () => this.handleSearchInput());
+document.getElementById('searchClearBtn')?.addEventListener('click', () => this.clearSearch());
+document.getElementById('btnRandom')?.addEventListener('click', () => this.pickRandomTonie());
+// Step 2 Editor
+document.getElementById('btnModeSimple')?.addEventListener('click', () => this.setMode('simple'));
+document.getElementById('btnModePro')?.addEventListener('click', () => this.setMode('pro'));
+document.getElementById('inputSeries')?.addEventListener('input', () => this.refreshPreview());
+document.getElementById('inputAlbum')?.addEventListener('input', () => this.refreshPreview());
+document.getElementById('inputId')?.addEventListener('input', () => this.refreshPreview());
+document.getElementById('checkShowId')?.addEventListener('change', () => this.refreshPreview());
+document.getElementById('sliderZoom')?.addEventListener('input', () => this.refreshPreview());
+document.getElementById('sliderRotate')?.addEventListener('input', () => this.refreshPreview());
+document.getElementById('btnCopyAudioId')?.addEventListener('click', () => this.copyAudioId());
+document.querySelectorAll('.preset-badge-btn').forEach(btn => {
+btn.addEventListener('click', () => {
+const val = btn.getAttribute('data-val');
+if (val) {
+const albumInput = document.getElementById('inputAlbum');
+if (albumInput) albumInput.value = val;
+this.refreshPreview();
+}
+});
+});
+document.getElementById('btnGoToSheet')?.addEventListener('click', () => this.setStep(3));
+// Step 3 Matrix
+document.getElementById('selectSystem')?.addEventListener('change', () => this.onSystemChange());
+document.getElementById('selectSize')?.addEventListener('change', () => this.onSizeChange());
+document.getElementById('btnFillSheet')?.addEventListener('click', () => this.fillEntireSheet());
+document.getElementById('btnClearSheet')?.addEventListener('click', () => this.clearEntireSheet());
+document.getElementById('btnPrintA4')?.addEventListener('click', () => this.runPrintA4());
+document.getElementById('btnExportPng')?.addEventListener('click', () => this.runExportPng());
+},
+fetchOnlineRevvoxData: async function() {
+const statusDot = document.getElementById('statusDot');
+const statusLabel = document.getElementById('statusLabel');
+const urls = [
 'https://cdn.jsdelivr.net/gh/toniebox-reverse-engineering/tonies-json@release/tonies.json',
 'https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json'
 ];
-for (const url of sources) {
+for (const u of urls) {
 try {
 const controller = new AbortController();
-const timeoutId = setTimeout(() => controller.abort(), 3500); // 3.5s hard timeout to prevent mobile freezes
-const res = await fetch(url, { signal: controller.signal, cache: 'force-cache' });
-clearTimeout(timeoutId);
+const timer = setTimeout(() => controller.abort(), 4000);
+const res = await fetch(u, { signal: controller.signal, cache: 'force-cache' });
+clearTimeout(timer);
 if (!res.ok) continue;
-const raw = await res.json();
-if (Array.isArray(raw) && raw.length > 0) {
-this.db = raw.map(item => {
+const data = await res.json();
+if (Array.isArray(data) && data.length > 0) {
+this.db = data.map(item => {
 const mId = String(item.model || item.id || item.article || 'N/A').trim();
 const mSeries = String(item.series || 'Tonie').trim();
 let mTitle = String(item.episodes || item.episode || item.title || item.name || 'Ohne Titel').trim();
@@ -514,117 +655,102 @@ mTitle = mTitle.substring(mSeries.length).replace(/^[\s-–:]+/, '').trim() || m
 }
 const mPic = String(item.pic || item.image || item.image_url || '').trim();
 let mAudio = '';
-if (Array.isArray(item.audio_id)) {
-mAudio = String(item.audio_id[0] || '').trim();
-} else if (item.audio_id !== null && item.audio_id !== undefined) {
-mAudio = String(item.audio_id).trim();
-}
+if (Array.isArray(item.audio_id)) mAudio = String(item.audio_id[0] || '').trim();
+else if (item.audio_id !== null && item.audio_id !== undefined) mAudio = String(item.audio_id).trim();
 return { id: mId, title: mTitle, series: mSeries, pic: mPic, audio_id: mAudio };
 });
-this.updateStatusText(⁠${this.db.length} Tonies bereit⁠, true);
-this.filterAndRenderSearch();
+if (statusDot) statusDot.className = 'status-dot online';
+if (statusLabel) statusLabel.innerText = ⁠${this.db.length} Tonies geladen⁠;
+this.runSearchFilter();
 return;
 }
-} catch (err) {
-console.warn(⁠Fetch timeout or notice:⁠, err);
+} catch(e) {
+console.warn("Revvox fetch noticed, falling back gracefully.");
 }
 }
-this.updateStatusText(⁠${this.db.length} Motive (Basis)⁠, true);
-this.filterAndRenderSearch();
 },
-setEditorMode: function(mode) {
-this.editorMode = mode;
-const btnSimple = document.getElementById('btnModeSimple');
-const btnPro = document.getElementById('btnModePro');
-const proPanel = document.getElementById('proToolsPanel');
-if (btnSimple) btnSimple.className = 'mode-toggle-btn' + (mode === 'simple' ? ' active' : '');
-if (btnPro) btnPro.className = 'mode-toggle-btn' + (mode === 'pro' ? ' active' : '');
-if (proPanel) proPanel.style.display = mode === 'pro' ? 'block' : 'none';
+switchSubTab: function(tabKey) {
+this.activeSubTab = tabKey;
+document.getElementById('subTabDb')?.classList.toggle('active', tabKey === 'db');
+document.getElementById('subTabFav')?.classList.toggle('active', tabKey === 'fav');
+document.getElementById('subTabCustom')?.classList.toggle('active', tabKey === 'custom');
+const dbView = document.getElementById('subViewDb');
+const customView = document.getElementById('subViewCustom');
+if (dbView) dbView.style.display = tabKey === 'custom' ? 'none' : 'block';
+if (customView) customView.style.display = tabKey === 'custom' ? 'block' : 'none';
+if (tabKey === 'db') this.runSearchFilter();
+if (tabKey === 'fav') this.renderFavorites();
 },
-switchPickerTab: function(tab) {
-this.activeTab = tab;
-document.getElementById('tabDbBtn')?.classList.toggle('active', tab === 'db');
-document.getElementById('tabFavBtn')?.classList.toggle('active', tab === 'fav');
-document.getElementById('tabCustomBtn')?.classList.toggle('active', tab === 'custom');
-const dbView = document.getElementById('tabDbView');
-const customView = document.getElementById('tabCustomView');
-if (dbView) dbView.style.display = tab === 'custom' ? 'none' : 'block';
-if (customView) customView.style.display = tab === 'custom' ? 'block' : 'none';
-if (tab === 'db') this.handleSearchDebounced();
-if (tab === 'fav') this.renderFavoritesList();
-},
-handleSearchDebounced: function() {
-const input = document.getElementById('dbSearchInput');
+handleSearchInput: function() {
+const input = document.getElementById('searchInput');
 const clearBtn = document.getElementById('searchClearBtn');
-if (clearBtn) {
-clearBtn.style.display = (input && input.value.trim().length > 0) ? 'block' : 'none';
-}
-clearTimeout(this.searchTimer);
-this.searchTimer = setTimeout(() => this.filterAndRenderSearch(), 100);
+if (clearBtn) clearBtn.style.display = (input && input.value.trim().length > 0) ? 'block' : 'none';
+clearTimeout(this.searchDebounceTimer);
+this.searchDebounceTimer = setTimeout(() => this.runSearchFilter(), 120);
 },
-clearSearchInput: function() {
-const input = document.getElementById('dbSearchInput');
+clearSearch: function() {
+const input = document.getElementById('searchInput');
 if (input) {
 input.value = '';
 input.focus();
 }
-this.handleSearchDebounced();
+this.handleSearchInput();
 },
-filterAndRenderSearch: function() {
-const query = String(document.getElementById('dbSearchInput')?.value || '').toLowerCase().trim();
+runSearchFilter: function() {
+const query = String(document.getElementById('searchInput')?.value || '').toLowerCase().trim();
 let results = this.db;
 if (query) {
 results = this.db.filter(t => {
-const titleStr = String(t.title || '').toLowerCase();
-const seriesStr = String(t.series || '').toLowerCase();
-const idStr = String(t.id || '').toLowerCase();
-const audioStr = String(t.audio_id || '').toLowerCase();
-return titleStr.includes(query) || seriesStr.includes(query) || idStr.includes(query) || audioStr.includes(query);
+return String(t.title || '').toLowerCase().includes(query) ||
+String(t.series || '').toLowerCase().includes(query) ||
+String(t.id || '').toLowerCase().includes(query) ||
+String(t.audio_id || '').toLowerCase().includes(query);
 });
 }
-const counterEl = document.getElementById('dbResultCounter');
-if (counterEl) counterEl.innerText = ⁠${results.length} Motive⁠;
-this.renderItemsGrid(results.slice(0, 60));
+const countEl = document.getElementById('resultCountLabel');
+if (countEl) countEl.innerText = ⁠${results.length} Motive⁠;
+this.renderMotives(results.slice(0, 60));
 },
-renderItemsGrid: function(items) {
-const grid = document.getElementById('toniesGrid');
+renderMotives: function(list) {
+const grid = document.getElementById('motivesGrid');
 if (!grid) return;
 grid.innerHTML = '';
-if (!items || items.length === 0) {
-grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 25px 0; font-size: 13px;">Kein Motiv gefunden.</div>';
+if (!list || list.length === 0) {
+grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 30px 0; font-size: 13.5px;">Kein Motiv gefunden.</div>';
 return;
 }
-items.forEach(tonie => {
+list.forEach(tonie => {
 const isFav = this.favorites.includes(tonie.id);
 const card = document.createElement('div');
-card.className = 'grid-card' + (this.selectedTonie && this.selectedTonie.id === tonie.id ? ' selected' : '');
-card.addEventListener('click', () => this.selectTonieItem(tonie));
-const imgFallback = this.makeDefaultAvatarSvg(tonie.title);
-const imgSrc = tonie.pic || imgFallback;
-const starBtn = document.createElement('span');
-starBtn.className = 'fav-star-btn' + (isFav ? ' is-fav' : '');
-starBtn.innerText = '★';
-starBtn.addEventListener('click', (e) => {
+card.className = 'tonie-thumb-card' + (this.selectedTonie && this.selectedTonie.id === tonie.id ? ' is-active' : '');
+card.addEventListener('click', () => {
+this.selectTonie(tonie);
+this.setStep(2);
+});
+const fallbackSvg = this.generateAvatarFallback(tonie.title);
+const imgSrc = tonie.pic || fallbackSvg;
+const star = document.createElement('span');
+star.className = 'card-fav-star' + (isFav ? ' is-fav' : '');
+star.innerText = '★';
+star.addEventListener('click', (e) => {
 e.stopPropagation();
-this.toggleFavoriteItem(tonie.id);
+this.toggleFavorite(tonie.id);
 });
 const img = document.createElement('img');
-img.className = 'grid-thumb';
+img.className = 'thumb-avatar';
 img.src = imgSrc;
 img.alt = tonie.title || 'Tonie';
-img.addEventListener('error', function() {
-this.src = imgFallback;
-}, { once: true });
+img.addEventListener('error', function() { this.src = fallbackSvg; }, { once: true });
 const seriesDiv = document.createElement('div');
-seriesDiv.className = 'grid-series';
+seriesDiv.className = 'thumb-series';
 seriesDiv.innerText = tonie.series || 'Tonie';
 const titleDiv = document.createElement('div');
-titleDiv.className = 'grid-title';
+titleDiv.className = 'thumb-title';
 titleDiv.innerText = tonie.title || 'Ohne Titel';
 const idDiv = document.createElement('div');
-idDiv.className = 'grid-id';
+idDiv.className = 'thumb-id';
 idDiv.innerText = tonie.id || '';
-card.appendChild(starBtn);
+card.appendChild(star);
 card.appendChild(img);
 card.appendChild(seriesDiv);
 card.appendChild(titleDiv);
@@ -632,80 +758,79 @@ card.appendChild(idDiv);
 grid.appendChild(card);
 });
 },
-makeDefaultAvatarSvg: function(title) {
-const initial = String(title || 'T').trim().charAt(0).toUpperCase() || 'T';
-return svgToUri(⁠<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#E2E8F0'/><text x='50' y='58' font-family='sans-serif' font-size='28' font-weight='bold' text-anchor='middle' fill='#64748B'>${initial}</text></svg>⁠);
+generateAvatarFallback: function(text) {
+const char = String(text || 'T').trim().charAt(0).toUpperCase() || 'T';
+return encodeSvgUri(⁠<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='50' fill='#F1F5F9'/><text x='50' y='58' font-family='sans-serif' font-size='30' font-weight='bold' text-anchor='middle' fill='#64748B'>${char}</text></svg>⁠);
 },
-toggleFavoriteItem: function(tonieId) {
-if (!tonieId) return;
-if (this.favorites.includes(tonieId)) {
-this.favorites = this.favorites.filter(id => id !== tonieId);
+toggleFavorite: function(id) {
+if (!id) return;
+if (this.favorites.includes(id)) {
+this.favorites = this.favorites.filter(fId => fId !== id);
 } else {
-this.favorites.push(tonieId);
+this.favorites.push(id);
 }
-safeStorageSet('tonie_favs', this.favorites);
-this.updateFavCounterBadge();
-if (this.activeTab === 'fav') this.renderFavoritesList();
-else this.filterAndRenderSearch();
+setStorage('tonie_favs', this.favorites);
+this.updateFavBadge();
+if (this.activeSubTab === 'fav') this.renderFavorites();
+else this.runSearchFilter();
 },
-updateFavCounterBadge: function() {
-const badge = document.getElementById('favQty');
-if (badge) badge.innerText = this.favorites.length;
+updateFavBadge: function() {
+const b = document.getElementById('favCountBadge');
+if (b) b.innerText = this.favorites.length;
 },
-renderFavoritesList: function() {
-const favItems = this.db.filter(t => this.favorites.includes(t.id));
-const counterEl = document.getElementById('dbResultCounter');
-if (counterEl) counterEl.innerText = ⁠${favItems.length} Favoriten⁠;
-this.renderItemsGrid(favItems);
+renderFavorites: function() {
+const list = this.db.filter(t => this.favorites.includes(t.id));
+const countEl = document.getElementById('resultCountLabel');
+if (countEl) countEl.innerText = ⁠${list.length} Favoriten⁠;
+this.renderMotives(list);
 },
-selectRandomItem: function() {
+pickRandomTonie: function() {
 if (!this.db || this.db.length === 0) return;
-const randomItem = this.db[Math.floor(Math.random() * this.db.length)];
-this.selectTonieItem(randomItem);
+const rand = this.db[Math.floor(Math.random() * this.db.length)];
+this.selectTonie(rand);
+this.setStep(2);
 },
-handleCustomUpload: function(event) {
-const file = event.target.files && event.target.files[0];
+handleCustomUpload: function(e) {
+const file = e.target.files && e.target.files[0];
 if (!file) return;
 const reader = new FileReader();
-reader.onload = (e) => {
+reader.onload = (event) => {
 const customTonie = {
 id: "KREATIV-TAG",
 title: "Mein Tonie",
 series: "Kreativ",
-pic: e.target.result,
+pic: event.target.result,
 audio_id: "CUSTOM"
 };
-this.selectTonieItem(customTonie);
+this.selectTonie(customTonie);
+this.setStep(2);
 };
 reader.readAsDataURL(file);
 },
-selectTonieItem: function(tonie) {
+selectTonie: function(tonie) {
 this.selectedTonie = tonie;
 let serie = String(tonie.series || '').trim();
 let album = String(tonie.title || '').trim();
 if (serie && album.toLowerCase().startsWith(serie.toLowerCase())) {
 album = album.substring(serie.length).replace(/^[\s-–:]+/, '').trim();
 }
-if ((!serie || serie === 'Tonie') && album.includes(' - ')) {
-const parts = album.split(' - ');
-serie = parts[0].trim();
-album = parts.slice(1).join(' - ').trim();
-}
-const inputTitle = document.getElementById('inputTitle');
-const inputAlbum = document.getElementById('inputAlbum');
-const inputBottomId = document.getElementById('inputBottomId');
-const dumpAudioIdLabel = document.getElementById('dumpAudioIdLabel');
-if (inputTitle) inputTitle.value = serie || album || 'Tonie';
-if (inputAlbum) inputAlbum.value = album !== serie ? album : '';
-if (inputBottomId) inputBottomId.value = tonie.id || '';
-if (dumpAudioIdLabel) dumpAudioIdLabel.innerText = tonie.audio_id || 'Keine ID';
-document.querySelectorAll('.grid-card').forEach(c => c.classList.remove('selected'));
+const sIn = document.getElementById('inputSeries');
+const aIn = document.getElementById('inputAlbum');
+const idIn = document.getElementById('inputId');
+const aIdLbl = document.getElementById('labelAudioId');
+if (sIn) sIn.value = serie || album || 'Tonie';
+if (aIn) aIn.value = album !== serie ? album : '';
+if (idIn) idIn.value = tonie.id || '';
+if (aIdLbl) aIdLbl.innerText = tonie.audio_id || 'Keine ID';
+document.querySelectorAll('.tonie-thumb-card').forEach(c => c.classList.remove('is-active'));
 this.refreshPreview();
 },
-applyPreset: function(text) {
-const inputAlbum = document.getElementById('inputAlbum');
-if (inputAlbum) inputAlbum.value = text;
-this.refreshPreview();
+setMode: function(mode) {
+this.editorMode = mode;
+document.getElementById('btnModeSimple')?.classList.toggle('active', mode === 'simple');
+document.getElementById('btnModePro')?.classList.toggle('active', mode === 'pro');
+const proPanel = document.getElementById('proSettingsPanel');
+if (proPanel) proPanel.style.display = mode === 'pro' ? 'block' : 'none';
 },
 copyAudioId: function() {
 if (!this.selectedTonie || !this.selectedTonie.audio_id) return;
@@ -713,127 +838,142 @@ navigator.clipboard.writeText(this.selectedTonie.audio_id).then(() => {
 alert(⁠Audio-ID "${this.selectedTonie.audio_id}" kopiert!⁠);
 });
 },
-buildCurvedStickerSvg: function() {
+buildCurvedSvg: function() {
 if (!this.selectedTonie) return '';
-const titleTxt = String(document.getElementById('inputTitle')?.value || '').trim();
+const serieTxt = String(document.getElementById('inputSeries')?.value || '').trim();
 const albumTxt = String(document.getElementById('inputAlbum')?.value || '').trim();
-const idTxt = String(document.getElementById('inputBottomId')?.value || '').trim();
-const showId = document.getElementById('toggleShowId')?.checked ?? true;
+const idTxt = String(document.getElementById('inputId')?.value || '').trim();
+const showId = document.getElementById('checkShowId')?.checked ?? true;
 const zoom = (parseFloat(document.getElementById('sliderZoom')?.value || 100)) / 100;
-const rotation = document.getElementById('sliderRotation')?.value || 0;
-const imgUrl = this.selectedTonie.pic || this.makeDefaultAvatarSvg(titleTxt || albumTxt);
-let topString = '';
-let bottomString = '';
-let isBottomId = false;
+const rotate = document.getElementById('sliderRotate')?.value || 0;
+const img = this.selectedTonie.pic || this.generateAvatarFallback(serieTxt || albumTxt);
+let topStr = '';
+let bottomStr = '';
+let isId = false;
 if (showId && idTxt) {
-topString = (titleTxt && albumTxt) ? ⁠${titleTxt} – ${albumTxt}⁠ : (titleTxt || albumTxt);
-bottomString = idTxt;
-isBottomId = true;
+topStr = (serieTxt && albumTxt) ? ⁠${serieTxt} – ${albumTxt}⁠ : (serieTxt || albumTxt);
+bottomStr = idTxt;
+isId = true;
 } else {
-topString = titleTxt;
-bottomString = albumTxt;
-isBottomId = false;
+topStr = serieTxt;
+bottomStr = albumTxt;
+isId = false;
 }
-const bottomColor = isBottomId ? "#C02741" : "#0F172A";
-const bottomFont = isBottomId ? "monospace" : "-apple-system, sans-serif";
-const bottomSize = isBottomId ? "10.5" : "10";
-return ⁠<svg viewBox="0 0 160 160" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> <defs> <clipPath id="circleMask"><circle cx="80" cy="80" r="79" /></clipPath> <path id="topArc" d="M 22 80 A 58 58 0 0 1 138 80" fill="transparent" /> <path id="bottomArc" d="M 22 80 A 58 58 0 0 0 138 80" fill="transparent" /> </defs> <circle cx="80" cy="80" r="80" fill="#FFFFFF" /> <g clip-path="url(#circleMask)"> <image href="${imgUrl}" xlink:href="${imgUrl}" x="${80 - (62 * zoom)}" y="${80 - (62 * zoom)}" width="${124 * zoom}" height="${124 * zoom}" preserveAspectRatio="xMidYMid slice" transform="rotate(${rotation} 80 80)" opacity="0.96" /> </g> <text font-family="-apple-system, sans-serif" font-weight="800" font-size="11" fill="#0F172A"> <textPath href="#topArc" startOffset="50%" text-anchor="middle">${this.escapeXml(topString)}</textPath> </text> <text font-family="${bottomFont}" font-weight="700" font-size="${bottomSize}" fill="${bottomColor}"> <textPath href="#bottomArc" startOffset="50%" text-anchor="middle">${this.escapeXml(bottomString)}</textPath> </text> </svg>⁠.trim();
+const bottomCol = isId ? "#C02741" : "#1C1917";
+const bottomFont = isId ? "ui-monospace, monospace" : "-apple-system, sans-serif";
+const bottomSize = isId ? "10.5" : "10";
+return ⁠<svg viewBox="0 0 160 160" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> <defs> <clipPath id="circleMask"><circle cx="80" cy="80" r="79" /></clipPath> <path id="arcTop" d="M 24 80 A 56 56 0 0 1 136 80" fill="transparent" /> <path id="arcBottom" d="M 24 80 A 56 56 0 0 0 136 80" fill="transparent" /> </defs> <circle cx="80" cy="80" r="80" fill="#FFFFFF" /> <g clip-path="url(#circleMask)"> <image href="${img}" xlink:href="${img}" x="${80 - (62 * zoom)}" y="${80 - (62 * zoom)}" width="${124 * zoom}" height="${124 * zoom}" preserveAspectRatio="xMidYMid slice" transform="rotate(${rotate} 80 80)" opacity="0.96" /> </g> <text font-family="-apple-system, sans-serif" font-weight="800" font-size="11" fill="#1C1917"> <textPath href="#arcTop" startOffset="50%" text-anchor="middle">${this.escapeXml(topStr)}</textPath> </text> <text font-family="${bottomFont}" font-weight="700" font-size="${bottomSize}" fill="${bottomCol}"> <textPath href="#arcBottom" startOffset="50%" text-anchor="middle">${this.escapeXml(bottomStr)}</textPath> </text> </svg>⁠.trim();
 },
 escapeXml: function(str) {
 return String(str || '').replace(/[&<>"']/g, c => ({ '&': '&', '<': '<', '>': '>', '"': '"', "'": ''' }[c]));
 },
 refreshPreview: function() {
-const svg = this.buildCurvedStickerSvg();
-const stage = document.getElementById('masterStickerPreview');
+const svg = this.buildCurvedSvg();
+const stage = document.getElementById('livePreviewStage');
 if (stage) stage.innerHTML = svg;
 },
 onSystemChange: function() {
-this.currentSystem = document.getElementById('selectPrintSystem').value;
-this.populateSizeDropdown();
+this.currentSystem = document.getElementById('selectSystem').value;
+this.populateSizes();
 this.onSizeChange();
 },
-populateSizeDropdown: function() {
-const sizeSelect = document.getElementById('selectPrintSize');
-if (!sizeSelect) return;
-sizeSelect.innerHTML = '';
-const system = this.currentSystem;
-const matchingKeys = Object.keys(this.formats).filter(k => this.formats[k].system === system);
-matchingKeys.forEach(k => {
+populateSizes: function() {
+const sizeSel = document.getElementById('selectSize');
+if (!sizeSel) return;
+sizeSel.innerHTML = '';
+const sys = this.currentSystem;
+const matchKeys = Object.keys(this.formats).filter(k => this.formats[k].system === sys);
+matchKeys.forEach(k => {
 const opt = document.createElement('option');
 opt.value = k;
 opt.textContent = this.formats[k].name;
-sizeSelect.appendChild(opt);
+sizeSel.appendChild(opt);
 });
-if (matchingKeys.length > 0) {
-sizeSelect.value = matchingKeys[0];
-this.currentFormatKey = matchingKeys[0];
+if (matchKeys.length > 0) {
+sizeSel.value = matchKeys[0];
+this.currentFormatKey = matchKeys[0];
 }
 },
 onSizeChange: function() {
-const sizeSelect = document.getElementById('selectPrintSize');
-if (!sizeSelect) return;
-this.currentFormatKey = sizeSelect.value;
+const sizeSel = document.getElementById('selectSize');
+if (!sizeSel) return;
+this.currentFormatKey = sizeSel.value;
 this.applyFormat(this.currentFormatKey);
 },
 applyFormat: function(formatKey) {
 const fmt = this.formats[formatKey];
 if (!fmt) return;
-const badge = document.getElementById('sheetSlotCountBadge');
+const badge = document.getElementById('sheetInfoBadge');
 if (badge) badge.innerText = ⁠${fmt.count} Etiketten⁠;
-const matrix = document.getElementById('sheetMatrixUi');
-if (matrix) matrix.className = ⁠sheet-matrix matrix-${formatKey}⁠;
-const prevSlots = [...this.sheetSlots];
+const paper = document.getElementById('sheetPaperUi');
+if (paper) paper.className = ⁠sheet-paper matrix-${formatKey}⁠;
+const oldSlots = [...this.sheetSlots];
 this.sheetSlots = new Array(fmt.count).fill(null);
-for (let i = 0; i < Math.min(prevSlots.length, fmt.count); i++) {
-this.sheetSlots[i] = prevSlots[i];
+for (let i = 0; i < Math.min(oldSlots.length, fmt.count); i++) {
+this.sheetSlots[i] = oldSlots[i];
 }
-this.renderSheetMatrixUi();
+this.renderSheetMatrix();
 },
-renderSheetMatrixUi: function() {
-const matrix = document.getElementById('sheetMatrixUi');
-if (!matrix) return;
-matrix.innerHTML = '';
-const count = this.sheetSlots.length;
-for (let i = 0; i < count; i++) {
-const slot = document.createElement('div');
-const hasData = Boolean(this.sheetSlots[i]);
-slot.className = 'sheet-slot-node' + (hasData ? ' has-content' : '');
-slot.addEventListener('click', () => this.assignActiveStickerToSlot(i));
-if (hasData) {
-slot.innerHTML = this.sheetSlots[i];
+renderSheetMatrix: function() {
+const paper = document.getElementById('sheetPaperUi');
+if (!paper) return;
+paper.innerHTML = '';
+const total = this.sheetSlots.length;
+for (let i = 0; i < total; i++) {
+const cell = document.createElement('div');
+const hasCover = Boolean(this.sheetSlots[i]);
+cell.className = 'sheet-cell-slot' + (hasCover ? ' has-content' : '');
+cell.addEventListener('click', () => this.assignSlot(i));
+if (hasCover) {
+cell.innerHTML = this.sheetSlots[i];
 } else {
-slot.innerHTML = ⁠<span class="sheet-slot-number">${i + 1}</span>⁠;
+cell.innerHTML = ⁠<span class="sheet-cell-num">${i + 1}</span>⁠;
 }
-matrix.appendChild(slot);
+paper.appendChild(cell);
 }
 },
-assignActiveStickerToSlot: function(index) {
+assignSlot: function(idx) {
 if (!this.selectedTonie) {
-alert("Bitte wähle zuerst ein Motiv aus!");
+alert("Wähle bitte zuerst in Schritt 1 ein Motiv aus!");
 return;
 }
-this.sheetSlots[index] = this.buildCurvedStickerSvg();
-this.renderSheetMatrixUi();
+this.sheetSlots[idx] = this.buildCurvedSvg();
+this.renderSheetMatrix();
 },
-fillAllSlotsWithActive: function() {
+fillEntireSheet: function() {
 if (!this.selectedTonie) {
-alert("Bitte wähle zuerst ein Motiv aus!");
+alert("Wähle bitte zuerst in Schritt 1 ein Motiv aus!");
 return;
 }
-const svg = this.buildCurvedStickerSvg();
+const svg = this.buildCurvedSvg();
 this.sheetSlots = this.sheetSlots.map(() => svg);
-this.renderSheetMatrixUi();
+this.renderSheetMatrix();
 },
-clearSheetSlots: function() {
+clearEntireSheet: function() {
 this.sheetSlots.fill(null);
-this.renderSheetMatrixUi();
+this.renderSheetMatrix();
 },
-exportHighResPng: function() {
+runPrintA4: function() {
+const hasStickers = this.sheetSlots.some(s => s !== null);
+if (!hasStickers) this.fillEntireSheet();
+const host = document.getElementById('printContainer');
+if (!host) return;
+host.innerHTML = '';
+host.className = 'print-' + this.currentFormatKey;
+this.sheetSlots.forEach(svgStr => {
+const circle = document.createElement('div');
+circle.className = 'print-target-circle';
+circle.innerHTML = svgStr || '';
+host.appendChild(circle);
+});
+window.print();
+},
+runExportPng: function() {
 if (!this.selectedTonie) {
-alert("Bitte erst ein Motiv auswählen!");
+alert("Wähle bitte zuerst in Schritt 1 ein Motiv aus!");
 return;
 }
-const svgMarkup = this.buildCurvedStickerSvg();
+const svgMarkup = this.buildCurvedSvg();
 const canvas = document.createElement('canvas');
 canvas.width = 1200;
 canvas.height = 1200;
@@ -846,44 +986,24 @@ ctx.fillStyle = '#FFFFFF';
 ctx.fillRect(0, 0, 1200, 1200);
 ctx.drawImage(img, 0, 0, 1200, 1200);
 URL.revokeObjectURL(url);
-const a = document.createElement('a');
-a.download = ⁠Tonie-Tag-${(this.selectedTonie.id || 'custom')}.png⁠;
-a.href = canvas.toDataURL('image/png');
-a.click();
+const link = document.createElement('a');
+link.download = ⁠Tonie-Cover-${(this.selectedTonie.id || 'custom')}.png⁠;
+link.href = canvas.toDataURL('image/png');
+link.click();
 };
 img.src = url;
 },
-triggerA4Print: function() {
-const hasStickers = this.sheetSlots.some(s => s !== null);
-if (!hasStickers) {
-this.fillAllSlotsWithActive();
-}
-const printHost = document.getElementById('printHost');
-if (!printHost) return;
-printHost.innerHTML = '';
-printHost.className = 'print-format-' + this.currentFormatKey;
-this.sheetSlots.forEach(svgString => {
-const cell = document.createElement('div');
-cell.className = 'print-cell';
-cell.innerHTML = svgString || '';
-printHost.appendChild(cell);
-});
-window.print();
-},
-openHelpModal: function() {
+toggleHelpModal: function(open) {
 const modal = document.getElementById('helpModal');
-if (modal) modal.classList.add('is-open');
-},
-closeHelpModal: function() {
-const modal = document.getElementById('helpModal');
-if (modal) modal.classList.remove('is-open');
+if (modal) modal.classList.toggle('is-visible', Boolean(open));
 }
 };
 if (document.readyState === 'loading') {
-document.addEventListener('DOMContentLoaded', () => window.app.init());
+document.addEventListener('DOMContentLoaded', () => AppStudio.init());
 } else {
-window.app.init();
+AppStudio.init();
 }
+})();
 </script>
 </body>
 </html>
