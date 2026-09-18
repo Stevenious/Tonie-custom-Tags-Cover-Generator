@@ -739,6 +739,10 @@
                 await Library.loadData();
                 Editor.initDragDrop();
                 PrintStudio.renderSheet();
+                // Load default dummy state into editor if db is available
+                if (State.db.length > 0) {
+                    App.loadToEditor(State.db[0]);
+                }
             },
 
             switchView(view) {
@@ -790,7 +794,7 @@
 
                 Editor.update();
                 App.showLibrary(false);
-                showToast(`"${State.currentDesign.serie}" geladen`);
+                showToast(`"${State.currentDesign.serie || 'Tonie'}" geladen`);
             },
 
             async convertImageToBase64(url) {
@@ -817,16 +821,18 @@
             async loadData() {
                 try {
                     const res = await fetch('https://raw.githubusercontent.com/tonieaudio/tonies-json/master/tonies.json');
+                    if (!res.ok) throw new Error('Netzwerkfehler');
                     State.db = await res.json();
                     document.getElementById('db-counter').innerText = `${State.db.length} Tonies ✓`;
-                    this.render(State.db);
                 } catch (e) {
-                    document.getElementById('db-counter').innerText = 'Offline-Modus';
+                    console.warn("Konnte Online-DB nicht laden, nutze Fallback.", e);
+                    document.getElementById('db-counter').innerText = 'Offline-Modus (Demo)';
                     State.db = [
-                        { id: "1490952835", serie: "Janosch", ep: "Oh, wie schön ist Panama", pic: "" }
+                        { id: "1490952835", serie: "Janosch", ep: "Oh, wie schön ist Panama", pic: "" },
+                        { id: "1234567890", serie: "Die Olchis", ep: "Die Olchis und der schwarze Pirat", pic: "" }
                     ];
-                    this.render(State.db);
                 }
+                this.render(State.db);
             },
 
             switchTab(tab) {
@@ -863,11 +869,16 @@
                 const grid = document.getElementById('asset-grid');
                 grid.innerHTML = '';
 
-                const totalPages = Math.ceil(this.currentData.length / this.itemsPerPage);
-                if (this.currentPage > totalPages && totalPages > 0) this.currentPage = totalPages;
+                const totalPages = Math.ceil(this.currentData.length / this.itemsPerPage) || 1;
+                if (this.currentPage > totalPages) this.currentPage = totalPages;
 
                 const start = (this.currentPage - 1) * this.itemsPerPage;
                 const paginatedData = this.currentData.slice(start, start + this.itemsPerPage);
+
+                if (paginatedData.length === 0) {
+                    grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: #64748b; padding: 20px;">Keine Einträge gefunden</div>';
+                    return;
+                }
 
                 paginatedData.forEach(item => {
                     const isFav = State.favorites.includes(item.id);
@@ -998,18 +1009,6 @@
                 sheet.innerHTML = '';
                 let count = 0;
 
-                // Adjust sheet CSS based on label format (Avery 30mm / 40mm / Free)
-                if (State.labelFormat === 'avery40') {
-                    sheet.style.width = '210mm';
-                    sheet.style.padding = '15mm';
-                } else if (State.labelFormat === 'avery30') {
-                    sheet.style.width = '210mm';
-                    sheet.style.padding = '12mm';
-                } else {
-                    sheet.style.width = '210mm';
-                    sheet.style.padding = '15mm';
-                }
-
                 State.printSlots.forEach((slot, index) => {
                     const slotDiv = document.createElement('div');
                     slotDiv.className = 'print-slot';
@@ -1096,7 +1095,6 @@
                     showToast("Keine UID für diesen Sticker hinterlegt");
                     return;
                 }
-                // Format following nortakales/flipper-zero-tonies structure
                 const uidHex = slot.uid.length >= 14 ? slot.uid.toUpperCase() : "E00403" + slot.uid.padStart(10, '0').toUpperCase();
                 const formattedUid = uidHex.match(/.{1,2}/g).join(' ');
 
