@@ -39,22 +39,22 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
+            padding: 0 15px;
             z-index: 100;
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             font-weight: 700;
-            font-size: 18px;
+            font-size: 16px;
             color: var(--text-main);
         }
 
         .brand svg {
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             fill: var(--primary);
         }
 
@@ -73,8 +73,8 @@
         .view-btn {
             background: transparent;
             border: none;
-            padding: 6px 16px;
-            font-size: 13px;
+            padding: 6px 12px;
+            font-size: 12px;
             font-weight: 600;
             color: var(--text-muted);
             border-radius: 6px;
@@ -89,9 +89,17 @@
         }
 
         .header-info {
-            font-size: 13px;
+            font-size: 12px;
             color: var(--text-muted);
             font-weight: 500;
+            display: none;
+        }
+
+        @media(min-width: 768px) {
+            header { padding: 0 20px; }
+            .brand { font-size: 18px; }
+            .view-btn { padding: 6px 16px; font-size: 13px; }
+            .header-info { display: block; }
         }
 
         /* MAIN LAYOUT */
@@ -104,19 +112,31 @@
 
         /* SIDEBARS */
         .sidebar {
-            width: 340px;
+            width: 100%;
+            max-width: 340px;
             background: var(--bg-sidebar);
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             transition: transform 0.3s ease, width 0.3s ease;
             z-index: 10;
+            position: absolute;
+            height: 100%;
+            top: 0;
+            left: 0;
         }
 
         .sidebar.right {
             border-right: none;
             border-left: 1px solid var(--border);
-            width: 320px;
+            max-width: 320px;
+            left: auto;
+            right: 0;
+            transform: translateX(100%);
+        }
+
+        .sidebar.right.mobile-open {
+            transform: translateX(0);
         }
 
         .sidebar.hidden-panel {
@@ -126,8 +146,14 @@
             border: none;
         }
 
-        .sidebar.right.hidden-panel {
-            transform: translateX(100%);
+        @media(min-width: 1024px) {
+            .sidebar {
+                position: relative;
+                transform: none !important;
+            }
+            .sidebar.right {
+                transform: none !important;
+            }
         }
 
         .sidebar-header {
@@ -285,6 +311,7 @@
             flex-direction: column;
             overflow: hidden;
             position: relative;
+            width: 100%;
         }
 
         .canvas-container {
@@ -299,28 +326,29 @@
 
         .design-toolbar {
             position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
+            top: 15px;
+            left: 15px;
+            right: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             z-index: 5;
+            gap: 10px;
         }
 
         .btn {
             background: var(--primary);
             color: #ffffff;
             border: none;
-            padding: 10px 20px;
+            padding: 8px 14px;
             border-radius: 8px;
             font-weight: 600;
-            font-size: 13px;
+            font-size: 12px;
             cursor: pointer;
             transition: background 0.2s, transform 0.1s;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .btn:hover {
@@ -339,23 +367,55 @@
             border-color: var(--primary);
         }
 
+        @media(min-width: 768px) {
+            .design-toolbar { top: 20px; left: 20px; right: 20px; }
+            .btn { padding: 10px 20px; font-size: 13px; }
+        }
+
+        /* MOBILE FLOATING NAV BUTTONS */
+        .mobile-nav-bar {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 20;
+        }
+
+        @media(min-width: 1024px) {
+            .mobile-nav-bar { display: none; }
+        }
+
+        .mobile-toggle-btn {
+            background: #0f172a;
+            color: #fff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            cursor: pointer;
+        }
+
         /* LIVE PREVIEW CANVAS */
         .tag-preview-card {
             background: #ffffff;
             border-radius: 16px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            padding: 30px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 20px;
-            max-width: 420px;
+            gap: 15px;
+            max-width: 380px;
             width: 100%;
         }
 
         .tag-circle-preview {
-            width: 280px;
-            height: 280px;
+            width: 240px;
+            height: 240px;
             border-radius: 50%;
             border: 2px dashed #cbd5e1;
             position: relative;
@@ -364,6 +424,11 @@
             align-items: center;
             justify-content: center;
             background: #fff;
+        }
+
+        @media(min-width: 768px) {
+            .tag-preview-card { padding: 30px; max-width: 420px; gap: 20px; }
+            .tag-circle-preview { width: 280px; height: 280px; }
         }
 
         .tag-circle-preview img {
@@ -437,19 +502,19 @@
             flex-direction: column;
             background: #e2e8f0;
             overflow-y: auto;
-            padding: 30px;
+            padding: 20px;
             align-items: center;
         }
 
         .print-toolbar-bar {
             background: #ffffff;
-            padding: 12px 20px;
+            padding: 12px 15px;
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             display: flex;
-            gap: 15px;
+            gap: 12px;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             max-width: 900px;
             width: 100%;
             justify-content: space-between;
@@ -467,6 +532,18 @@
             grid-template-rows: repeat(4, 1fr);
             gap: 5mm;
             box-sizing: border-box;
+            transform: scale(0.65);
+            transform-origin: top center;
+            margin-bottom: -100px;
+        }
+
+        @media(min-width: 768px) {
+            .print-workspace { padding: 30px; }
+            .a4-sheet { transform: scale(0.85); margin-bottom: -40px; }
+        }
+
+        @media(min-width: 1200px) {
+            .a4-sheet { transform: scale(1); margin-bottom: 0; }
         }
 
         .print-slot {
@@ -585,13 +662,14 @@
                 padding: 0 !important;
                 overflow: visible !important;
             }
-            .print-toolbar-bar, .sticker-actions { display: none !important; }
+            .print-toolbar-bar, .sticker-actions, .mobile-nav-bar { display: none !important; }
             .a4-sheet {
                 box-shadow: none !important;
                 margin: 0 !important;
                 padding: 10mm !important;
                 width: 210mm !important;
                 height: 297mm !important;
+                transform: none !important;
             }
             .print-slot { border: none !important; background: transparent !important; }
             img {
@@ -606,10 +684,10 @@
     <header>
         <div class="brand">
             <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-            TagGen Studio <span>V2 Phoenix</span>
+            TagGen <span>V2 Phoenix</span>
         </div>
         <div class="view-switcher">
-            <button class="view-btn active" id="btn-view-design" onclick="App.switchView('design')">🎨 Cover Editor</button>
+            <button class="view-btn active" id="btn-view-design" onclick="App.switchView('design')">🎨 Editor</button>
             <button class="view-btn" id="btn-view-print" onclick="App.switchView('print')">🖨️ Print Studio</button>
         </div>
         <div class="header-info" id="db-counter">Lade Datenbank...</div>
@@ -633,8 +711,8 @@
         <!-- CENTER WORKSPACE: DESIGN EDITOR -->
         <div class="workspace" id="workspace-design">
             <div class="design-toolbar">
-                <button class="btn btn-secondary" id="back-to-lib-btn" style="display:none;" onclick="App.showLibrary(true)">← Andere Figur suchen</button>
-                <button class="btn" onclick="Editor.addToPrintStudio()">+ Auf den Druckbogen legen</button>
+                <button class="btn btn-secondary" id="back-to-lib-btn" style="display:none;" onclick="App.showLibrary(true)">← Bibliothek</button>
+                <button class="btn" onclick="Editor.addToPrintStudio()">+ Auf den Druckbogen</button>
             </div>
             <div class="canvas-container" id="drop-zone">
                 <div class="tag-preview-card">
@@ -655,6 +733,12 @@
                         💡 Tipp: Bilddatei per Drag & Drop hier ablegen
                     </div>
                 </div>
+            </div>
+
+            <!-- Mobile Floating Navigation -->
+            <div class="mobile-nav-bar">
+                <button class="mobile-toggle-btn" onclick="App.toggleMobilePanel('left')">📚 Bibliothek</button>
+                <button class="mobile-toggle-btn" onclick="App.toggleMobilePanel('right')">⚙️ Anpassung</button>
             </div>
         </div>
 
@@ -693,7 +777,7 @@
         <!-- PRINT STUDIO VIEW -->
         <div class="print-workspace" id="workspace-print">
             <div class="print-toolbar-bar">
-                <div style="display: flex; gap: 15px; align-items: center;">
+                <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
                     <strong>Print Studio</strong>
                     <select id="label-format-select" onchange="PrintStudio.changeFormat(this.value)" style="padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border);">
                         <option value="free">Freies Grid (Standard)</option>
@@ -702,10 +786,10 @@
                     </select>
                     <span style="font-size: 12px; color: var(--text-muted);" id="print-counter">0 / 12 belegt</span>
                 </div>
-                <div style="display: flex; gap: 10px;">
-                    <button class="btn btn-secondary" onclick="PrintStudio.exportUIDs()">📋 UID-Liste exportieren</button>
-                    <button class="btn btn-secondary" onclick="PrintStudio.clearSheet()">Bogen leeren</button>
-                    <button class="btn" onclick="window.print()">🖨️ PDF / Drucken</button>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn btn-secondary" onclick="PrintStudio.exportUIDs()">📋 UID-Liste</button>
+                    <button class="btn btn-secondary" onclick="PrintStudio.clearSheet()">Leeren</button>
+                    <button class="btn" onclick="window.print()">🖨️ Drucken</button>
                 </div>
             </div>
             <div class="a4-sheet" id="print-sheet"></div>
@@ -739,7 +823,6 @@
                 await Library.loadData();
                 Editor.initDragDrop();
                 PrintStudio.renderSheet();
-                // Load default dummy state into editor if db is available
                 if (State.db.length > 0) {
                     App.loadToEditor(State.db[0]);
                 }
@@ -753,10 +836,27 @@
                 document.getElementById('workspace-design').style.display = isPrint ? 'none' : 'flex';
                 document.getElementById('workspace-print').style.display = isPrint ? 'flex' : 'none';
                 
-                document.getElementById('left-sidebar').classList.toggle('hidden-panel', isPrint);
-                document.getElementById('right-sidebar').classList.toggle('hidden-panel', isPrint);
+                if (window.innerWidth >= 1024) {
+                    document.getElementById('left-sidebar').classList.toggle('hidden-panel', isPrint);
+                    document.getElementById('right-sidebar').classList.toggle('hidden-panel', isPrint);
+                } else {
+                    document.getElementById('left-sidebar').classList.add('hidden-panel');
+                    document.getElementById('right-sidebar').classList.remove('mobile-open');
+                }
 
                 if (isPrint) PrintStudio.renderSheet();
+            },
+
+            toggleMobilePanel(panel) {
+                const left = document.getElementById('left-sidebar');
+                const right = document.getElementById('right-sidebar');
+                if (panel === 'left') {
+                    left.classList.toggle('hidden-panel');
+                    right.classList.remove('mobile-open');
+                } else {
+                    right.classList.toggle('mobile-open');
+                    left.classList.add('hidden-panel');
+                }
             },
 
             showLibrary(show) {
@@ -793,7 +893,11 @@
                 State.currentDesign.showUid = false;
 
                 Editor.update();
-                App.showLibrary(false);
+                if (window.innerWidth < 1024) {
+                    document.getElementById('left-sidebar').classList.add('hidden-panel');
+                } else {
+                    App.showLibrary(false);
+                }
                 showToast(`"${State.currentDesign.serie || 'Tonie'}" geladen`);
             },
 
@@ -825,8 +929,8 @@
                     State.db = await res.json();
                     document.getElementById('db-counter').innerText = `${State.db.length} Tonies ✓`;
                 } catch (e) {
-                    console.warn("Konnte Online-DB nicht laden, nutze Fallback.", e);
-                    document.getElementById('db-counter').innerText = 'Offline-Modus (Demo)';
+                    document.warn("Konnte Online-DB nicht laden, nutze Fallback.", e);
+                    document.getElementById('db-counter').innerText = 'Offline-Modus';
                     State.db = [
                         { id: "1490952835", serie: "Janosch", ep: "Oh, wie schön ist Panama", pic: "" },
                         { id: "1234567890", serie: "Die Olchis", ep: "Die Olchis und der schwarze Pirat", pic: "" }
@@ -840,7 +944,7 @@
                 document.getElementById('tab-db').classList.toggle('active', tab === 'db');
                 document.getElementById('tab-fav').classList.toggle('active', tab === 'fav');
                 this.currentPage = 1;
-                this.filter();
+                this.filter(document.getElementById('search-input').value);
             },
 
             handleSearch(query) {
