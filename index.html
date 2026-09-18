@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Tonie & Tag Cover HUB V17</title>
+<title>Tonie & Tag Cover HUB V18</title>
 <style>
 :root, [data-theme="light"] {
 --brand-red: #A31E33;
@@ -41,8 +41,7 @@ body { background: var(--bg-body); color: var(--text-main); transition: backgrou
 /* HEADER */
 .app-header { background: var(--bg-card); padding: 12px 1rem; position: sticky; top: 0; z-index: 100; box-shadow: var(--shadow-sm); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
 .logo-container { flex: 1; display: flex; align-items: center; min-width: 0; }
-.logo-svg { height: 48px; width: 100%; max-width: 420px; }
-@media (max-width: 480px) { .logo-svg { height: 38px; } }
+.logo-svg { height: 44px; width: 100%; max-width: 380px; }
 .header-actions { display: flex; gap: 8px; flex-shrink: 0; }
 .pill-btn { background: var(--bg-sub); color: var(--text-main); border: 1px solid var(--border-color); padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-sm); }
 .pill-btn.accent { background: var(--brand-red); color: #FFF; border-color: var(--brand-red); }
@@ -204,6 +203,7 @@ html, body { background: #FFF !important; margin: 0 !important; padding: 0 !impo
 <label>FORMAT / GRÖSSE</label>
 <select id="selSize" class="input-field">
 <option value="avery-40" selected>L3415 - Ø 40 mm (24x)</option>
+<option value="avery-35">Ø 35 mm</option>
 <option value="avery-30">6223 - Ø 30 mm (48x)</option>
 <option value="avery-25">L7103 - Ø 25 mm (70x)</option>
 </select>
@@ -232,10 +232,12 @@ if (el) el.addEventListener(type, fn);
 }
 var formats = {
 'avery-40': { type: 'avery', slots: 24, size: 40, cols: 3, startX: 7.2, startY: 12.5, gapX: 42.5, gapY: 40 },
+'avery-35': { type: 'avery', slots: 35, size: 35, cols: 4, startX: 10, startY: 15, gapX: 36, gapY: 35 },
 'avery-30': { type: 'avery', slots: 48, size: 30, cols: 4, startX: 13, startY: 21.2, gapX: 33, gapY: 30 },
 'avery-25': { type: 'avery', slots: 70, size: 25, cols: 5, startX: 9, startY: 13.5, gapX: 28, gapY: 25 },
 'raster-43': { type: 'raster', slots: 24, size: 43, cols: 4 },
 'raster-40': { type: 'raster', slots: 24, size: 40, cols: 4 },
+'raster-35': { type: 'raster', slots: 35, size: 35, cols: 4 },
 'raster-30': { type: 'raster', slots: 48, size: 30, cols: 5 },
 'raster-25': { type: 'raster', slots: 70, size: 25, cols: 6 }
 };
@@ -260,7 +262,7 @@ offlineDb: [
 ],
 init: function() {
 try {
-var favs = localStorage.getItem('hub_favs_v17');
+var favs = localStorage.getItem('hub_favs_v18');
 if (favs) this.favorites = JSON.parse(favs);
 if (!Array.isArray(this.favorites)) this.favorites = [];
 } catch(e) { this.favorites = []; }
@@ -403,7 +405,7 @@ toggleFav: function(id) {
 var idx = this.favorites.indexOf(id);
 if (idx > -1) this.favorites.splice(idx, 1);
 else this.favorites.push(id);
-try { localStorage.setItem('hub_favs_v17', JSON.stringify(this.favorites)); } catch(e) {}
+try { localStorage.setItem('hub_favs_v18', JSON.stringify(this.favorites)); } catch(e) {}
 this.updateFavCounter();
 var tabFav = safeEl('tabFav');
 if (tabFav && tabFav.classList.contains('active')) this.switchTab('tabFav');
@@ -483,11 +485,13 @@ if (!sys || !sizeSel) return;
 sizeSel.innerHTML = '';
 if (sys.value === 'avery') {
 sizeSel.innerHTML = '<option value="avery-40">L3415 - Ø 40 mm (24x)</option>' +
+'<option value="avery-35">Ø 35 mm</option>' +
 '<option value="avery-30">6223 - Ø 30 mm (48x)</option>' +
 '<option value="avery-25">L7103 - Ø 25 mm (70x)</option>';
 } else {
 sizeSel.innerHTML = '<option value="raster-43" selected>Münzkapsel 43 mm (24x)</option>' +
 '<option value="raster-40">Münzkapsel 40 mm (24x)</option>' +
+'<option value="raster-35">Münzkapsel 35 mm (35x)</option>' +
 '<option value="raster-30">Münzkapsel 30 mm (48x)</option>' +
 '<option value="raster-25">Münzkapsel 25 mm (70x)</option>';
 }
