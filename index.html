@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Tonie & Tag Cover HUB V10</title>
+<title>Tonie & Tag Cover HUB V11</title>
 <!-- 
-V10.0 Clean Slate Master
-- Modular decoupled architecture (Search & Sheet run independently)
-- Instant zero-latency search bootstrap
-- 3-tier input engine (Series, Album, ID with standalone toggle)
-- Bulletproof print and format manager
+V11.0 Unified Master Suite
+- Decoupled, instant zero-latency search engine with robust offline fallback
+- Fully synchronized Avery & Free Raster format picker (including 43mm Münzkapseln)
+- Interactive 3-step workflow with Simpel & Pro modes
+- Bulletproof 1-page A4 print & slot manager
 -->
 <style>
 :root, [data-theme="light"] {
@@ -99,8 +99,8 @@ input:checked + .slider:before { transform: translateX(20px); }
 .sheet-board { background: var(--bg-sub); padding: 1.5rem; border-radius: 16px; display: flex; justify-content: center; overflow-x: auto; box-shadow: inset 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 1rem; }
 .sheet-paper { background: #FFF; padding: 15px; box-shadow: var(--shadow-md); display: grid; width: max-content; gap: 4px; }
 .grid-col-3 { grid-template-columns: repeat(3, 40px); }
-.grid-col-4 { grid-template-columns: repeat(4, 30px); }
-.grid-col-5 { grid-template-columns: repeat(5, 25px); }
+.grid-col-4 { grid-template-columns: repeat(4, 35px); }
+.grid-col-5 { grid-template-columns: repeat(5, 30px); }
 .grid-col-6 { grid-template-columns: repeat(6, 25px); }
 .sheet-slot { border-radius: 50%; border: 1px dashed #94A3B8; background: #F8FAFC; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 11px; color: #94A3B8; overflow: hidden; }
 .sheet-slot.filled { border: none; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
@@ -463,7 +463,6 @@ var safeImg = this.activeTonie.pic;
 if(safeImg && safeImg.indexOf('<svg') > -1 && safeImg.indexOf('utf8,') > -1) {
 safeImg = "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(safeImg.substring(safeImg.indexOf('<svg')));
 }
-// ID active: Album text on bottom curve, ID text on inner bottom path!
 var idElement = '';
 if (showId && idText) {
 idElement = '<text font-family="monospace" font-weight="700" font-size="9" fill="#A31E33">' +
