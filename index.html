@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TagGen Studio V2.1.3 – Phoenix</title>
+    <title>TagGen Studio V2.1.4 – Phoenix</title>
     
     <!-- ESP Web Tools -->
     <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
@@ -22,10 +22,10 @@
             --text-subtle: #94a3b8;
             
             /* Status Colors */
-            --status-exact: #10b981;  /* Green */
-            --status-strong: #3b82f6; /* Blue */
-            --status-fuzzy: #f59e0b;  /* Yellow */
-            --status-none: #94a3b8;   /* Gray */
+            --status-exact: #10b981;
+            --status-strong: #3b82f6;
+            --status-fuzzy: #f59e0b;
+            --status-none: #94a3b8;
             --flipper-orange: #ff8200;
         }
 
@@ -233,10 +233,17 @@
             padding: 12px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 8px; /* BUGFIX: Größerer Gap für weniger "gedrungenes" Layout */
         }
 
-        /* Clean Studio Cards */
+        /* Clean Studio Cards - BUGFIX: Feste Höhe & Pagination */
+        .asset-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr)); /* BUGFIX: Zurück auf 2 Spalten für 4-6 Kacheln Ansicht */
+            gap: 10px;
+            align-content: start;
+        }
+
         .asset-card {
             background: #fff;
             border: 1px solid var(--border);
@@ -244,10 +251,12 @@
             overflow: hidden;
             cursor: pointer;
             display: flex;
-            gap: 12px;
+            flex-direction: column; /* BUGFIX: Vertikales Layout statt horizontal gequetscht */
+            gap: 8px;
             padding: 10px;
             transition: all 0.15s ease;
             position: relative;
+            min-height: 160px; /* Einheitliche Höhe für Grid */
         }
 
         .asset-card:hover {
@@ -257,8 +266,8 @@
         }
 
         .card-img-wrap {
-            width: 72px;
-            height: 72px;
+            width: 100%;
+            height: 80px; /* Fester Platz für das Bild oben */
             background: var(--bg-canvas);
             border-radius: 7px;
             flex-shrink: 0;
@@ -267,7 +276,6 @@
             justify-content: center;
             overflow: hidden;
             position: relative;
-            border: 1px solid #f1f5f9;
         }
 
         .card-img-wrap img {
@@ -284,18 +292,18 @@
 
         .fav-btn {
             position: absolute;
-            top: 3px;
-            right: 3px;
+            top: 4px;
+            right: 4px;
             background: rgba(255,255,255,0.95);
             border: none;
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 13px;
+            font-size: 14px;
             color: #cbd5e1;
             transition: color 0.15s;
             box-shadow: 0 1px 3px rgba(0,0,0,0.12);
@@ -307,7 +315,7 @@
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-start;
             min-width: 0;
         }
 
@@ -351,6 +359,25 @@
             letter-spacing: 0.02em;
             width: max-content;
         }
+
+        /* Pagination Controls (Wieder eingebaut) */
+        .pagination-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+        .pagination-controls button {
+            background: #e2e8f0;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .pagination-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
 
         /* Center: Canvas View */
         .canvas-area {
@@ -690,7 +717,6 @@
                             <button class="lib-tab" id="tab-fav" onclick="Library.switchTab('fav')">Favoriten</button>
                         </div>
 
-                        <!-- Update: User-friendly Placeholder -->
                         <input type="text" class="search-input" id="search-input" placeholder="Tonie, Serie oder Titel suchen ...">
                         
                         <div class="filter-row">
@@ -700,7 +726,6 @@
                                 <option value="en-us">Englisch</option>
                                 <option value="fr-fr">Französisch</option>
                             </select>
-                            <!-- Update: Wording adjusted for Tonie community -->
                             <select class="filter-select" id="filter-dump">
                                 <option value="all">Alle Tonies</option>
                                 <option value="exact">🟢 ID-Match (Exakt)</option>
@@ -710,8 +735,15 @@
                         </div>
                     </div>
                     
-                    <div class="asset-scroll" id="asset-grid">
-                        <!-- Dynamically populated Cards -->
+                    <div class="asset-scroll">
+                        <div class="asset-grid" id="asset-grid">
+                            <!-- Dynamically populated Cards -->
+                        </div>
+                        <div class="pagination-controls" id="pagination-controls" style="display: none;">
+                            <button id="btn-prev-page" onclick="Library.prevPage()">← Zurück</button>
+                            <span id="page-info">1 / 1</span>
+                            <button id="btn-next-page" onclick="Library.nextPage()">Weiter →</button>
+                        </div>
                     </div>
                 </div>
 
@@ -895,7 +927,14 @@
             }
         };
         
-        const Library = { activeTab: 'db' };
+        // BUGFIX: Pagination logic for Library
+        const Library = { 
+            activeTab: 'db',
+            currentPage: 1,
+            itemsPerPage: 8,
+            filteredData: []
+        };
+        
         const Search = {};
         const UI = {};
         const Editor = {
@@ -906,7 +945,7 @@
         const NfcStudio = { mode: 'usb', port: null, writer: null, bleDevice: null, bleChar: null };
         const Storage = {};
 
-        // Utility: Robust String Normalization (Handles Umlauts/Accents)
+        // Utility: Robust String Normalization
         const clean = s => {
             if (!s) return '';
             return s.normalize('NFD')
@@ -973,9 +1012,11 @@
                     const episode = v2.episode || v1.episodes || v1.episode || v1.title || '';
                     const image = v2.image || v1.picture || v1.pic || v1.image || '';
                     const language = (v2.language || v1.language || 'de-de').toLowerCase();
-                    const tracks = Array.isArray(v2.tracks) 
-                        ? v2.tracks.length 
-                        : (Array.isArray(v2['track-desc']) ? v2['track-desc'].length : 0);
+                    // BUGFIX 1: Extract tracks correctly from string or array length
+                    let tracks = 0;
+                    if (Array.isArray(v2.tracks)) tracks = v2.tracks.length;
+                    else if (Array.isArray(v2['track-desc'])) tracks = v2['track-desc'].length;
+                    else if (typeof v2.tracks === 'string') tracks = 1; // Fallback
 
                     return {
                         id: primaryId,
@@ -1007,8 +1048,8 @@
         };
 
         Data.loadDumpIndex = async () => {
-            const cacheKey = 'phoenix_dump_index_v2_1_3';
-            const timeKey = 'phoenix_dump_time_v2_1_3';
+            const cacheKey = 'phoenix_dump_index_v2_1_4';
+            const timeKey = 'phoenix_dump_time_v2_1_4';
             const now = Date.now();
 
             const cached = localStorage.getItem(cacheKey);
@@ -1049,7 +1090,6 @@
         Data.getMatchQuality = (tonie) => {
             if (!tonie) return 'none';
             
-            // 1. Exact Audio-ID match across all known IDs
             const idsToCheck = (tonie.audioIds && tonie.audioIds.length > 0) ? tonie.audioIds : [tonie.id];
             for (const id of idsToCheck) {
                 if (id && id.length >= 6 && Data.dumpIndex.exactIds.has(id.toLowerCase())) {
@@ -1057,14 +1097,12 @@
                 }
             }
             
-            // 2. Strong Match (Series folder + exact filename match)
             const tTitle = clean(tonie.title);
             const tSerie = clean(tonie.series);
             if (tSerie && tTitle && Data.dumpIndex.strong.has(tSerie + '||' + tTitle)) {
                 return 'strong';
             }
 
-            // 3. Fuzzy Match (Filename match only)
             if (tTitle.length > 4 && Data.dumpIndex.titles.has(tTitle)) {
                 return 'fuzzy';
             }
@@ -1072,11 +1110,12 @@
             return 'none';
         };
 
-        // --- 3. LIBRARY & TABS ---
+        // --- 3. LIBRARY, TABS & SEARCH ---
         Library.switchTab = (tab) => {
             Library.activeTab = tab;
             document.getElementById('tab-db').classList.toggle('active', tab === 'db');
             document.getElementById('tab-fav').classList.toggle('active', tab === 'fav');
+            Library.currentPage = 1;
             Search.filter();
         };
 
@@ -1089,7 +1128,6 @@
 
             let results = Data.tonies;
 
-            // Safe Check Bugfix #1 Avoid crash on undefined series
             if (Library.activeTab === 'fav') results = results.filter(t => favs.includes(t.id));
             if (lang) results = results.filter(t => t.language === lang);
             
@@ -1105,16 +1143,35 @@
                 );
             }
 
-            UI.renderCards(results.slice(0, 50));
+            Library.filteredData = results;
+            Library.currentPage = 1;
+            UI.renderCards();
         };
 
+        Library.nextPage = () => { Library.currentPage++; UI.renderCards(); };
+        Library.prevPage = () => { Library.currentPage--; UI.renderCards(); };
+
         // --- 4. UI & CARDS ---
-        UI.renderCards = (items) => {
+        UI.renderCards = () => {
             const grid = document.getElementById('asset-grid');
             grid.innerHTML = '';
             const favs = JSON.parse(localStorage.getItem('phoenix_favs') || '[]');
+            
+            const total = Library.filteredData.length;
+            const totalPages = Math.ceil(total / Library.itemsPerPage) || 1;
+            if (Library.currentPage > totalPages) Library.currentPage = totalPages;
+            
+            const start = (Library.currentPage - 1) * Library.itemsPerPage;
+            const paginated = Library.filteredData.slice(start, start + Library.itemsPerPage);
 
-            items.forEach(item => {
+            const pagination = document.getElementById('pagination-controls');
+            if (total === 0) {
+                grid.innerHTML = '<div style="text-align:center; padding: 20px; color:var(--text-muted); font-size:13px; grid-column:1/-1;">Keine Tonies gefunden</div>';
+                pagination.style.display = 'none';
+                return;
+            }
+
+            paginated.forEach(item => {
                 const isFav = favs.includes(item.id);
                 const matchQ = Data.getMatchQuality(item);
                 
@@ -1152,6 +1209,7 @@
                 meta.className = 'card-meta';
                 
                 const infoText = document.createElement('span');
+                // BUGFIX: Show language and tracks correctly
                 infoText.textContent = `${item.language.toUpperCase()} · ${item.tracks} Tracks`;
                 meta.appendChild(infoText);
 
@@ -1159,13 +1217,13 @@
                     const badge = document.createElement('div');
                     badge.className = 'match-badge';
                     if (matchQ === 'exact') {
-                        badge.textContent = '🟢 ID-Match';
+                        badge.textContent = '🟢 ID';
                         badge.style.background = 'var(--status-exact)';
                     } else if (matchQ === 'strong') {
-                        badge.textContent = '🔵 Titel-Match';
+                        badge.textContent = '🔵 Titel';
                         badge.style.background = 'var(--status-strong)';
                     } else {
-                        badge.textContent = '🟡 Ähnlicher Treffer';
+                        badge.textContent = '🟡 Fuzzy';
                         badge.style.background = 'var(--status-fuzzy)';
                     }
                     meta.appendChild(badge);
@@ -1179,6 +1237,16 @@
                 card.appendChild(content);
                 grid.appendChild(card);
             });
+
+            // Update Pagination
+            if (totalPages > 1) {
+                pagination.style.display = 'flex';
+                document.getElementById('page-info').textContent = `${Library.currentPage} / ${totalPages}`;
+                document.getElementById('btn-prev-page').disabled = Library.currentPage === 1;
+                document.getElementById('btn-next-page').disabled = Library.currentPage === totalPages;
+            } else {
+                pagination.style.display = 'none';
+            }
         };
 
         UI.toggleFav = (id) => {
@@ -1416,7 +1484,7 @@
         // --- 7. STORAGE & PROJECT PERSISTENCE ---
         Storage.saveProject = () => {
             const p = {
-                version: 2.13,
+                version: 2.14,
                 format: document.getElementById('print-format').value,
                 slots: PrintStudio.slots
             };
