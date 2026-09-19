@@ -98,8 +98,8 @@ Den Projektordner einfach per Drag & Drop in das [Netlify Drop Dashboard](https:
 
 Ein besonderer Dank geht an die Community und Maker, die dieses Projekt ermöglichen:
 
-* **[RFIDFriend](https://github.com):** Für die hervorragende Arbeit, den Support und die Bereitstellung hochwertiger **Custom UID Tags (Magic Tags / SLIX)** für die Tonie-Community.
-* **Toniebox Reverse Engineering Team:** Für die Bereitstellung und kontinuierliche Pflege der weltweiten `tonies-json`-Datenbank.
+* **[RFIDFriend]([https://github.com/RFIDfriend/]):** Für die hervorragende Arbeit, den Support und die Bereitstellung hochwertiger **Custom UID Tags (Magic Tags / SLIX)** für die Tonie-Community.
+* **[Toniebox Reverse Engineering Team]([https://github.com/toniebox-reverse-engineering]):** Für die Bereitstellung und kontinuierliche Pflege der weltweiten `tonies-json`-Datenbank.
 * **nortakales / flipper-zero-tonies:** Für die Kuration und Pflege der Community-NFC-Dumps.
 
 ---
