@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>TagGen Studio V2.6.2 LTS – Community Edition</title>
+<title>TagGen Studio V2.6.3 LTS – Community Edition</title>
 <!-- ESP Web Tools -->
 <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
 <style>
 /* =========================================
-1. DESIGN SYSTEM & VARIABLES (Sprint 1)
+1. DESIGN SYSTEM & VARIABLES (Phoenix LTS)
 ========================================= */
 :root {
 --bg: #0f172a;
@@ -270,19 +270,6 @@ z-index: 5;
 }
 .fav-btn:hover { border-color: var(--accent2); color: var(--accent2); transform: scale(1.1); }
 .fav-btn.active { color: var(--accent2); border-color: var(--accent2); }
-.match-badge {
-position: absolute;
-top: 6px; left: 6px;
-color: #ffffff;
-font-size: 9px;
-font-weight: 700;
-padding: 3px 6px;
-border-radius: 8px;
-letter-spacing: 0.02em;
-pointer-events: none;
-z-index: 5;
-box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
 .card-title {
 font-size: 14px;
 font-weight: 700;
@@ -533,7 +520,7 @@ HEADER
 </div>
 <div class="header-actions">
 <span class="db-status" id="db-status">Lade Datenbank...</span>
-<span class="version-pill">V2.6.2 LTS</span>
+<span class="version-pill">V2.6.3 LTS</span>
 </div>
 </header>
 <!-- =========================================
@@ -741,21 +728,32 @@ Firmware Web-Installer (benötigt Chrome/Edge)
 </div>
 <div id="toast">Nachricht</div>
 <!-- =========================================
-JAVASCRIPT ARCHITECTURE (Phoenix LTS)
+JAVASCRIPT ARCHITECTURE (Phoenix LTS V2.6.3)
 ========================================= -->
 <script>
+// Phoenix Sicherheitsnetz gegen unbehandelte Skriptfehler
+window.addEventListener('error', event => {
+console.error('[Phoenix LTS Fatal]', event.error || event.message);
+});
 const App = {
 init() {
+try {
 Editor.initDragDrop();
 PrintStudio.init();
 Data.init();
-document.getElementById('search-input').addEventListener('input', Search.filter);
-document.getElementById('print-format').addEventListener('change', PrintStudio.changeFormat);
+const searchInput = document.getElementById('search-input');
+if (searchInput) searchInput.addEventListener('input', Search.filter);
+const printFormat = document.getElementById('print-format');
+if (printFormat) printFormat.addEventListener('change', PrintStudio.changeFormat);
+} catch (e) {
+console.error("App.init Fehler:", e);
+}
 },
 switchView(view) {
 document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
 document.querySelectorAll('.workspace').forEach(w => w.classList.remove('active'));
-document.getElementById(⁠view-${view}⁠).classList.add('active');
+const target = document.getElementById(⁠view-${view}⁠);
+if (target) target.classList.add('active');
 if (view === 'print') PrintStudio.render();
 }
 };
@@ -800,7 +798,7 @@ const PrintStudio = { slots: [] };
 const NfcStudio = { mode: 'usb', port: null, writer: null, bleDevice: null, bleChar: null };
 const Storage = {};
 /* =========================================================
-DATABASE NORMALIZATION
+DATABASE NORMALIZATION & LTS ROBUSTNESS
 ========================================================= */
 const clean = value => {
 if (value === null || value === undefined) return '';
@@ -908,19 +906,23 @@ id: item.id, item, text: item.searchText || ''
 };
 Data.init = async () => {
 UI.showToast("Synchronisiere Datenbank...");
+let rawV1 = [];
+let rawV2 = [];
 try {
+const controller = new AbortController();
+const timeoutId = setTimeout(() => controller.abort(), 9000);
 const [resV1, resV2] = await Promise.all([
-fetch('https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json'),
-fetch('https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/toniesV2.json').catch(() => null)
+fetch('https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json', { signal: controller.signal }),
+fetch('https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/toniesV2.json', { signal: controller.signal }).catch(() => null)
 ]);
+clearTimeout(timeoutId);
 if (!resV1.ok) {
 throw new Error(⁠HTTP ${resV1.status} beim Laden von tonies.json⁠);
 }
-let rawV1 = await resV1.json();
+rawV1 = await resV1.json();
 if (!Array.isArray(rawV1)) {
 rawV1 = Object.values(rawV1 || {});
 }
-let rawV2 = [];
 if (resV2 && resV2.ok) {
 try {
 rawV2 = await resV2.json();
@@ -929,6 +931,31 @@ rawV2 = Object.values(rawV2 || {});
 }
 } catch (e2) {
 rawV2 = [];
+}
+}
+localStorage.setItem('phoenix_tonies_cache_v1', JSON.stringify(rawV1));
+if (rawV2.length > 0) {
+localStorage.setItem('phoenix_tonies_cache_v2', JSON.stringify(rawV2));
+}
+document.getElementById('db-status').textContent = 'Online';
+} catch (error) {
+console.warn("Netzwerk-Sync fehlgeschlagen, lade Cache:", error);
+const cachedV1 = localStorage.getItem('phoenix_tonies_cache_v1');
+const cachedV2 = localStorage.getItem('phoenix_tonies_cache_v2');
+if (cachedV1) {
+try {
+rawV1 = JSON.parse(cachedV1);
+if (cachedV2) rawV2 = JSON.parse(cachedV2);
+document.getElementById('db-status').textContent = 'Offline (Cache)';
+UI.showToast("Datenbank aus Cache geladen");
+} catch (cacheErr) {
+console.error("Cache Parse Fehler:", cacheErr);
+}
+}
+if (rawV1.length === 0) {
+document.getElementById('db-status').textContent = 'DB-Fehler';
+UI.showToast(⁠Datenbankfehler: ${error.message || error}⁠);
+return;
 }
 }
 Data.buildV2Map(rawV2);
@@ -965,11 +992,7 @@ else if (Data.tonies.length > 0) Editor.load(Data.tonies[0], true);
 } else if (Data.tonies.length > 0) {
 Editor.load(Data.tonies[0], true);
 }
-} catch (error) {
-console.error("TagGen Database Error:", error);
-UI.showToast(⁠DB-Fehler: ${error.message || error}⁠);
-document.getElementById('db-status').textContent = 'DB-Fehler';
-}
+// Unkritischer NFC Dump Sync im Hintergrund
 try {
 await Data.loadDumpIndex();
 Search.filter();
@@ -977,7 +1000,7 @@ if (Editor.current && Editor.current.id) {
 Editor.update();
 }
 } catch (dumpErr) {
-console.warn("NFC Dump Sync fehlgeschlagen (nicht kritisch):", dumpErr);
+console.warn("NFC Dump Sync im Hintergrund übersprungen:", dumpErr);
 }
 };
 Data.loadDumpIndex = async () => {
@@ -1030,7 +1053,8 @@ Library.currentPage = 1;
 Search.filter();
 };
 Search.filter = () => {
-const rawQuery = document.getElementById('search-input').value || '';
+const searchInput = document.getElementById('search-input');
+const rawQuery = searchInput ? searchInput.value : '';
 const queryParts = clean(rawQuery).split(/\s+/).filter(Boolean);
 const favs = JSON.parse(localStorage.getItem('phoenix_favs') || '[]');
 const recent = History.get();
@@ -1066,6 +1090,7 @@ if(e.key === 'ArrowRight') Library.nextPage();
 });
 UI.renderCards = () => {
 const grid = document.getElementById('asset-grid');
+if (!grid) return;
 const favs = JSON.parse(localStorage.getItem('phoenix_favs') || '[]');
 const total = Library.filteredData.length;
 const totalPages = Math.ceil(total / Library.itemsPerPage) || 1;
@@ -1075,7 +1100,7 @@ const paginated = Library.filteredData.slice(start, start + Library.itemsPerPage
 const pagination = document.getElementById('pagination-controls');
 if (total === 0) {
 grid.innerHTML = '<div style="text-align:center; padding:20px; color:var(--muted); font-size:13px; grid-column:1/-1;">Nichts gefunden</div>';
-pagination.style.display = 'none';
+if (pagination) pagination.style.display = 'none';
 return;
 }
 const fragment = document.createDocumentFragment();
@@ -1091,7 +1116,6 @@ const img = document.createElement('img');
 img.className = 'card-img';
 img.loading = 'lazy';
 img.decoding = 'async';
-img.fetchPriority = 'low';
 img.src = item.pic || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 img.onerror = () => { img.classList.add('fallback'); };
 imgWrap.appendChild(img);
@@ -1123,13 +1147,18 @@ card.appendChild(meta);
 fragment.appendChild(card);
 });
 grid.replaceChildren(fragment);
+if (pagination) {
 if (totalPages > 1) {
 pagination.style.display = 'flex';
-document.getElementById('page-info').textContent = ⁠${Library.currentPage} / ${totalPages}⁠;
-document.getElementById('btn-prev-page').disabled = Library.currentPage === 1;
-document.getElementById('btn-next-page').disabled = Library.currentPage === totalPages;
+const pageInfo = document.getElementById('page-info');
+if (pageInfo) pageInfo.textContent = ⁠${Library.currentPage} / ${totalPages}⁠;
+const prevBtn = document.getElementById('btn-prev-page');
+const nextBtn = document.getElementById('btn-next-page');
+if (prevBtn) prevBtn.disabled = Library.currentPage === 1;
+if (nextBtn) nextBtn.disabled = Library.currentPage === totalPages;
 } else {
 pagination.style.display = 'none';
+}
 }
 };
 UI.toggleFav = (id) => {
@@ -1141,6 +1170,7 @@ Search.filter();
 };
 UI.showToast = (msg) => {
 const t = document.getElementById('toast');
+if (!t) return;
 t.textContent = msg;
 t.classList.add('show');
 setTimeout(() => t.classList.remove('show'), 2500);
@@ -1198,10 +1228,10 @@ Editor.state.zoom = parseInt(document.getElementById('slider-zoom').value);
 Editor.state.x = parseInt(document.getElementById('slider-x').value);
 Editor.state.y = parseInt(document.getElementById('slider-y').value);
 Editor.state.fontSize = parseInt(document.getElementById('slider-font').value);
-document.getElementById('val-zoom').textContent = Editor.state.zoom + '%';
-document.getElementById('val-x').textContent = Editor.state.x + '%';
-document.getElementById('val-y').textContent = Editor.state.y + '%';
-document.getElementById('val-font').textContent = Editor.state.fontSize + '%';
+document.getElementById('val-zoom').textContent = ⁠${Editor.state.zoom}%⁠;
+document.getElementById('val-x').textContent = ⁠${Editor.state.x}%⁠;
+document.getElementById('val-y').textContent = ⁠${Editor.state.y}%⁠;
+document.getElementById('val-font').textContent = ⁠${Editor.state.fontSize}%⁠;
 const img = document.getElementById('preview-img');
 img.src = Editor.current.pic || '';
 img.style.transform = ⁠translate(${Editor.state.x}%, ${Editor.state.y}%) scale(${Editor.state.zoom / 100})⁠;
@@ -1215,6 +1245,7 @@ document.getElementById('svg-text-bottom').textContent = Editor.current.title;
 };
 Editor.initDragDrop = () => {
 const zone = document.getElementById('drop-zone');
+if (!zone) return;
 zone.ondragover = e => e.preventDefault();
 zone.ondrop = e => {
 e.preventDefault();
@@ -1225,8 +1256,14 @@ r.onload = ev => { Editor.current.pic = ev.target.result; Editor.update(); };
 r.readAsDataURL(file);
 }
 };
-['series','title','uid'].forEach(id => document.getElementById(⁠input-${id}⁠).addEventListener('input', Editor.update));
-['zoom','x','y','font'].forEach(id => document.getElementById(⁠slider-${id}⁠).addEventListener('input', Editor.update));
+['series','title','uid'].forEach(id => {
+const el = document.getElementById(⁠input-${id}⁠);
+if (el) el.addEventListener('input', Editor.update);
+});
+['zoom','x','y','font'].forEach(id => {
+const el = document.getElementById(⁠slider-${id}⁠);
+if (el) el.addEventListener('input', Editor.update);
+});
 };
 PrintStudio.init = () => {
 PrintStudio.slots = new Array(12).fill(null);
@@ -1241,16 +1278,20 @@ const geo = {
 'custom': { w: 43, h: 43, cols: 3, rows: 4, ml: 30.5, mt: 47.5, gx: 10, gy: 10 }
 };
 const customInput = document.getElementById('custom-size-input');
-const conf = geo[key] || geo['43-12'];
-if (key === 'custom') {
-const cVal = parseInt(customInput.value) || 43;
-conf.w = cVal; conf.h = cVal;
+const base = geo[key] || geo['43-12'];
+const conf = { ...base };
+if (key === 'custom' && customInput) {
+const cVal = parseInt(customInput.value, 10) || 43;
+conf.w = cVal;
+conf.h = cVal;
 }
 return conf;
 };
 PrintStudio.changeFormat = () => {
-const key = document.getElementById('print-format').value;
-document.getElementById('custom-size-wrap').style.display = key === 'custom' ? 'flex' : 'none';
+const fmtSelect = document.getElementById('print-format');
+const key = fmtSelect ? fmtSelect.value : '43-12';
+const customWrap = document.getElementById('custom-size-wrap');
+if (customWrap) customWrap.style.display = key === 'custom' ? 'flex' : 'none';
 const geo = PrintStudio.getGeometry(key);
 const total = geo.cols * geo.rows;
 const old = PrintStudio.slots;
@@ -1262,8 +1303,10 @@ PrintStudio.render();
 };
 PrintStudio.render = () => {
 const grid = document.getElementById('sheet-grid');
+if (!grid) return;
 grid.innerHTML = '';
-const key = document.getElementById('print-format').value;
+const fmtSelect = document.getElementById('print-format');
+const key = fmtSelect ? fmtSelect.value : '43-12';
 const geo = PrintStudio.getGeometry(key);
 let count = 0;
 PrintStudio.slots.forEach((data, index) => {
@@ -1282,7 +1325,7 @@ slot.ondragleave = () => slot.classList.remove('drag-over');
 slot.ondrop = e => {
 e.preventDefault();
 slot.classList.remove('drag-over');
-const from = parseInt(e.dataTransfer.getData('text'));
+const from = parseInt(e.dataTransfer.getData('text'), 10);
 if (from !== index && !isNaN(from)) {
 const t = PrintStudio.slots[from];
 PrintStudio.slots[from] = PrintStudio.slots[index];
@@ -1295,14 +1338,15 @@ count++;
 const s = document.createElement('div');
 s.className = 'sticker';
 s.draggable = true;
-s.ondragstart = e => e.dataTransfer.setData('text', index);
+s.ondragstart = e => e.dataTransfer.setData('text', String(index));
 const fScale = data.state.fontSize / 100;
-s.innerHTML = ⁠<img src="${data.pic}" style="width:100%; height:100%; object-fit:contain; position:absolute; transform:translate(${data.state.x}%, ${data.state.y}%) scale(${data.state.zoom/100})"> <svg viewBox="0 0 100 100" style="position:absolute; inset:0; width:100%; height:100%;"> <path id="p-t-${index}" d="M 16,50 A 34,34 0 0,1 84,50" fill="none"/> <path id="p-u-${index}" d="M 22,50 A 28,28 0 0,0 78,50" fill="none"/> <path id="p-b-${index}" d="M 14,50 A 36,36 0 0,0 86,50" fill="none"/> <text font-size="${(7.5*fScale).toFixed(1)}" font-weight="bold" fill="var(--accent)" text-anchor="middle"><textPath href="#p-t-${index}" startOffset="50%" letter-spacing="0.1em">${data.series}</textPath></text> <text font-size="${(5*fScale).toFixed(1)}" font-weight="bold" fill="var(--muted)" text-anchor="middle"><textPath href="#p-u-${index}" startOffset="50%" letter-spacing="0.12em">${data.uid ? 'ID: '+data.uid : ''}</textPath></text> <text font-size="${(6.5*fScale).toFixed(1)}" font-weight="bold" fill="var(--text)" text-anchor="middle"><textPath href="#p-b-${index}" startOffset="50%" letter-spacing="0.12em">${data.title}</textPath></text> </svg> <div class="sticker-actions"> <button class="s-btn del" onclick="PrintStudio.slots[${index}]=null; PrintStudio.render()">✕</button> </div>⁠;
+s.innerHTML = ⁠<img src="${data.pic}" style="width:100%; height:100%; object-fit:contain; position:absolute; transform:translate(${data.state.x}%, ${data.state.y}%) scale(${data.state.zoom/100})"> <svg viewBox="0 0 100 100" style="position:absolute; inset:0; width:100%; height:100%;"> <path id="p-t-${index}" d="M 16,50 A 34,34 0 0,1 84,50" fill="none"/> <path id="p-u-${index}" d="M 22,50 A 28,28 0 0,0 78,50" fill="none"/> <path id="p-b-${index}" d="M 14,50 A 36,36 0 0,0 86,50" fill="none"/> <text font-size="${(7.5*fScale).toFixed(1)}" font-weight="bold" fill="var(--accent)" text-anchor="middle"><textPath href="#p-t-${index}" startOffset="50%" letter-spacing="0.1em">${data.series}</textPath></text> <text font-size="${(5*fScale).toFixed(1)}" font-weight="bold" fill="var(--muted)" text-anchor="middle"><textPath href="#p-u-${index}" startOffset="50%" letter-spacing="0.12em">${data.uid ?⁠ID: ${data.uid}⁠: ''}</textPath></text> <text font-size="${(6.5*fScale).toFixed(1)}" font-weight="bold" fill="var(--text)" text-anchor="middle"><textPath href="#p-b-${index}" startOffset="50%" letter-spacing="0.12em">${data.title}</textPath></text> </svg> <div class="sticker-actions"> <button class="s-btn del" onclick="PrintStudio.slots[${index}]=null; PrintStudio.render()">✕</button> </div>⁠;
 slot.appendChild(s);
 }
 grid.appendChild(slot);
 });
-document.getElementById('print-count').textContent = count;
+const printCount = document.getElementById('print-count');
+if (printCount) printCount.textContent = count;
 };
 PrintStudio.addCurrentToSheet = () => {
 const emptyIdx = PrintStudio.slots.findIndex(s => s === null);
@@ -1320,9 +1364,10 @@ PrintStudio.render();
 UI.showToast("Druckbogen geleert.");
 };
 Storage.saveProject = () => {
+const fmtSelect = document.getElementById('print-format');
 const p = {
-version: 2.6,
-format: document.getElementById('print-format').value,
+version: 2.63,
+format: fmtSelect ? fmtSelect.value : '43-12',
 slots: PrintStudio.slots
 };
 const blob = new Blob([JSON.stringify(p)], { type: 'application/json' });
@@ -1340,7 +1385,8 @@ r.onload = ev => {
 try {
 const p = JSON.parse(ev.target.result);
 if (p.slots) {
-document.getElementById('print-format').value = p.format || '43-12';
+const fmtSelect = document.getElementById('print-format');
+if (fmtSelect) fmtSelect.value = p.format || '43-12';
 PrintStudio.slots = p.slots;
 PrintStudio.changeFormat();
 UI.showToast("Projekt erfolgreich geladen!");
@@ -1353,19 +1399,31 @@ r.readAsText(file);
 };
 NfcStudio.setMode = (mode) => {
 NfcStudio.mode = mode;
-document.getElementById('hw-usb').classList.toggle('active', mode === 'usb');
-document.getElementById('hw-ble').classList.toggle('active', mode === 'ble');
+const btnUsb = document.getElementById('hw-usb');
+const btnBle = document.getElementById('hw-ble');
+if (btnUsb) btnUsb.classList.toggle('active', mode === 'usb');
+if (btnBle) btnBle.classList.toggle('active', mode === 'ble');
 };
 NfcStudio.connect = async () => {
 if (NfcStudio.mode === 'usb') {
+if (!('serial' in navigator)) {
+return UI.showToast("Web Serial wird von diesem Browser nicht unterstützt.");
+}
 try {
 NfcStudio.port = await navigator.serial.requestPort();
 await NfcStudio.port.open({ baudRate: 115200 });
 NfcStudio.writer = NfcStudio.port.writable.getWriter();
-document.getElementById('nfc-conn-status').innerHTML = '<span style="color:var(--status-exact)">🟢 USB Verbunden</span>';
+const statusEl = document.getElementById('nfc-conn-status');
+if (statusEl) statusEl.innerHTML = '<span style="color:var(--status-exact)">🟢 USB Verbunden</span>';
 UI.showToast("ESP32 via USB verbunden.");
-} catch(e) { UI.showToast("USB-Verbindungsfehler."); }
+} catch(e) {
+console.error("[NFC USB]", e);
+UI.showToast(⁠USB-Verbindungsfehler: ${e.message || e}⁠);
+}
 } else {
+if (!('bluetooth' in navigator)) {
+return UI.showToast("Web Bluetooth wird von diesem Browser nicht unterstützt.");
+}
 try {
 NfcStudio.bleDevice = await navigator.bluetooth.requestDevice({
 filters: [{ namePrefix: 'NFC' }, { namePrefix: 'ESP' }],
@@ -1374,23 +1432,34 @@ optionalServices: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e']
 const server = await NfcStudio.bleDevice.gatt.connect();
 const srv = await server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
 NfcStudio.bleChar = await srv.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e');
-document.getElementById('nfc-conn-status').innerHTML = '<span style="color:var(--status-exact)">🟢 BLE Verbunden</span>';
+const statusEl = document.getElementById('nfc-conn-status');
+if (statusEl) statusEl.innerHTML = '<span style="color:var(--status-exact)">🟢 BLE Verbunden</span>';
 UI.showToast("ESP32 via Bluetooth verbunden.");
-} catch(e) { UI.showToast("BLE-Verbindungsfehler."); }
+} catch(e) {
+console.error("[NFC BLE]", e);
+UI.showToast(⁠BLE-Verbindungsfehler: ${e.message || e}⁠);
+}
 }
 };
 NfcStudio.flashTag = async () => {
 const uid = Editor.current.uid;
 if (!uid) return UI.showToast("Keine Audio-ID geladen!");
-const uidHex = uid.length >= 14 ? uid.toUpperCase() : "E00403" + uid.padStart(10, '0').toUpperCase();
+const uidHex = uid.length >= 14 ? uid.toUpperCase() : ⁠E00403${uid.padStart(10, '0').toUpperCase()}⁠;
 const cmd = ⁠{"cmd":"write_magic_tag","uid":"${uidHex}"}\n⁠;
 const payload = new TextEncoder().encode(cmd);
 try {
-if (NfcStudio.mode === 'usb' && NfcStudio.writer) await NfcStudio.writer.write(payload);
-else if (NfcStudio.mode === 'ble' && NfcStudio.bleChar) await NfcStudio.bleChar.writeValue(payload);
-else return UI.showToast("Bitte erst Hardware verbinden!");
+if (NfcStudio.mode === 'usb' && NfcStudio.writer) {
+await NfcStudio.writer.write(payload);
+} else if (NfcStudio.mode === 'ble' && NfcStudio.bleChar) {
+await NfcStudio.bleChar.writeValue(payload);
+} else {
+return UI.showToast("Bitte erst Hardware verbinden!");
+}
 UI.showToast("Flash-Kommando gesendet!");
-} catch(e) { UI.showToast("Übertragungsfehler."); }
+} catch(e) {
+console.error("[NFC Flash]", e);
+UI.showToast("Übertragungsfehler beim Flashen.");
+}
 };
 // Automatischer Start beim Laden der Seite
 window.addEventListener('DOMContentLoaded', App.init);
