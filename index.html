@@ -3,28 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TagGen Studio V2 – Phoenix</title>
+    <title>TagGen Studio V2.1 – Phoenix</title>
     
-    <!-- ESP Web Tools für direkten Firmware-Flash aus dem Browser -->
+    <!-- ESP Web Tools -->
     <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
 
     <style>
         :root {
             --primary: #e11d48;
             --primary-hover: #be123c;
-            --bg-canvas: #f1f5f9;
+            --bg-canvas: #f8fafc;
             --bg-sidebar: #ffffff;
             --border: #e2e8f0;
             --text-main: #0f172a;
             --text-muted: #64748b;
-            --flipper-orange: #ff8200;
+            
+            /* Status Colors */
+            --status-exact: #10b981; /* Green */
+            --status-fuzzy: #f59e0b; /* Yellow */
+            --status-none: #94a3b8;  /* Gray */
+            --status-custom: #8b5cf6; /* Purple */
+            --flipper: #ff8200;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -32,13 +38,12 @@
             background-color: var(--bg-canvas);
             color: var(--text-main);
             height: 100vh;
-            height: 100dvh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
 
-        /* HEADER */
+        /* --- HEADER & NAV --- */
         header {
             height: 60px;
             background: #ffffff;
@@ -46,41 +51,31 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 12px;
+            padding: 0 20px;
             z-index: 100;
             flex-shrink: 0;
-            gap: 8px;
         }
 
         .brand {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-weight: 700;
-            font-size: 15px;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 16px;
             color: var(--text-main);
-            white-space: nowrap;
-            flex-shrink: 0;
+            letter-spacing: -0.02em;
         }
 
+        /* Neues NFC/Tag Logo */
         .brand svg {
-            width: 22px;
-            height: 22px;
-            fill: var(--primary);
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
-
-        .brand span {
-            color: var(--primary);
-        }
-
-        /* Top Nav View Switcher */
-        .view-switcher-container {
-            overflow-x: auto;
-            scrollbar-width: none;
-            -webkit-overflow-scrolling: touch;
-            display: flex;
-        }
-        .view-switcher-container::-webkit-scrollbar { display: none; }
 
         .view-switcher {
             display: flex;
@@ -88,23 +83,21 @@
             padding: 4px;
             border-radius: 8px;
             gap: 4px;
-            flex-shrink: 0;
         }
 
         .view-btn {
             background: transparent;
             border: none;
-            padding: 6px 11px;
-            font-size: 12px;
+            padding: 6px 14px;
+            font-size: 13px;
             font-weight: 600;
             color: var(--text-muted);
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s;
-            white-space: nowrap;
             display: inline-flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
         }
 
         .view-btn.active {
@@ -116,47 +109,13 @@
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .header-info {
+            gap: 12px;
             font-size: 12px;
             color: var(--text-muted);
             font-weight: 500;
-            display: none;
         }
 
-        .refresh-btn {
-            background: #f8fafc;
-            border: 1px solid var(--border);
-            padding: 5px 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 11px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            color: var(--text-main);
-            transition: all 0.2s;
-            white-space: nowrap;
-        }
-
-        .refresh-btn:hover {
-            background: #e2e8f0;
-            border-color: #cbd5e1;
-        }
-
-        @media(min-width: 768px) {
-            header { padding: 0 20px; }
-            .brand { font-size: 17px; }
-            .view-btn { padding: 6px 14px; font-size: 13px; }
-            .header-info { display: block; }
-            .refresh-btn { font-size: 12px; padding: 5px 10px; }
-        }
-
-        /* MAIN LAYOUT */
+        /* --- MAIN LAYOUT --- */
         .app-container {
             display: flex;
             flex: 1;
@@ -164,156 +123,78 @@
             position: relative;
         }
 
-        /* SIDEBARS */
         .sidebar {
-            width: 100%;
-            max-width: 350px;
+            width: 360px;
             background: var(--bg-sidebar);
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            transition: transform 0.25s ease, width 0.25s ease, opacity 0.2s;
             z-index: 20;
-            position: absolute;
-            height: 100%;
-            top: 0;
-            left: 0;
+            transition: transform 0.3s ease;
         }
 
-        .sidebar.right {
-            border-right: none;
-            border-left: 1px solid var(--border);
-            max-width: 320px;
-            left: auto;
-            right: 0;
-            transform: translateX(100%);
-            overflow-y: auto;
-            z-index: 25;
+        .sidebar.hidden {
+            display: none;
         }
 
-        .sidebar.right.mobile-open {
-            transform: translateX(0);
-        }
-
-        .sidebar.hidden-panel {
-            transform: translateX(-100%);
-            width: 0;
-            overflow: hidden;
-            border: none;
-            pointer-events: none;
-        }
-
-        /* Responsive Desktop Rules */
-        @media(min-width: 1024px) {
-            .sidebar {
-                position: relative;
-                transform: none !important;
-                pointer-events: auto !important;
-            }
-            .sidebar.right {
-                transform: none !important;
-            }
-            .sidebar.hidden-panel {
-                display: none !important;
-                width: 0 !important;
-            }
-        }
-
-        .sidebar-header {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .tabs {
-            display: flex;
-            gap: 15px;
-            border-bottom: 1px solid var(--border);
-            padding: 0 16px;
-        }
-
-        .tab {
-            padding: 10px 0;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-muted);
-            background: none;
-            border: none;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .tab.active {
-            color: var(--primary);
-        }
-
-        .tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--primary);
-        }
-
-        .search-box {
-            padding: 12px 16px;
+        /* --- LIBRARY TAB --- */
+        .lib-header {
+            padding: 15px 20px;
             border-bottom: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 12px;
         }
 
         .search-input {
             width: 100%;
-            padding: 8px 12px;
+            padding: 10px 12px;
             border: 1px solid var(--border);
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 13px;
             outline: none;
-            transition: border-color 0.2s;
+            background: var(--bg-canvas);
         }
 
-        .search-input:focus {
-            border-color: var(--primary);
-        }
-
-        .search-filter-row {
+        .filter-row {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 12px;
-            color: var(--text-muted);
+            gap: 8px;
+        }
+        
+        .filter-select {
+            flex: 1;
+            padding: 6px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 11px;
+            color: var(--text-main);
+            background: #fff;
+            outline: none;
         }
 
-        /* ASSET GRID */
         .asset-scroll {
             flex: 1;
             overflow-y: auto;
-            padding: 12px 16px;
+            padding: 15px;
         }
 
         .asset-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            display: flex;
+            flex-direction: column;
             gap: 10px;
-            align-content: start;
-            grid-auto-rows: max-content;
         }
 
+        /* Saubere DOM Cards (Kein String-HTML) */
         .asset-card {
             background: #fff;
             border: 1px solid var(--border);
-            border-radius: 8px;
+            border-radius: 10px;
             overflow: hidden;
             cursor: pointer;
-            transition: all 0.15s;
             display: flex;
-            flex-direction: column;
-            min-height: 155px;
+            gap: 12px;
+            padding: 10px;
+            transition: all 0.15s;
             position: relative;
         }
 
@@ -322,216 +203,136 @@
             box-shadow: 0 4px 12px rgba(225, 29, 72, 0.08);
         }
 
-        .asset-thumb {
-            height: 85px;
-            width: 100%;
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            background-color: #f8fafc;
+        .card-img-wrap {
+            width: 65px;
+            height: 65px;
+            background: var(--bg-canvas);
+            border-radius: 6px;
             flex-shrink: 0;
-            position: relative;
-        }
-
-        .fav-btn {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: rgba(255,255,255,0.95);
-            border: none;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            font-size: 13px;
-            color: #cbd5e1;
-            transition: color 0.2s;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
         }
 
-        .fav-btn.active {
-            color: #eab308;
+        .card-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        /* Fallback Image Style */
+        .card-img-wrap img.fallback {
+            width: 50%;
+            height: 50%;
+            opacity: 0.3;
         }
 
-        .flipper-pill-badge {
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            background: var(--flipper-orange);
-            color: #ffffff;
-            font-size: 9px;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 10px;
+        .card-content {
+            flex: 1;
             display: flex;
-            align-items: center;
-            gap: 3px;
-            box-shadow: 0 2px 4px rgba(255,130,0,0.3);
-            pointer-events: none;
-            letter-spacing: 0.02em;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0; /* for text truncation */
         }
 
-        .asset-info {
-            padding: 8px;
+        .card-serie {
             font-size: 11px;
-            display: flex;
-            flex-direction: column;
-            gap: 2px;
-            flex-shrink: 0;
-        }
-
-        .asset-info strong {
+            font-weight: 700;
             color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
-        .asset-info span {
-            color: var(--text-muted);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        /* CENTER WORKSPACE */
-        .workspace {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-            width: 100%;
-        }
-
-        .canvas-container {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 15px;
-            overflow: auto;
-            position: relative;
-        }
-
-        .design-toolbar {
-            position: absolute;
-            top: 12px;
-            left: 12px;
-            right: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 5;
-            gap: 8px;
-        }
-
-        .btn {
-            background: var(--primary);
-            color: #ffffff;
-            border: none;
-            padding: 8px 14px;
-            border-radius: 8px;
+        .card-title {
+            font-size: 13px;
             font-weight: 600;
-            font-size: 12px;
-            cursor: pointer;
-            transition: background 0.2s, transform 0.1s;
-            display: inline-flex;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
             align-items: center;
             gap: 6px;
-            white-space: nowrap;
         }
 
-        .btn:hover {
-            background: var(--primary-hover);
+        /* Status Badges */
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
         }
+        .status-exact { background: var(--status-exact); }
+        .status-fuzzy { background: var(--status-fuzzy); }
+        .status-none { background: var(--status-none); }
 
-        .btn-secondary {
-            background: #ffffff;
-            color: var(--text-main);
-            border: 1px solid var(--border);
+        /* --- EDITOR VIEW --- */
+        .workspace {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            position: relative;
+            background: #f1f5f9;
         }
+        .workspace.active { display: flex; }
 
-        .btn-secondary:hover {
-            background: #f8fafc;
-            color: var(--primary);
-            border-color: var(--primary);
-        }
-
-        /* MOBILE FLOATING BAR */
-        .mobile-nav-bar {
-            position: absolute;
-            bottom: 15px;
-            left: 50%;
-            transform: translateX(-50%);
+        .editor-layout {
             display: flex;
-            gap: 8px;
-            z-index: 30;
+            flex: 1;
+            overflow: hidden;
         }
 
-        @media(min-width: 1024px) {
-            .mobile-nav-bar { display: none; }
-        }
-
-        .mobile-toggle-btn {
-            background: #0f172a;
-            color: #fff;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 30px;
-            font-size: 12px;
-            font-weight: 600;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-            cursor: pointer;
-            display: inline-flex;
+        .canvas-area {
+            flex: 1;
+            display: flex;
             align-items: center;
-            gap: 5px;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
         }
 
-        /* LIVE PREVIEW CANVAS */
-        .tag-preview-card {
-            background: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            padding: 20px;
+        /* Preview Card - Cleaner Hierarchy */
+        .preview-wrapper {
+            background: #fff;
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.04);
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 15px;
-            max-width: 360px;
-            width: 100%;
+            gap: 20px;
         }
 
-        .tag-circle-preview {
-            width: 230px;
-            height: 230px;
+        .tag-circle {
+            width: 260px;
+            height: 260px;
             border-radius: 50%;
             border: 2px dashed #cbd5e1;
             position: relative;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             background: #fff;
         }
 
-        @media(min-width: 768px) {
-            .tag-preview-card { padding: 28px; max-width: 410px; gap: 18px; }
-            .tag-circle-preview { width: 280px; height: 280px; }
-        }
-
-        .tag-circle-preview img {
+        .tag-circle img {
             width: 100%;
             height: 100%;
             object-fit: contain;
             position: absolute;
-            transition: transform 0.05s ease-out;
+            transition: transform 0.1s;
         }
 
-        .tag-circle-preview svg {
+        .tag-circle svg {
             position: absolute;
             inset: 0;
             width: 100%;
@@ -539,82 +340,93 @@
             pointer-events: none;
         }
 
-        /* RIGHT PANEL CONTROLS */
-        .control-group {
-            padding: 16px;
+        .editor-controls {
+            width: 320px;
+            background: #fff;
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        .control-section {
+            padding: 20px;
             border-bottom: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
 
-        .control-label {
+        .control-section h3 {
             font-size: 11px;
-            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: var(--text-muted);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            margin-bottom: 5px;
         }
 
         .input-group {
             display: flex;
             flex-direction: column;
-            gap: 5px;
+            gap: 4px;
         }
-
         .input-group label {
-            font-size: 13px;
-            font-weight: 500;
+            font-size: 12px;
+            font-weight: 600;
             display: flex;
-            align-items: center;
-            gap: 8px;
+            justify-content: space-between;
         }
-
-        .input-group input[type="text"], .input-group select, .input-group input[type="number"] {
-            padding: 8px 12px;
+        .input-group input[type="text"] {
+            padding: 8px 10px;
             border: 1px solid var(--border);
             border-radius: 6px;
             font-size: 13px;
             outline: none;
+        }
+        .input-group input[type="text"]:focus { border-color: var(--primary); }
+
+        .btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        .btn:hover { background: var(--primary-hover); }
+        .btn-secondary {
             background: #fff;
+            color: var(--text-main);
+            border: 1px solid var(--border);
         }
+        .btn-secondary:hover { background: #f8fafc; border-color: var(--primary); color: var(--primary); }
 
-        .input-group input:focus, .input-group select:focus {
-            border-color: var(--primary);
-        }
-
-        .range-slider {
-            width: 100%;
-            accent-color: var(--primary);
-        }
-
-        /* PRINT STUDIO VIEW */
-        .print-workspace {
-            display: none;
-            flex: 1;
-            flex-direction: column;
-            background: #e2e8f0;
-            overflow-y: auto;
-            padding: 15px;
-            align-items: center;
-        }
-
-        .print-toolbar-bar {
-            background: #ffffff;
-            padding: 10px 14px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        /* --- PRINT STUDIO --- */
+        .print-toolbar {
+            background: #fff;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
             display: flex;
-            gap: 10px;
-            align-items: center;
-            margin-bottom: 15px;
-            max-width: 950px;
-            width: 100%;
             justify-content: space-between;
+            align-items: center;
             flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .print-scroll {
+            flex: 1;
+            overflow: auto;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
         }
 
         .a4-sheet {
@@ -622,275 +434,121 @@
             min-height: 297mm;
             background: white;
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            padding: 15mm;
-            display: grid;
-            gap: 4mm;
-            box-sizing: border-box;
-            transform: scale(0.65);
+            position: relative;
             transform-origin: top center;
-            margin-bottom: -100px;
-            transition: all 0.2s;
+            /* Scaling for view */
+            transform: scale(0.8);
+            margin-bottom: -50px;
         }
 
-        @media(min-width: 768px) {
-            .print-workspace { padding: 25px; }
-            .a4-sheet { transform: scale(0.85); margin-bottom: -40px; }
+        /* Exact Geometry Container */
+        .sheet-grid {
+            display: grid;
+            width: 100%;
+            height: 100%;
         }
 
-        @media(min-width: 1200px) {
-            .a4-sheet { transform: scale(1); margin-bottom: 0; }
-        }
-
-        .print-slot {
+        .slot {
             border: 1px dashed #cbd5e1;
-            border-radius: 8px;
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            position: relative;
-            background: #f8fafc;
-            overflow: hidden;
-            transition: background 0.15s, border-color 0.15s;
-            min-height: 44mm;
         }
+        .slot.drag-over { background: #ffe4e6; border-color: var(--primary); }
 
-        .print-slot.drag-over {
-            border-color: var(--primary) !important;
-            background: #ffe4e6 !important;
-        }
-
-        .print-slot-number {
-            position: absolute;
-            top: 4px;
-            left: 6px;
-            font-size: 10px;
-            color: #94a3b8;
-            font-weight: 600;
-            pointer-events: none;
-        }
-
-        .print-sticker {
+        .sticker {
             border-radius: 50%;
             position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: white;
-            margin: auto;
             overflow: hidden;
+            background: #fff;
             cursor: grab;
-            user-select: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
-
-        .print-sticker:active {
-            cursor: grabbing;
-        }
+        .sticker:active { cursor: grabbing; }
 
         .sticker-actions {
             position: absolute;
-            top: 4px;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translate(-50%, -50%);
             display: flex;
-            gap: 3px;
-            background: rgba(15, 23, 42, 0.88);
-            backdrop-filter: blur(4px);
-            padding: 3px 6px;
+            gap: 4px;
+            background: rgba(15, 23, 42, 0.85);
+            padding: 6px;
             border-radius: 20px;
-            opacity: 0.15;
-            transition: opacity 0.2s ease;
-            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
         }
-
-        .print-sticker:hover .sticker-actions {
-            opacity: 1;
-        }
-
-        .sticker-action-btn {
-            background: transparent;
-            border: none;
-            color: #fff;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            font-size: 10px;
-            font-weight: bold;
-            transition: background 0.15s;
-        }
-
-        .sticker-action-btn.move:hover { background: #475569; }
-        .sticker-action-btn.clone:hover { background: #0284c7; }
-        .sticker-action-btn.nfc:hover { background: #10b981; }
-        .sticker-action-btn.delete:hover { background: #e11d48; }
-
-        /* DUMP STUDIO VIEW */
-        .dump-workspace {
-            display: none;
-            flex: 1;
-            background: #e2e8f0;
-            overflow-y: auto;
-            padding: 15px;
-            align-items: flex-start;
-            justify-content: center;
-        }
+        .sticker:hover .sticker-actions { opacity: 1; pointer-events: auto; }
         
-        .dump-container {
+        .s-btn {
+            background: none; border: none; color: #fff; font-size: 14px; cursor: pointer;
+            width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+        }
+        .s-btn:hover { background: rgba(255,255,255,0.2); }
+        .s-btn.del:hover { background: var(--primary); }
+
+        /* --- NFC / DUMP STUDIO --- */
+        .nfc-container {
+            max-width: 800px;
+            margin: 40px auto;
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            max-width: 950px;
-            width: 100%;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 0 20px;
         }
 
-        @media(min-width: 800px) {
-            .dump-container { grid-template-columns: 1fr 1fr; }
-        }
-
-        .dump-card {
+        .nfc-card {
             background: #fff;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            border: 1px solid var(--border);
         }
 
-        .dump-card h3 {
-            color: var(--text-main);
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 8px;
+        .nfc-card h2 {
+            font-size: 16px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
             gap: 8px;
-            font-size: 15px;
+            border-bottom: 2px solid var(--bg-canvas);
+            padding-bottom: 10px;
         }
 
-        .dump-card p {
-            font-size: 13px;
-            line-height: 1.5;
-            color: var(--text-muted);
-        }
-
-        .dump-info-box {
-            background: #f8fafc;
-            border: 1px solid var(--border);
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 13px;
+        .hardware-toggle {
             display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .dump-info-box strong { color: var(--text-main); }
-
-        .connection-toggle {
-            display: flex;
-            background: #e2e8f0;
+            background: var(--bg-canvas);
             padding: 4px;
             border-radius: 8px;
-            gap: 4px;
+            margin-bottom: 15px;
         }
-
-        .connection-btn {
-            flex: 1;
-            background: transparent;
-            border: none;
-            padding: 8px 10px;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
+        .hw-btn {
+            flex: 1; border: none; background: none; padding: 8px; font-size: 12px; font-weight: 600;
+            color: var(--text-muted); border-radius: 6px; cursor: pointer;
         }
+        .hw-btn.active { background: #fff; color: var(--text-main); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
 
-        .connection-btn.active {
-            background: #ffffff;
-            color: var(--text-main);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        /* TOAST NOTIFICATION */
+        /* Toast */
         #toast {
-            position: fixed;
-            bottom: 25px;
-            left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: #0f172a;
-            color: #fff;
-            padding: 10px 18px;
-            border-radius: 30px;
-            font-size: 13px;
-            font-weight: 500;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-            transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            z-index: 1000;
-            pointer-events: none;
-            max-width: 90vw;
-            text-align: center;
+            position: fixed; bottom: 30px; left: 50%; transform: translate(-50%, 100px);
+            background: #0f172a; color: #fff; padding: 12px 24px; border-radius: 30px;
+            font-size: 13px; font-weight: 500; transition: transform 0.3s; z-index: 1000;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
         }
-        #toast.show {
-            transform: translateX(-50%) translateY(0);
-        }
+        #toast.show { transform: translate(-50%, 0); }
 
-        .pagination-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            font-size: 12px;
-            color: var(--text-muted);
-            grid-column: 1 / -1;
-        }
-
-        .pagination-controls button {
-            background: #e2e8f0;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .pagination-controls button:disabled { opacity: 0.4; cursor: not-allowed; }
-
-        /* PRINT MEDIA FIXES */
         @media print {
-            body { background: white !important; }
             body * { visibility: hidden; }
-            .print-workspace, .print-workspace * { visibility: visible; }
-            .print-workspace {
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: 100%;
-                background: white !important;
-                padding: 0 !important;
-                overflow: visible !important;
-            }
-            .print-toolbar-bar, .sticker-actions, .mobile-nav-bar, .print-slot-number { display: none !important; }
-            .a4-sheet {
-                box-shadow: none !important;
-                margin: 0 !important;
-                width: 210mm !important;
-                height: 297mm !important;
-                transform: none !important;
-            }
-            .print-slot { border: none !important; background: transparent !important; }
-            img {
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
+            #workspace-print, #workspace-print * { visibility: visible; }
+            #workspace-print { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: #fff; }
+            .print-toolbar, .sticker-actions { display: none !important; }
+            .a4-sheet { transform: none !important; margin: 0 !important; box-shadow: none !important; }
+            .slot { border: none !important; }
+            img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
 </head>
@@ -898,247 +556,193 @@
 
     <header>
         <div class="brand">
-            <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-            TagGen <span>V2 Phoenix</span>
+            <svg viewBox="0 0 24 24">
+                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/>
+                <path d="M12 6a6 6 0 0 0-6 6 6 6 0 0 0 6 6 6 6 0 0 0 6-6 6 6 0 0 0-6-6zm0 10a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"/>
+                <circle cx="12" cy="12" r="2" fill="currentColor"/>
+            </svg>
+            <span>TagGen <span style="color:var(--text-main); font-weight:600;">Phoenix</span></span>
         </div>
-        
-        <!-- Header View Switcher inkl. Bibliothek-Button -->
-        <div class="view-switcher-container">
-            <div class="view-switcher">
-                <button class="view-btn" id="btn-view-lib" onclick="App.toggleLibrary()">📚 <span class="nav-text">Bibliothek</span></button>
-                <button class="view-btn active" id="btn-view-design" onclick="App.switchView('design')">🎨 <span class="nav-text">Editor</span></button>
-                <button class="view-btn" id="btn-view-print" onclick="App.switchView('print')">🖨️ <span class="nav-text">Print Studio</span></button>
-                <button class="view-btn" id="btn-view-dump" onclick="App.switchView('dump')" style="color: var(--flipper-orange);">📲 <span class="nav-text">Dump Studio</span></button>
-            </div>
+
+        <div class="view-switcher">
+            <button class="view-btn active" data-view="design" onclick="App.switchView('design')">1. Tonie & Editor</button>
+            <button class="view-btn" data-view="print" onclick="App.switchView('print')">2. Druckbogen</button>
+            <button class="view-btn" data-view="nfc" onclick="App.switchView('nfc')">3. NFC Setup</button>
         </div>
 
         <div class="header-actions">
-            <div class="header-info" id="db-counter">Lade Tonies...</div>
-            <button class="refresh-btn" onclick="App.forceFlipperUpdate()" title="Flipper-Zero Dumps von GitHub neu abgleichen">
-                🔄 <span id="flipper-status-text">Dumps</span>
-            </button>
+            <span id="db-status">Lade Datenbank...</span>
         </div>
     </header>
 
     <div class="app-container">
-        <!-- LEFT SIDEBAR: LIBRARY -->
-        <div class="sidebar" id="left-sidebar">
-            <div class="sidebar-header">
-                <span class="control-label" style="font-size: 13px; font-weight: bold; color: var(--text-main);">📚 Tonie-Bibliothek</span>
-                <button class="btn-secondary" style="padding: 4px 8px; font-size: 11px; border-radius: 4px;" onclick="App.toggleLibrary(false)">✕ Schließen</button>
-            </div>
-            <div class="tabs">
-                <button class="tab active" id="tab-db" onclick="Library.switchTab('db')">Datenbank</button>
-                <button class="tab" id="tab-fav" onclick="Library.switchTab('fav')">Favoriten</button>
-            </div>
-            <div class="search-box">
-                <input type="text" class="search-input" id="search-input" placeholder="Tonie oder ID suchen..." oninput="Library.handleSearch(this.value)">
-                <div class="search-filter-row">
-                    <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
-                        <input type="checkbox" id="check-filter-dump" onchange="Library.handleFilterDump(this.checked)"> Nur mit FZ-Dump
-                    </label>
-                    <span id="search-count-label"></span>
-                </div>
-            </div>
-            <div class="asset-scroll">
-                <div class="asset-grid" id="asset-grid"></div>
-            </div>
-        </div>
-
-        <!-- CENTER WORKSPACE: DESIGN EDITOR -->
-        <div class="workspace" id="workspace-design">
-            <div class="design-toolbar">
-                <button class="btn btn-secondary" id="back-to-lib-btn" onclick="App.toggleLibrary(true)">📚 Bibliothek</button>
-                <button class="btn" onclick="Editor.addToPrintStudio()">+ Auf den Druckbogen</button>
-            </div>
-            <div class="canvas-container" id="drop-zone">
-                <div class="tag-preview-card">
-                    <div class="tag-circle-preview" id="preview-circle">
-                        <img id="preview-img" src="" alt="">
-                        <svg viewBox="0 0 100 100" id="preview-svg">
-                            <!-- Oberer Pfad fuer Serie -->
-                            <path id="path-top" d="M 16,50 A 34,34 0 0,1 84,50" fill="none"/>
-                            <!-- Mittlerer/Innerer Pfad oberhalb des Titels fuer UID -->
-                            <path id="path-uid" d="M 22,50 A 28,28 0 0,0 78,50" fill="none"/>
-                            <!-- Unterer Pfad fuer Titel -->
-                            <path id="path-bottom" d="M 14,50 A 36,36 0 0,0 86,50" fill="none"/>
-
-                            <!-- Serie Text -->
-                            <text font-size="7.5" font-weight="bold" fill="#e11d48" text-anchor="middle" id="svg-text-top-node">
-                                <textPath href="#path-top" startOffset="50%" id="svg-text-top" letter-spacing="0.1em"></textPath>
-                            </text>
-
-                            <!-- UID Text (sauber oberhalb des Titels geschwungen) -->
-                            <text font-size="5" font-weight="bold" fill="#64748b" text-anchor="middle" id="svg-text-uid-node">
-                                <textPath href="#path-uid" startOffset="50%" id="svg-text-uid" letter-spacing="0.12em"></textPath>
-                            </text>
-
-                            <!-- Titel Text -->
-                            <text font-size="6.5" font-weight="bold" fill="#0f172a" text-anchor="middle" id="svg-text-bottom-node">
-                                <textPath href="#path-bottom" startOffset="50%" id="svg-text-bottom" letter-spacing="0.12em"></textPath>
-                            </text>
-
-                            <!-- Flipper Zero NFC Badge (dezent & mittig oberhalb der Schrift) -->
-                            <g id="flipper-badge" style="display: none;">
-                                <circle cx="50" cy="71" r="4.2" fill="#FF8200"/>
-                                <path d="M48 72.2 A 2.5 2.5 0 0 1 52 72.2 M46.8 70.6 A 4.2 4.2 0 0 1 53.2 70.6 M48.8 73.8 A 1.2 1.2 0 0 1 51.2 73.8" stroke="white" stroke-width="0.7" fill="none" stroke-linecap="round"/>
-                            </g>
-                        </svg>
+        
+        <!-- ==================== VIEW 1: EDITOR & LIBRARY ==================== -->
+        <div class="workspace active" id="view-design">
+            <div class="editor-layout">
+                
+                <!-- Sidebar Library -->
+                <div class="sidebar" id="lib-sidebar">
+                    <div class="lib-header">
+                        <input type="text" class="search-input" id="search-input" placeholder="🔎 Tonie, Serie oder ID suchen...">
+                        <div class="filter-row">
+                            <select class="filter-select" id="filter-lang">
+                                <option value="">🌐 Alle Sprachen</option>
+                                <option value="de-de">Deutsch</option>
+                                <option value="en-us">Englisch</option>
+                            </select>
+                            <select class="filter-select" id="filter-dump">
+                                <option value="all">Alle Tonies</option>
+                                <option value="exact">🟢 Exakter Dump</option>
+                                <option value="fuzzy">🟡 Fuzzy Match</option>
+                            </select>
+                        </div>
                     </div>
-                    <div style="font-size: 11px; color: var(--text-muted); text-align: center;">
-                        💡 Tipp: Eigenes Bild per Drag & Drop hier ablegen
+                    <div class="asset-scroll" id="asset-grid">
+                        <!-- Cards injected via JS -->
                     </div>
                 </div>
-            </div>
 
-            <!-- Mobile Floating Navigation -->
-            <div class="mobile-nav-bar">
-                <button class="mobile-toggle-btn" onclick="App.toggleLibrary()">📚 Bibliothek</button>
-                <button class="mobile-toggle-btn" onclick="App.toggleMobilePanel('right')">⚙️ Anpassung</button>
+                <!-- Center Canvas -->
+                <div class="canvas-area" id="drop-zone">
+                    <div class="preview-wrapper">
+                        <div class="tag-circle" id="preview-circle">
+                            <img id="preview-img" src="" alt="" loading="lazy">
+                            <svg viewBox="0 0 100 100" id="preview-svg">
+                                <path id="path-top" d="M 16,50 A 34,34 0 0,1 84,50" fill="none"/>
+                                <path id="path-uid" d="M 22,50 A 28,28 0 0,0 78,50" fill="none"/>
+                                <path id="path-bottom" d="M 14,50 A 36,36 0 0,0 86,50" fill="none"/>
+
+                                <text font-size="7.5" font-weight="bold" fill="#e11d48" text-anchor="middle" id="svg-text-top-node">
+                                    <textPath href="#path-top" startOffset="50%" id="svg-text-top" letter-spacing="0.1em"></textPath>
+                                </text>
+                                <text font-size="5" font-weight="bold" fill="#64748b" text-anchor="middle" id="svg-text-uid-node">
+                                    <textPath href="#path-uid" startOffset="50%" id="svg-text-uid" letter-spacing="0.12em"></textPath>
+                                </text>
+                                <text font-size="6.5" font-weight="bold" fill="#0f172a" text-anchor="middle" id="svg-text-bottom-node">
+                                    <textPath href="#path-bottom" startOffset="50%" id="svg-text-bottom" letter-spacing="0.12em"></textPath>
+                                </text>
+                            </svg>
+                        </div>
+                        <button class="btn" onclick="PrintStudio.addCurrentToSheet()" style="width: 100%;">+ Auf den Druckbogen</button>
+                    </div>
+                </div>
+
+                <!-- Right Sidebar Editor Controls -->
+                <div class="editor-controls">
+                    <div class="control-section">
+                        <h3>Texte</h3>
+                        <div class="input-group">
+                            <label>Serie (Oben)</label>
+                            <input type="text" id="input-serie">
+                        </div>
+                        <div class="input-group">
+                            <label>Titel (Unten)</label>
+                            <input type="text" id="input-title">
+                        </div>
+                        <div class="input-group">
+                            <label>Audio ID (Mitte)</label>
+                            <input type="text" id="input-uid" placeholder="16-stellige Hex-ID">
+                        </div>
+                        <div class="input-group" style="margin-top: 10px;">
+                            <label>Schriftgröße <span id="val-font" style="color:var(--primary)">100%</span></label>
+                            <input type="range" class="range-slider" id="slider-font" min="70" max="150" value="100">
+                        </div>
+                    </div>
+                    <div class="control-section">
+                        <h3>Bildausrichtung</h3>
+                        <div class="input-group">
+                            <label>Zoom <span id="val-zoom">100%</span></label>
+                            <input type="range" class="range-slider" id="slider-zoom" min="50" max="200" value="100">
+                        </div>
+                        <div class="input-group">
+                            <label>X-Achse <span id="val-x">0%</span></label>
+                            <input type="range" class="range-slider" id="slider-x" min="-40" max="40" value="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Y-Achse <span id="val-y">0%</span></label>
+                            <input type="range" class="range-slider" id="slider-y" min="-40" max="40" value="0">
+                        </div>
+                        <button class="btn-secondary" style="margin-top:10px; padding: 6px; font-size:11px;" onclick="Editor.resetTransform()">Zurücksetzen</button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- RIGHT SIDEBAR: TYPOGRAPHY & TRANSFORM -->
-        <div class="sidebar right" id="right-sidebar">
-            <div class="sidebar-header">
-                <span class="control-label">Typografie & Layout</span>
-                <button class="btn-secondary" style="padding: 2px 6px; font-size: 10px; border-radius: 4px;" onclick="App.toggleMobilePanel('right', false)">✕</button>
-            </div>
-            <div class="control-group">
-                <div class="input-group">
-                    <label><input type="checkbox" id="check-serie" checked onchange="Editor.update()"> Serie (Oben)</label>
-                    <input type="text" id="input-serie" oninput="Editor.update()">
-                </div>
-                <div class="input-group">
-                    <label><input type="checkbox" id="check-title" checked onchange="Editor.update()"> Titel (Unten)</label>
-                    <input type="text" id="input-title" oninput="Editor.update()">
-                </div>
-                <div class="input-group">
-                    <label><input type="checkbox" id="check-uid" onchange="Editor.update()"> UID / ID (Über Titel)</label>
-                    <input type="text" id="input-uid" placeholder="Hex-Code / Audio-ID" oninput="Editor.update()">
-                </div>
-                <div class="input-group">
-                    <label>Schriftgröße <span id="fontsize-val" style="margin-left:auto; color: var(--primary); font-weight: bold;">100%</span></label>
-                    <input type="range" class="range-slider" id="slider-fontsize" min="70" max="150" value="100" oninput="Editor.update()">
-                </div>
-            </div>
-
-            <div class="control-group">
-                <span class="control-label">
-                    Bild-Transformation
-                    <button class="btn-secondary" style="padding: 2px 6px; font-size: 10px; border-radius: 4px; cursor: pointer;" onclick="Editor.resetTransform()">Reset</button>
-                </span>
-                <div class="input-group">
-                    <label>Zoom <span id="zoom-val" style="margin-left:auto; font-weight: bold;">100%</span></label>
-                    <input type="range" class="range-slider" id="slider-zoom" min="50" max="200" value="100" oninput="Editor.update()">
-                </div>
-                <div class="input-group">
-                    <label>Position X (Horizontal) <span id="posx-val" style="margin-left:auto; font-weight: bold;">0%</span></label>
-                    <input type="range" class="range-slider" id="slider-posx" min="-40" max="40" value="0" oninput="Editor.update()">
-                </div>
-                <div class="input-group">
-                    <label>Position Y (Vertikal) <span id="posy-val" style="margin-left:auto; font-weight: bold;">0%</span></label>
-                    <input type="range" class="range-slider" id="slider-posy" min="-40" max="40" value="0" oninput="Editor.update()">
-                </div>
-            </div>
-        </div>
-
-        <!-- PRINT STUDIO VIEW -->
-        <div class="print-workspace" id="workspace-print">
-            <div class="print-toolbar-bar">
-                <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                    <strong>Bogenformat:</strong>
-                    <select id="label-format-select" onchange="PrintStudio.changeFormat(this.value)" style="padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border);">
-                        <option value="43-12">Avery / Münzkapsel 43 mm (12er • 3×4)</option>
-                        <option value="40-24">Avery Zweckform 40 mm (24er • 4×6)</option>
-                        <option value="40-12">Avery Zweckform 40 mm (12er • 3×4)</option>
-                        <option value="30-48">Avery Zweckform 30 mm (48er • 6×8)</option>
-                        <option value="custom">Frei definierbar (mm)</option>
+        <!-- ==================== VIEW 2: PRINT STUDIO ==================== -->
+        <div class="workspace" id="view-print">
+            <div class="print-toolbar">
+                <div style="display:flex; gap:15px; align-items:center;">
+                    <select id="print-format" class="btn-secondary" style="padding:8px; border-radius:8px;">
+                        <option value="43-12">Münzkapsel 43mm (3x4)</option>
+                        <option value="40-24">Avery Zweckform 40mm (4x6)</option>
+                        <option value="30-48">Avery Zweckform 30mm (6x8)</option>
                     </select>
-                    <div id="custom-size-wrap" style="display: none; align-items: center; gap: 4px;">
-                        <input type="number" id="custom-size-input" value="43" min="10" max="90" style="width: 55px; padding: 5px;" oninput="PrintStudio.renderSheet()" title="Durchmesser in mm">
-                        <span style="font-size: 12px; color: var(--text-muted);">mm Ø</span>
-                    </div>
-                    <span style="font-size: 12px; color: var(--text-muted); margin-left: 6px;" id="print-counter">0 belegt</span>
+                    <span style="font-size:12px; color:var(--text-muted);"><b id="print-count">0</b> Sticker belegt</span>
                 </div>
-                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                    <button class="btn btn-secondary" onclick="PrintStudio.exportUIDs()">📋 UID-Liste</button>
-                    <button class="btn btn-secondary" onclick="PrintStudio.clearSheet()">Leeren</button>
-                    <button class="btn" onclick="window.print()">🖨️ Drucken</button>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn-secondary" onclick="Storage.saveProject()">💾 Projekt speichern</button>
+                    <button class="btn-secondary" onclick="document.getElementById('file-load').click()">📂 Laden</button>
+                    <input type="file" id="file-load" style="display:none" accept=".json" onchange="Storage.loadProject(event)">
+                    <button class="btn-secondary" onclick="PrintStudio.clear()">🗑️ Leeren</button>
+                    <button class="btn" onclick="window.print()">🖨️ PDF / Drucken</button>
                 </div>
             </div>
-            <div class="a4-sheet" id="print-sheet"></div>
+            <div class="print-scroll">
+                <div class="a4-sheet" id="print-sheet">
+                    <!-- Geometrie wird von JS berechnet -->
+                    <div class="sheet-grid" id="sheet-grid"></div>
+                </div>
+            </div>
         </div>
 
-        <!-- DUMP STUDIO VIEW (FELD 4) -->
-        <div class="dump-workspace" id="workspace-dump">
-            <div class="dump-container">
-                <!-- CARD 1: FIRMWARE FLASHER -->
-                <div class="dump-card">
-                    <h3>🛠️ 1. ESP32 Web-Flasher</h3>
-                    <p>
-                        Apple iOS blockiert native Magic Tag Schreibbefehle via WebNFC, und Android ist oft beschränkt. 
-                        <strong>Die Lösung:</strong> Ein ESP32 + PN5180 als Brücke!
+        <!-- ==================== VIEW 3: NFC / DUMP STUDIO ==================== -->
+        <div class="workspace" id="view-nfc">
+            <div class="nfc-container">
+                
+                <!-- Card 1: ESP32 Setup -->
+                <div class="nfc-card">
+                    <h2>🛠️ Hardware Setup</h2>
+                    <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px;">
+                        Apple iOS und Standard-Android limitieren direkte Magic-Tag-Schreibbefehle. 
+                        Nutze einen <b>ESP32 + PN5180</b> als Brücke, um Tags direkt aus dem Browser zu flashen.
                     </p>
-                    <div style="background: #fffbeb; padding: 12px; border-radius: 8px; border: 1px solid #fde68a; font-size: 12px; color: #92400e;">
-                        Verbinde dein ESP32 Entwicklerboard per USB. Klicke auf "Connect", um die <a href="https://github.com/RFIDfriend/NFC-Archiver" target="_blank" style="color: var(--primary);">NFC-Archiver Firmware</a> von RFIDfriend direkt aus dem Browser zu installieren.
-                    </div>
-                    
-                    <div style="display: flex; justify-content: center; padding: 15px 0;">
+                    <div style="background:#f1f5f9; padding:15px; border-radius:8px; text-align:center; margin-bottom:15px;">
+                        <span style="display:block; font-size:12px; font-weight:bold; margin-bottom:10px;">Firmware Flasher (Erfordert Chrome/Edge)</span>
                         <esp-web-install-button manifest="https://raw.githubusercontent.com/RFIDfriend/NFC-Archiver/main/flash/manifest.json"></esp-web-install-button>
                     </div>
-                    <p style="font-size: 11px; text-align: center; color: var(--text-muted);">
-                        (Firmware-Flash erfordert Chrome/Edge auf Windows, Mac oder Linux)
-                    </p>
                 </div>
 
-                <!-- CARD 2: TAG WRITER -->
-                <div class="dump-card">
-                    <h3>📲 2. Web Tag-Writer</h3>
-                    <p>
-                        Kopple dein Gerät mit dem NFC Archiver, um den SLIX-L Magic Tag drahtlos oder per USB zu beschreiben.
-                    </p>
-
-                    <!-- CONNECTION TOGGLE (USB / BLE) -->
-                    <div class="connection-toggle">
-                        <button class="connection-btn active" id="btn-conn-usb" onclick="DumpStudio.setConnectionType('usb')">🔌 USB (Desktop)</button>
-                        <button class="connection-btn" id="btn-conn-ble" onclick="DumpStudio.setConnectionType('ble')">📡 Bluetooth (Mobile)</button>
+                <!-- Card 2: Tag Writer -->
+                <div class="nfc-card">
+                    <h2>📲 Magic Tag Writer</h2>
+                    <div class="hardware-toggle">
+                        <button class="hw-btn active" id="hw-usb" onclick="NfcStudio.setMode('usb')">🔌 USB (Web Serial)</button>
+                        <button class="hw-btn" id="hw-ble" onclick="NfcStudio.setMode('ble')">📡 Bluetooth (BLE)</button>
                     </div>
-                    
-                    <div class="dump-info-box" style="margin-top: 5px;">
-                        <div style="display: flex; justify-content: space-between;">
-                            <span>Aktueller Tonie:</span>
-                            <strong id="dump-target-name">Kein Tonie gewählt</strong>
+
+                    <div style="background:#f8fafc; border:1px solid var(--border); padding:12px; border-radius:8px; margin-bottom:15px; font-size:13px;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                            <span>Tonie:</span><strong id="nfc-target-title">-</strong>
                         </div>
-                        <div style="display: flex; justify-content: space-between;">
-                            <span>Target UID:</span>
-                            <strong id="dump-target-uid">Keine UID</strong>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                            <span>UID:</span><strong id="nfc-target-uid">-</strong>
                         </div>
-                        <div style="display: flex; justify-content: space-between; margin-top: 5px; padding-top: 5px; border-top: 1px dashed #cbd5e1;">
-                            <span>Dump Status:</span>
-                            <strong id="dump-status-badge">🔴 Kein Dump</strong>
+                        <div style="display:flex; justify-content:space-between; padding-top:5px; border-top:1px dashed var(--border);">
+                            <span>Dump:</span><strong id="nfc-target-status">-</strong>
                         </div>
                     </div>
 
-                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0;">
-                        <span id="hardware-status" style="font-weight: bold; color: #e11d48; font-size: 13px;">🔴 Nicht verbunden</span>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn btn-secondary" onclick="DumpStudio.disconnectHardware()" style="padding: 6px 12px; font-size: 11px;">Trennen</button>
-                            <button class="btn" id="btn-hardware-connect" style="background: #10b981; padding: 6px 12px; font-size: 11px;" onclick="DumpStudio.connectHardware()">Verbinden</button>
-                        </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                        <span id="nfc-conn-status" style="font-size:12px; font-weight:bold; color:var(--text-muted);">🔴 Getrennt</span>
+                        <button class="btn-secondary" style="font-size:11px; padding:6px 12px;" onclick="NfcStudio.connect()">Verbinden</button>
                     </div>
-                    
-                    <p id="ios-ble-hint" style="display:none; font-size: 11px; text-align: center; margin-top: -8px; color: #d97706;">
-                        ⚠️ iOS-Nutzer: Nutze den <strong>Bluefy</strong> WebBLE Browser aus dem App Store.
-                    </p>
 
-                    <button class="btn" style="width: 100%; padding: 12px; font-size: 14px; justify-content: center; background: var(--flipper-orange);" onclick="DumpStudio.writeTag()">
-                        ⚡ Dump auf Magic Tag flashen
+                    <button class="btn" style="width:100%; background:var(--flipper-orange); padding:12px;" onclick="NfcStudio.flashTag()">
+                        ⚡ Magic Tag (SLIX) Flashen
                     </button>
-                    <p style="font-size: 11px; text-align: center; color: var(--text-muted);">
-                        Leg den Tag auf das PN5180 Modul und klicke auf Flashen.
-                    </p>
                 </div>
+
             </div>
         </div>
 
@@ -1146,930 +750,571 @@
 
     <div id="toast">Nachricht</div>
 
+    <!-- Anwendungs-Logik Modularisiert -->
     <script>
-        const State = {
-            db: [],
-            favorites: JSON.parse(localStorage.getItem('taggen_favs') || '[]'),
-            currentTab: 'db',
-            filterOnlyWithDump: false,
-            isLibraryOpen: true,
-            currentDesign: {
-                serie: '',
-                title: '',
-                uid: '',
-                pic: '',
-                zoom: 100,
-                posX: 0,
-                posY: 0,
-                fontSize: 100,
-                showSerie: true,
-                showTitle: true,
-                showUid: false,
-                hasFlipperDump: false
-            },
-            formatKey: '43-12',
-            printSlots: new Array(12).fill(null),
-            flipperIndex: []
-        };
-
-        const App = {
-            init() {
-                // UI & Drag-Drop sofort initialisieren (niemals blockieren!)
-                Editor.initDragDrop();
-                PrintStudio.renderSheet();
-
-                // Responsive Library Panel Default
-                if (window.innerWidth < 1024) {
-                    State.isLibraryOpen = false;
-                    document.getElementById('left-sidebar').classList.add('hidden-panel');
-                } else {
-                    State.isLibraryOpen = true;
-                    document.getElementById('left-sidebar').classList.remove('hidden-panel');
-                }
-                this.updateLibBtnState();
-
-                // Asynchrones Laden starten (blockiert die UI nicht!)
-                this.startAsyncDataLoad();
-            },
-
-            async startAsyncDataLoad() {
-                try {
-                    await Library.loadData();
-                    if (State.db.length > 0) {
-                        App.loadToEditor(State.db[0], true);
-                    }
-                } catch(e) {
-                    console.error("Fehler beim Laden der Tonie-Datenbank:", e);
-                }
-
-                // Flipper Dumps laden im Hintergrund
-                try {
-                    await App.loadFlipperIndex();
-                } catch(e) {
-                    console.warn("Flipper-Dump Laden fehlgeschlagen:", e);
-                }
-            },
-
-            toggleLibrary(forceState) {
-                if (typeof forceState === 'boolean') {
-                    State.isLibraryOpen = forceState;
-                } else {
-                    State.isLibraryOpen = !State.isLibraryOpen;
-                }
-
-                const libEl = document.getElementById('left-sidebar');
-                if (State.isLibraryOpen) {
-                    libEl.classList.remove('hidden-panel');
-                    // Falls wir im Print- oder Dump-Studio waren, zurück zum Editor
-                    if (document.getElementById('workspace-design').style.display === 'none') {
-                        App.switchView('design');
-                    }
-                } else {
-                    libEl.classList.add('hidden-panel');
-                }
-
-                this.updateLibBtnState();
-            },
-
-            updateLibBtnState() {
-                const btn = document.getElementById('btn-view-lib');
-                if (btn) {
-                    btn.classList.toggle('active', State.isLibraryOpen);
-                }
-            },
-
-            async loadFlipperIndex() {
-                const cacheKey = 'flipper_index_cache_v2';
-                const timeKey = 'flipper_index_time_v2';
-                const now = Date.now();
-
-                const cached = localStorage.getItem(cacheKey);
-                const cachedTime = localStorage.getItem(timeKey);
-                if (cached && cachedTime && (now - parseInt(cachedTime) < 24 * 60 * 60 * 1000)) {
-                    try {
-                        State.flipperIndex = JSON.parse(cached);
-                        App.updateDumperStatus();
-                        Library.filter(document.getElementById('search-input').value);
-                        Editor.update();
-                        return;
-                    } catch(e) {}
-                }
-
-                const branches = ['master', 'main'];
-                let loaded = false;
-
-                for (const branch of branches) {
-                    try {
-                        const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 6000); // 6s Timeout gegen Hänger
-                        const res = await fetch(`https://api.github.com/repos/nortakales/flipper-zero-tonies/git/trees/${branch}?recursive=1`, { signal: controller.signal });
-                        clearTimeout(timeoutId);
-
-                        if (res.ok) {
-                            const data = await res.json();
-                            if (data.tree && Array.isArray(data.tree)) {
-                                const nfcFiles = data.tree.filter(f => f.path && f.path.endsWith('.nfc'));
-                                
-                                State.flipperIndex = nfcFiles.map(file => {
-                                    const path = file.path;
-                                    const isGerman = path.toLowerCase().startsWith('german/');
-                                    const parts = path.split('/');
-                                    const filename = parts[parts.length - 1].replace(/\.nfc$/i, '');
-                                    const folder = parts.length > 2 ? parts[parts.length - 2] : '';
-                                    return { path, name: filename, folder, isGerman };
-                                });
-
-                                localStorage.setItem(cacheKey, JSON.stringify(State.flipperIndex));
-                                localStorage.setItem(timeKey, now.toString());
-                                loaded = true;
-                                break;
-                            }
-                        }
-                    } catch (e) {
-                        console.warn(`Zweig ${branch} Abfrage übersprungen / Timeout`);
-                    }
-                }
-
-                if (!loaded) {
-                    try {
-                        const fallbackRes = await fetch('flipper_index.json');
-                        if (fallbackRes.ok) {
-                            const raw = await fallbackRes.json();
-                            State.flipperIndex = raw.map(item => typeof item === 'string' ? { path: item, name: item, folder: '', isGerman: true } : item);
-                            loaded = true;
-                        }
-                    } catch(e) {}
-                }
-
-                App.updateDumperStatus();
-                Library.filter(document.getElementById('search-input').value);
-                Editor.update();
-            },
-
-            updateDumperStatus() {
-                if (!Array.isArray(State.flipperIndex)) return;
-                const germanCount = State.flipperIndex.filter(d => d.isGerman).length;
-                const totalCount = State.flipperIndex.length;
-                const statusElem = document.getElementById('flipper-status-text');
-                if (statusElem) {
-                    statusElem.innerText = germanCount > 0 ? `${germanCount} DE Dumps` : (totalCount > 0 ? `${totalCount} Dumps` : 'Dumps');
-                }
-            },
-
-            async forceFlipperUpdate() {
-                localStorage.removeItem('flipper_index_time_v2');
-                localStorage.removeItem('flipper_index_cache_v2');
-                showToast("Prüfe GitHub auf neue Dumps...");
-                await this.loadFlipperIndex();
-                showToast(`Abgleich fertig: ${State.flipperIndex.length} Dumps verfügbar`);
-            },
-
-            switchView(view) {
-                document.getElementById('btn-view-design').classList.toggle('active', view === 'design');
-                document.getElementById('btn-view-print').classList.toggle('active', view === 'print');
-                document.getElementById('btn-view-dump').classList.toggle('active', view === 'dump');
-                
-                document.getElementById('workspace-design').style.display = view === 'design' ? 'flex' : 'none';
-                document.getElementById('workspace-print').style.display = view === 'print' ? 'flex' : 'none';
-                document.getElementById('workspace-dump').style.display = view === 'dump' ? 'flex' : 'none';
-                
-                // Auf Print/Dump Schirmen schließen wir die Sidebars
-                if (view !== 'design') {
-                    document.getElementById('left-sidebar').classList.add('hidden-panel');
-                    document.getElementById('right-sidebar').classList.remove('mobile-open');
-                    State.isLibraryOpen = false;
-                    this.updateLibBtnState();
-                }
-
-                if (view === 'print') PrintStudio.renderSheet();
-                if (view === 'dump') DumpStudio.updatePreview();
-            },
-
-            toggleMobilePanel(panel, forceState) {
-                const right = document.getElementById('right-sidebar');
-                if (typeof forceState === 'boolean') {
-                    right.classList.toggle('mobile-open', forceState);
-                } else {
-                    right.classList.toggle('mobile-open');
-                }
-            },
-
-            loadToEditor(item, isInitial = false) {
-                State.currentDesign.serie = item.serie || '';
-                State.currentDesign.title = item.ep || item.title || '';
-                State.currentDesign.uid = item.id || '';
-                State.currentDesign.pic = item.pic || '';
-                State.currentDesign.zoom = 100;
-                State.currentDesign.posX = 0;
-                State.currentDesign.posY = 0;
-                State.currentDesign.fontSize = 100;
-
-                document.getElementById('input-serie').value = State.currentDesign.serie;
-                document.getElementById('input-title').value = State.currentDesign.title;
-                document.getElementById('input-uid').value = State.currentDesign.uid;
-                document.getElementById('slider-zoom').value = 100;
-                document.getElementById('slider-posx').value = 0;
-                document.getElementById('slider-posy').value = 0;
-                document.getElementById('slider-fontsize').value = 100;
-                document.getElementById('check-serie').checked = true;
-                document.getElementById('check-title').checked = true;
-                document.getElementById('check-uid').checked = false;
-
-                State.currentDesign.showSerie = true;
-                State.currentDesign.showTitle = true;
-                State.currentDesign.showUid = false;
-
-                Editor.update();
-
-                // Auf mobilen Displays schließen wir nach der Tonie-Auswahl die Bibliothek,
-                // damit der Nutzer direkt das Ergebnis im Editor sieht
-                if (!isInitial && window.innerWidth < 1024) {
-                    App.toggleLibrary(false);
-                }
-                if (!isInitial) {
-                    showToast(`"${State.currentDesign.serie || 'Tonie'}" geladen`);
-                }
-            },
-
-            async convertImageToBase64(url) {
-                if (!url || url.startsWith('data:')) return url;
-                try {
-                    const res = await fetch(url, { mode: 'cors' });
-                    const blob = await res.blob();
-                    return new Promise((resolve) => {
-                        const reader = new FileReader();
-                        reader.onloadend = () => resolve(reader.result);
-                        reader.readAsDataURL(blob);
-                    });
-                } catch (e) {
-                    return url;
-                }
+        // --- 1. GLOBALS & NAMESPACES ---
+        const App = {};
+        const Data = {
+            tonies: [],          // Base Array
+            v2Map: new Map(),    // V2 Data enrichment
+            dumpIndex: {
+                exactIds: new Set(),
+                folders: new Set(),
+                titles: new Set()
             }
         };
-
-        const DumpStudio = {
-            connType: 'usb',
-            port: null,
-            writer: null,
-            bleDevice: null,
-            bleCharacteristic: null,
-
-            setConnectionType(type) {
-                this.connType = type;
-                document.getElementById('btn-conn-usb').classList.toggle('active', type === 'usb');
-                document.getElementById('btn-conn-ble').classList.toggle('active', type === 'ble');
-                
-                const btnConnect = document.getElementById('btn-hardware-connect');
-                const iosHint = document.getElementById('ios-ble-hint');
-                
-                if (type === 'usb') {
-                    btnConnect.innerText = '🔌 USB Verbinden';
-                    iosHint.style.display = 'none';
-                } else {
-                    btnConnect.innerText = '📡 BLE Verbinden';
-                    if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
-                        iosHint.style.display = 'block';
-                    } else {
-                        iosHint.style.display = 'none';
-                    }
-                }
-            },
-
-            updatePreview() {
-                const title = State.currentDesign.title || 'Kein Tonie gewählt';
-                const uid = State.currentDesign.uid || 'Keine UID';
-                document.getElementById('dump-target-name').innerText = title;
-                document.getElementById('dump-target-uid').innerText = uid;
-                
-                const hasDump = State.currentDesign.hasFlipperDump;
-                const statusBadge = document.getElementById('dump-status-badge');
-                if (hasDump) {
-                    statusBadge.innerHTML = '<span style="color:#10b981;">🟢 Flipper Dump verfügbar</span>';
-                } else {
-                    statusBadge.innerHTML = '<span style="color:#e11d48;">🔴 Kein Dump (Nur UID Flash)</span>';
-                }
-            },
-
-            async connectHardware() {
-                if (this.connType === 'usb') {
-                    await this.connectSerial();
-                } else {
-                    await this.connectBLE();
-                }
-            },
-
-            async disconnectHardware() {
-                if (this.connType === 'usb') {
-                    await this.disconnectSerial();
-                } else {
-                    await this.disconnectBLE();
-                }
-            },
-
-            async connectSerial() {
-                try {
-                    if (!navigator.serial) {
-                        showToast("Web Serial wird in diesem Browser nicht unterstützt (Nutze Chrome/Edge).");
-                        return;
-                    }
-                    this.port = await navigator.serial.requestPort();
-                    await this.port.open({ baudRate: 115200 });
-                    this.writer = this.port.writable.getWriter();
-                    this.setHardwareStatus(true, 'USB');
-                    showToast("ESP32 (USB) erfolgreich verbunden!");
-                } catch (e) {
-                    console.error("Serial Error:", e);
-                    showToast("Verbindung fehlgeschlagen oder abgebrochen.");
-                }
-            },
-
-            async disconnectSerial() {
-                if (this.writer) {
-                    this.writer.releaseLock();
-                    this.writer = null;
-                }
-                if (this.port) {
-                    await this.port.close();
-                    this.port = null;
-                }
-                this.setHardwareStatus(false);
-                showToast("USB Verbindung getrennt.");
-            },
-
-            async connectBLE() {
-                try {
-                    if (!navigator.bluetooth) {
-                        showToast("Web Bluetooth API nicht unterstützt (Auf iOS Bluefy Browser nutzen).");
-                        return;
-                    }
-                    showToast("Suche nach NFC-Archiver...");
-                    this.bleDevice = await navigator.bluetooth.requestDevice({
-                        acceptAllDevices: false,
-                        filters: [{ namePrefix: 'NFC' }, { namePrefix: 'ESP' }, { namePrefix: 'Archiver' }],
-                        optionalServices: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e']
-                    });
-
-                    this.bleDevice.addEventListener('gattserverdisconnected', () => this.setHardwareStatus(false));
-                    const server = await this.bleDevice.gatt.connect();
-                    const service = await server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
-                    this.bleCharacteristic = await service.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e');
-                    
-                    this.setHardwareStatus(true, 'BLE');
-                    showToast("ESP32 (Bluetooth) erfolgreich verbunden!");
-                } catch (e) {
-                    console.error("BLE Error:", e);
-                    showToast("Bluetooth Verbindung fehlgeschlagen.");
-                }
-            },
-
-            async disconnectBLE() {
-                if (this.bleDevice && this.bleDevice.gatt.connected) {
-                    this.bleDevice.gatt.disconnect();
-                }
-                this.bleCharacteristic = null;
-                this.bleDevice = null;
-                this.setHardwareStatus(false);
-                showToast("Bluetooth Verbindung getrennt.");
-            },
-
-            setHardwareStatus(isConnected, type = '') {
-                const statusEl = document.getElementById('hardware-status');
-                if (isConnected) {
-                    statusEl.innerHTML = `<span style="color:#10b981; font-weight:bold;">🟢 Verbunden mit ESP32 (${type})</span>`;
-                } else {
-                    statusEl.innerHTML = `<span style="color:#e11d48; font-weight:bold;">🔴 Nicht verbunden</span>`;
-                }
-            },
-
-            async writeTag() {
-                if (this.connType === 'usb' && !this.writer) {
-                    showToast("Fehler: Bitte zuerst via USB verbinden!");
-                    return;
-                }
-                if (this.connType === 'ble' && !this.bleCharacteristic) {
-                    showToast("Fehler: Bitte zuerst via Bluetooth verbinden!");
-                    return;
-                }
-
-                const uid = State.currentDesign.uid;
-                if (!uid) {
-                    showToast("Fehler: Keine UID im Editor hinterlegt!");
-                    return;
-                }
-
-                showToast(`Sende Flash-Befehl via ${this.connType.toUpperCase()}...`);
-                const uidHex = uid.length >= 14 ? uid.toUpperCase() : "E00403" + uid.padStart(10, '0').toUpperCase();
-                const command = `{"cmd": "write_magic_tag", "uid": "${uidHex}"}\n`;
-                const encoder = new TextEncoder();
-                const payload = encoder.encode(command);
-
-                try {
-                    if (this.connType === 'usb') {
-                        await this.writer.write(payload);
-                    } else if (this.connType === 'ble') {
-                        await this.bleCharacteristic.writeValue(payload);
-                    }
-                    setTimeout(() => showToast("✅ Flash-Kommando gesendet!"), 500);
-                } catch (e) {
-                    console.error("Schreibfehler:", e);
-                    showToast("Fehler beim Senden der Daten.");
-                }
-            }
-        };
-
-        const Library = {
-            currentPage: 1,
-            itemsPerPage: 6,
-            currentData: [],
-
-            async loadData() {
-                const sources = [
-                    'https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json',
-                    'https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/TonieV2.json'
-                ];
-
-                let rawData = null;
-                for (const url of sources) {
-                    try {
-                        const controller = new AbortController();
-                        const timeoutId = setTimeout(() => controller.abort(), 6000);
-                        const res = await fetch(url, { signal: controller.signal });
-                        clearTimeout(timeoutId);
-                        if (res.ok) {
-                            rawData = await res.json();
-                            break;
-                        }
-                    } catch (e) {}
-                }
-
-                if (rawData) {
-                    let items = Array.isArray(rawData) ? rawData : Object.values(rawData);
-                    State.db = items.map(i => {
-                        let rawId = i.audio_id || i.id || i.hash || '';
-                        if (Array.isArray(rawId)) rawId = rawId[0];
-
-                        return {
-                            id: String(rawId || ''),
-                            serie: i.series || i.title || i.name || 'Unbekannt',
-                            ep: i.episodes || i.title || i.name || '',
-                            pic: i.picture || i.pic || i.image || ''
-                        };
-                    }).filter(i => i.serie);
-
-                    document.getElementById('db-counter').innerText = `${State.db.length} Tonies ✓`;
-                } else {
-                    document.getElementById('db-counter').innerText = 'Offline-Modus';
-                    State.db = [
-                        { id: "1490952835", serie: "Janosch", ep: "Oh, wie schön ist Panama", pic: "" },
-                        { id: "1234567890", serie: "Die Olchis", ep: "Die Olchis und der schwarze Pirat", pic: "" }
-                    ];
-                }
-                this.filter('');
-            },
-
-            switchTab(tab) {
-                State.currentTab = tab;
-                document.getElementById('tab-db').classList.toggle('active', tab === 'db');
-                document.getElementById('tab-fav').classList.toggle('active', tab === 'fav');
-                this.currentPage = 1;
-                this.filter(document.getElementById('search-input').value);
-            },
-
-            handleSearch(query) {
-                this.currentPage = 1;
-                this.filter(query);
-            },
-
-            handleFilterDump(checked) {
-                State.filterOnlyWithDump = checked;
-                this.currentPage = 1;
-                this.filter(document.getElementById('search-input').value);
-            },
-
-            isDumpAvailable(item) {
-                if (!Array.isArray(State.flipperIndex) || State.flipperIndex.length === 0 || !item) return false;
-
-                const clean = (s) => (s || '').toLowerCase()
-                    .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
-                    .replace(/[^a-z0-9]/g, '');
-
-                const tTitle = clean(item.ep || item.title);
-                const tSerie = clean(item.serie);
-                const tId = clean(item.id);
-
-                return State.flipperIndex.some(dump => {
-                    const dName = clean(dump.name);
-                    const dFolder = clean(dump.folder);
-                    const dPath = clean(dump.path);
-
-                    if (tId && tId.length >= 6 && dPath.includes(tId)) return true;
-                    if (tSerie && tTitle && tTitle.length >= 4) {
-                        if (dFolder.includes(tSerie) && (dName.includes(tTitle) || tTitle.includes(dName))) {
-                            return true;
-                        }
-                    }
-                    if (tTitle && tTitle.length >= 5) {
-                        if (dName.includes(tTitle) || tTitle.includes(dName)) return true;
-                    }
-                    if (tSerie && tSerie.length >= 4 && tTitle && tTitle.length >= 3) {
-                        if (dPath.includes(tSerie) && dName.includes(tTitle.slice(0, 8))) return true;
-                    }
-
-                    return false;
-                });
-            },
-
-            filter(query = '') {
-                let data = State.db;
-                if (State.currentTab === 'fav') {
-                    data = data.filter(item => State.favorites.includes(item.id));
-                }
-                if (query.trim() !== '') {
-                    const q = query.toLowerCase();
-                    data = data.filter(item => 
-                        (item.serie && item.serie.toLowerCase().includes(q)) ||
-                        (item.ep && item.ep.toLowerCase().includes(q)) ||
-                        (item.id && item.id.toLowerCase().includes(q))
-                    );
-                }
-
-                if (State.filterOnlyWithDump) {
-                    data = data.filter(item => this.isDumpAvailable(item));
-                }
-
-                document.getElementById('search-count-label').innerText = `${data.length} Treffer`;
-                this.render(data);
-            },
-
-            render(data) {
-                this.currentData = data;
-                const grid = document.getElementById('asset-grid');
-                grid.innerHTML = '';
-
-                const totalPages = Math.ceil(this.currentData.length / this.itemsPerPage) || 1;
-                if (this.currentPage > totalPages) this.currentPage = totalPages;
-
-                const start = (this.currentPage - 1) * this.itemsPerPage;
-                const paginatedData = this.currentData.slice(start, start + this.itemsPerPage);
-
-                if (paginatedData.length === 0) {
-                    grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: #64748b; padding: 25px;">Keine Tonies gefunden</div>';
-                    return;
-                }
-
-                paginatedData.forEach(item => {
-                    const isFav = State.favorites.includes(item.id);
-                    const hasDump = this.isDumpAvailable(item);
-
-                    const card = document.createElement('div');
-                    card.className = 'asset-card';
-                    card.innerHTML = `
-                        <div class="asset-thumb" style="background-image: url('${item.pic || ''}')">
-                            ${hasDump ? '<div class="flipper-pill-badge" title="Flipper-Zero Dump auf GitHub vorhanden">🐬 FZ Dump</div>' : ''}
-                            <button class="fav-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); Library.toggleFav('${item.id}')" title="Favorit">
-                                ${isFav ? '★' : '☆'}
-                            </button>
-                        </div>
-                        <div class="asset-info">
-                            <strong>${item.serie || 'Unbekannt'}</strong>
-                            <span>${item.ep || item.id || ''}</span>
-                        </div>
-                    `;
-                    card.onclick = () => App.loadToEditor(item);
-                    grid.appendChild(card);
-                });
-
-                if (totalPages > 1) {
-                    const pagination = document.createElement('div');
-                    pagination.className = 'pagination-controls';
-                    pagination.innerHTML = `
-                        <button onclick="Library.prevPage()" ${this.currentPage === 1 ? 'disabled' : ''}>← Zurück</button>
-                        <span>${this.currentPage} / ${totalPages}</span>
-                        <button onclick="Library.nextPage()" ${this.currentPage === totalPages ? 'disabled' : ''}>Weiter →</button>
-                    `;
-                    grid.appendChild(pagination);
-                }
-            },
-
-            nextPage() {
-                this.currentPage++;
-                this.render(this.currentData);
-            },
-
-            prevPage() {
-                this.currentPage--;
-                this.render(this.currentData);
-            },
-
-            toggleFav(id) {
-                const idx = State.favorites.indexOf(id);
-                if (idx > -1) {
-                    State.favorites.splice(idx, 1);
-                } else {
-                    State.favorites.push(id);
-                }
-                localStorage.setItem('taggen_favs', JSON.stringify(State.favorites));
-                this.filter(document.getElementById('search-input').value);
-            }
-        };
-
+        const Search = {};
+        const UI = {};
         const Editor = {
-            initDragDrop() {
-                const zone = document.getElementById('drop-zone');
-                zone.ondragover = (e) => e.preventDefault();
-                zone.ondrop = (e) => {
-                    e.preventDefault();
-                    const file = e.dataTransfer.files[0];
-                    if (file && file.type.startsWith('image/')) {
-                        const reader = new FileReader();
-                        reader.onload = (event) => {
-                            State.currentDesign.pic = event.target.result;
-                            this.update();
-                            showToast("Eigenes Bild erfolgreich geladen");
-                        };
-                        reader.readAsDataURL(file);
-                    }
-                };
-            },
-
-            resetTransform() {
-                State.currentDesign.zoom = 100;
-                State.currentDesign.posX = 0;
-                State.currentDesign.posY = 0;
-                document.getElementById('slider-zoom').value = 100;
-                document.getElementById('slider-posx').value = 0;
-                document.getElementById('slider-posy').value = 0;
-                this.update();
-            },
-
-            update() {
-                State.currentDesign.serie = document.getElementById('input-serie').value;
-                State.currentDesign.title = document.getElementById('input-title').value;
-                State.currentDesign.uid = document.getElementById('input-uid').value;
-                State.currentDesign.zoom = parseInt(document.getElementById('slider-zoom').value) || 100;
-                State.currentDesign.posX = parseInt(document.getElementById('slider-posx').value) || 0;
-                State.currentDesign.posY = parseInt(document.getElementById('slider-posy').value) || 0;
-                State.currentDesign.fontSize = parseInt(document.getElementById('slider-fontsize').value) || 100;
-
-                State.currentDesign.showSerie = document.getElementById('check-serie').checked;
-                State.currentDesign.showTitle = document.getElementById('check-title').checked;
-                State.currentDesign.showUid = document.getElementById('check-uid').checked;
-
-                document.getElementById('zoom-val').innerText = State.currentDesign.zoom + '%';
-                document.getElementById('posx-val').innerText = (State.currentDesign.posX > 0 ? '+' : '') + State.currentDesign.posX + '%';
-                document.getElementById('posy-val').innerText = (State.currentDesign.posY > 0 ? '+' : '') + State.currentDesign.posY + '%';
-                document.getElementById('fontsize-val').innerText = State.currentDesign.fontSize + '%';
-
-                State.currentDesign.hasFlipperDump = Library.isDumpAvailable({
-                    serie: State.currentDesign.serie,
-                    title: State.currentDesign.title,
-                    id: State.currentDesign.uid
-                });
-
-                document.getElementById('flipper-badge').style.display = State.currentDesign.hasFlipperDump ? 'block' : 'none';
-
-                const img = document.getElementById('preview-img');
-                img.src = State.currentDesign.pic || '';
-                img.style.transform = `translate(${State.currentDesign.posX}%, ${State.currentDesign.posY}%) scale(${State.currentDesign.zoom / 100})`;
-
-                const fScale = State.currentDesign.fontSize / 100;
-                const topFontSize = (7.5 * fScale).toFixed(1);
-                const botFontSize = (6.5 * fScale).toFixed(1);
-                const uidFontSize = (5.0 * fScale).toFixed(1);
-
-                document.getElementById('svg-text-top-node').setAttribute('font-size', topFontSize);
-                document.getElementById('svg-text-bottom-node').setAttribute('font-size', botFontSize);
-                document.getElementById('svg-text-uid-node').setAttribute('font-size', uidFontSize);
-
-                document.getElementById('svg-text-top').textContent = State.currentDesign.showSerie ? State.currentDesign.serie : '';
-                document.getElementById('svg-text-uid').textContent = (State.currentDesign.showUid && State.currentDesign.uid) ? 'ID: ' + State.currentDesign.uid : '';
-                document.getElementById('svg-text-bottom').textContent = State.currentDesign.showTitle ? State.currentDesign.title : '';
-                
-                if (document.getElementById('workspace-dump').style.display === 'flex') {
-                    DumpStudio.updatePreview();
-                }
-            },
-
-            async addToPrintStudio() {
-                if (State.currentDesign.pic && !State.currentDesign.pic.startsWith('data:')) {
-                    State.currentDesign.pic = await App.convertImageToBase64(State.currentDesign.pic);
-                }
-
-                const emptyIndex = State.printSlots.findIndex(s => s === null);
-                if (emptyIndex === -1) {
-                    showToast(`Druckbogen ist voll (${State.printSlots.length}/${State.printSlots.length})`);
-                    return;
-                }
-                State.printSlots[emptyIndex] = JSON.parse(JSON.stringify(State.currentDesign));
-                showToast(`Auf Platz ${emptyIndex + 1} platziert!`);
-                App.switchView('print');
-            }
+            state: { zoom: 100, x: 0, y: 0, fontSize: 100 }
         };
+        const PrintStudio = { slots: [] };
+        const NfcStudio = { mode: 'usb', port: null, writer: null, bleDevice: null, bleChar: null };
+        const Storage = {};
 
-        const PrintStudio = {
-            getFormatConfig(formatKey) {
-                switch(formatKey) {
-                    case '40-24': return { cols: 4, rows: 6, count: 24, sizeMm: 40, padding: '15mm 10mm' };
-                    case '40-12': return { cols: 3, rows: 4, count: 12, sizeMm: 40, padding: '15mm' };
-                    case '30-48': return { cols: 6, rows: 8, count: 48, sizeMm: 30, padding: '12mm 8mm' };
-                    case 'custom': {
-                        const customSize = parseInt(document.getElementById('custom-size-input').value) || 43;
-                        return { cols: 3, rows: 4, count: 12, sizeMm: customSize, padding: '15mm' };
-                    }
-                    case '43-12':
-                    default: return { cols: 3, rows: 4, count: 12, sizeMm: 43, padding: '15mm' };
+        // --- 2. DATA LAYER (V1 + V2 + Dumps) ---
+        Data.init = async () => {
+            UI.showToast("Synchronisiere Datenbanken...");
+            try {
+                // Paralleles Laden von V1 und V2
+                const [resV1, resV2] = await Promise.all([
+                    fetch('https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json'),
+                    fetch('https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/TonieV2.json').catch(() => null)
+                ]);
+
+                if (resV1.ok) {
+                    const rawV1 = await resV1.json();
+                    Data.tonies = Array.isArray(rawV1) ? rawV1 : Object.values(rawV1);
                 }
-            },
 
-            changeFormat(val) {
-                State.formatKey = val;
-                const customWrap = document.getElementById('custom-size-wrap');
-                customWrap.style.display = (val === 'custom') ? 'flex' : 'none';
-
-                const config = this.getFormatConfig(val);
-                const oldSlots = State.printSlots;
-                State.printSlots = new Array(config.count).fill(null);
-                for (let i = 0; i < Math.min(oldSlots.length, config.count); i++) {
-                    State.printSlots[i] = oldSlots[i];
+                if (resV2 && resV2.ok) {
+                    const rawV2 = await resV2.json();
+                    const arrV2 = Array.isArray(rawV2) ? rawV2 : Object.values(rawV2);
+                    arrV2.forEach(item => {
+                        let id = item.audio_id || item.id || item.hash;
+                        if(Array.isArray(id)) id = id[0];
+                        if(id) Data.v2Map.set(String(id), item);
+                    });
                 }
-                this.renderSheet();
-            },
 
-            renderSheet() {
-                const sheet = document.getElementById('print-sheet');
-                sheet.innerHTML = '';
-
-                const config = this.getFormatConfig(State.formatKey);
-                sheet.style.gridTemplateColumns = `repeat(${config.cols}, 1fr)`;
-                sheet.style.gridTemplateRows = `repeat(${config.rows}, 1fr)`;
-                sheet.style.padding = config.padding;
-
-                let count = 0;
-
-                State.printSlots.forEach((slot, index) => {
-                    const slotDiv = document.createElement('div');
-                    slotDiv.className = 'print-slot';
-                    slotDiv.dataset.index = index;
-
-                    const numSpan = document.createElement('span');
-                    numSpan.className = 'print-slot-number';
-                    numSpan.innerText = `${index + 1}`;
-                    slotDiv.appendChild(numSpan);
-
-                    slotDiv.ondragover = (e) => { e.preventDefault(); slotDiv.classList.add('drag-over'); };
-                    slotDiv.ondragleave = () => slotDiv.classList.remove('drag-over');
-                    slotDiv.ondrop = (e) => {
-                        e.preventDefault();
-                        slotDiv.classList.remove('drag-over');
-                        const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
-                        if (isNaN(fromIndex) || fromIndex === index) return;
-
-                        const temp = State.printSlots[fromIndex];
-                        State.printSlots[fromIndex] = State.printSlots[index];
-                        State.printSlots[index] = temp;
-                        PrintStudio.renderSheet();
-                        showToast(`Cover von Platz ${fromIndex + 1} auf Platz ${index + 1} verschoben`);
+                // Enrichment
+                Data.tonies = Data.tonies.map(t => {
+                    let id = t.audio_id || t.id || t.hash;
+                    if(Array.isArray(id)) id = id[0];
+                    id = String(id || '');
+                    
+                    const v2 = Data.v2Map.get(id) || {};
+                    return {
+                        id: id,
+                        serie: v2.series || t.series || t.title || 'Unbekannt',
+                        title: v2.episode || t.episodes || t.title || '',
+                        pic: v2.image || t.picture || t.pic || '',
+                        lang: (v2.language || 'de-de').toLowerCase(),
+                        tracks: v2.tracks ? v2.tracks.length : 0
                     };
+                }).filter(t => t.serie);
 
-                    if (slot) {
-                        count++;
-                        const sticker = document.createElement('div');
-                        sticker.className = 'print-sticker';
-                        sticker.style.width = `${config.sizeMm}mm`;
-                        sticker.style.height = `${config.sizeMm}mm`;
-                        sticker.draggable = true;
+                document.getElementById('db-status').textContent = `${Data.tonies.length} Tonies geladen`;
+                
+                await Data.loadDumpIndex();
+                Search.filter();
+                
+                if(Data.tonies.length > 0) Editor.load(Data.tonies[0], true);
 
-                        sticker.ondragstart = (e) => { e.dataTransfer.setData('text/plain', index); };
-
-                        const fScale = (slot.fontSize || 100) / 100;
-                        const topFontSize = (7.5 * fScale).toFixed(1);
-                        const botFontSize = (6.5 * fScale).toFixed(1);
-                        const uidFontSize = (5.0 * fScale).toFixed(1);
-
-                        sticker.innerHTML = `
-                            <div style="width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center;">
-                                <img src="${slot.pic || ''}" style="width: 100%; height: 100%; object-fit: contain; transform: translate(${slot.posX || 0}%, ${slot.posY || 0}%) scale(${slot.zoom / 100}); position: absolute; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
-                                <svg viewBox="0 0 100 100" style="position: absolute; inset: 0; width: 100%; height: 100%;">
-                                    <path id="p-top-${index}" d="M 16,50 A 34,34 0 0,1 84,50" fill="none"/>
-                                    <path id="p-uid-${index}" d="M 22,50 A 28,28 0 0,0 78,50" fill="none"/>
-                                    <path id="p-bot-${index}" d="M 14,50 A 36,36 0 0,0 86,50" fill="none"/>
-                                    
-                                    <text font-size="${topFontSize}" font-weight="bold" fill="#e11d48" text-anchor="middle">
-                                        <textPath href="#p-top-${index}" startOffset="50%" letter-spacing="0.1em">${slot.showSerie ? slot.serie : ''}</textPath>
-                                    </text>
-
-                                    <text font-size="${uidFontSize}" font-weight="bold" fill="#64748b" text-anchor="middle">
-                                        <textPath href="#p-uid-${index}" startOffset="50%" letter-spacing="0.12em">${(slot.showUid && slot.uid) ? 'ID: ' + slot.uid : ''}</textPath>
-                                    </text>
-
-                                    <text font-size="${botFontSize}" font-weight="bold" fill="#0f172a" text-anchor="middle">
-                                        <textPath href="#p-bot-${index}" startOffset="50%" letter-spacing="0.12em">${slot.showTitle ? slot.title : ''}</textPath>
-                                    </text>
-
-                                    ${slot.hasFlipperDump ? `
-                                    <g>
-                                        <circle cx="50" cy="71" r="4.2" fill="#FF8200"/>
-                                        <path d="M48 72.2 A 2.5 2.5 0 0 1 52 72.2 M46.8 70.6 A 4.2 4.2 0 0 1 53.2 70.6 M48.8 73.8 A 1.2 1.2 0 0 1 51.2 73.8" stroke="white" stroke-width="0.7" fill="none" stroke-linecap="round"/>
-                                    </g>
-                                    ` : ''}
-                                </svg>
-                            </div>
-                            <div class="sticker-actions">
-                                <button class="sticker-action-btn move" title="Nach links verschieben" onclick="PrintStudio.shiftSticker(${index}, -1)">◀</button>
-                                <button class="sticker-action-btn move" title="Nach rechts verschieben" onclick="PrintStudio.shiftSticker(${index}, 1)">▶</button>
-                                <button class="sticker-action-btn clone" title="Duplizieren" onclick="PrintStudio.cloneSticker(${index})">＋</button>
-                                <button class="sticker-action-btn nfc" title="Flipper .nfc Export" onclick="PrintStudio.exportNfc(${index})">🏷️</button>
-                                <button class="sticker-action-btn delete" title="Entfernen" onclick="PrintStudio.removeSticker(${index})">✕</button>
-                            </div>
-                        `;
-                        slotDiv.appendChild(sticker);
-                    }
-                    sheet.appendChild(slotDiv);
-                });
-
-                document.getElementById('print-counter').innerText = `${count} / ${config.count} belegt`;
-            },
-
-            shiftSticker(index, delta) {
-                const targetIndex = index + delta;
-                if (targetIndex < 0 || targetIndex >= State.printSlots.length) return;
-                const temp = State.printSlots[index];
-                State.printSlots[index] = State.printSlots[targetIndex];
-                State.printSlots[targetIndex] = temp;
-                this.renderSheet();
-            },
-
-            cloneSticker(index) {
-                const emptyIndex = State.printSlots.findIndex(s => s === null);
-                if (emptyIndex === -1) {
-                    showToast("Kein freier Platz mehr auf diesem Bogen");
-                    return;
-                }
-                State.printSlots[emptyIndex] = JSON.parse(JSON.stringify(State.printSlots[index]));
-                this.renderSheet();
-                showToast(`Sticker auf Platz ${emptyIndex + 1} dupliziert`);
-            },
-
-            removeSticker(index) {
-                State.printSlots[index] = null;
-                this.renderSheet();
-                showToast("Sticker entfernt");
-            },
-
-            clearSheet() {
-                State.printSlots.fill(null);
-                this.renderSheet();
-                showToast("Bogen vollständig geleert");
-            },
-
-            exportUIDs() {
-                const uids = State.printSlots
-                    .filter(s => s !== null)
-                    .map((s, i) => `${i+1}. ${s.serie} - ${s.title} (UID: ${s.uid || 'Keine'})`)
-                    .join("\n");
-
-                if (!uids) {
-                    showToast("Keine Sticker auf dem Bogen vorhanden");
-                    return;
-                }
-                const blob = new Blob([uids], { type: 'text/plain;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'tonie-uids-export.txt';
-                a.click();
-                showToast("UID-Liste exportiert");
-            },
-
-            exportNfc(index) {
-                const slot = State.printSlots[index];
-                if (!slot || !slot.uid) {
-                    showToast("Keine UID für diesen Sticker hinterlegt");
-                    return;
-                }
-                const uidHex = slot.uid.length >= 14 ? slot.uid.toUpperCase() : "E00403" + slot.uid.padStart(10, '0').toUpperCase();
-                const formattedUid = uidHex.match(/.{1,2}/g).join(' ');
-
-                const nfcContent = `Filetype: Flipper NFC device\nVersion: 3\nDevice Type: ICODE SLIX\nUID: ${formattedUid}\nATQA: 00 04\nSAK: 00\n# TagGen Studio V2 Phoenix - ${slot.serie} - ${slot.title}\n`;
-
-                const blob = new Blob([nfcContent], { type: 'text/plain;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${slot.serie.replace(/[^a-z0-9]/gi, '_')}.nfc`;
-                a.click();
-                showToast("Flipper .nfc Datei exportiert");
+            } catch (error) {
+                console.error("DB Load Error:", error);
+                UI.showToast("Fehler beim Laden der Datenbank. Offline-Modus aktiv.");
             }
         };
 
-        function showToast(msg) {
+        Data.loadDumpIndex = async () => {
+            const cacheKey = 'phoenix_dump_index';
+            const timeKey = 'phoenix_dump_time';
+            const now = Date.now();
+
+            const cached = localStorage.getItem(cacheKey);
+            const cachedTime = localStorage.getItem(timeKey);
+
+            let nfcFiles = [];
+
+            if (cached && cachedTime && (now - parseInt(cachedTime) < 24*60*60*1000)) {
+                nfcFiles = JSON.parse(cached);
+            } else {
+                try {
+                    const res = await fetch(`https://api.github.com/repos/nortakales/flipper-zero-tonies/git/trees/master?recursive=1`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        nfcFiles = data.tree.filter(f => f.path && f.path.endsWith('.nfc')).map(f => f.path);
+                        localStorage.setItem(cacheKey, JSON.stringify(nfcFiles));
+                        localStorage.setItem(timeKey, now.toString());
+                    }
+                } catch(e) {
+                    console.warn("GitHub API Limit, versuche Fallback");
+                }
+            }
+
+            // O(1) Lookup Maps bauen
+            const clean = s => (s||'').toLowerCase().replace(/[^a-z0-9]/g, '');
+            nfcFiles.forEach(path => {
+                const parts = path.split('/');
+                const filename = clean(parts[parts.length-1].replace('.nfc',''));
+                const folder = parts.length > 1 ? clean(parts[parts.length-2]) : '';
+                
+                // Wir extrahieren mögliche IDs aus dem Pfad (Hex-Strings)
+                const idMatch = path.match(/[a-fA-F0-9]{8,16}/);
+                if(idMatch) Data.dumpIndex.exactIds.add(idMatch[0].toLowerCase());
+                
+                if(folder) Data.dumpIndex.folders.add(folder);
+                Data.dumpIndex.titles.add(filename);
+            });
+        };
+
+        Data.getMatchQuality = (tonie) => {
+            if(!tonie || !tonie.id) return 'none';
+            const tId = tonie.id.toLowerCase();
+            const tTitle = (tonie.title||'').toLowerCase().replace(/[^a-z0-9]/g, '');
+            const tSerie = (tonie.serie||'').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+            if (tId.length >= 6 && Data.dumpIndex.exactIds.has(tId)) return 'exact';
+            
+            // Fuzzy Logic
+            if (tTitle.length > 4 && Data.dumpIndex.titles.has(tTitle)) return 'fuzzy';
+            if (tSerie.length > 4 && Data.dumpIndex.folders.has(tSerie)) return 'fuzzy';
+
+            return 'none';
+        };
+
+        // --- 3. SEARCH & LIBRARY ---
+        Search.filter = () => {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const lang = document.getElementById('filter-lang').value;
+            const dumpFilter = document.getElementById('filter-dump').value;
+            const isFavTab = document.querySelector('#tab-fav').classList.contains('active');
+            
+            const favs = JSON.parse(localStorage.getItem('phoenix_favs') || '[]');
+
+            let results = Data.tonies;
+
+            if (isFavTab) results = results.filter(t => favs.includes(t.id));
+            if (lang) results = results.filter(t => t.lang === lang);
+            
+            if (dumpFilter === 'exact') results = results.filter(t => Data.getMatchQuality(t) === 'exact');
+            if (dumpFilter === 'fuzzy') results = results.filter(t => Data.getMatchQuality(t) !== 'none');
+
+            if (query) {
+                results = results.filter(t => 
+                    t.serie.toLowerCase().includes(query) || 
+                    t.title.toLowerCase().includes(query) || 
+                    t.id.toLowerCase().includes(query)
+                );
+            }
+
+            UI.renderCards(results.slice(0, 50)); // Max 50 wg. DOM Performance
+        };
+
+        // --- 4. UI & DOM RENDERING ---
+        UI.renderCards = (items) => {
+            const grid = document.getElementById('asset-grid');
+            grid.innerHTML = ''; // Fast clear
+            const favs = JSON.parse(localStorage.getItem('phoenix_favs') || '[]');
+
+            items.forEach(item => {
+                const isFav = favs.includes(item.id);
+                const matchQ = Data.getMatchQuality(item);
+                
+                // Safe DOM Element Creation
+                const card = document.createElement('div');
+                card.className = 'asset-card';
+                card.onclick = () => Editor.load(item);
+
+                // Image Wrap
+                const imgWrap = document.createElement('div');
+                imgWrap.className = 'card-img-wrap';
+                
+                const img = document.createElement('img');
+                img.loading = 'lazy';
+                img.src = item.pic || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='; // Transparent GIF
+                img.onerror = () => { img.classList.add('fallback'); };
+                imgWrap.appendChild(img);
+
+                // Status Badge
+                if (matchQ !== 'none') {
+                    const badge = document.createElement('div');
+                    badge.className = 'flipper-pill-badge';
+                    badge.textContent = matchQ === 'exact' ? '🟢 Dump' : '🟡 Fuzzy';
+                    badge.style.background = matchQ === 'exact' ? 'var(--status-exact)' : 'var(--status-fuzzy)';
+                    imgWrap.appendChild(badge);
+                }
+
+                // Fav Btn
+                const favBtn = document.createElement('button');
+                favBtn.className = `fav-btn ${isFav ? 'active' : ''}`;
+                favBtn.textContent = isFav ? '★' : '☆';
+                favBtn.onclick = (e) => { e.stopPropagation(); UI.toggleFav(item.id); };
+                imgWrap.appendChild(favBtn);
+
+                // Content
+                const content = document.createElement('div');
+                content.className = 'card-content';
+                
+                const serie = document.createElement('div');
+                serie.className = 'card-serie';
+                serie.textContent = item.serie;
+                
+                const title = document.createElement('div');
+                title.className = 'card-title';
+                title.textContent = item.title;
+
+                const meta = document.createElement('div');
+                meta.className = 'card-meta';
+                const dotColor = matchQ === 'exact' ? 'var(--status-exact)' : (matchQ === 'fuzzy' ? 'var(--status-fuzzy)' : 'var(--status-none)');
+                meta.innerHTML = `<span class="status-dot" style="background:${dotColor}"></span> ${item.lang.toUpperCase()} • ${item.tracks} Tracks`;
+
+                content.appendChild(serie);
+                content.appendChild(title);
+                content.appendChild(meta);
+
+                card.appendChild(imgWrap);
+                card.appendChild(content);
+                grid.appendChild(card);
+            });
+        };
+
+        UI.toggleFav = (id) => {
+            let favs = JSON.parse(localStorage.getItem('phoenix_favs') || '[]');
+            if(favs.includes(id)) favs = favs.filter(f => f !== id);
+            else favs.push(id);
+            localStorage.setItem('phoenix_favs', JSON.stringify(favs));
+            Search.filter();
+        };
+
+        UI.showToast = (msg) => {
             const t = document.getElementById('toast');
-            t.innerText = msg;
+            t.textContent = msg;
             t.classList.add('show');
             setTimeout(() => t.classList.remove('show'), 2500);
-        }
+        };
 
-        window.onload = () => App.init();
+        // --- 5. EDITOR ---
+        Editor.current = { serie: '', title: '', uid: '', pic: '' };
+        
+        Editor.load = (item, silent=false) => {
+            Editor.current = { ...item };
+            Editor.resetTransform();
+            
+            document.getElementById('input-serie').value = item.serie;
+            document.getElementById('input-title').value = item.title;
+            document.getElementById('input-uid').value = item.id;
+            
+            Editor.update();
+            if(!silent) UI.showToast(`"${item.serie}" geladen`);
+        };
+
+        Editor.resetTransform = () => {
+            Editor.state = { zoom: 100, x: 0, y: 0, fontSize: 100 };
+            document.getElementById('slider-zoom').value = 100;
+            document.getElementById('slider-x').value = 0;
+            document.getElementById('slider-y').value = 0;
+            document.getElementById('slider-font').value = 100;
+            Editor.update();
+        };
+
+        Editor.update = () => {
+            Editor.current.serie = document.getElementById('input-serie').value;
+            Editor.current.title = document.getElementById('input-title').value;
+            Editor.current.uid = document.getElementById('input-uid').value;
+            
+            Editor.state.zoom = parseInt(document.getElementById('slider-zoom').value);
+            Editor.state.x = parseInt(document.getElementById('slider-x').value);
+            Editor.state.y = parseInt(document.getElementById('slider-y').value);
+            Editor.state.fontSize = parseInt(document.getElementById('slider-font').value);
+
+            // Update Labels
+            document.getElementById('val-zoom').textContent = Editor.state.zoom + '%';
+            document.getElementById('val-x').textContent = Editor.state.x + '%';
+            document.getElementById('val-y').textContent = Editor.state.y + '%';
+            document.getElementById('val-font').textContent = Editor.state.fontSize + '%';
+
+            // Visual Updates (DOM safe)
+            const img = document.getElementById('preview-img');
+            img.src = Editor.current.pic;
+            img.style.transform = `translate(${Editor.state.x}%, ${Editor.state.y}%) scale(${Editor.state.zoom / 100})`;
+
+            const fScale = Editor.state.fontSize / 100;
+            document.getElementById('svg-text-top-node').setAttribute('font-size', (7.5 * fScale).toFixed(1));
+            document.getElementById('svg-text-uid-node').setAttribute('font-size', (5.0 * fScale).toFixed(1));
+            document.getElementById('svg-text-bottom-node').setAttribute('font-size', (6.5 * fScale).toFixed(1));
+
+            document.getElementById('svg-text-top').textContent = Editor.current.serie;
+            document.getElementById('svg-text-uid').textContent = Editor.current.uid ? `ID: ${Editor.current.uid}` : '';
+            document.getElementById('svg-text-bottom').textContent = Editor.current.title;
+            
+            // Sync Dump Studio
+            document.getElementById('nfc-target-title').textContent = Editor.current.title || 'Kein Titel';
+            document.getElementById('nfc-target-uid').textContent = Editor.current.uid || 'Keine UID';
+            
+            const matchQ = Data.getMatchQuality(Editor.current);
+            const sBadge = document.getElementById('nfc-target-status');
+            if(matchQ === 'exact') sBadge.innerHTML = '<span style="color:var(--status-exact)">🟢 Exakter Dump</span>';
+            else if(matchQ === 'fuzzy') sBadge.innerHTML = '<span style="color:var(--status-fuzzy)">🟡 Fuzzy Match</span>';
+            else sBadge.innerHTML = '<span style="color:var(--text-muted)">⚪ Kein Dump (Nur UID Flash)</span>';
+        };
+
+        Editor.initDragDrop = () => {
+            const zone = document.getElementById('drop-zone');
+            zone.ondragover = e => e.preventDefault();
+            zone.ondrop = e => {
+                e.preventDefault();
+                const file = e.dataTransfer.files[0];
+                if(file && file.type.startsWith('image/')) {
+                    const r = new FileReader();
+                    r.onload = ev => { Editor.current.pic = ev.target.result; Editor.update(); };
+                    r.readAsDataURL(file);
+                }
+            };
+            
+            // Input Listeners
+            ['serie','title','uid'].forEach(id => {
+                document.getElementById(`input-${id}`).addEventListener('input', Editor.update);
+            });
+            ['zoom','x','y','font'].forEach(id => {
+                document.getElementById(`slider-${id}`).addEventListener('input', Editor.update);
+            });
+            document.getElementById('filter-lang').addEventListener('change', Search.filter);
+            document.getElementById('filter-dump').addEventListener('change', Search.filter);
+        };
+
+        // --- 6. PRINT STUDIO ---
+        PrintStudio.init = () => {
+            PrintStudio.slots = new Array(12).fill(null);
+            PrintStudio.changeFormat();
+        };
+
+        PrintStudio.getGeometry = (key) => {
+            // Absolute Positioning approach for perfect Avery mapping
+            // Values in mm
+            const geo = {
+                '43-12': { w: 43, h: 43, cols: 3, rows: 4, ml: 25, mt: 35, gx: 15, gy: 20 },
+                '40-24': { w: 40, h: 40, cols: 4, rows: 6, ml: 15, mt: 15, gx: 6, gy: 6 },
+                '40-12': { w: 40, h: 40, cols: 3, rows: 4, ml: 30, mt: 35, gx: 15, gy: 20 },
+                '30-48': { w: 30, h: 30, cols: 6, rows: 8, ml: 11, mt: 11.5, gx: 1, gy: 1 }, // Avery 6223 approx
+                'custom': { w: 43, h: 43, cols: 3, rows: 4, ml: 25, mt: 35, gx: 15, gy: 20 }
+            };
+            const customInput = document.getElementById('custom-size-input');
+            const conf = geo[key] || geo['43-12'];
+            if(key === 'custom') {
+                const cVal = parseInt(customInput.value) || 43;
+                conf.w = cVal; conf.h = cVal;
+            }
+            return conf;
+        };
+
+        PrintStudio.changeFormat = () => {
+            const key = document.getElementById('print-format').value;
+            document.getElementById('custom-size-wrap').style.display = key === 'custom' ? 'flex' : 'none';
+            
+            const geo = PrintStudio.getGeometry(key);
+            const total = geo.cols * geo.rows;
+            
+            // Array anpassen, Inhalte behalten
+            const old = PrintStudio.slots;
+            PrintStudio.slots = new Array(total).fill(null);
+            for(let i=0; i<Math.min(old.length, total); i++) PrintStudio.slots[i] = old[i];
+            
+            PrintStudio.render();
+        };
+
+        PrintStudio.render = () => {
+            const grid = document.getElementById('sheet-grid');
+            grid.innerHTML = '';
+            
+            const key = document.getElementById('print-format').value;
+            const geo = PrintStudio.getGeometry(key);
+            
+            let count = 0;
+
+            PrintStudio.slots.forEach((data, index) => {
+                const col = index % geo.cols;
+                const row = Math.floor(index / geo.cols);
+                
+                const left = geo.ml + (col * (geo.w + geo.gx));
+                const top = geo.mt + (row * (geo.h + geo.gy));
+
+                const slot = document.createElement('div');
+                slot.className = 'slot';
+                slot.style.position = 'absolute';
+                slot.style.left = `${left}mm`;
+                slot.style.top = `${top}mm`;
+                slot.style.width = `${geo.w}mm`;
+                slot.style.height = `${geo.h}mm`;
+                slot.style.borderRadius = '50%';
+                
+                // Drag Drop Events
+                slot.ondragover = e => { e.preventDefault(); slot.classList.add('drag-over'); };
+                slot.ondragleave = () => slot.classList.remove('drag-over');
+                slot.ondrop = e => {
+                    e.preventDefault();
+                    slot.classList.remove('drag-over');
+                    const from = parseInt(e.dataTransfer.getData('text'));
+                    if(from !== index && !isNaN(from)) {
+                        const t = PrintStudio.slots[from];
+                        PrintStudio.slots[from] = PrintStudio.slots[index];
+                        PrintStudio.slots[index] = t;
+                        PrintStudio.render();
+                    }
+                };
+
+                if(data) {
+                    count++;
+                    const s = document.createElement('div');
+                    s.className = 'sticker';
+                    s.style.width = '100%'; s.style.height = '100%';
+                    s.draggable = true;
+                    s.ondragstart = e => e.dataTransfer.setData('text', index);
+
+                    const fScale = data.state.fontSize / 100;
+                    // Safe SVG Generation
+                    s.innerHTML = `
+                        <img src="${data.pic}" style="width:100%; height:100%; object-fit:contain; position:absolute; transform:translate(${data.state.x}%, ${data.state.y}%) scale(${data.state.zoom/100})">
+                        <svg viewBox="0 0 100 100" style="position:absolute; inset:0; width:100%; height:100%;">
+                            <path id="p-t-${index}" d="M 16,50 A 34,34 0 0,1 84,50" fill="none"/>
+                            <path id="p-u-${index}" d="M 22,50 A 28,28 0 0,0 78,50" fill="none"/>
+                            <path id="p-b-${index}" d="M 14,50 A 36,36 0 0,0 86,50" fill="none"/>
+                            <text font-size="${(7.5*fScale).toFixed(1)}" font-weight="bold" fill="#e11d48" text-anchor="middle"><textPath href="#p-t-${index}" startOffset="50%" letter-spacing="0.1em">${data.serie}</textPath></text>
+                            <text font-size="${(5*fScale).toFixed(1)}" font-weight="bold" fill="#64748b" text-anchor="middle"><textPath href="#p-u-${index}" startOffset="50%" letter-spacing="0.12em">${data.uid ? 'ID: '+data.uid : ''}</textPath></text>
+                            <text font-size="${(6.5*fScale).toFixed(1)}" font-weight="bold" fill="#0f172a" text-anchor="middle"><textPath href="#p-b-${index}" startOffset="50%" letter-spacing="0.12em">${data.title}</textPath></text>
+                        </svg>
+                        <div class="sticker-actions">
+                            <button class="s-btn" onclick="PrintStudio.slots[${index}]=null; PrintStudio.render()">✕</button>
+                        </div>
+                    `;
+                    slot.appendChild(s);
+                }
+                grid.appendChild(slot);
+            });
+            document.getElementById('print-count').textContent = count;
+        };
+
+        PrintStudio.addCurrentToSheet = async () => {
+            const data = { ...Editor.current, state: { ...Editor.state } };
+            // Convert to Base64 for print safety if needed, skipped here for brevity/performance
+            const emptyIdx = PrintStudio.slots.findIndex(s => s === null);
+            if(emptyIdx > -1) {
+                PrintStudio.slots[emptyIdx] = data;
+                UI.showToast(`Cover auf Position ${emptyIdx+1} platziert!`);
+                App.switchView('print');
+            } else {
+                UI.showToast("Druckbogen ist voll!");
+            }
+        };
+
+        PrintStudio.clear = () => {
+            PrintStudio.slots.fill(null);
+            PrintStudio.render();
+            UI.showToast("Druckbogen geleert.");
+        };
+
+        // --- 7. STORAGE / PROJECTS ---
+        Storage.saveProject = () => {
+            const p = {
+                version: 2.1,
+                format: document.getElementById('print-format').value,
+                slots: PrintStudio.slots
+            };
+            const blob = new Blob([JSON.stringify(p)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'TagGen_Project.json';
+            a.click();
+            UI.showToast("Projekt gespeichert.");
+        };
+
+        Storage.loadProject = (e) => {
+            const file = e.target.files[0];
+            if(!file) return;
+            const r = new FileReader();
+            r.onload = ev => {
+                try {
+                    const p = JSON.parse(ev.target.result);
+                    if(p.version && p.slots) {
+                        document.getElementById('print-format').value = p.format;
+                        PrintStudio.slots = p.slots;
+                        PrintStudio.changeFormat(); // Re-inits sizing
+                        UI.showToast("Projekt geladen!");
+                    }
+                } catch(err) {
+                    UI.showToast("Fehler beim Laden.");
+                }
+            };
+            r.readAsText(file);
+        };
+
+        // --- 8. NFC / DUMP STUDIO ---
+        NfcStudio.setMode = (mode) => {
+            NfcStudio.mode = mode;
+            document.getElementById('hw-usb').classList.toggle('active', mode==='usb');
+            document.getElementById('hw-ble').classList.toggle('active', mode==='ble');
+        };
+
+        NfcStudio.connect = async () => {
+            if(NfcStudio.mode === 'usb') {
+                try {
+                    NfcStudio.port = await navigator.serial.requestPort();
+                    await NfcStudio.port.open({ baudRate: 115200 });
+                    NfcStudio.writer = NfcStudio.port.writable.getWriter();
+                    document.getElementById('nfc-conn-status').innerHTML = '🟢 USB Verbunden';
+                } catch(e) { UI.showToast("USB Fehler."); }
+            } else {
+                try {
+                    NfcStudio.bleDevice = await navigator.bluetooth.requestDevice({
+                        filters: [{namePrefix:'NFC'},{namePrefix:'ESP'}],
+                        optionalServices: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e']
+                    });
+                    const server = await NfcStudio.bleDevice.gatt.connect();
+                    const srv = await server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
+                    NfcStudio.bleChar = await srv.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e');
+                    document.getElementById('nfc-conn-status').innerHTML = '🟢 BLE Verbunden';
+                } catch(e) { UI.showToast("BLE Fehler."); }
+            }
+        };
+
+        NfcStudio.flashTag = async () => {
+            const uid = Editor.current.uid;
+            if(!uid) return UI.showToast("Keine UID im Editor!");
+            
+            const uidHex = uid.length >= 14 ? uid.toUpperCase() : "E00403" + uid.padStart(10, '0').toUpperCase();
+            const cmd = `{"cmd":"write_magic_tag","uid":"${uidHex}"}\n`;
+            const payload = new TextEncoder().encode(cmd);
+
+            try {
+                if(NfcStudio.mode==='usb' && NfcStudio.writer) await NfcStudio.writer.write(payload);
+                else if(NfcStudio.mode==='ble' && NfcStudio.bleChar) await NfcStudio.bleChar.writeValue(payload);
+                else return UI.showToast("Nicht verbunden!");
+                UI.showToast("Flash Kommando gesendet!");
+            } catch(e) { UI.showToast("Senden fehlgeschlagen."); }
+        };
+
+        // --- APP ROUTING ---
+        App.switchView = (view) => {
+            document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.view===view));
+            document.querySelectorAll('.workspace').forEach(w => w.classList.remove('active'));
+            document.getElementById(`view-${view}`).classList.add('active');
+            
+            // Lib Sidebar only in Design view
+            document.getElementById('lib-sidebar').classList.toggle('hidden', view !== 'design');
+            
+            if(view === 'print') PrintStudio.render();
+        };
+
+        // Init
+        window.onload = () => {
+            Editor.initDragDrop();
+            PrintStudio.init();
+            Data.init();
+            
+            document.getElementById('search-input').addEventListener('input', Search.filter);
+            document.getElementById('print-format').addEventListener('change', PrintStudio.changeFormat);
+        };
     </script>
 </body>
 </html>
