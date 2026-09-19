@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TagGen Studio V2.1 – Phoenix</title>
+    <title>TagGen Studio V2.1.2 – Phoenix</title>
     
     <!-- ESP Web Tools -->
     <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
@@ -12,18 +12,21 @@
         :root {
             --primary: #e11d48;
             --primary-hover: #be123c;
+            --primary-soft: #fff1f2;
             --bg-canvas: #f8fafc;
             --bg-sidebar: #ffffff;
             --border: #e2e8f0;
+            --border-focus: #cbd5e1;
             --text-main: #0f172a;
             --text-muted: #64748b;
+            --text-subtle: #94a3b8;
             
-            /* Status Colors */
-            --status-exact: #10b981; /* Green */
-            --status-fuzzy: #f59e0b; /* Yellow */
-            --status-none: #94a3b8;  /* Gray */
-            --status-custom: #8b5cf6; /* Purple */
-            --flipper: #ff8200;
+            /* Match Status Colors */
+            --status-exact: #10b981;
+            --status-strong: #3b82f6;
+            --status-fuzzy: #f59e0b;
+            --status-none: #94a3b8;
+            --flipper-orange: #ff8200;
         }
 
         * {
@@ -38,12 +41,13 @@
             background-color: var(--bg-canvas);
             color: var(--text-main);
             height: 100vh;
+            height: 100dvh;
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
 
-        /* --- HEADER & NAV --- */
+        /* --- HEADER & NAVIGATION --- */
         header {
             height: 60px;
             background: #ffffff;
@@ -64,15 +68,15 @@
             font-size: 16px;
             color: var(--text-main);
             letter-spacing: -0.02em;
+            user-select: none;
         }
 
-        /* Neues NFC/Tag Logo */
         .brand svg {
-            width: 24px;
-            height: 24px;
+            width: 26px;
+            height: 26px;
             fill: none;
             stroke: var(--primary);
-            stroke-width: 2;
+            stroke-width: 2.2;
             stroke-linecap: round;
             stroke-linejoin: round;
         }
@@ -81,20 +85,21 @@
             display: flex;
             background: var(--bg-canvas);
             padding: 4px;
-            border-radius: 8px;
+            border-radius: 10px;
             gap: 4px;
+            border: 1px solid var(--border);
         }
 
         .view-btn {
             background: transparent;
             border: none;
-            padding: 6px 14px;
+            padding: 7px 16px;
             font-size: 13px;
             font-weight: 600;
             color: var(--text-muted);
-            border-radius: 6px;
+            border-radius: 7px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             gap: 6px;
@@ -103,19 +108,29 @@
         .view-btn.active {
             background: #ffffff;
             color: var(--text-main);
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
         }
 
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             font-size: 12px;
             color: var(--text-muted);
             font-weight: 500;
         }
 
-        /* --- MAIN LAYOUT --- */
+        .db-badge {
+            background: #f1f5f9;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        /* --- MAIN APP LAYOUT --- */
         .app-container {
             display: flex;
             flex: 1;
@@ -123,68 +138,105 @@
             position: relative;
         }
 
-        .sidebar {
-            width: 360px;
+        /* --- WORKSPACES --- */
+        .workspace {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            position: relative;
+            background: var(--bg-canvas);
+        }
+        .workspace.active { display: flex; }
+
+        /* --- STUDIO EDITOR (VIEW 1) --- */
+        .studio-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Left: Library Sidebar */
+        .sidebar-lib {
+            width: 350px;
             background: var(--bg-sidebar);
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             z-index: 20;
-            transition: transform 0.3s ease;
+            flex-shrink: 0;
         }
 
-        .sidebar.hidden {
-            display: none;
-        }
-
-        /* --- LIBRARY TAB --- */
         .lib-header {
-            padding: 15px 20px;
+            padding: 16px;
             border-bottom: 1px solid var(--border);
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
+        }
+
+        .lib-tabs {
+            display: flex;
+            gap: 16px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .lib-tab {
+            background: none;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            position: relative;
+            padding-bottom: 4px;
+            transition: color 0.15s;
+        }
+        .lib-tab.active { color: var(--primary); }
+        .lib-tab.active::after {
+            content: ''; position: absolute; bottom: -9px; left: 0; right: 0;
+            height: 2px; background: var(--primary); border-radius: 2px;
         }
 
         .search-input {
             width: 100%;
-            padding: 10px 12px;
+            padding: 9px 12px;
             border: 1px solid var(--border);
             border-radius: 8px;
             font-size: 13px;
             outline: none;
             background: var(--bg-canvas);
+            transition: border-color 0.2s;
         }
+        .search-input:focus { border-color: var(--primary); background: #fff; }
 
         .filter-row {
             display: flex;
-            gap: 8px;
+            gap: 6px;
         }
         
         .filter-select {
             flex: 1;
-            padding: 6px;
+            padding: 6px 8px;
             border: 1px solid var(--border);
             border-radius: 6px;
             font-size: 11px;
             color: var(--text-main);
             background: #fff;
             outline: none;
+            cursor: pointer;
         }
 
         .asset-scroll {
             flex: 1;
             overflow-y: auto;
-            padding: 15px;
-        }
-
-        .asset-grid {
+            padding: 12px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
-        /* Saubere DOM Cards (Kein String-HTML) */
+        /* Clean Studio Cards */
         .asset-card {
             background: #fff;
             border: 1px solid var(--border);
@@ -194,26 +246,28 @@
             display: flex;
             gap: 12px;
             padding: 10px;
-            transition: all 0.15s;
+            transition: all 0.15s ease;
             position: relative;
         }
 
         .asset-card:hover {
             border-color: var(--primary);
-            box-shadow: 0 4px 12px rgba(225, 29, 72, 0.08);
+            box-shadow: 0 4px 14px rgba(225, 29, 72, 0.08);
+            transform: translateY(-1px);
         }
 
         .card-img-wrap {
-            width: 65px;
-            height: 65px;
+            width: 68px;
+            height: 68px;
             background: var(--bg-canvas);
-            border-radius: 6px;
+            border-radius: 7px;
             flex-shrink: 0;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
             position: relative;
+            border: 1px solid #f1f5f9;
         }
 
         .card-img-wrap img {
@@ -222,11 +276,49 @@
             object-fit: contain;
         }
         
-        /* Fallback Image Style */
         .card-img-wrap img.fallback {
-            width: 50%;
-            height: 50%;
-            opacity: 0.3;
+            width: 40%;
+            height: 40%;
+            opacity: 0.25;
+        }
+
+        .fav-btn {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            background: rgba(255,255,255,0.95);
+            border: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 13px;
+            color: #cbd5e1;
+            transition: color 0.15s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            z-index: 5;
+        }
+        .fav-btn.active { color: #eab308; }
+
+        .match-badge {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            color: #ffffff;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            pointer-events: none;
+            letter-spacing: 0.02em;
+            z-index: 5;
         }
 
         .card-content {
@@ -234,7 +326,7 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            min-width: 0; /* for text truncation */
+            min-width: 0;
         }
 
         .card-serie {
@@ -242,7 +334,7 @@
             font-weight: 700;
             color: var(--primary);
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.04em;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -252,7 +344,7 @@
             font-size: 13px;
             font-weight: 600;
             color: var(--text-main);
-            margin-bottom: 4px;
+            margin: 1px 0 4px 0;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -264,50 +356,36 @@
             display: flex;
             align-items: center;
             gap: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        /* Status Badges */
         .status-dot {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             display: inline-block;
-        }
-        .status-exact { background: var(--status-exact); }
-        .status-fuzzy { background: var(--status-fuzzy); }
-        .status-none { background: var(--status-none); }
-
-        /* --- EDITOR VIEW --- */
-        .workspace {
-            flex: 1;
-            display: none;
-            flex-direction: column;
-            position: relative;
-            background: #f1f5f9;
-        }
-        .workspace.active { display: flex; }
-
-        .editor-layout {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
+            flex-shrink: 0;
         }
 
+        /* Center: Canvas View */
         .canvas-area {
             flex: 1;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 24px;
             position: relative;
+            overflow: auto;
         }
 
-        /* Preview Card - Cleaner Hierarchy */
         .preview-wrapper {
-            background: #fff;
-            padding: 40px;
-            border-radius: 24px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.04);
+            background: #ffffff;
+            padding: 36px 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.02);
+            border: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -315,13 +393,13 @@
         }
 
         .tag-circle {
-            width: 260px;
-            height: 260px;
+            width: 270px;
+            height: 270px;
             border-radius: 50%;
             border: 2px dashed #cbd5e1;
             position: relative;
             overflow: hidden;
-            background: #fff;
+            background: #ffffff;
         }
 
         .tag-circle img {
@@ -329,7 +407,7 @@
             height: 100%;
             object-fit: contain;
             position: absolute;
-            transition: transform 0.1s;
+            transition: transform 0.08s ease-out;
         }
 
         .tag-circle svg {
@@ -340,17 +418,19 @@
             pointer-events: none;
         }
 
-        .editor-controls {
+        /* Right: Design Controls */
+        .sidebar-controls {
             width: 320px;
-            background: #fff;
+            background: var(--bg-sidebar);
             border-left: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             overflow-y: auto;
+            flex-shrink: 0;
         }
 
         .control-section {
-            padding: 20px;
+            padding: 18px 20px;
             border-bottom: 1px solid var(--border);
             display: flex;
             flex-direction: column;
@@ -360,9 +440,9 @@
         .control-section h3 {
             font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.06em;
             color: var(--text-muted);
-            margin-bottom: 5px;
+            margin-bottom: 2px;
         }
 
         .input-group {
@@ -370,21 +450,32 @@
             flex-direction: column;
             gap: 4px;
         }
+
         .input-group label {
             font-size: 12px;
             font-weight: 600;
             display: flex;
             justify-content: space-between;
         }
+
         .input-group input[type="text"] {
             padding: 8px 10px;
             border: 1px solid var(--border);
             border-radius: 6px;
             font-size: 13px;
             outline: none;
+            background: #fff;
+            transition: border-color 0.2s;
         }
         .input-group input[type="text"]:focus { border-color: var(--primary); }
 
+        .range-slider {
+            width: 100%;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        /* Buttons */
         .btn {
             background: var(--primary);
             color: #fff;
@@ -394,30 +485,38 @@
             font-weight: 600;
             font-size: 13px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 6px;
+            user-select: none;
         }
         .btn:hover { background: var(--primary-hover); }
+
         .btn-secondary {
             background: #fff;
             color: var(--text-main);
             border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
         }
         .btn-secondary:hover { background: #f8fafc; border-color: var(--primary); color: var(--primary); }
 
-        /* --- PRINT STUDIO --- */
+        /* --- PRINT STUDIO (VIEW 2) --- */
         .print-toolbar {
             background: #fff;
-            padding: 15px 20px;
+            padding: 14px 24px;
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 12px;
         }
 
         .print-scroll {
@@ -436,34 +535,38 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             position: relative;
             transform-origin: top center;
-            /* Scaling for view */
-            transform: scale(0.8);
-            margin-bottom: -50px;
+            transform: scale(0.85);
+            margin-bottom: -40px;
         }
 
-        /* Exact Geometry Container */
         .sheet-grid {
-            display: grid;
+            position: relative;
             width: 100%;
             height: 100%;
         }
 
         .slot {
+            position: absolute;
             border: 1px dashed #cbd5e1;
-            position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
+            border-radius: 50%;
+            box-sizing: border-box;
+            background: #fafafa;
+            transition: background 0.15s, border-color 0.15s;
         }
         .slot.drag-over { background: #ffe4e6; border-color: var(--primary); }
 
         .sticker {
+            width: 100%;
+            height: 100%;
             border-radius: 50%;
             position: relative;
             overflow: hidden;
             background: #fff;
             cursor: grab;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
         }
         .sticker:active { cursor: grabbing; }
 
@@ -475,29 +578,31 @@
             display: flex;
             gap: 4px;
             background: rgba(15, 23, 42, 0.85);
-            padding: 6px;
+            backdrop-filter: blur(4px);
+            padding: 5px;
             border-radius: 20px;
             opacity: 0;
             transition: opacity 0.2s;
             pointer-events: none;
+            z-index: 10;
         }
         .sticker:hover .sticker-actions { opacity: 1; pointer-events: auto; }
         
         .s-btn {
-            background: none; border: none; color: #fff; font-size: 14px; cursor: pointer;
-            width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+            background: none; border: none; color: #fff; font-size: 13px; cursor: pointer;
+            width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
             border-radius: 50%;
         }
         .s-btn:hover { background: rgba(255,255,255,0.2); }
         .s-btn.del:hover { background: var(--primary); }
 
-        /* --- NFC / DUMP STUDIO --- */
+        /* --- NFC SETUP (VIEW 3) --- */
         .nfc-container {
-            max-width: 800px;
+            max-width: 860px;
             margin: 40px auto;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 24px;
             padding: 0 20px;
         }
 
@@ -507,11 +612,13 @@
             padding: 24px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.03);
             border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
         }
 
         .nfc-card h2 {
             font-size: 16px;
-            margin-bottom: 12px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -524,30 +631,32 @@
             background: var(--bg-canvas);
             padding: 4px;
             border-radius: 8px;
-            margin-bottom: 15px;
+            border: 1px solid var(--border);
         }
         .hw-btn {
             flex: 1; border: none; background: none; padding: 8px; font-size: 12px; font-weight: 600;
             color: var(--text-muted); border-radius: 6px; cursor: pointer;
+            transition: all 0.2s ease;
         }
-        .hw-btn.active { background: #fff; color: var(--text-main); box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+        .hw-btn.active { background: #fff; color: var(--text-main); box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
 
-        /* Toast */
+        /* Toast Notifications */
         #toast {
             position: fixed; bottom: 30px; left: 50%; transform: translate(-50%, 100px);
             background: #0f172a; color: #fff; padding: 12px 24px; border-radius: 30px;
-            font-size: 13px; font-weight: 500; transition: transform 0.3s; z-index: 1000;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            font-size: 13px; font-weight: 500; transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000; box-shadow: 0 10px 25px rgba(0,0,0,0.25); pointer-events: none;
         }
         #toast.show { transform: translate(-50%, 0); }
 
+        /* PRINT MEDIA FIXES */
         @media print {
             body * { visibility: hidden; }
-            #workspace-print, #workspace-print * { visibility: visible; }
-            #workspace-print { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: #fff; }
+            #view-print, #view-print * { visibility: visible; }
+            #view-print { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: #fff; }
             .print-toolbar, .sticker-actions { display: none !important; }
             .a4-sheet { transform: none !important; margin: 0 !important; box-shadow: none !important; }
-            .slot { border: none !important; }
+            .slot { border: none !important; background: transparent !important; }
             img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
@@ -556,54 +665,72 @@
 
     <header>
         <div class="brand">
+            <!-- Custom NFC Tag/Wave Logo -->
             <svg viewBox="0 0 24 24">
-                <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/>
-                <path d="M12 6a6 6 0 0 0-6 6 6 6 0 0 0 6 6 6 6 0 0 0 6-6 6 6 0 0 0-6-6zm0 10a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"/>
-                <circle cx="12" cy="12" r="2" fill="currentColor"/>
+                <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+                <rect x="9" y="9" width="6" height="6"></rect>
+                <line x1="9" y1="1" x2="9" y2="4"></line>
+                <line x1="15" y1="1" x2="15" y2="4"></line>
+                <line x1="9" y1="20" x2="9" y2="23"></line>
+                <line x1="15" y1="20" x2="15" y2="23"></line>
+                <line x1="20" y1="9" x2="23" y2="9"></line>
+                <line x1="20" y1="14" x2="23" y2="14"></line>
+                <line x1="1" y1="9" x2="4" y2="9"></line>
+                <line x1="1" y1="14" x2="4" y2="14"></line>
             </svg>
-            <span>TagGen <span style="color:var(--text-main); font-weight:600;">Phoenix</span></span>
+            <span>TagGen <span style="color:var(--primary);">Phoenix</span></span>
         </div>
 
         <div class="view-switcher">
             <button class="view-btn active" data-view="design" onclick="App.switchView('design')">1. Tonie & Editor</button>
             <button class="view-btn" data-view="print" onclick="App.switchView('print')">2. Druckbogen</button>
-            <button class="view-btn" data-view="nfc" onclick="App.switchView('nfc')">3. NFC Setup</button>
+            <button class="view-btn" data-view="nfc" onclick="App.switchView('nfc')" style="color: var(--flipper-orange);">3. NFC Setup</button>
         </div>
 
         <div class="header-actions">
-            <span id="db-status">Lade Datenbank...</span>
+            <span class="db-badge" id="db-status">Lade Datenbank...</span>
         </div>
     </header>
 
     <div class="app-container">
         
-        <!-- ==================== VIEW 1: EDITOR & LIBRARY ==================== -->
+        <!-- ==================== VIEW 1: STUDIO EDITOR & LIBRARY ==================== -->
         <div class="workspace active" id="view-design">
-            <div class="editor-layout">
+            <div class="studio-layout">
                 
-                <!-- Sidebar Library -->
-                <div class="sidebar" id="lib-sidebar">
+                <!-- Left Column: Tonie Library -->
+                <div class="sidebar-lib">
                     <div class="lib-header">
-                        <input type="text" class="search-input" id="search-input" placeholder="🔎 Tonie, Serie oder ID suchen...">
+                        <!-- Restored & Repaired Tabs -->
+                        <div class="lib-tabs">
+                            <button class="lib-tab active" id="tab-db" onclick="Library.switchTab('db')">Datenbank</button>
+                            <button class="lib-tab" id="tab-fav" onclick="Library.switchTab('fav')">Favoriten</button>
+                        </div>
+
+                        <input type="text" class="search-input" id="search-input" placeholder="🔎 Tonie, Serie oder Audio-ID suchen...">
+                        
                         <div class="filter-row">
                             <select class="filter-select" id="filter-lang">
                                 <option value="">🌐 Alle Sprachen</option>
                                 <option value="de-de">Deutsch</option>
                                 <option value="en-us">Englisch</option>
+                                <option value="fr-fr">Französisch</option>
                             </select>
                             <select class="filter-select" id="filter-dump">
                                 <option value="all">Alle Tonies</option>
                                 <option value="exact">🟢 Exakter Dump</option>
+                                <option value="strong">🔵 Strong Match</option>
                                 <option value="fuzzy">🟡 Fuzzy Match</option>
                             </select>
                         </div>
                     </div>
+                    
                     <div class="asset-scroll" id="asset-grid">
-                        <!-- Cards injected via JS -->
+                        <!-- Dynamically populated Cards -->
                     </div>
                 </div>
 
-                <!-- Center Canvas -->
+                <!-- Center Column: Visual Cover Canvas -->
                 <div class="canvas-area" id="drop-zone">
                     <div class="preview-wrapper">
                         <div class="tag-circle" id="preview-circle">
@@ -624,14 +751,16 @@
                                 </text>
                             </svg>
                         </div>
-                        <button class="btn" onclick="PrintStudio.addCurrentToSheet()" style="width: 100%;">+ Auf den Druckbogen</button>
+                        <button class="btn" onclick="PrintStudio.addCurrentToSheet()" style="width: 100%;">
+                            + Auf den Druckbogen
+                        </button>
                     </div>
                 </div>
 
-                <!-- Right Sidebar Editor Controls -->
-                <div class="editor-controls">
+                <!-- Right Column: Precise Design Controls -->
+                <div class="sidebar-controls">
                     <div class="control-section">
-                        <h3>Texte</h3>
+                        <h3>Texte & Typografie</h3>
                         <div class="input-group">
                             <label>Serie (Oben)</label>
                             <input type="text" id="input-serie">
@@ -641,14 +770,15 @@
                             <input type="text" id="input-title">
                         </div>
                         <div class="input-group">
-                            <label>Audio ID (Mitte)</label>
+                            <label>Audio-ID (Mitte)</label>
                             <input type="text" id="input-uid" placeholder="16-stellige Hex-ID">
                         </div>
-                        <div class="input-group" style="margin-top: 10px;">
+                        <div class="input-group" style="margin-top: 6px;">
                             <label>Schriftgröße <span id="val-font" style="color:var(--primary)">100%</span></label>
                             <input type="range" class="range-slider" id="slider-font" min="70" max="150" value="100">
                         </div>
                     </div>
+                    
                     <div class="control-section">
                         <h3>Bildausrichtung</h3>
                         <div class="input-group">
@@ -663,7 +793,9 @@
                             <label>Y-Achse <span id="val-y">0%</span></label>
                             <input type="range" class="range-slider" id="slider-y" min="-40" max="40" value="0">
                         </div>
-                        <button class="btn-secondary" style="margin-top:10px; padding: 6px; font-size:11px;" onclick="Editor.resetTransform()">Zurücksetzen</button>
+                        <button class="btn-secondary" style="margin-top:6px;" onclick="Editor.resetTransform()">
+                            Achsen zentrieren
+                        </button>
                     </div>
                 </div>
             </div>
@@ -672,70 +804,84 @@
         <!-- ==================== VIEW 2: PRINT STUDIO ==================== -->
         <div class="workspace" id="view-print">
             <div class="print-toolbar">
-                <div style="display:flex; gap:15px; align-items:center;">
-                    <select id="print-format" class="btn-secondary" style="padding:8px; border-radius:8px;">
-                        <option value="43-12">Münzkapsel 43mm (3x4)</option>
-                        <option value="40-24">Avery Zweckform 40mm (4x6)</option>
-                        <option value="30-48">Avery Zweckform 30mm (6x8)</option>
+                <div style="display:flex; gap:12px; align-items:center;">
+                    <select id="print-format" class="btn-secondary" style="padding:8px 12px; border-radius:8px;">
+                        <option value="43-12">Münzkapsel 43mm (12er • 3×4)</option>
+                        <option value="40-24">Avery Zweckform L3415 / 5080 40mm (24er • 4×6)</option>
+                        <option value="40-12">Avery 40mm Standard (12er • 3×4)</option>
+                        <option value="30-48">Avery Zweckform 6223 30mm (48er • 6×8)</option>
+                        <option value="custom">Frei definierbar (mm)</option>
                     </select>
+                    
+                    <div id="custom-size-wrap" style="display: none; align-items: center; gap: 4px;">
+                        <input type="number" id="custom-size-input" value="43" min="10" max="90" style="width: 55px; padding: 6px;" oninput="PrintStudio.changeFormat()" title="Durchmesser in mm">
+                        <span style="font-size: 12px; color: var(--text-muted);">mm Ø</span>
+                    </div>
+                    
                     <span style="font-size:12px; color:var(--text-muted);"><b id="print-count">0</b> Sticker belegt</span>
                 </div>
+                
                 <div style="display:flex; gap:8px;">
                     <button class="btn-secondary" onclick="Storage.saveProject()">💾 Projekt speichern</button>
                     <button class="btn-secondary" onclick="document.getElementById('file-load').click()">📂 Laden</button>
                     <input type="file" id="file-load" style="display:none" accept=".json" onchange="Storage.loadProject(event)">
-                    <button class="btn-secondary" onclick="PrintStudio.clear()">🗑️ Leeren</button>
+                    <button class="btn-secondary" onclick="PrintStudio.clear()">🗑️ Bogen leeren</button>
                     <button class="btn" onclick="window.print()">🖨️ PDF / Drucken</button>
                 </div>
             </div>
+            
             <div class="print-scroll">
                 <div class="a4-sheet" id="print-sheet">
-                    <!-- Geometrie wird von JS berechnet -->
                     <div class="sheet-grid" id="sheet-grid"></div>
                 </div>
             </div>
         </div>
 
-        <!-- ==================== VIEW 3: NFC / DUMP STUDIO ==================== -->
+        <!-- ==================== VIEW 3: NFC SETUP ==================== -->
         <div class="workspace" id="view-nfc">
             <div class="nfc-container">
                 
-                <!-- Card 1: ESP32 Setup -->
+                <!-- Card 1: ESP32 Flasher -->
                 <div class="nfc-card">
-                    <h2>🛠️ Hardware Setup</h2>
-                    <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px;">
-                        Apple iOS und Standard-Android limitieren direkte Magic-Tag-Schreibbefehle. 
-                        Nutze einen <b>ESP32 + PN5180</b> als Brücke, um Tags direkt aus dem Browser zu flashen.
+                    <h2>🛠️ Hardware Bridge Setup</h2>
+                    <p style="font-size:13px; color:var(--text-muted); line-height:1.5;">
+                        Apple iOS und Standard-Android limitieren direkte Magic-Tag-Schreibbefehle. Verwende einen <b>ESP32 + PN5180</b> als Hardware-Bridge, um ICODE SLIX Tags direkt aus dem Browser zu beschreiben.
                     </p>
-                    <div style="background:#f1f5f9; padding:15px; border-radius:8px; text-align:center; margin-bottom:15px;">
-                        <span style="display:block; font-size:12px; font-weight:bold; margin-bottom:10px;">Firmware Flasher (Erfordert Chrome/Edge)</span>
+                    <div style="background:#f8fafc; border:1px solid var(--border); padding:16px; border-radius:10px; text-align:center;">
+                        <span style="display:block; font-size:12px; font-weight:700; margin-bottom:10px; color:var(--text-main);">
+                            Firmware Web-Installer (Google Chrome / Edge)
+                        </span>
                         <esp-web-install-button manifest="https://raw.githubusercontent.com/RFIDfriend/NFC-Archiver/main/flash/manifest.json"></esp-web-install-button>
                     </div>
+                    <p style="font-size:11px; color:var(--text-muted); text-align:center;">
+                        Basiert auf der offiziellen Firmware von <a href="https://github.com/RFIDfriend/NFC-Archiver" target="_blank" style="color:var(--primary); text-decoration:none; font-weight:600;">RFIDfriend/NFC-Archiver</a>.
+                    </p>
                 </div>
 
                 <!-- Card 2: Tag Writer -->
                 <div class="nfc-card">
                     <h2>📲 Magic Tag Writer</h2>
+                    
                     <div class="hardware-toggle">
                         <button class="hw-btn active" id="hw-usb" onclick="NfcStudio.setMode('usb')">🔌 USB (Web Serial)</button>
                         <button class="hw-btn" id="hw-ble" onclick="NfcStudio.setMode('ble')">📡 Bluetooth (BLE)</button>
                     </div>
 
-                    <div style="background:#f8fafc; border:1px solid var(--border); padding:12px; border-radius:8px; margin-bottom:15px; font-size:13px;">
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <div style="background:#f8fafc; border:1px solid var(--border); padding:14px; border-radius:10px; font-size:13px; display:flex; flex-direction:column; gap:6px;">
+                        <div style="display:flex; justify-content:space-between;">
                             <span>Tonie:</span><strong id="nfc-target-title">-</strong>
                         </div>
-                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                            <span>UID:</span><strong id="nfc-target-uid">-</strong>
+                        <div style="display:flex; justify-content:space-between;">
+                            <span>UID:</span><strong id="nfc-target-uid" style="font-family:monospace;">-</strong>
                         </div>
-                        <div style="display:flex; justify-content:space-between; padding-top:5px; border-top:1px dashed var(--border);">
-                            <span>Dump:</span><strong id="nfc-target-status">-</strong>
+                        <div style="display:flex; justify-content:space-between; padding-top:6px; border-top:1px dashed var(--border);">
+                            <span>Dump Status:</span><strong id="nfc-target-status">-</strong>
                         </div>
                     </div>
 
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
                         <span id="nfc-conn-status" style="font-size:12px; font-weight:bold; color:var(--text-muted);">🔴 Getrennt</span>
-                        <button class="btn-secondary" style="font-size:11px; padding:6px 12px;" onclick="NfcStudio.connect()">Verbinden</button>
+                        <button class="btn-secondary" onclick="NfcStudio.connect()">Hardware Verbinden</button>
                     </div>
 
                     <button class="btn" style="width:100%; background:var(--flipper-orange); padding:12px;" onclick="NfcStudio.flashTag()">
@@ -750,86 +896,121 @@
 
     <div id="toast">Nachricht</div>
 
-    <!-- Anwendungs-Logik Modularisiert -->
+    <!-- Modular Script Architecture -->
     <script>
-        // --- 1. GLOBALS & NAMESPACES ---
+        // --- 1. NAMESPACES & REPAIRED MODULE DEFINITIONS ---
         const App = {};
         const Data = {
-            tonies: [],          // Base Array
-            v2Map: new Map(),    // V2 Data enrichment
+            tonies: [],          
+            v2Map: new Map(),    
             dumpIndex: {
                 exactIds: new Set(),
-                folders: new Set(),
+                strong: new Set(),
                 titles: new Set()
             }
         };
+        
+        // BUGFIX 1: Explicitly Define Library Module
+        const Library = {
+            activeTab: 'db'
+        };
+
         const Search = {};
         const UI = {};
         const Editor = {
-            state: { zoom: 100, x: 0, y: 0, fontSize: 100 }
+            state: { zoom: 100, x: 0, y: 0, fontSize: 100 },
+            current: { serie: '', title: '', uid: '', pic: '' }
         };
         const PrintStudio = { slots: [] };
         const NfcStudio = { mode: 'usb', port: null, writer: null, bleDevice: null, bleChar: null };
         const Storage = {};
 
-        // --- 2. DATA LAYER (V1 + V2 + Dumps) ---
+        // Utility: String Normalization
+        const clean = s => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+
+        // --- 2. DATA LAYER (Normalized V1 + V2 Community Data) ---
         Data.init = async () => {
-            UI.showToast("Synchronisiere Datenbanken...");
+            UI.showToast("Synchronisiere Tonie-Datenbank...");
             try {
-                // Paralleles Laden von V1 und V2
+                // BUGFIX 2: Load Correct toniesV2.json URL
                 const [resV1, resV2] = await Promise.all([
                     fetch('https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json'),
-                    fetch('https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/TonieV2.json').catch(() => null)
+                    fetch('https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/toniesV2.json').catch(() => null)
                 ]);
 
+                let rawV1 = [];
                 if (resV1.ok) {
-                    const rawV1 = await resV1.json();
-                    Data.tonies = Array.isArray(rawV1) ? rawV1 : Object.values(rawV1);
+                    const dataV1 = await resV1.json();
+                    rawV1 = Array.isArray(dataV1) ? dataV1 : Object.values(dataV1);
                 }
 
                 if (resV2 && resV2.ok) {
-                    const rawV2 = await resV2.json();
-                    const arrV2 = Array.isArray(rawV2) ? rawV2 : Object.values(rawV2);
+                    const dataV2 = await resV2.json();
+                    const arrV2 = Array.isArray(dataV2) ? dataV2 : Object.values(dataV2);
                     arrV2.forEach(item => {
-                        let id = item.audio_id || item.id || item.hash;
-                        if(Array.isArray(id)) id = id[0];
-                        if(id) Data.v2Map.set(String(id), item);
+                        // V2 can have array of IDs or single hash
+                        const rawId = item.audio_id || item.id || item.hash;
+                        if (Array.isArray(rawId)) {
+                            rawId.forEach(id => Data.v2Map.set(String(id), item));
+                        } else if (rawId) {
+                            Data.v2Map.set(String(rawId), item);
+                        }
                     });
                 }
 
-                // Enrichment
-                Data.tonies = Data.tonies.map(t => {
-                    let id = t.audio_id || t.id || t.hash;
-                    if(Array.isArray(id)) id = id[0];
-                    id = String(id || '');
+                // Full V2 Model Normalization
+                Data.tonies = rawV1.map(v1 => {
+                    const rawId = v1.audio_id || v1.id || v1.hash || '';
+                    const primaryId = Array.isArray(rawId) ? String(rawId[0] || '') : String(rawId || '');
                     
-                    const v2 = Data.v2Map.get(id) || {};
+                    const v2 = Data.v2Map.get(primaryId) || {};
+                    
+                    const audioIds = Array.isArray(v2.audio_id || v1.audio_id) 
+                        ? (v2.audio_id || v1.audio_id).map(String) 
+                        : [primaryId].filter(Boolean);
+
+                    const series = v2.series || v1.series || v1.title || 'Unbekannt';
+                    const episode = v2.episode || v1.episodes || v1.episode || v1.title || '';
+                    const image = v2.image || v1.picture || v1.pic || v1.image || '';
+                    const language = (v2.language || v1.language || 'de-de').toLowerCase();
+                    const tracks = Array.isArray(v2.tracks) 
+                        ? v2.tracks.length 
+                        : (Array.isArray(v2['track-desc']) ? v2['track-desc'].length : 0);
+
                     return {
-                        id: id,
-                        serie: v2.series || t.series || t.title || 'Unbekannt',
-                        title: v2.episode || t.episodes || t.title || '',
-                        pic: v2.image || t.picture || t.pic || '',
-                        lang: (v2.language || 'de-de').toLowerCase(),
-                        tracks: v2.tracks ? v2.tracks.length : 0
+                        id: primaryId,
+                        audioIds: audioIds,
+                        hash: v2.hash || v1.hash || '',
+                        series: series,
+                        title: episode,
+                        image: image,
+                        pic: image,
+                        language: language,
+                        category: v2.category || v1.category || '',
+                        age: v2.age || v1.age || '',
+                        tracks: tracks,
+                        confidence: v2.confidence || null
                     };
-                }).filter(t => t.serie);
+                }).filter(t => t.series);
 
                 document.getElementById('db-status').textContent = `${Data.tonies.length} Tonies geladen`;
                 
                 await Data.loadDumpIndex();
                 Search.filter();
                 
-                if(Data.tonies.length > 0) Editor.load(Data.tonies[0], true);
+                if (Data.tonies.length > 0) {
+                    Editor.load(Data.tonies[0], true);
+                }
 
             } catch (error) {
                 console.error("DB Load Error:", error);
-                UI.showToast("Fehler beim Laden der Datenbank. Offline-Modus aktiv.");
+                UI.showToast("Offline-Modus aktiv.");
             }
         };
 
         Data.loadDumpIndex = async () => {
-            const cacheKey = 'phoenix_dump_index';
-            const timeKey = 'phoenix_dump_time';
+            const cacheKey = 'phoenix_dump_index_v2_1_2';
+            const timeKey = 'phoenix_dump_time_v2_1_2';
             const now = Date.now();
 
             const cached = localStorage.getItem(cacheKey);
@@ -849,117 +1030,139 @@
                         localStorage.setItem(timeKey, now.toString());
                     }
                 } catch(e) {
-                    console.warn("GitHub API Limit, versuche Fallback");
+                    console.warn("GitHub Dump Fetch Limit, Fallback aktiv");
                 }
             }
 
-            // O(1) Lookup Maps bauen
-            const clean = s => (s||'').toLowerCase().replace(/[^a-z0-9]/g, '');
+            // O(1) Sets aufbauen
             nfcFiles.forEach(path => {
                 const parts = path.split('/');
                 const filename = clean(parts[parts.length-1].replace('.nfc',''));
                 const folder = parts.length > 1 ? clean(parts[parts.length-2]) : '';
                 
-                // Wir extrahieren mögliche IDs aus dem Pfad (Hex-Strings)
+                // Hex ID matches
                 const idMatch = path.match(/[a-fA-F0-9]{8,16}/);
-                if(idMatch) Data.dumpIndex.exactIds.add(idMatch[0].toLowerCase());
+                if (idMatch) Data.dumpIndex.exactIds.add(idMatch[0].toLowerCase());
                 
-                if(folder) Data.dumpIndex.folders.add(folder);
+                if (folder && filename) Data.dumpIndex.strong.add(folder + '||' + filename);
                 Data.dumpIndex.titles.add(filename);
             });
         };
 
+        // BUGFIX 3: Categorized Exact -> Strong -> Fuzzy Dump Matching
         Data.getMatchQuality = (tonie) => {
-            if(!tonie || !tonie.id) return 'none';
-            const tId = tonie.id.toLowerCase();
-            const tTitle = (tonie.title||'').toLowerCase().replace(/[^a-z0-9]/g, '');
-            const tSerie = (tonie.serie||'').toLowerCase().replace(/[^a-z0-9]/g, '');
-
-            if (tId.length >= 6 && Data.dumpIndex.exactIds.has(tId)) return 'exact';
+            if (!tonie || !tonie.id) return 'none';
             
-            // Fuzzy Logic
-            if (tTitle.length > 4 && Data.dumpIndex.titles.has(tTitle)) return 'fuzzy';
-            if (tSerie.length > 4 && Data.dumpIndex.folders.has(tSerie)) return 'fuzzy';
+            // 1. Exact Audio-ID match
+            const idsToCheck = (tonie.audioIds && tonie.audioIds.length > 0) ? tonie.audioIds : [tonie.id];
+            for (const id of idsToCheck) {
+                if (id && id.length >= 6 && Data.dumpIndex.exactIds.has(id.toLowerCase())) {
+                    return 'exact';
+                }
+            }
+            
+            // 2. Strong Match (Series folder + exact filename match)
+            const tTitle = clean(tonie.title);
+            const tSerie = clean(tonie.series);
+            if (tSerie && tTitle && Data.dumpIndex.strong.has(tSerie + '||' + tTitle)) {
+                return 'strong';
+            }
+
+            // 3. Fuzzy Match (Filename match)
+            if (tTitle.length > 4 && Data.dumpIndex.titles.has(tTitle)) {
+                return 'fuzzy';
+            }
 
             return 'none';
         };
 
-        // --- 3. SEARCH & LIBRARY ---
+        // --- 3. LIBRARY & TABS ---
+        Library.switchTab = (tab) => {
+            Library.activeTab = tab;
+            document.getElementById('tab-db').classList.toggle('active', tab === 'db');
+            document.getElementById('tab-fav').classList.toggle('active', tab === 'fav');
+            Search.filter();
+        };
+
         Search.filter = () => {
             const query = document.getElementById('search-input').value.toLowerCase();
             const lang = document.getElementById('filter-lang').value;
             const dumpFilter = document.getElementById('filter-dump').value;
-            const isFavTab = document.querySelector('#tab-fav').classList.contains('active');
             
             const favs = JSON.parse(localStorage.getItem('phoenix_favs') || '[]');
 
             let results = Data.tonies;
 
-            if (isFavTab) results = results.filter(t => favs.includes(t.id));
-            if (lang) results = results.filter(t => t.lang === lang);
+            if (Library.activeTab === 'fav') results = results.filter(t => favs.includes(t.id));
+            if (lang) results = results.filter(t => t.language === lang);
             
             if (dumpFilter === 'exact') results = results.filter(t => Data.getMatchQuality(t) === 'exact');
+            if (dumpFilter === 'strong') results = results.filter(t => ['exact', 'strong'].includes(Data.getMatchQuality(t)));
             if (dumpFilter === 'fuzzy') results = results.filter(t => Data.getMatchQuality(t) !== 'none');
 
             if (query) {
                 results = results.filter(t => 
-                    t.serie.toLowerCase().includes(query) || 
+                    t.series.toLowerCase().includes(query) || 
                     t.title.toLowerCase().includes(query) || 
                     t.id.toLowerCase().includes(query)
                 );
             }
 
-            UI.renderCards(results.slice(0, 50)); // Max 50 wg. DOM Performance
+            UI.renderCards(results.slice(0, 50));
         };
 
-        // --- 4. UI & DOM RENDERING ---
+        // --- 4. UI & CARDS ---
         UI.renderCards = (items) => {
             const grid = document.getElementById('asset-grid');
-            grid.innerHTML = ''; // Fast clear
+            grid.innerHTML = '';
             const favs = JSON.parse(localStorage.getItem('phoenix_favs') || '[]');
 
             items.forEach(item => {
                 const isFav = favs.includes(item.id);
                 const matchQ = Data.getMatchQuality(item);
                 
-                // Safe DOM Element Creation
                 const card = document.createElement('div');
                 card.className = 'asset-card';
                 card.onclick = () => Editor.load(item);
 
-                // Image Wrap
                 const imgWrap = document.createElement('div');
                 imgWrap.className = 'card-img-wrap';
                 
                 const img = document.createElement('img');
                 img.loading = 'lazy';
-                img.src = item.pic || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs='; // Transparent GIF
+                img.src = item.pic || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
                 img.onerror = () => { img.classList.add('fallback'); };
                 imgWrap.appendChild(img);
 
-                // Status Badge
+                // BUGFIX 4: Missing Badge Classes
                 if (matchQ !== 'none') {
                     const badge = document.createElement('div');
-                    badge.className = 'flipper-pill-badge';
-                    badge.textContent = matchQ === 'exact' ? '🟢 Dump' : '🟡 Fuzzy';
-                    badge.style.background = matchQ === 'exact' ? 'var(--status-exact)' : 'var(--status-fuzzy)';
+                    badge.className = 'match-badge';
+                    if (matchQ === 'exact') {
+                        badge.textContent = '🟢 Exakt';
+                        badge.style.background = 'var(--status-exact)';
+                    } else if (matchQ === 'strong') {
+                        badge.textContent = '🔵 Strong';
+                        badge.style.background = 'var(--status-strong)';
+                    } else {
+                        badge.textContent = '🟡 Fuzzy';
+                        badge.style.background = 'var(--status-fuzzy)';
+                    }
                     imgWrap.appendChild(badge);
                 }
 
-                // Fav Btn
                 const favBtn = document.createElement('button');
                 favBtn.className = `fav-btn ${isFav ? 'active' : ''}`;
                 favBtn.textContent = isFav ? '★' : '☆';
                 favBtn.onclick = (e) => { e.stopPropagation(); UI.toggleFav(item.id); };
                 imgWrap.appendChild(favBtn);
 
-                // Content
                 const content = document.createElement('div');
                 content.className = 'card-content';
                 
                 const serie = document.createElement('div');
                 serie.className = 'card-serie';
-                serie.textContent = item.serie;
+                serie.textContent = item.series;
                 
                 const title = document.createElement('div');
                 title.className = 'card-title';
@@ -967,8 +1170,14 @@
 
                 const meta = document.createElement('div');
                 meta.className = 'card-meta';
-                const dotColor = matchQ === 'exact' ? 'var(--status-exact)' : (matchQ === 'fuzzy' ? 'var(--status-fuzzy)' : 'var(--status-none)');
-                meta.innerHTML = `<span class="status-dot" style="background:${dotColor}"></span> ${item.lang.toUpperCase()} • ${item.tracks} Tracks`;
+                
+                let dotColor = 'var(--status-none)';
+                if (matchQ === 'exact') dotColor = 'var(--status-exact)';
+                if (matchQ === 'strong') dotColor = 'var(--status-strong)';
+                if (matchQ === 'fuzzy') dotColor = 'var(--status-fuzzy)';
+                
+                // Community Data Display (Lang, Tracks, Audio-ID)
+                meta.innerHTML = `<span class="status-dot" style="background:${dotColor}"></span> ${item.language.toUpperCase()} • ${item.tracks} Tracks • ID: ${item.id.slice(0, 8)}...`;
 
                 content.appendChild(serie);
                 content.appendChild(title);
@@ -982,7 +1191,7 @@
 
         UI.toggleFav = (id) => {
             let favs = JSON.parse(localStorage.getItem('phoenix_favs') || '[]');
-            if(favs.includes(id)) favs = favs.filter(f => f !== id);
+            if (favs.includes(id)) favs = favs.filter(f => f !== id);
             else favs.push(id);
             localStorage.setItem('phoenix_favs', JSON.stringify(favs));
             Search.filter();
@@ -996,18 +1205,16 @@
         };
 
         // --- 5. EDITOR ---
-        Editor.current = { serie: '', title: '', uid: '', pic: '' };
-        
         Editor.load = (item, silent=false) => {
             Editor.current = { ...item };
             Editor.resetTransform();
             
-            document.getElementById('input-serie').value = item.serie;
+            document.getElementById('input-serie').value = item.series;
             document.getElementById('input-title').value = item.title;
             document.getElementById('input-uid').value = item.id;
             
             Editor.update();
-            if(!silent) UI.showToast(`"${item.serie}" geladen`);
+            if (!silent) UI.showToast(`"${item.series}" geladen`);
         };
 
         Editor.resetTransform = () => {
@@ -1020,7 +1227,7 @@
         };
 
         Editor.update = () => {
-            Editor.current.serie = document.getElementById('input-serie').value;
+            Editor.current.series = document.getElementById('input-serie').value;
             Editor.current.title = document.getElementById('input-title').value;
             Editor.current.uid = document.getElementById('input-uid').value;
             
@@ -1029,15 +1236,13 @@
             Editor.state.y = parseInt(document.getElementById('slider-y').value);
             Editor.state.fontSize = parseInt(document.getElementById('slider-font').value);
 
-            // Update Labels
             document.getElementById('val-zoom').textContent = Editor.state.zoom + '%';
             document.getElementById('val-x').textContent = Editor.state.x + '%';
             document.getElementById('val-y').textContent = Editor.state.y + '%';
             document.getElementById('val-font').textContent = Editor.state.fontSize + '%';
 
-            // Visual Updates (DOM safe)
             const img = document.getElementById('preview-img');
-            img.src = Editor.current.pic;
+            img.src = Editor.current.pic || '';
             img.style.transform = `translate(${Editor.state.x}%, ${Editor.state.y}%) scale(${Editor.state.zoom / 100})`;
 
             const fScale = Editor.state.fontSize / 100;
@@ -1045,18 +1250,19 @@
             document.getElementById('svg-text-uid-node').setAttribute('font-size', (5.0 * fScale).toFixed(1));
             document.getElementById('svg-text-bottom-node').setAttribute('font-size', (6.5 * fScale).toFixed(1));
 
-            document.getElementById('svg-text-top').textContent = Editor.current.serie;
+            document.getElementById('svg-text-top').textContent = Editor.current.series;
             document.getElementById('svg-text-uid').textContent = Editor.current.uid ? `ID: ${Editor.current.uid}` : '';
             document.getElementById('svg-text-bottom').textContent = Editor.current.title;
             
-            // Sync Dump Studio
+            // Sync NFC Studio
             document.getElementById('nfc-target-title').textContent = Editor.current.title || 'Kein Titel';
             document.getElementById('nfc-target-uid').textContent = Editor.current.uid || 'Keine UID';
             
-            const matchQ = Data.getMatchQuality(Editor.current);
+            const matchQ = Data.getMatchQuality({ ...Editor.current, id: Editor.current.uid });
             const sBadge = document.getElementById('nfc-target-status');
-            if(matchQ === 'exact') sBadge.innerHTML = '<span style="color:var(--status-exact)">🟢 Exakter Dump</span>';
-            else if(matchQ === 'fuzzy') sBadge.innerHTML = '<span style="color:var(--status-fuzzy)">🟡 Fuzzy Match</span>';
+            if (matchQ === 'exact') sBadge.innerHTML = '<span style="color:var(--status-exact)">🟢 Exakter Dump</span>';
+            else if (matchQ === 'strong') sBadge.innerHTML = '<span style="color:var(--status-strong)">🔵 Strong Match</span>';
+            else if (matchQ === 'fuzzy') sBadge.innerHTML = '<span style="color:var(--status-fuzzy)">🟡 Fuzzy Match</span>';
             else sBadge.innerHTML = '<span style="color:var(--text-muted)">⚪ Kein Dump (Nur UID Flash)</span>';
         };
 
@@ -1066,14 +1272,13 @@
             zone.ondrop = e => {
                 e.preventDefault();
                 const file = e.dataTransfer.files[0];
-                if(file && file.type.startsWith('image/')) {
+                if (file && file.type.startsWith('image/')) {
                     const r = new FileReader();
                     r.onload = ev => { Editor.current.pic = ev.target.result; Editor.update(); };
                     r.readAsDataURL(file);
                 }
             };
             
-            // Input Listeners
             ['serie','title','uid'].forEach(id => {
                 document.getElementById(`input-${id}`).addEventListener('input', Editor.update);
             });
@@ -1084,25 +1289,32 @@
             document.getElementById('filter-dump').addEventListener('change', Search.filter);
         };
 
-        // --- 6. PRINT STUDIO ---
+        // --- 6. PRINT STUDIO (Millimeter Calibrated) ---
         PrintStudio.init = () => {
             PrintStudio.slots = new Array(12).fill(null);
             PrintStudio.changeFormat();
         };
 
+        // BUGFIX 5: Calibrated Presets
         PrintStudio.getGeometry = (key) => {
-            // Absolute Positioning approach for perfect Avery mapping
-            // Values in mm
             const geo = {
-                '43-12': { w: 43, h: 43, cols: 3, rows: 4, ml: 25, mt: 35, gx: 15, gy: 20 },
-                '40-24': { w: 40, h: 40, cols: 4, rows: 6, ml: 15, mt: 15, gx: 6, gy: 6 },
-                '40-12': { w: 40, h: 40, cols: 3, rows: 4, ml: 30, mt: 35, gx: 15, gy: 20 },
-                '30-48': { w: 30, h: 30, cols: 6, rows: 8, ml: 11, mt: 11.5, gx: 1, gy: 1 }, // Avery 6223 approx
-                'custom': { w: 43, h: 43, cols: 3, rows: 4, ml: 25, mt: 35, gx: 15, gy: 20 }
+                // 43mm Münzkapseln: 3x4 Nutzen, 10mm Gaps, zentriert auf A4
+                '43-12': { w: 43, h: 43, cols: 3, rows: 4, ml: 30.5, mt: 47.5, gx: 10, gy: 10 },
+                
+                // Avery Zweckform L3415 / 5080 (40mm 24er Nutzen)
+                '40-24': { w: 40, h: 40, cols: 4, rows: 6, ml: 17.5, mt: 21.5, gx: 5, gy: 5 },
+                
+                // Avery 40mm 12er
+                '40-12': { w: 40, h: 40, cols: 3, rows: 4, ml: 35.0, mt: 50.0, gx: 10, gy: 10 },
+                
+                // Avery Zweckform 6223 (30mm 48er Nutzen): Ränder nach Datenblatt
+                '30-48': { w: 30, h: 30, cols: 6, rows: 8, ml: 15.0, mt: 28.5, gx: 0, gy: 0 },
+                
+                'custom': { w: 43, h: 43, cols: 3, rows: 4, ml: 30.5, mt: 47.5, gx: 10, gy: 10 }
             };
             const customInput = document.getElementById('custom-size-input');
             const conf = geo[key] || geo['43-12'];
-            if(key === 'custom') {
+            if (key === 'custom') {
                 const cVal = parseInt(customInput.value) || 43;
                 conf.w = cVal; conf.h = cVal;
             }
@@ -1116,10 +1328,11 @@
             const geo = PrintStudio.getGeometry(key);
             const total = geo.cols * geo.rows;
             
-            // Array anpassen, Inhalte behalten
             const old = PrintStudio.slots;
             PrintStudio.slots = new Array(total).fill(null);
-            for(let i=0; i<Math.min(old.length, total); i++) PrintStudio.slots[i] = old[i];
+            for (let i = 0; i < Math.min(old.length, total); i++) {
+                PrintStudio.slots[i] = old[i];
+            }
             
             PrintStudio.render();
         };
@@ -1142,21 +1355,18 @@
 
                 const slot = document.createElement('div');
                 slot.className = 'slot';
-                slot.style.position = 'absolute';
                 slot.style.left = `${left}mm`;
                 slot.style.top = `${top}mm`;
                 slot.style.width = `${geo.w}mm`;
                 slot.style.height = `${geo.h}mm`;
-                slot.style.borderRadius = '50%';
                 
-                // Drag Drop Events
                 slot.ondragover = e => { e.preventDefault(); slot.classList.add('drag-over'); };
                 slot.ondragleave = () => slot.classList.remove('drag-over');
                 slot.ondrop = e => {
                     e.preventDefault();
                     slot.classList.remove('drag-over');
                     const from = parseInt(e.dataTransfer.getData('text'));
-                    if(from !== index && !isNaN(from)) {
+                    if (from !== index && !isNaN(from)) {
                         const t = PrintStudio.slots[from];
                         PrintStudio.slots[from] = PrintStudio.slots[index];
                         PrintStudio.slots[index] = t;
@@ -1164,28 +1374,27 @@
                     }
                 };
 
-                if(data) {
+                if (data) {
                     count++;
                     const s = document.createElement('div');
                     s.className = 'sticker';
-                    s.style.width = '100%'; s.style.height = '100%';
                     s.draggable = true;
                     s.ondragstart = e => e.dataTransfer.setData('text', index);
 
                     const fScale = data.state.fontSize / 100;
-                    // Safe SVG Generation
+                    
                     s.innerHTML = `
                         <img src="${data.pic}" style="width:100%; height:100%; object-fit:contain; position:absolute; transform:translate(${data.state.x}%, ${data.state.y}%) scale(${data.state.zoom/100})">
                         <svg viewBox="0 0 100 100" style="position:absolute; inset:0; width:100%; height:100%;">
                             <path id="p-t-${index}" d="M 16,50 A 34,34 0 0,1 84,50" fill="none"/>
                             <path id="p-u-${index}" d="M 22,50 A 28,28 0 0,0 78,50" fill="none"/>
                             <path id="p-b-${index}" d="M 14,50 A 36,36 0 0,0 86,50" fill="none"/>
-                            <text font-size="${(7.5*fScale).toFixed(1)}" font-weight="bold" fill="#e11d48" text-anchor="middle"><textPath href="#p-t-${index}" startOffset="50%" letter-spacing="0.1em">${data.serie}</textPath></text>
+                            <text font-size="${(7.5*fScale).toFixed(1)}" font-weight="bold" fill="#e11d48" text-anchor="middle"><textPath href="#p-t-${index}" startOffset="50%" letter-spacing="0.1em">${data.series}</textPath></text>
                             <text font-size="${(5*fScale).toFixed(1)}" font-weight="bold" fill="#64748b" text-anchor="middle"><textPath href="#p-u-${index}" startOffset="50%" letter-spacing="0.12em">${data.uid ? 'ID: '+data.uid : ''}</textPath></text>
                             <text font-size="${(6.5*fScale).toFixed(1)}" font-weight="bold" fill="#0f172a" text-anchor="middle"><textPath href="#p-b-${index}" startOffset="50%" letter-spacing="0.12em">${data.title}</textPath></text>
                         </svg>
                         <div class="sticker-actions">
-                            <button class="s-btn" onclick="PrintStudio.slots[${index}]=null; PrintStudio.render()">✕</button>
+                            <button class="s-btn del" onclick="PrintStudio.slots[${index}]=null; PrintStudio.render()">✕</button>
                         </div>
                     `;
                     slot.appendChild(s);
@@ -1197,9 +1406,8 @@
 
         PrintStudio.addCurrentToSheet = async () => {
             const data = { ...Editor.current, state: { ...Editor.state } };
-            // Convert to Base64 for print safety if needed, skipped here for brevity/performance
             const emptyIdx = PrintStudio.slots.findIndex(s => s === null);
-            if(emptyIdx > -1) {
+            if (emptyIdx > -1) {
                 PrintStudio.slots[emptyIdx] = data;
                 UI.showToast(`Cover auf Position ${emptyIdx+1} platziert!`);
                 App.switchView('print');
@@ -1214,99 +1422,98 @@
             UI.showToast("Druckbogen geleert.");
         };
 
-        // --- 7. STORAGE / PROJECTS ---
+        // --- 7. STORAGE & PROJECT PERSISTENCE ---
         Storage.saveProject = () => {
             const p = {
-                version: 2.1,
+                version: 2.12,
                 format: document.getElementById('print-format').value,
                 slots: PrintStudio.slots
             };
             const blob = new Blob([JSON.stringify(p)], { type: 'application/json' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = 'TagGen_Project.json';
+            a.download = 'TagGen_Phoenix_Project.json';
             a.click();
-            UI.showToast("Projekt gespeichert.");
+            UI.showToast("Projektdatei exportiert.");
         };
 
         Storage.loadProject = (e) => {
             const file = e.target.files[0];
-            if(!file) return;
+            if (!file) return;
             const r = new FileReader();
             r.onload = ev => {
                 try {
                     const p = JSON.parse(ev.target.result);
-                    if(p.version && p.slots) {
-                        document.getElementById('print-format').value = p.format;
+                    if (p.slots) {
+                        document.getElementById('print-format').value = p.format || '43-12';
                         PrintStudio.slots = p.slots;
-                        PrintStudio.changeFormat(); // Re-inits sizing
-                        UI.showToast("Projekt geladen!");
+                        PrintStudio.changeFormat();
+                        UI.showToast("Projekt erfolgreich geladen!");
                     }
                 } catch(err) {
-                    UI.showToast("Fehler beim Laden.");
+                    UI.showToast("Ungültige Projektdatei.");
                 }
             };
             r.readAsText(file);
         };
 
-        // --- 8. NFC / DUMP STUDIO ---
+        // --- 8. NFC & HARDWARE PROTOCOL ---
         NfcStudio.setMode = (mode) => {
             NfcStudio.mode = mode;
-            document.getElementById('hw-usb').classList.toggle('active', mode==='usb');
-            document.getElementById('hw-ble').classList.toggle('active', mode==='ble');
+            document.getElementById('hw-usb').classList.toggle('active', mode === 'usb');
+            document.getElementById('hw-ble').classList.toggle('active', mode === 'ble');
         };
 
         NfcStudio.connect = async () => {
-            if(NfcStudio.mode === 'usb') {
+            if (NfcStudio.mode === 'usb') {
                 try {
                     NfcStudio.port = await navigator.serial.requestPort();
                     await NfcStudio.port.open({ baudRate: 115200 });
                     NfcStudio.writer = NfcStudio.port.writable.getWriter();
-                    document.getElementById('nfc-conn-status').innerHTML = '🟢 USB Verbunden';
-                } catch(e) { UI.showToast("USB Fehler."); }
+                    document.getElementById('nfc-conn-status').innerHTML = '<span style="color:var(--status-exact)">🟢 USB Verbunden</span>';
+                    UI.showToast("ESP32 via USB verbunden.");
+                } catch(e) { UI.showToast("USB-Verbindungsfehler."); }
             } else {
                 try {
                     NfcStudio.bleDevice = await navigator.bluetooth.requestDevice({
-                        filters: [{namePrefix:'NFC'},{namePrefix:'ESP'}],
+                        filters: [{ namePrefix: 'NFC' }, { namePrefix: 'ESP' }],
                         optionalServices: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e']
                     });
                     const server = await NfcStudio.bleDevice.gatt.connect();
                     const srv = await server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
                     NfcStudio.bleChar = await srv.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e');
-                    document.getElementById('nfc-conn-status').innerHTML = '🟢 BLE Verbunden';
-                } catch(e) { UI.showToast("BLE Fehler."); }
+                    document.getElementById('nfc-conn-status').innerHTML = '<span style="color:var(--status-exact)">🟢 BLE Verbunden</span>';
+                    UI.showToast("ESP32 via Bluetooth verbunden.");
+                } catch(e) { UI.showToast("BLE-Verbindungsfehler."); }
             }
         };
 
         NfcStudio.flashTag = async () => {
             const uid = Editor.current.uid;
-            if(!uid) return UI.showToast("Keine UID im Editor!");
+            if (!uid) return UI.showToast("Keine Audio-ID geladen!");
             
             const uidHex = uid.length >= 14 ? uid.toUpperCase() : "E00403" + uid.padStart(10, '0').toUpperCase();
             const cmd = `{"cmd":"write_magic_tag","uid":"${uidHex}"}\n`;
             const payload = new TextEncoder().encode(cmd);
 
             try {
-                if(NfcStudio.mode==='usb' && NfcStudio.writer) await NfcStudio.writer.write(payload);
-                else if(NfcStudio.mode==='ble' && NfcStudio.bleChar) await NfcStudio.bleChar.writeValue(payload);
-                else return UI.showToast("Nicht verbunden!");
-                UI.showToast("Flash Kommando gesendet!");
-            } catch(e) { UI.showToast("Senden fehlgeschlagen."); }
+                if (NfcStudio.mode === 'usb' && NfcStudio.writer) await NfcStudio.writer.write(payload);
+                else if (NfcStudio.mode === 'ble' && NfcStudio.bleChar) await NfcStudio.bleChar.writeValue(payload);
+                else return UI.showToast("Bitte erst Hardware verbinden!");
+                UI.showToast("Flash-Kommando gesendet!");
+            } catch(e) { UI.showToast("Übertragungsfehler."); }
         };
 
-        // --- APP ROUTING ---
+        // --- 9. APP VIEW ROUTING ---
         App.switchView = (view) => {
-            document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.view===view));
+            document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
             document.querySelectorAll('.workspace').forEach(w => w.classList.remove('active'));
             document.getElementById(`view-${view}`).classList.add('active');
             
-            // Lib Sidebar only in Design view
-            document.getElementById('lib-sidebar').classList.toggle('hidden', view !== 'design');
-            
-            if(view === 'print') PrintStudio.render();
+            if (view === 'print') PrintStudio.render();
         };
 
-        // Init
+        // DOM Entrypoint
         window.onload = () => {
             Editor.initDragDrop();
             PrintStudio.init();
