@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TagGen Studio V2.6.6 LTS – Phoenix</title>
+    <title>TagGen Studio V2.6.7 LTS – Phoenix Fine-Tuned</title>
     
     <!-- ESP Web Tools -->
     <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
@@ -157,7 +157,7 @@
 
         /* Left: Library Sidebar */
         .sidebar-lib {
-            width: 350px;
+            width: 380px;
             background: var(--bg-sidebar);
             border-right: 1px solid var(--border);
             display: flex;
@@ -236,6 +236,12 @@
             grid-template-columns: repeat(2, minmax(0, 1fr));
             align-content: start;
             gap: 10px;
+        }
+
+        .load-more-container {
+            grid-column: 1 / -1;
+            padding: 14px;
+            text-align: center;
         }
 
         /* Clean Studio Cards */
@@ -657,23 +663,18 @@
         }
         #toast.show { transform: translate(-50%, 0); }
 
-        @media (max-width: 480px) {
-            .asset-scroll { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 10px; }
-            .asset-card { padding: 7px; gap: 7px; }
-            .card-serie { font-size: 10px; }
-            .card-title { font-size: 12px; }
-            .card-meta { font-size: 10px; }
-        }
-
-        /* --- PHOENIX RESPONSIVE PATCH: 8-CARD DESKTOP + MOBILE SWIPE --- */
-        @media (min-width: 1500px) {
-            .asset-scroll { grid-template-columns: repeat(8, minmax(0, 1fr)); }
-        }
-        @media (min-width: 1250px) and (max-width: 1499px) {
-            .asset-scroll { grid-template-columns: repeat(6, minmax(0, 1fr)); }
-        }
-        @media (min-width: 961px) and (max-width: 1249px) {
+        /* --- FINE-TUNED GRID OPTIMIZATION (UP TO 8 CARDS ON DESKTOP) --- */
+        @media (min-width: 1600px) {
             .asset-scroll { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+            .sidebar-lib { width: 440px; }
+        }
+        @media (min-width: 1300px) and (max-width: 1599px) {
+            .asset-scroll { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+            .sidebar-lib { width: 400px; }
+        }
+        @media (min-width: 961px) and (max-width: 1299px) {
+            .asset-scroll { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .sidebar-lib { width: 360px; }
         }
 
         @media (max-width: 960px) {
@@ -686,7 +687,7 @@
             .view-btn { padding: 7px 10px; white-space: nowrap; }
             .header-actions { display:none; }
 
-            /* Mobile = horizontal page swipe, not compressed desktop columns */
+            /* Mobile = horizontal page swipe */
             .studio-layout {
                 width: 300vw;
                 min-width: 300vw;
@@ -694,7 +695,7 @@
                 overflow: hidden;
                 touch-action: pan-x;
                 transform: translateX(0);
-                transition: transform .22s ease;
+                transition: transform .22s cubic-bezier(0.2, 0.8, 0.2, 1);
             }
             .sidebar-lib, .canvas-area, .sidebar-controls {
                 width: 100vw;
@@ -720,7 +721,6 @@
             .sidebar-controls input[type="text"] { font-size: 16px; min-height: 42px; }
             .range-slider { min-height: 34px; }
 
-            /* Print studio fits viewport; physical A4 remains 210x297mm for print */
             .print-scroll { padding: 12px; overflow:auto; }
             .a4-sheet {
                 width: min(210mm, calc(100vw - 24px));
@@ -763,7 +763,6 @@
 
     <header>
         <div class="brand">
-            <!-- Custom NFC Tag/Wave Logo -->
             <svg viewBox="0 0 24 24">
                 <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
                 <rect x="9" y="9" width="6" height="6"></rect>
@@ -799,7 +798,6 @@
                 <!-- Left Column: Tonie Library -->
                 <div class="sidebar-lib">
                     <div class="lib-header">
-                        <!-- Restored & Repaired Tabs -->
                         <div class="lib-tabs">
                             <button class="lib-tab active" id="tab-db" onclick="Library.switchTab('db')">Datenbank</button>
                             <button class="lib-tab" id="tab-fav" onclick="Library.switchTab('fav')">Favoriten</button>
@@ -938,8 +936,6 @@
         <!-- ==================== VIEW 3: NFC SETUP ==================== -->
         <div class="workspace" id="view-nfc">
             <div class="nfc-container">
-                
-                <!-- Card 1: ESP32 Flasher -->
                 <div class="nfc-card">
                     <h2>🛠️ Hardware Bridge Setup</h2>
                     <p style="font-size:13px; color:var(--text-muted); line-height:1.5;">
@@ -956,10 +952,8 @@
                     </p>
                 </div>
 
-                <!-- Card 2: Tag Writer -->
                 <div class="nfc-card">
                     <h2>📲 Magic Tag Writer</h2>
-                    
                     <div class="hardware-toggle">
                         <button class="hw-btn active" id="hw-usb" onclick="NfcStudio.setMode('usb')">🔌 USB (Web Serial)</button>
                         <button class="hw-btn" id="hw-ble" onclick="NfcStudio.setMode('ble')">📡 Bluetooth (BLE)</button>
@@ -986,7 +980,6 @@
                         ⚡ Magic Tag (SLIX) Flashen
                     </button>
                 </div>
-
             </div>
         </div>
 
@@ -994,23 +987,19 @@
 
     <div id="toast">Nachricht</div>
 
-    <!-- Phoenix LTS Script Architecture -->
+    <!-- Script Architecture -->
     <script>
-        // --- 1. NAMESPACES & REPAIRED MODULE DEFINITIONS ---
         const App = {};
         const Data = {
             tonies: [],          
             v2Map: new Map(),    
-            dumpIndex: {
-                exactIds: new Set(),
-                strong: new Set(),
-                titles: new Set()
-            }
+            dumpIndex: { exactIds: new Set(), strong: new Set(), titles: new Set() }
         };
         
-        // BUGFIX 1: Explicitly Define Library Module
         const Library = {
-            activeTab: 'db'
+            activeTab: 'db',
+            renderLimit: 36,
+            currentFilteredResults: []
         };
 
         const Search = {};
@@ -1023,12 +1012,7 @@
         const NfcStudio = { mode: 'usb', port: null, writer: null, bleDevice: null, bleChar: null };
         const Storage = {};
 
-        // Utility: String Normalization
-        const normalizeText = s => String(s ?? '')
-            .normalize('NFD')
-            .replace(/[\u0300-\u036f]/g, '')
-            .toLowerCase()
-            .trim();
+        const normalizeText = s => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
         const clean = s => normalizeText(s).replace(/[^a-z0-9]/g, '');
         const splitQuery = s => normalizeText(s).split(/\s+/).map(clean).filter(Boolean);
 
@@ -1036,286 +1020,159 @@
             const controller = new AbortController();
             const timer = setTimeout(() => controller.abort(), timeout);
             try {
-                const response = await fetch(url, {
-                    cache: 'no-cache',
-                    signal: controller.signal,
-                    headers: { 'Accept': 'application/json' }
-                });
-                if (!response.ok) throw new Error(`HTTP ${response.status} für ${url}`);
+                const response = await fetch(url, { cache: 'no-cache', signal: controller.signal, headers: { 'Accept': 'application/json' } });
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 return await response.json();
-            } finally {
-                clearTimeout(timer);
-            }
+            } finally { clearTimeout(timer); }
         };
 
-        const extractV1Tonies = (raw) => {
-            if (Array.isArray(raw)) return raw;
-            if (raw && Array.isArray(raw.tonies)) return raw.tonies;
-            if (raw && Array.isArray(raw.data)) return raw.data;
-            return [];
-        };
-
+        const extractV1Tonies = (raw) => Array.isArray(raw) ? raw : (raw?.tonies || raw?.data || []);
         const extractV2Tonies = (raw) => {
             if (!raw) return [];
             if (Array.isArray(raw)) {
                 const flattened = [];
                 raw.forEach(article => {
-                    if (!article || typeof article !== 'object') return;
-                    if (Array.isArray(article.data)) {
-                        article.data.forEach(item => {
-                            if (item && typeof item === 'object') {
-                                flattened.push({ ...item, article: item.article || article.article || '' });
-                            }
-                        });
-                    } else if (article.series || article.episode || article.image) {
+                    if (article?.data && Array.isArray(article.data)) {
+                        article.data.forEach(item => flattened.push({ ...item, article: item.article || article.article || '' }));
+                    } else if (article?.series || article?.episode || article?.image) {
                         flattened.push(article);
                     }
                 });
                 return flattened;
             }
-            if (Array.isArray(raw.data)) return raw.data;
-            if (Array.isArray(raw.tonies)) return raw.tonies;
-            return [];
+            return raw.data || raw.tonies || [];
         };
 
         const collectIds = (item) => {
             const ids = [];
-            if (!item || typeof item !== 'object') return ids;
+            if (!item) return ids;
             ['audio_id', 'audioId', 'id', 'hash'].forEach(key => {
-                const value = item[key];
-                if (Array.isArray(value)) ids.push(...value);
-                else if (value !== undefined && value !== null && value !== '') ids.push(value);
+                const val = item[key];
+                if (Array.isArray(val)) ids.push(...val);
+                else if (val != null && val !== '') ids.push(val);
             });
-            if (Array.isArray(item.ids)) {
-                item.ids.forEach(entry => {
-                    if (!entry || typeof entry !== 'object') return;
-                    ['audio-id', 'audio_id', 'audioId', 'id', 'hash'].forEach(key => {
-                        const value = entry[key];
-                        if (value !== undefined && value !== null && value !== '') ids.push(value);
-                    });
-                });
-            }
             return [...new Set(ids.map(String).filter(Boolean))];
         };
 
-        // --- 2. DATA LAYER (Normalized V1 + V2 Community Data) ---
         Data.init = async () => {
-            UI.showToast("Synchronisiere Tonie-Datenbank...");
-            const cacheV1 = 'phoenix_tonies_cache_v2_6_6_v1';
-            const cacheV2 = 'phoenix_tonies_cache_v2_6_6_v2';
-            const legacyCacheV1 = 'phoenix_tonies_cache_v1';
-            const legacyCacheV2 = 'phoenix_tonies_cache_v2';
+            UI.showToast("Lade Datenbank...");
+            const cacheV1 = 'phoenix_v267_v1', cacheV2 = 'phoenix_v267_v2';
             const urlV1 = 'https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json';
             const urlV2 = 'https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/toniesV2.json';
 
             try {
-                Data.v2Map.clear();
-                let rawV1 = [];
-                let rawV2 = [];
-                let source = 'online';
-
-                // V1 is the required base database. V2 is optional enrichment.
+                let rawV1 = [], rawV2 = [], source = 'online';
                 try {
                     const dataV1 = await fetchJson(urlV1);
                     rawV1 = extractV1Tonies(dataV1);
-                    if (!rawV1.length) throw new Error('V1 JSON ungültig/leer');
-                    try { localStorage.setItem(cacheV1, JSON.stringify(rawV1)); } catch(lsError) { console.warn('V1 Cache Storage failed:', lsError); }
-                } catch (v1Error) {
-                    console.warn('V1 online load failed, trying cache:', v1Error);
-                    const cached = localStorage.getItem(cacheV1) || localStorage.getItem(legacyCacheV1);
-                    if (!cached) throw new Error(`Netzwerk/Parse-Fehler und kein lokaler Cache vorhanden. (${v1Error.message})`);
-                    try {
-                        rawV1 = extractV1Tonies(JSON.parse(cached));
-                        if (!rawV1.length) throw new Error('Lokaler V1-Cache ist leer');
-                    } catch(cacheError) {
-                        localStorage.removeItem(cacheV1);
-                        localStorage.removeItem(legacyCacheV1);
-                        throw new Error('Datenbank konnte online nicht geladen werden und der lokale Cache ist ungültig.');
-                    }
+                    localStorage.setItem(cacheV1, JSON.stringify(rawV1));
+                } catch (e) {
+                    const cached = localStorage.getItem(cacheV1);
+                    if (!cached) throw e;
+                    rawV1 = extractV1Tonies(JSON.parse(cached));
                     source = 'cache';
                 }
 
                 try {
                     const dataV2 = await fetchJson(urlV2);
                     rawV2 = extractV2Tonies(dataV2);
-                    if (rawV2.length) { try { localStorage.setItem(cacheV2, JSON.stringify(rawV2)); } catch(lsError) { console.warn('V2 Cache Storage failed:', lsError); } }
-                } catch (v2Error) {
-                    console.warn('V2 online load failed, trying cache:', v2Error);
-                    try {
-                        const cachedV2 = localStorage.getItem(cacheV2) || localStorage.getItem(legacyCacheV2);
-                        if (cachedV2) rawV2 = extractV2Tonies(JSON.parse(cachedV2));
-                    } catch (cacheError) {
-                        console.warn('V2 cache invalid:', cacheError);
-                    }
+                    localStorage.setItem(cacheV2, JSON.stringify(rawV2));
+                } catch (e) {
+                    const cached = localStorage.getItem(cacheV2);
+                    if (cached) rawV2 = extractV2Tonies(JSON.parse(cached));
                 }
 
-                rawV2.forEach(item => {
-                    collectIds(item).forEach(id => Data.v2Map.set(id, item));
-                });
-
-                const getImage = (v2, v1) => {
-                    const candidates = [
-                        v2?.image, v2?.picture, v2?.pic, v2?.cover, v2?.coverUrl, v2?.image_url,
-                        v1?.image, v1?.picture, v1?.pic, v1?.cover, v1?.coverUrl, v1?.image_url
-                    ];
-                    return candidates.find(v => typeof v === 'string' && v.trim()) || '';
-                };
+                rawV2.forEach(item => collectIds(item).forEach(id => Data.v2Map.set(id, item)));
 
                 Data.tonies = rawV1.map(v1 => {
-                    if (!v1 || typeof v1 !== 'object') return null;
                     const rawIds = collectIds(v1);
-                    const primaryId = String(rawIds[0] || v1.no || v1.audio_id || v1.id || '');
+                    const primaryId = String(rawIds[0] || v1.no || '');
                     let v2 = {};
-                    for (const candidateId of rawIds) {
-                        v2 = Data.v2Map.get(String(candidateId)) || {};
+                    for (const cid of rawIds) {
+                        v2 = Data.v2Map.get(String(cid)) || {};
                         if (Object.keys(v2).length) break;
                     }
-
                     const v2Ids = collectIds(v2);
-                    const audioIds = [...new Set([...rawIds, ...v2Ids].map(String).filter(Boolean))];
-                    const series = String(v2.series || v1.series || v1.serie || v1.brand || v1.title || 'Unbekannt');
-                    const title = String(v2.episode || v2.title || v1.episodes || v1.episode || v1.subtitle || v1.title || '');
-                    const image = getImage(v2, v1);
+                    const audioIds = [...new Set([...rawIds, ...v2Ids].map(String))];
+                    const series = String(v2.series || v1.series || v1.serie || v1.brand || 'Unbekannt');
+                    const title = String(v2.episode || v2.title || v1.episodes || v1.episode || '');
+                    const image = v2.image || v2.picture || v1.image || v1.picture || '';
                     const language = String(v2.language || v1.language || 'de-de').toLowerCase();
-                    const tracks = Array.isArray(v2.tracks) ? v2.tracks.length :
-                        (Array.isArray(v2['track-desc']) ? v2['track-desc'].length :
-                        (Array.isArray(v1.tracks) ? v1.tracks.length : 0));
+                    const tracks = v2.tracks?.length || v1.tracks?.length || 0;
 
-                    return {
-                        id: primaryId, audioIds, hash: v2.hash || v1.hash || '',
-                        series, title, image, pic: image, language,
-                        category: v2.category || v1.category || '',
-                        age: v2.age || v1.age || '', tracks, confidence: v2.confidence || null
-                    };
-                }).filter(t => t && (t.series || t.title || t.id));
+                    return { id: primaryId, audioIds, series, title, image, pic: image, language, tracks };
+                }).filter(t => t.series || t.title || t.id);
 
-                if (!Data.tonies.length) throw new Error('Die Tonie-Datenbank enthält keine Einträge.');
-
-                const v2Text = rawV2.length ? ` · V2 ${rawV2.length}` : '';
-                document.getElementById('db-status').textContent = `${Data.tonies.length} Tonies${v2Text}${source === 'cache' ? ' · Cache' : ''}`;
-
-                // Dump matching is optional and must never block the database.
-                try { await Data.loadDumpIndex(); } catch (dumpError) { console.warn('Dump index skipped:', dumpError); }
+                document.getElementById('db-status').textContent = `${Data.tonies.length} Tonies${source === 'cache' ? ' (Cache)' : ''}`;
+                
+                try { await Data.loadDumpIndex(); } catch(e) {}
                 Search.filter();
                 if (Data.tonies[0]) Editor.load(Data.tonies[0], true);
-            } catch (error) {
-                console.error('DB Load Error:', error);
-                document.getElementById('db-status').textContent = 'Datenbankfehler';
-                UI.showToast(`Datenbankfehler: ${error.message || error}`);
+            } catch (err) {
+                document.getElementById('db-status').textContent = 'Fehler beim Laden';
+                UI.showToast('Datenbankfehler aufgetreten.');
             }
         };
 
         Data.loadDumpIndex = async () => {
-            const cacheKey = 'phoenix_dump_index_v2_6_6';
-            const timeKey = 'phoenix_dump_time_v2_6_6';
-            const now = Date.now();
-
-            const cached = localStorage.getItem(cacheKey);
-            const cachedTime = localStorage.getItem(timeKey);
-
-            let nfcFiles = [];
-
-            if (cached && cachedTime && (now - parseInt(cachedTime, 10) < 24*60*60*1000)) {
-                try {
-                    const parsed = JSON.parse(cached);
-                    nfcFiles = Array.isArray(parsed) ? parsed : [];
-                } catch(e) { nfcFiles = []; }
-            } else {
-                try {
-                    const data = await fetchJson('https://api.github.com/repos/nortakales/flipper-zero-tonies/git/trees/master?recursive=1', 15000);
-                    if (data && Array.isArray(data.tree)) {
-                        nfcFiles = data.tree.filter(f => f.path && f.path.endsWith('.nfc')).map(f => f.path);
-                        localStorage.setItem(cacheKey, JSON.stringify(nfcFiles));
-                        localStorage.setItem(timeKey, now.toString());
+            const data = await fetchJson('https://api.github.com/repos/nortakales/flipper-zero-tonies/git/trees/master?recursive=1', 10000);
+            if (data?.tree) {
+                data.tree.forEach(f => {
+                    if (f.path?.endsWith('.nfc')) {
+                        const m = f.path.match(/[a-fA-F0-9]{8,16}/);
+                        if (m) Data.dumpIndex.exactIds.add(m[0].toLowerCase());
+                        Data.dumpIndex.titles.add(clean(f.path.split('/').pop().replace('.nfc','')));
                     }
-                } catch(e) {
-                    console.warn("GitHub Dump Fetch Limit, Fallback aktiv");
-                }
+                });
             }
-
-            // O(1) Sets aufbauen
-            nfcFiles.forEach(path => {
-                const parts = path.split('/');
-                const filename = clean(parts[parts.length-1].replace('.nfc',''));
-                const folder = parts.length > 1 ? clean(parts[parts.length-2]) : '';
-                
-                // Hex ID matches
-                const idMatch = path.match(/[a-fA-F0-9]{8,16}/);
-                if (idMatch) Data.dumpIndex.exactIds.add(idMatch[0].toLowerCase());
-                
-                if (folder && filename) Data.dumpIndex.strong.add(folder + '||' + filename);
-                Data.dumpIndex.titles.add(filename);
-            });
         };
 
-        // BUGFIX 3: Categorized Exact -> Strong -> Fuzzy Dump Matching
         Data.getMatchQuality = (tonie) => {
-            if (!tonie || !tonie.id) return 'none';
-            
-            // 1. Exact Audio-ID match
-            const idsToCheck = (tonie.audioIds && tonie.audioIds.length > 0) ? tonie.audioIds : [tonie.id];
-            for (const id of idsToCheck) {
-                if (id && id.length >= 6 && Data.dumpIndex.exactIds.has(id.toLowerCase())) {
-                    return 'exact';
-                }
+            const ids = tonie.audioIds?.length ? tonie.audioIds : [tonie.id];
+            for (const id of ids) {
+                if (id && Data.dumpIndex.exactIds.has(id.toLowerCase())) return 'exact';
             }
-            
-            // 2. Strong Match (Series folder + exact filename match)
-            const tTitle = clean(tonie.title);
-            const tSerie = clean(tonie.series);
-            if (tSerie && tTitle && Data.dumpIndex.strong.has(tSerie + '||' + tTitle)) {
-                return 'strong';
-            }
-
-            // 3. Fuzzy Match (Filename match)
-            if (tTitle.length > 4 && Data.dumpIndex.titles.has(tTitle)) {
-                return 'fuzzy';
-            }
-
+            if (Data.dumpIndex.titles.has(clean(tonie.title))) return 'fuzzy';
             return 'none';
         };
 
-        // --- 3. LIBRARY & TABS ---
         Library.switchTab = (tab) => {
             Library.activeTab = tab;
+            Library.renderLimit = 36;
             document.getElementById('tab-db').classList.toggle('active', tab === 'db');
             document.getElementById('tab-fav').classList.toggle('active', tab === 'fav');
             Search.filter();
         };
 
         Search.filter = () => {
-            const rawQuery = document.getElementById('search-input').value;
-            const query = normalizeText(rawQuery);
-            const queryParts = splitQuery(rawQuery);
+            const queryParts = splitQuery(document.getElementById('search-input').value);
             const lang = document.getElementById('filter-lang').value;
             const dumpFilter = document.getElementById('filter-dump').value;
-            
             const favs = JSON.parse(localStorage.getItem('phoenix_favs') || '[]');
 
             let results = Data.tonies;
-
             if (Library.activeTab === 'fav') results = results.filter(t => favs.includes(t.id));
             if (lang) results = results.filter(t => t.language === lang);
-            
             if (dumpFilter === 'exact') results = results.filter(t => Data.getMatchQuality(t) === 'exact');
-            if (dumpFilter === 'strong') results = results.filter(t => ['exact', 'strong'].includes(Data.getMatchQuality(t)));
             if (dumpFilter === 'fuzzy') results = results.filter(t => Data.getMatchQuality(t) !== 'none');
 
             if (queryParts.length) {
                 results = results.filter(t => {
                     const haystack = clean(`${t.series} ${t.title} ${t.id} ${(t.audioIds || []).join(' ')}`);
-                    return queryParts.every(part => haystack.includes(part));
+                    return queryParts.every(p => haystack.includes(p));
                 });
             }
 
-            UI.renderCards(results.slice(0, 50));
+            Library.currentFilteredResults = results;
+            Library.renderLimit = 36;
+            UI.renderCards();
         };
 
-        // --- 4. UI & CARDS ---
-        UI.renderCards = (items) => {
+        UI.renderCards = () => {
             const grid = document.getElementById('asset-grid');
             grid.innerHTML = '';
             const favs = JSON.parse(localStorage.getItem('phoenix_favs') || '[]');
+            const items = Library.currentFilteredResults.slice(0, Library.renderLimit);
 
             items.forEach(item => {
                 const isFav = favs.includes(item.id);
@@ -1330,24 +1187,15 @@
                 
                 const img = document.createElement('img');
                 img.loading = 'lazy';
-                img.src = item.pic || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+                img.src = item.pic || '';
                 img.onerror = () => { img.classList.add('fallback'); img.removeAttribute('src'); };
                 imgWrap.appendChild(img);
 
-                // BUGFIX 4: Missing Badge Classes
                 if (matchQ !== 'none') {
                     const badge = document.createElement('div');
                     badge.className = 'match-badge';
-                    if (matchQ === 'exact') {
-                        badge.textContent = '🟢 Exakt';
-                        badge.style.background = 'var(--status-exact)';
-                    } else if (matchQ === 'strong') {
-                        badge.textContent = '🔵 Strong';
-                        badge.style.background = 'var(--status-strong)';
-                    } else {
-                        badge.textContent = '🟡 Fuzzy';
-                        badge.style.background = 'var(--status-fuzzy)';
-                    }
+                    badge.textContent = matchQ === 'exact' ? '🟢 Exakt' : '🟡 Match';
+                    badge.style.background = matchQ === 'exact' ? 'var(--status-exact)' : 'var(--status-fuzzy)';
                     imgWrap.appendChild(badge);
                 }
 
@@ -1359,42 +1207,42 @@
 
                 const content = document.createElement('div');
                 content.className = 'card-content';
-                
-                const serie = document.createElement('div');
-                serie.className = 'card-serie';
-                serie.textContent = item.series;
-                
-                const title = document.createElement('div');
-                title.className = 'card-title';
-                title.textContent = item.title;
-
-                const meta = document.createElement('div');
-                meta.className = 'card-meta';
-                
-                let dotColor = 'var(--status-none)';
-                if (matchQ === 'exact') dotColor = 'var(--status-exact)';
-                if (matchQ === 'strong') dotColor = 'var(--status-strong)';
-                if (matchQ === 'fuzzy') dotColor = 'var(--status-fuzzy)';
-                
-                // Community Data Display (Lang, Tracks, Audio-ID)
-                meta.innerHTML = `<span class="status-dot" style="background:${dotColor}"></span> ${item.language.toUpperCase()} • ${item.tracks} Tracks • ID: ${item.id.slice(0, 8)}...`;
-
-                content.appendChild(serie);
-                content.appendChild(title);
-                content.appendChild(meta);
+                content.innerHTML = `
+                    <div class="card-serie">${item.series}</div>
+                    <div class="card-title">${item.title}</div>
+                    <div class="card-meta">
+                        <span class="status-dot" style="background:${matchQ === 'exact' ? 'var(--status-exact)' : 'var(--status-none)'}"></span>
+                        ${item.language.toUpperCase()} • ${item.tracks} Tracks
+                    </div>
+                `;
 
                 card.appendChild(imgWrap);
                 card.appendChild(content);
                 grid.appendChild(card);
             });
+
+            // "Load More" / Infinite scroll trigger button for smoother mobile & desktop performance
+            if (Library.renderLimit < Library.currentFilteredResults.length) {
+                const moreWrap = document.createElement('div');
+                moreWrap.className = 'load-more-container';
+                const moreBtn = document.createElement('button');
+                moreBtn.className = 'btn-secondary';
+                moreBtn.style.width = '100%';
+                moreBtn.textContent = `Weitere Laden (${Library.currentFilteredResults.length - Library.renderLimit} übrig)...`;
+                moreBtn.onclick = () => {
+                    Library.renderLimit += 36;
+                    UI.renderCards();
+                };
+                moreWrap.appendChild(moreBtn);
+                grid.appendChild(moreWrap);
+            }
         };
 
         UI.toggleFav = (id) => {
             let favs = JSON.parse(localStorage.getItem('phoenix_favs') || '[]');
-            if (favs.includes(id)) favs = favs.filter(f => f !== id);
-            else favs.push(id);
+            favs = favs.includes(id) ? favs.filter(f => f !== id) : [...favs, id];
             localStorage.setItem('phoenix_favs', JSON.stringify(favs));
-            Search.filter();
+            UI.renderCards();
         };
 
         UI.showToast = (msg) => {
@@ -1404,19 +1252,12 @@
             setTimeout(() => t.classList.remove('show'), 2500);
         };
 
-        // --- 5. EDITOR ---
         Editor.load = (item, silent=false) => {
-            if (!item || typeof item !== 'object') {
-                UI.showToast('Kein gültiger Tonie-Datensatz gefunden.');
-                return;
-            }
-            Editor.current = { ...item, pic: item.pic || item.image || '' };
+            Editor.current = { ...item, pic: item.pic || '' };
             Editor.resetTransform();
-            
             document.getElementById('input-serie').value = item.series;
             document.getElementById('input-title').value = item.title;
             document.getElementById('input-uid').value = item.id;
-            
             Editor.update();
             if (!silent) UI.showToast(`"${item.series}" geladen`);
         };
@@ -1458,16 +1299,8 @@
             document.getElementById('svg-text-uid').textContent = Editor.current.uid ? `ID: ${Editor.current.uid}` : '';
             document.getElementById('svg-text-bottom').textContent = Editor.current.title;
             
-            // Sync NFC Studio
-            document.getElementById('nfc-target-title').textContent = Editor.current.title || 'Kein Titel';
-            document.getElementById('nfc-target-uid').textContent = Editor.current.uid || 'Keine UID';
-            
-            const matchQ = Data.getMatchQuality({ ...Editor.current, id: Editor.current.uid });
-            const sBadge = document.getElementById('nfc-target-status');
-            if (matchQ === 'exact') sBadge.innerHTML = '<span style="color:var(--status-exact)">🟢 Exakter Dump</span>';
-            else if (matchQ === 'strong') sBadge.innerHTML = '<span style="color:var(--status-strong)">🔵 Strong Match</span>';
-            else if (matchQ === 'fuzzy') sBadge.innerHTML = '<span style="color:var(--status-fuzzy)">🟡 Fuzzy Match</span>';
-            else sBadge.innerHTML = '<span style="color:var(--text-muted)">⚪ Kein Dump (Nur UID Flash)</span>';
+            document.getElementById('nfc-target-title').textContent = Editor.current.title || '-';
+            document.getElementById('nfc-target-uid').textContent = Editor.current.uid || '-';
         };
 
         Editor.initDragDrop = () => {
@@ -1476,50 +1309,34 @@
             zone.ondrop = e => {
                 e.preventDefault();
                 const file = e.dataTransfer.files[0];
-                if (file && file.type.startsWith('image/')) {
+                if (file?.type.startsWith('image/')) {
                     const r = new FileReader();
                     r.onload = ev => { Editor.current.pic = ev.target.result; Editor.update(); };
                     r.readAsDataURL(file);
                 }
             };
-            
-            ['serie','title','uid'].forEach(id => {
-                document.getElementById(`input-${id}`).addEventListener('input', Editor.update);
-            });
-            ['zoom','x','y','font'].forEach(id => {
-                document.getElementById(`slider-${id}`).addEventListener('input', Editor.update);
-            });
+            ['serie','title','uid'].forEach(id => document.getElementById(`input-${id}`).addEventListener('input', Editor.update));
+            ['zoom','x','y','font'].forEach(id => document.getElementById(`slider-${id}`).addEventListener('input', Editor.update));
             document.getElementById('filter-lang').addEventListener('change', Search.filter);
             document.getElementById('filter-dump').addEventListener('change', Search.filter);
         };
 
-        // --- 6. PRINT STUDIO (Millimeter Calibrated) ---
         PrintStudio.init = () => {
             PrintStudio.slots = new Array(12).fill(null);
             PrintStudio.changeFormat();
         };
 
-        // BUGFIX 5: Calibrated Presets
         PrintStudio.getGeometry = (key) => {
             const geo = {
-                // 43mm Münzkapseln: 3x4 Nutzen, 10mm Gaps, zentriert auf A4
                 '43-12': { w: 43, h: 43, cols: 3, rows: 4, ml: 30.5, mt: 47.5, gx: 10, gy: 10 },
-                
-                // Avery Zweckform L3415 / 5080 (40mm 24er Nutzen)
                 '40-24': { w: 40, h: 40, cols: 4, rows: 6, ml: 17.5, mt: 21.5, gx: 5, gy: 5 },
-                
-                // Avery 40mm 12er
                 '40-12': { w: 40, h: 40, cols: 3, rows: 4, ml: 35.0, mt: 50.0, gx: 10, gy: 10 },
-                
-                // Avery Zweckform 6223 (30mm 48er Nutzen): Ränder nach Datenblatt
                 '30-48': { w: 30, h: 30, cols: 6, rows: 8, ml: 15.0, mt: 28.5, gx: 0, gy: 0 },
-                
                 'custom': { w: 43, h: 43, cols: 3, rows: 4, ml: 30.5, mt: 47.5, gx: 10, gy: 10 }
             };
-            const customInput = document.getElementById('custom-size-input');
             const conf = geo[key] || geo['43-12'];
             if (key === 'custom') {
-                const cVal = parseInt(customInput.value) || 43;
+                const cVal = parseInt(document.getElementById('custom-size-input').value) || 43;
                 conf.w = cVal; conf.h = cVal;
             }
             return conf;
@@ -1528,39 +1345,26 @@
         PrintStudio.changeFormat = () => {
             const key = document.getElementById('print-format').value;
             document.getElementById('custom-size-wrap').style.display = key === 'custom' ? 'flex' : 'none';
-            
             const geo = PrintStudio.getGeometry(key);
             const total = geo.cols * geo.rows;
-            
             const old = PrintStudio.slots;
             PrintStudio.slots = new Array(total).fill(null);
-            for (let i = 0; i < Math.min(old.length, total); i++) {
-                PrintStudio.slots[i] = old[i];
-            }
-            
+            for (let i = 0; i < Math.min(old.length, total); i++) PrintStudio.slots[i] = old[i];
             PrintStudio.render();
         };
 
         PrintStudio.render = () => {
             const grid = document.getElementById('sheet-grid');
             grid.innerHTML = '';
-            
-            const key = document.getElementById('print-format').value;
-            const geo = PrintStudio.getGeometry(key);
-            
+            const geo = PrintStudio.getGeometry(document.getElementById('print-format').value);
             let count = 0;
 
             PrintStudio.slots.forEach((data, index) => {
-                const col = index % geo.cols;
-                const row = Math.floor(index / geo.cols);
-                
-                const left = geo.ml + (col * (geo.w + geo.gx));
-                const top = geo.mt + (row * (geo.h + geo.gy));
-
+                const col = index % geo.cols, row = Math.floor(index / geo.cols);
                 const slot = document.createElement('div');
                 slot.className = 'slot';
-                slot.style.left = `${left}mm`;
-                slot.style.top = `${top}mm`;
+                slot.style.left = `${geo.ml + (col * (geo.w + geo.gx))}mm`;
+                slot.style.top = `${geo.mt + (row * (geo.h + geo.gy))}mm`;
                 slot.style.width = `${geo.w}mm`;
                 slot.style.height = `${geo.h}mm`;
                 
@@ -1570,7 +1374,7 @@
                     e.preventDefault();
                     slot.classList.remove('drag-over');
                     const from = parseInt(e.dataTransfer.getData('text'));
-                    if (from !== index && !isNaN(from)) {
+                    if (!isNaN(from) && from !== index) {
                         const t = PrintStudio.slots[from];
                         PrintStudio.slots[from] = PrintStudio.slots[index];
                         PrintStudio.slots[index] = t;
@@ -1585,47 +1389,31 @@
                     s.draggable = true;
                     s.ondragstart = e => e.dataTransfer.setData('text', index);
 
-                    const fScale = data.state.fontSize / 100;
-                    
                     const img = document.createElement('img');
-                    img.src = typeof data.pic === 'string' ? data.pic : '';
-                    img.alt = '';
-                    img.style.cssText = `width:100%;height:100%;object-fit:contain;position:absolute;transform:translate(${Number(data.state.x)||0}%, ${Number(data.state.y)||0}%) scale(${(Number(data.state.zoom)||100)/100})`;
+                    img.src = data.pic || '';
+                    img.style.cssText = `width:100%;height:100%;object-fit:contain;position:absolute;transform:translate(${data.state.x}%, ${data.state.y}%) scale(${data.state.zoom/100})`;
                     s.appendChild(img);
 
                     const svgNS = 'http://www.w3.org/2000/svg';
                     const svg = document.createElementNS(svgNS, 'svg');
                     svg.setAttribute('viewBox', '0 0 100 100');
                     svg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
-
-                    const makePath = (id, d) => {
-                        const path = document.createElementNS(svgNS, 'path');
-                        path.setAttribute('id', id); path.setAttribute('d', d); path.setAttribute('fill', 'none');
-                        return path;
-                    };
-                    svg.appendChild(makePath(`p-t-${index}`, 'M 16,50 A 34,34 0 0,1 84,50'));
-                    svg.appendChild(makePath(`p-u-${index}`, 'M 22,50 A 28,28 0 0,0 78,50'));
-                    svg.appendChild(makePath(`p-b-${index}`, 'M 14,50 A 36,36 0 0,0 86,50'));
-
-                    const makeText = (size, fill, pathId, text) => {
-                        const node = document.createElementNS(svgNS, 'text');
-                        node.setAttribute('font-size', size); node.setAttribute('font-weight', 'bold');
-                        node.setAttribute('fill', fill); node.setAttribute('text-anchor', 'middle');
-                        const tp = document.createElementNS(svgNS, 'textPath');
-                        tp.setAttribute('href', `#${pathId}`); tp.setAttribute('startOffset', '50%'); tp.setAttribute('letter-spacing', '0.1em');
-                        tp.textContent = text || ''; node.appendChild(tp); return node;
-                    };
-                    svg.appendChild(makeText((7.5*fScale).toFixed(1), '#e11d48', `p-t-${index}`, data.series));
-                    svg.appendChild(makeText((5*fScale).toFixed(1), '#64748b', `p-u-${index}`, data.uid ? 'ID: '+data.uid : ''));
-                    svg.appendChild(makeText((6.5*fScale).toFixed(1), '#0f172a', `p-b-${index}`, data.title));
+                    
+                    const fScale = data.state.fontSize / 100;
+                    svg.innerHTML = `
+                        <path id="p-t-${index}" d="M 16,50 A 34,34 0 0,1 84,50" fill="none"/>
+                        <path id="p-u-${index}" d="M 22,50 A 28,28 0 0,0 78,50" fill="none"/>
+                        <path id="p-b-${index}" d="M 14,50 A 36,36 0 0,0 86,50" fill="none"/>
+                        <text font-size="${7.5*fScale}" font-weight="bold" fill="#e11d48" text-anchor="middle"><textPath href="#p-t-${index}" startOffset="50%" letter-spacing="0.1em">${data.series}</textPath></text>
+                        <text font-size="${5*fScale}" font-weight="bold" fill="#64748b" text-anchor="middle"><textPath href="#p-u-${index}" startOffset="50%" letter-spacing="0.12em">${data.uid ? 'ID: '+data.uid : ''}</textPath></text>
+                        <text font-size="${6.5*fScale}" font-weight="bold" fill="#0f172a" text-anchor="middle"><textPath href="#p-b-${index}" startOffset="50%" letter-spacing="0.12em">${data.title}</textPath></text>
+                    `;
                     s.appendChild(svg);
 
-                    const actions = document.createElement('div');
-                    actions.className = 'sticker-actions';
-                    const del = document.createElement('button');
-                    del.className = 's-btn del'; del.textContent = '✕';
-                    del.onclick = (ev) => { ev.stopPropagation(); PrintStudio.slots[index] = null; PrintStudio.render(); };
-                    actions.appendChild(del); s.appendChild(actions);
+                    const act = document.createElement('div');
+                    act.className = 'sticker-actions';
+                    act.innerHTML = `<button class="s-btn del" onclick="event.stopPropagation(); PrintStudio.slots[${index}]=null; PrintStudio.render();">✕</button>`;
+                    s.appendChild(act);
                     slot.appendChild(s);
                 }
                 grid.appendChild(slot);
@@ -1633,174 +1421,114 @@
             document.getElementById('print-count').textContent = count;
         };
 
-        PrintStudio.addCurrentToSheet = async () => {
+        PrintStudio.addCurrentToSheet = () => {
             const data = { ...Editor.current, state: { ...Editor.state } };
-            const emptyIdx = PrintStudio.slots.findIndex(s => s === null);
-            if (emptyIdx > -1) {
-                PrintStudio.slots[emptyIdx] = data;
-                UI.showToast(`Cover auf Position ${emptyIdx+1} platziert!`);
+            const idx = PrintStudio.slots.findIndex(s => s === null);
+            if (idx > -1) {
+                PrintStudio.slots[idx] = data;
+                UI.showToast(`Auf Position ${idx+1} platziert!`);
                 App.switchView('print');
-            } else {
-                UI.showToast("Druckbogen ist voll!");
-            }
+            } else UI.showToast("Druckbogen ist voll!");
         };
 
-        PrintStudio.clear = () => {
-            PrintStudio.slots.fill(null);
-            PrintStudio.render();
-            UI.showToast("Druckbogen geleert.");
-        };
+        PrintStudio.clear = () => { PrintStudio.slots.fill(null); PrintStudio.render(); UI.showToast("Bogen geleert."); };
 
-        // --- 7. STORAGE & PROJECT PERSISTENCE ---
         Storage.saveProject = () => {
-            const p = {
-                version: 2.12,
-                format: document.getElementById('print-format').value,
-                slots: PrintStudio.slots
-            };
-            const blob = new Blob([JSON.stringify(p)], { type: 'application/json' });
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = 'TagGen_Phoenix_Project.json';
-            a.click();
-            UI.showToast("Projektdatei exportiert.");
+            const blob = new Blob([JSON.stringify({ format: document.getElementById('print-format').value, slots: PrintStudio.slots })], { type: 'application/json' });
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'TagGen_Project.json'; a.click();
+            UI.showToast("Gespeichert.");
         };
 
         Storage.loadProject = (e) => {
-            const input = e.target;
-            const file = input.files && input.files[0];
+            const file = e.target.files?.[0];
             if (!file) return;
             const r = new FileReader();
             r.onload = ev => {
                 try {
                     const p = JSON.parse(ev.target.result);
-                    const validFormats = ['43-12','40-24','40-12','30-48','custom'];
-                    if (!p || typeof p !== 'object' || !Array.isArray(p.slots) || p.slots.length > 200) throw new Error('slots');
-                    const format = validFormats.includes(p.format) ? p.format : '43-12';
-                    document.getElementById('print-format').value = format;
-                    const geo = PrintStudio.getGeometry(format);
-                    const total = geo.cols * geo.rows;
-                    PrintStudio.slots = new Array(total).fill(null);
-                    for (let i = 0; i < Math.min(p.slots.length, total); i++) {
-                        const item = p.slots[i];
-                        if (!item || typeof item !== 'object') continue;
-                        PrintStudio.slots[i] = {
-                            series: String(item.series ?? ''), title: String(item.title ?? ''), uid: String(item.uid ?? ''),
-                            pic: typeof item.pic === 'string' ? item.pic : '',
-                            state: {
-                                zoom: Number.isFinite(Number(item.state?.zoom)) ? Number(item.state.zoom) : 100,
-                                x: Number.isFinite(Number(item.state?.x)) ? Number(item.state.x) : 0,
-                                y: Number.isFinite(Number(item.state?.y)) ? Number(item.state.y) : 0,
-                                fontSize: Number.isFinite(Number(item.state?.fontSize)) ? Number(item.state.fontSize) : 100
-                            }
-                        };
+                    if (p?.slots) {
+                        PrintStudio.slots = p.slots;
+                        document.getElementById('print-format').value = p.format || '43-12';
+                        PrintStudio.changeFormat();
+                        UI.showToast("Projekt geladen!");
                     }
-                    PrintStudio.changeFormat();
-                    UI.showToast('Projekt erfolgreich geladen!');
-                } catch(err) {
-                    console.warn('Project import rejected:', err);
-                    UI.showToast('Ungültige Projektdatei.');
-                } finally {
-                    input.value = '';
-                }
+                } catch(e) { UI.showToast("Fehler beim Laden."); }
+                e.target.value = '';
             };
-            r.onerror = () => { input.value = ''; UI.showToast('Projektdatei konnte nicht gelesen werden.'); };
             r.readAsText(file);
         };
 
-        // --- 8. NFC & HARDWARE PROTOCOL ---
-        NfcStudio.setMode = (mode) => {
-            NfcStudio.mode = mode;
-            document.getElementById('hw-usb').classList.toggle('active', mode === 'usb');
-            document.getElementById('hw-ble').classList.toggle('active', mode === 'ble');
+        NfcStudio.setMode = (m) => {
+            NfcStudio.mode = m;
+            document.getElementById('hw-usb').classList.toggle('active', m === 'usb');
+            document.getElementById('hw-ble').classList.toggle('active', m === 'ble');
         };
 
         NfcStudio.connect = async () => {
-            if (NfcStudio.mode === 'usb') {
-                try {
+            try {
+                if (NfcStudio.mode === 'usb') {
                     NfcStudio.port = await navigator.serial.requestPort();
                     await NfcStudio.port.open({ baudRate: 115200 });
                     NfcStudio.writer = NfcStudio.port.writable.getWriter();
-                    document.getElementById('nfc-conn-status').innerHTML = '<span style="color:var(--status-exact)">🟢 USB Verbunden</span>';
-                    UI.showToast("ESP32 via USB verbunden.");
-                } catch(e) { UI.showToast("USB-Verbindungsfehler."); }
-            } else {
-                try {
-                    NfcStudio.bleDevice = await navigator.bluetooth.requestDevice({
-                        filters: [{ namePrefix: 'NFC' }, { namePrefix: 'ESP' }],
-                        optionalServices: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e']
-                    });
+                    UI.showToast("USB Verbunden.");
+                } else {
+                    NfcStudio.bleDevice = await navigator.bluetooth.requestDevice({ filters: [{ namePrefix: 'NFC' }] });
                     const server = await NfcStudio.bleDevice.gatt.connect();
                     const srv = await server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
                     NfcStudio.bleChar = await srv.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e');
-                    document.getElementById('nfc-conn-status').innerHTML = '<span style="color:var(--status-exact)">🟢 BLE Verbunden</span>';
-                    UI.showToast("ESP32 via Bluetooth verbunden.");
-                } catch(e) { UI.showToast("BLE-Verbindungsfehler."); }
-            }
+                    UI.showToast("BLE Verbunden.");
+                }
+                document.getElementById('nfc-conn-status').innerHTML = '<span style="color:var(--status-exact)">🟢 Verbunden</span>';
+            } catch(e) { UI.showToast("Verbindungsfehler."); }
         };
 
         NfcStudio.flashTag = async () => {
             const uid = Editor.current.uid;
-            if (!uid) return UI.showToast("Keine Audio-ID geladen!");
-            
-            const uidHex = uid.length >= 14 ? uid.toUpperCase() : "E00403" + uid.padStart(10, '0').toUpperCase();
-            const cmd = `{"cmd":"write_magic_tag","uid":"${uidHex}"}\n`;
-            const payload = new TextEncoder().encode(cmd);
-
+            if (!uid) return UI.showToast("Keine UID!");
+            const cmd = `{"cmd":"write_magic_tag","uid":"${uid.length >= 14 ? uid.toUpperCase() : "E00403" + uid.padStart(10, '0').toUpperCase()}"}\n`;
             try {
-                if (NfcStudio.mode === 'usb' && NfcStudio.writer) await NfcStudio.writer.write(payload);
-                else if (NfcStudio.mode === 'ble' && NfcStudio.bleChar) await NfcStudio.bleChar.writeValue(payload);
-                else return UI.showToast("Bitte erst Hardware verbinden!");
-                UI.showToast("Flash-Kommando gesendet!");
+                if (NfcStudio.mode === 'usb' && NfcStudio.writer) await NfcStudio.writer.write(new TextEncoder().encode(cmd));
+                else if (NfcStudio.mode === 'ble' && NfcStudio.bleChar) await NfcStudio.bleChar.writeValue(new TextEncoder().encode(cmd));
+                else return UI.showToast("Hardware nicht verbunden!");
+                UI.showToast("Befehl gesendet!");
             } catch(e) { UI.showToast("Übertragungsfehler."); }
         };
 
-        // --- 9. APP VIEW ROUTING ---
         App.switchView = (view) => {
             document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
             document.querySelectorAll('.workspace').forEach(w => w.classList.remove('active'));
             document.getElementById(`view-${view}`).classList.add('active');
-            
             if (view === 'print') PrintStudio.render();
         };
 
-        // --- 10. MOBILE PAGE SWIPE ---
+        // Mobile Swipe & Touch Controls Handler
         (() => {
             let startX = 0, startY = 0, dragging = false;
-            const layout = () => document.querySelector('.studio-layout');
-            const go = (page) => {
-                const l = layout();
-                if (!l || window.innerWidth > 960) return;
-                const clamped = Math.max(0, Math.min(2, page));
-                l.dataset.page = String(clamped);
-                l.style.transform = `translateX(-${clamped * 100}vw)`;
+            const l = () => document.querySelector('.studio-layout');
+            const go = (p) => {
+                const layout = l();
+                if (!layout || window.innerWidth > 960) return;
+                const page = Math.max(0, Math.min(2, p));
+                layout.dataset.page = page;
+                layout.style.transform = `translateX(-${page * 100}vw)`;
             };
-            const bind = () => {
-                const l = layout(); if (!l) return;
-                l.addEventListener('touchstart', e => {
-                    if (e.touches.length !== 1) return;
-                    startX=e.touches[0].clientX; startY=e.touches[0].clientY; dragging=true;
+            window.addEventListener('load', () => {
+                const layout = l();
+                if (!layout) return;
+                layout.addEventListener('touchstart', e => { if (e.touches.length === 1) { startX = e.touches[0].clientX; startY = e.touches[0].clientY; dragging = true; } }, {passive:true});
+                layout.addEventListener('touchend', e => {
+                    if (!dragging) return; dragging = false;
+                    const dx = e.changedTouches[0].clientX - startX, dy = e.changedTouches[0].clientY - startY;
+                    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) go(Number(layout.dataset.page || 0) + (dx < 0 ? 1 : -1));
                 }, {passive:true});
-                l.addEventListener('touchend', e => {
-                    if (!dragging) return; dragging=false;
-                    const dx=e.changedTouches[0].clientX-startX;
-                    const dy=e.changedTouches[0].clientY-startY;
-                    if (Math.abs(dx)<55 || Math.abs(dx)<Math.abs(dy)*1.15) return;
-                    const page=Number(l.dataset.page||0);
-                    go(page+(dx<0?1:-1));
-                }, {passive:true});
-                l.dataset.page='0';
-            };
-            window.addEventListener('resize', () => { if (window.innerWidth > 960) { const l=layout(); if(l) l.style.transform=''; } else go(Number(layout()?.dataset.page||0)); });
-            window.addEventListener('load', bind);
+                layout.dataset.page = '0';
+            });
         })();
 
-        // DOM Entrypoint
         window.onload = () => {
             Editor.initDragDrop();
             PrintStudio.init();
             Data.init();
-            
             document.getElementById('search-input').addEventListener('input', Search.filter);
             document.getElementById('print-format').addEventListener('change', PrintStudio.changeFormat);
         };
