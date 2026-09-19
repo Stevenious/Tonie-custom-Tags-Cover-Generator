@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>TagGen Studio V2.6.5 LTS – Phoenix</title>
+    <title>TagGen Studio V2.6.6 LTS – Phoenix</title>
     
     <!-- ESP Web Tools -->
     <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
@@ -142,6 +142,11 @@
             color: var(--text-muted);
             border: 1px solid var(--border);
             white-space: nowrap;
+        }
+        .db-badge.error {
+            background: #fef2f2;
+            color: #ef4444;
+            border-color: #fca5a5;
         }
 
         /* --- MAIN APP LAYOUT --- */
@@ -694,9 +699,7 @@
                 flex-wrap: wrap;
             }
 
-            .brand {
-                font-size: 15px;
-            }
+            .brand { font-size: 15px; }
 
             .view-switcher {
                 order: 3;
@@ -711,9 +714,7 @@
                 min-height: 40px;
             }
 
-            .header-actions {
-                order: 2;
-            }
+            .header-actions { order: 2; }
 
             .db-badge {
                 font-size: 10px;
@@ -770,9 +771,7 @@
                 flex-shrink: 0;
             }
 
-            .control-section {
-                padding: 16px 14px;
-            }
+            .control-section { padding: 16px 14px; }
 
             /* Print Studio Mobile */
             .print-toolbar {
@@ -786,9 +785,7 @@
                 flex-wrap: wrap;
             }
 
-            .print-scroll {
-                padding: 14px 8px;
-            }
+            .print-scroll { padding: 14px 8px; }
 
             .a4-sheet {
                 transform: scale(0.55);
@@ -804,14 +801,10 @@
                 gap: 16px;
             }
 
-            .nfc-card {
-                padding: 18px;
-            }
+            .nfc-card { padding: 18px; }
 
             /* Unified Touch Targets */
-            .btn, .btn-secondary {
-                min-height: 44px;
-            }
+            .btn, .btn-secondary { min-height: 44px; }
 
             #toast {
                 bottom: calc(20px + env(safe-area-inset-bottom, 0));
@@ -1110,12 +1103,27 @@
             const timer = setTimeout(() => controller.abort(), timeout);
             try {
                 const response = await fetch(url, { cache: 'no-store', signal: controller.signal });
-                if (!response.ok) throw new Error(`HTTP ${response.status} für ${url}`);
-                // fetchJson returns parsed object immediately!
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
                 return await response.json();
             } finally {
                 clearTimeout(timer);
             }
+        };
+
+        // HOTFIX 2: Resilient Extractor for unknown JSON structures
+        const extractTonies = (raw) => {
+            if (!raw) return [];
+            // Direct array [ {...}, {...} ]
+            if (Array.isArray(raw)) return raw;
+            // Wrapped { tonies: [...] }
+            if (raw.tonies && Array.isArray(raw.tonies)) return raw.tonies;
+            // Wrapped { data: [...] }
+            if (raw.data && Array.isArray(raw.data)) return raw.data;
+            // Object map { "id1": {...}, "id2": {...} }
+            if (typeof raw === 'object') {
+                return Object.values(raw).filter(val => val !== null && typeof val === 'object' && !Array.isArray(val));
+            }
+            return [];
         };
 
         Data.init = async () => {
@@ -1124,6 +1132,7 @@
             const cacheV2 = 'phoenix_tonies_cache_v2';
             const urlV1 = 'https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json';
             const urlV2 = 'https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/toniesV2.json';
+            const statusBadge = document.getElementById('db-status');
 
             try {
                 Data.v2Map.clear();
@@ -1131,30 +1140,41 @@
                 let rawV2 = [];
                 let source = 'online';
 
+                // --- V1 Load (CRITICAL) ---
                 try {
                     const dataV1 = await fetchJson(urlV1);
-                    rawV1 = Array.isArray(dataV1) ? dataV1 : Object.values(dataV1 || {});
-                    localStorage.setItem(cacheV1, JSON.stringify(rawV1));
+                    rawV1 = extractTonies(dataV1);
+                    if (!rawV1 || rawV1.length === 0) throw new Error("V1 JSON ungültig/leer");
+                    
+                    try {
+                        localStorage.setItem(cacheV1, JSON.stringify(rawV1));
+                    } catch(lsError) {
+                        console.warn('V1 Cache Storage failed (Quota/Size limit):', lsError);
+                    }
                 } catch (v1Error) {
-                    console.warn('V1 online load failed, trying cache:', v1Error);
+                    console.warn('V1 online load/parse failed, trying cache:', v1Error);
                     const cached = localStorage.getItem(cacheV1);
-                    if (!cached) throw v1Error;
-                    rawV1 = JSON.parse(cached);
+                    if (!cached) throw new Error(`Netzwerk/Parse-Fehler und kein lokaler Cache vorhanden. (${v1Error.message})`);
+                    rawV1 = extractTonies(JSON.parse(cached));
+                    if (!rawV1 || rawV1.length === 0) throw new Error("V1 Cache ungültig/leer");
                     source = 'cache';
                 }
 
+                // --- V2 Load (OPTIONAL) ---
                 try {
                     const dataV2 = await fetchJson(urlV2);
-                    rawV2 = Array.isArray(dataV2) ? dataV2 : Object.values(dataV2 || {});
-                    localStorage.setItem(cacheV2, JSON.stringify(rawV2));
+                    rawV2 = extractTonies(dataV2);
+                    if (rawV2.length > 0) {
+                        try {
+                            localStorage.setItem(cacheV2, JSON.stringify(rawV2));
+                        } catch(lsError) {} // Ignore quota issues for V2
+                    }
                 } catch (v2Error) {
-                    console.warn('V2 online load failed, trying cache:', v2Error);
+                    console.warn('V2 online load/parse failed, trying cache:', v2Error);
                     try {
                         const cachedV2 = localStorage.getItem(cacheV2);
-                        if (cachedV2) rawV2 = JSON.parse(cachedV2);
-                    } catch (cacheError) {
-                        console.warn('V2 cache invalid:', cacheError);
-                    }
+                        if (cachedV2) rawV2 = extractTonies(JSON.parse(cachedV2));
+                    } catch (cacheError) {}
                 }
 
                 rawV2.forEach(item => {
@@ -1210,10 +1230,13 @@
                     };
                 }).filter(t => t && (t.series || t.title || t.id));
 
-                if (!Data.tonies.length) throw new Error('Die Tonie-Datenbank enthält keine Einträge.');
+                if (!Data.tonies.length) {
+                    throw new Error('Datenbank fehlerhaft formatiert. Keine Tonies gefunden.');
+                }
 
+                statusBadge.classList.remove('error');
                 const v2Text = rawV2.length ? ` · V2 ${rawV2.length}` : '';
-                document.getElementById('db-status').textContent = `${Data.tonies.length} Tonies${v2Text}${source === 'cache' ? ' · Cache' : ''}`;
+                statusBadge.textContent = `${Data.tonies.length} Tonies${v2Text}${source === 'cache' ? ' · Cache' : ''}`;
 
                 // Dump-Index wird asynchron und fehlerisoliert geladen
                 try {
@@ -1228,12 +1251,16 @@
                 }
             } catch (error) {
                 console.error('DB Load Error:', error);
-                document.getElementById('db-status').textContent = 'Datenbankfehler';
-                UI.showToast(`Datenbankfehler: ${error.message || error}`);
+                statusBadge.classList.add('error');
+                statusBadge.textContent = '❌ DB Ladefehler';
+                UI.showToast(`Fehler: ${error.message}`);
+                
+                // Clear state so it doesn't show ghost UI
+                Data.tonies = [];
+                Search.filter();
             }
         };
 
-        // HOTFIX 1: fetchJson fix & robust try-catch isolation
         Data.loadDumpIndex = async () => {
             const cacheKey = 'phoenix_dump_index_v2_6_5';
             const timeKey = 'phoenix_dump_time_v2_6_5';
@@ -1252,7 +1279,6 @@
                 }
             } else {
                 try {
-                    // Fix: data is already parsed JSON from fetchJson
                     const data = await fetchJson('https://api.github.com/repos/nortakales/flipper-zero-tonies/git/trees/master?recursive=1', 10000);
                     if (data && Array.isArray(data.tree)) {
                         nfcFiles = data.tree.filter(f => f.path && f.path.endsWith('.nfc')).map(f => f.path);
@@ -1319,7 +1345,7 @@
             
             const favs = JSON.parse(localStorage.getItem('phoenix_favs') || '[]');
 
-            let results = Data.tonies;
+            let results = Data.tonies || [];
 
             if (Library.activeTab === 'fav') results = results.filter(t => favs.includes(t.id));
             if (lang) results = results.filter(t => t.language === lang);
@@ -1341,12 +1367,13 @@
         UI.renderCards = (items) => {
             const grid = document.getElementById('asset-grid');
             grid.innerHTML = '';
-            const favs = JSON.parse(localStorage.getItem('phoenix_favs') || '[]');
-
-            if (items.length === 0) {
-                grid.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px;">Keine Tonies gefunden</div>';
+            
+            if (!items || items.length === 0) {
+                grid.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-muted); font-size:13px;">Keine Tonies gefunden. Ggf. gab es einen Datenbankfehler beim Laden.</div>';
                 return;
             }
+
+            const favs = JSON.parse(localStorage.getItem('phoenix_favs') || '[]');
 
             items.forEach(item => {
                 const isFav = favs.includes(item.id);
@@ -1531,7 +1558,7 @@
             };
             const customInput = document.getElementById('custom-size-input');
             const base = geo[key] || geo['43-12'];
-            const conf = { ...base }; // Clone object to prevent state mutation
+            const conf = { ...base }; 
             if (key === 'custom' && customInput) {
                 const cVal = parseInt(customInput.value, 10) || 43;
                 conf.w = cVal; conf.h = cVal;
