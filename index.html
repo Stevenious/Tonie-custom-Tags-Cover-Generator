@@ -13,6 +13,7 @@
             --border: #e2e8f0;
             --text-main: #0f172a;
             --text-muted: #64748b;
+            --flipper-orange: #ff8200;
         }
 
         * {
@@ -88,11 +89,37 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
         .header-info {
             font-size: 12px;
             color: var(--text-muted);
             font-weight: 500;
             display: none;
+        }
+
+        .refresh-btn {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            padding: 5px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--text-main);
+            transition: all 0.2s;
+        }
+
+        .refresh-btn:hover {
+            background: #e2e8f0;
+            border-color: #cbd5e1;
         }
 
         @media(min-width: 768px) {
@@ -133,6 +160,7 @@
             left: auto;
             right: 0;
             transform: translateX(100%);
+            overflow-y: auto;
         }
 
         .sidebar.right.mobile-open {
@@ -199,6 +227,9 @@
         .search-box {
             padding: 12px 20px;
             border-bottom: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .search-input {
@@ -213,6 +244,14 @@
 
         .search-input:focus {
             border-color: var(--primary);
+        }
+
+        .search-filter-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-muted);
         }
 
         /* ASSET GRID */
@@ -263,7 +302,7 @@
             position: absolute;
             top: 6px;
             right: 6px;
-            background: rgba(255,255,255,0.9);
+            background: rgba(255,255,255,0.95);
             border: none;
             width: 24px;
             height: 24px;
@@ -275,10 +314,29 @@
             font-size: 13px;
             color: #cbd5e1;
             transition: color 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
 
         .fav-btn.active {
             color: #eab308;
+        }
+
+        .flipper-pill-badge {
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            background: var(--flipper-orange);
+            color: #ffffff;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            box-shadow: 0 2px 4px rgba(255,130,0,0.3);
+            pointer-events: none;
+            letter-spacing: 0.02em;
         }
 
         .asset-info {
@@ -436,6 +494,7 @@
             height: 100%;
             object-fit: contain;
             position: absolute;
+            transition: transform 0.05s ease-out;
         }
 
         .tag-circle-preview svg {
@@ -448,7 +507,7 @@
 
         /* RIGHT PANEL CONTROLS */
         .control-group {
-            padding: 20px;
+            padding: 18px 20px;
             border-bottom: 1px solid var(--border);
             display: flex;
             flex-direction: column;
@@ -461,6 +520,9 @@
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .input-group {
@@ -528,13 +590,12 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
             padding: 15mm;
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            grid-template-rows: repeat(4, 1fr);
-            gap: 5mm;
+            gap: 4mm;
             box-sizing: border-box;
             transform: scale(0.65);
             transform-origin: top center;
             margin-bottom: -100px;
+            transition: all 0.2s;
         }
 
         @media(min-width: 768px) {
@@ -555,6 +616,23 @@
             position: relative;
             background: #f8fafc;
             overflow: hidden;
+            transition: background 0.15s, border-color 0.15s;
+            min-height: 44mm;
+        }
+
+        .print-slot.drag-over {
+            border-color: var(--primary) !important;
+            background: #ffe4e6 !important;
+        }
+
+        .print-slot-number {
+            position: absolute;
+            top: 4px;
+            left: 6px;
+            font-size: 10px;
+            color: #94a3b8;
+            font-weight: 600;
+            pointer-events: none;
         }
 
         .print-sticker {
@@ -566,21 +644,27 @@
             background: white;
             margin: auto;
             overflow: hidden;
+            cursor: grab;
+            user-select: none;
+        }
+
+        .print-sticker:active {
+            cursor: grabbing;
         }
 
         .sticker-actions {
             position: absolute;
-            top: 6px;
+            top: 4px;
             left: 50%;
             transform: translateX(-50%);
             display: flex;
-            gap: 4px;
-            background: rgba(15, 23, 42, 0.85);
+            gap: 3px;
+            background: rgba(15, 23, 42, 0.88);
             backdrop-filter: blur(4px);
             padding: 3px 6px;
             border-radius: 20px;
-            opacity: 0.2;
-            transition: opacity 0.2s ease, transform 0.2s ease;
+            opacity: 0.15;
+            transition: opacity 0.2s ease;
             z-index: 10;
         }
 
@@ -592,17 +676,19 @@
             background: transparent;
             border: none;
             color: #fff;
-            width: 24px;
-            height: 24px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            font-size: 11px;
+            font-size: 10px;
             font-weight: bold;
+            transition: background 0.15s;
         }
 
+        .sticker-action-btn.move:hover { background: #475569; }
         .sticker-action-btn.clone:hover { background: #0284c7; }
         .sticker-action-btn.nfc:hover { background: #10b981; }
         .sticker-action-btn.delete:hover { background: #e11d48; }
@@ -662,11 +748,10 @@
                 padding: 0 !important;
                 overflow: visible !important;
             }
-            .print-toolbar-bar, .sticker-actions, .mobile-nav-bar { display: none !important; }
+            .print-toolbar-bar, .sticker-actions, .mobile-nav-bar, .print-slot-number { display: none !important; }
             .a4-sheet {
                 box-shadow: none !important;
                 margin: 0 !important;
-                padding: 10mm !important;
                 width: 210mm !important;
                 height: 297mm !important;
                 transform: none !important;
@@ -690,10 +775,10 @@
             <button class="view-btn active" id="btn-view-design" onclick="App.switchView('design')">🎨 Editor</button>
             <button class="view-btn" id="btn-view-print" onclick="App.switchView('print')">🖨️ Print Studio</button>
         </div>
-        <div style="display: flex; gap: 15px; align-items: center;">
-            <div class="header-info" id="db-counter">Lade Datenbank...</div>
-            <button onclick="App.forceFlipperUpdate()" title="Flipper-Dumps aktualisieren" style="background: none; border: none; cursor: pointer; font-size: 16px; opacity: 0.6; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">
-                🔄
+        <div class="header-actions">
+            <div class="header-info" id="db-counter">Lade Tonies...</div>
+            <button class="refresh-btn" onclick="App.forceFlipperUpdate()" title="Flipper-Zero Dumps von GitHub neu abgleichen">
+                🔄 <span id="flipper-status-text">Dumps</span>
             </button>
         </div>
     </header>
@@ -707,6 +792,12 @@
             </div>
             <div class="search-box">
                 <input type="text" class="search-input" id="search-input" placeholder="Tonie oder ID suchen..." oninput="Library.handleSearch(this.value)">
+                <div class="search-filter-row">
+                    <label style="cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                        <input type="checkbox" id="check-filter-dump" onchange="Library.handleFilterDump(this.checked)"> Nur mit FZ-Dump
+                    </label>
+                    <span id="search-count-label"></span>
+                </div>
             </div>
             <div class="asset-scroll">
                 <div class="asset-grid" id="asset-grid"></div>
@@ -724,23 +815,37 @@
                     <div class="tag-circle-preview" id="preview-circle">
                         <img id="preview-img" src="" alt="">
                         <svg viewBox="0 0 100 100" id="preview-svg">
-                            <path id="path-top" d="M 18,50 A 32,32 0 0,1 82,50" fill="none"/>
-                            <path id="path-bottom" d="M 15,50 A 35,35 0 0,0 85,50" fill="none"/>
-                            <text font-size="7.5" font-weight="bold" fill="#e11d48" text-anchor="middle">
+                            <!-- Oberer Pfad fuer Serie -->
+                            <path id="path-top" d="M 16,50 A 34,34 0 0,1 84,50" fill="none"/>
+                            <!-- Mittlerer/Innerer Pfad oberhalb des Titels fuer UID -->
+                            <path id="path-uid" d="M 22,50 A 28,28 0 0,0 78,50" fill="none"/>
+                            <!-- Unterer Pfad fuer Titel -->
+                            <path id="path-bottom" d="M 14,50 A 36,36 0 0,0 86,50" fill="none"/>
+
+                            <!-- Serie Text -->
+                            <text font-size="7.5" font-weight="bold" fill="#e11d48" text-anchor="middle" id="svg-text-top-node">
                                 <textPath href="#path-top" startOffset="50%" id="svg-text-top" letter-spacing="0.1em"></textPath>
                             </text>
-                            <text font-size="6.5" font-weight="bold" fill="#0f172a" text-anchor="middle">
-                                <textPath href="#path-bottom" startOffset="50%" id="svg-text-bottom" letter-spacing="0.15em"></textPath>
+
+                            <!-- UID Text (sauber oberhalb des Titels geschwungen) -->
+                            <text font-size="5" font-weight="bold" fill="#64748b" text-anchor="middle" id="svg-text-uid-node">
+                                <textPath href="#path-uid" startOffset="50%" id="svg-text-uid" letter-spacing="0.12em"></textPath>
                             </text>
-                            <!-- Flipper Zero NFC Badge (wird dynamisch eingeblendet) -->
+
+                            <!-- Titel Text -->
+                            <text font-size="6.5" font-weight="bold" fill="#0f172a" text-anchor="middle" id="svg-text-bottom-node">
+                                <textPath href="#path-bottom" startOffset="50%" id="svg-text-bottom" letter-spacing="0.12em"></textPath>
+                            </text>
+
+                            <!-- Flipper Zero NFC Badge (dezent & mittig oberhalb der Schrift) -->
                             <g id="flipper-badge" style="display: none;">
-                                <circle cx="50" cy="75" r="5" fill="#FF8200"/>
-                                <path d="M47.5 76.5 A 3 3 0 0 1 52.5 76.5 M46 74.5 A 5 5 0 0 1 54 74.5 M48.5 78.5 A 1.5 1.5 0 0 1 51.5 78.5" stroke="white" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+                                <circle cx="50" cy="71" r="4.2" fill="#FF8200"/>
+                                <path d="M48 72.2 A 2.5 2.5 0 0 1 52 72.2 M46.8 70.6 A 4.2 4.2 0 0 1 53.2 70.6 M48.8 73.8 A 1.2 1.2 0 0 1 51.2 73.8" stroke="white" stroke-width="0.7" fill="none" stroke-linecap="round"/>
                             </g>
                         </svg>
                     </div>
                     <div style="font-size: 11px; color: var(--text-muted); text-align: center;">
-                        💡 Tipp: Bilddatei per Drag & Drop hier ablegen
+                        💡 Tipp: Eigenes Bild per Drag & Drop hier ablegen
                     </div>
                 </div>
             </div>
@@ -767,19 +872,31 @@
                     <input type="text" id="input-title" oninput="Editor.update()">
                 </div>
                 <div class="input-group">
-                    <label><input type="checkbox" id="check-uid" onchange="Editor.update()"> UID / ID aufdrucken</label>
+                    <label><input type="checkbox" id="check-uid" onchange="Editor.update()"> UID / ID (Über Titel)</label>
                     <input type="text" id="input-uid" placeholder="Hex-Code / Audio-ID" oninput="Editor.update()">
                 </div>
                 <div class="input-group">
-                    <label>Schriftgröße</label>
-                    <input type="range" class="range-slider" id="slider-fontsize" min="70" max="130" value="100" oninput="Editor.update()">
+                    <label>Schriftgröße <span id="fontsize-val" style="margin-left:auto; color: var(--primary); font-weight: bold;">100%</span></label>
+                    <input type="range" class="range-slider" id="slider-fontsize" min="70" max="150" value="100" oninput="Editor.update()">
                 </div>
             </div>
+
             <div class="control-group">
-                <span class="control-label">Bild-Transformation</span>
+                <span class="control-label">
+                    Bild-Transformation (Pro)
+                    <button class="btn-secondary" style="padding: 2px 6px; font-size: 10px; border-radius: 4px; cursor: pointer;" onclick="Editor.resetTransform()">Reset</button>
+                </span>
                 <div class="input-group">
-                    <label>Zoom <span id="zoom-val" style="margin-left:auto;">100%</span></label>
+                    <label>Zoom <span id="zoom-val" style="margin-left:auto; font-weight: bold;">100%</span></label>
                     <input type="range" class="range-slider" id="slider-zoom" min="50" max="200" value="100" oninput="Editor.update()">
+                </div>
+                <div class="input-group">
+                    <label>Position X (Horizontal) <span id="posx-val" style="margin-left:auto; font-weight: bold;">0%</span></label>
+                    <input type="range" class="range-slider" id="slider-posx" min="-40" max="40" value="0" oninput="Editor.update()">
+                </div>
+                <div class="input-group">
+                    <label>Position Y (Vertikal) <span id="posy-val" style="margin-left:auto; font-weight: bold;">0%</span></label>
+                    <input type="range" class="range-slider" id="slider-posy" min="-40" max="40" value="0" oninput="Editor.update()">
                 </div>
             </div>
         </div>
@@ -788,16 +905,19 @@
         <div class="print-workspace" id="workspace-print">
             <div class="print-toolbar-bar">
                 <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-                    <strong>Print Studio</strong>
+                    <strong>Bogenformat:</strong>
                     <select id="label-format-select" onchange="PrintStudio.changeFormat(this.value)" style="padding: 6px 10px; border-radius: 6px; border: 1px solid var(--border);">
-                        <option value="free">Freier Standard</option>
-                        <option value="43">Avery 43mm</option>
-                        <option value="40">Avery 40mm</option>
-                        <option value="30">Avery 30mm</option>
-                        <option value="custom">Manuell (mm)</option>
+                        <option value="43-12">Avery / Münzkapsel 43 mm (12er • 3×4)</option>
+                        <option value="40-24">Avery Zweckform 40 mm (24er • 4×6)</option>
+                        <option value="40-12">Avery Zweckform 40 mm (12er • 3×4)</option>
+                        <option value="30-48">Avery Zweckform 30 mm (48er • 6×8)</option>
+                        <option value="custom">Frei definierbar (mm)</option>
                     </select>
-                    <input type="number" id="custom-size-input" value="40" min="10" max="100" style="width: 70px; display: none;" oninput="PrintStudio.renderSheet()" title="Durchmesser in mm">
-                    <span style="font-size: 12px; color: var(--text-muted);" id="print-counter">0 / 12 belegt</span>
+                    <div id="custom-size-wrap" style="display: none; align-items: center; gap: 4px;">
+                        <input type="number" id="custom-size-input" value="43" min="10" max="90" style="width: 60px; padding: 5px;" oninput="PrintStudio.renderSheet()" title="Durchmesser in mm">
+                        <span style="font-size: 12px; color: var(--text-muted);">mm Ø</span>
+                    </div>
+                    <span style="font-size: 12px; color: var(--text-muted); margin-left: 6px;" id="print-counter">0 belegt</span>
                 </div>
                 <div style="display: flex; gap: 8px; flex-wrap: wrap;">
                     <button class="btn btn-secondary" onclick="PrintStudio.exportUIDs()">📋 UID-Liste</button>
@@ -816,21 +936,24 @@
             db: [],
             favorites: JSON.parse(localStorage.getItem('taggen_favs') || '[]'),
             currentTab: 'db',
+            filterOnlyWithDump: false,
             currentDesign: {
                 serie: '',
                 title: '',
                 uid: '',
                 pic: '',
                 zoom: 100,
+                posX: 0,
+                posY: 0,
                 fontSize: 100,
                 showSerie: true,
                 showTitle: true,
                 showUid: false,
                 hasFlipperDump: false
             },
+            formatKey: '43-12',
             printSlots: new Array(12).fill(null),
-            labelSize: '40', // Standard 40mm
-            flipperIndex: []
+            flipperIndex: [] // Enthält { path, name, folder, isGerman }
         };
 
         const App = {
@@ -839,69 +962,100 @@
                 await App.loadFlipperIndex();
                 Editor.initDragDrop();
                 PrintStudio.renderSheet();
+
+                // Erstes Tonie laden ohne die Sidebar zu schliessen
                 if (State.db.length > 0) {
-                    App.loadToEditor(State.db[0]);
+                    App.loadToEditor(State.db[0], true);
                 }
             },
 
             async loadFlipperIndex() {
-                const cacheKey = 'flipper_index_cache';
-                const timeKey = 'flipper_index_time';
+                const cacheKey = 'flipper_index_cache_v2';
+                const timeKey = 'flipper_index_time_v2';
                 const now = Date.now();
-                
-                // 1. Cache prüfen (24 Stunden gültig)
+
+                // 1. Lokaler Cache (24h)
                 const cached = localStorage.getItem(cacheKey);
                 const cachedTime = localStorage.getItem(timeKey);
-                
                 if (cached && cachedTime && (now - cachedTime < 24 * 60 * 60 * 1000)) {
                     State.flipperIndex = JSON.parse(cached);
-                    console.log("Flipper-Index aus Cache geladen:", State.flipperIndex.length);
+                    App.updateDumperStatus();
                     return;
                 }
 
-                // 2. Live-Abgleich von GitHub API
-                try {
-                    const res = await fetch('https://api.github.com/repos/nortakales/flipper-zero-tonies/git/trees/main?recursive=1');
-                    if (res.ok) {
-                        const data = await res.json();
-                        // Filtere nur .nfc Dateien und extrahiere den reinen Dateinamen
-                        const nfcFiles = data.tree
-                            .filter(file => file.path.endsWith('.nfc'))
-                            .map(file => {
-                                const parts = file.path.split('/');
-                                return parts[parts.length - 1]; 
-                            });
-                        
-                        State.flipperIndex = nfcFiles;
-                        
-                        // Im Cache speichern
-                        localStorage.setItem(cacheKey, JSON.stringify(nfcFiles));
-                        localStorage.setItem(timeKey, now.toString());
-                        console.log("Flipper-Index live aktualisiert:", nfcFiles.length);
-                        return;
+                // 2. Live-Abgleich von GitHub API (primär 'master', dann 'main')
+                const branches = ['master', 'main'];
+                let loaded = false;
+
+                for (const branch of branches) {
+                    try {
+                        const res = await fetch(`https://api.github.com/repos/nortakales/flipper-zero-tonies/git/trees/${branch}?recursive=1`);
+                        if (res.ok) {
+                            const data = await res.json();
+                            if (data.tree && Array.isArray(data.tree)) {
+                                const nfcFiles = data.tree.filter(f => f.path && f.path.endsWith('.nfc'));
+                                
+                                State.flipperIndex = nfcFiles.map(file => {
+                                    const path = file.path;
+                                    const isGerman = path.toLowerCase().startsWith('german/');
+                                    const parts = path.split('/');
+                                    const filename = parts[parts.length - 1].replace(/\.nfc$/i, '');
+                                    const folder = parts.length > 2 ? parts[parts.length - 2] : '';
+                                    return {
+                                        path: path,
+                                        name: filename,
+                                        folder: folder,
+                                        isGerman: isGerman
+                                    };
+                                });
+
+                                localStorage.setItem(cacheKey, JSON.stringify(State.flipperIndex));
+                                localStorage.setItem(timeKey, now.toString());
+                                loaded = true;
+                                break;
+                            }
+                        }
+                    } catch (e) {
+                        console.warn(`Zweig ${branch} fehlgeschlagen`, e);
                     }
-                } catch(e) {
-                    console.warn("GitHub API Fetch fehlgeschlagen, versuche Fallback...", e);
                 }
 
-                // 3. Fallback auf lokale Datei (falls API-Limit erreicht)
-                try {
-                    const fallbackRes = await fetch('flipper_index.json');
-                    if (fallbackRes.ok) {
-                        State.flipperIndex = await fallbackRes.json();
-                        console.log("Flipper-Index (Fallback) geladen");
+                // 3. Fallback auf lokale statische Datei
+                if (!loaded) {
+                    try {
+                        const fallbackRes = await fetch('flipper_index.json');
+                        if (fallbackRes.ok) {
+                            const raw = await fallbackRes.json();
+                            State.flipperIndex = raw.map(item => typeof item === 'string' ? { path: item, name: item, folder: '', isGerman: true } : item);
+                            loaded = true;
+                        }
+                    } catch(e) {
+                        console.warn("Fallback flipper_index.json nicht verfügbar", e);
                     }
-                } catch(e) {
-                    console.error("Kein Flipper-Index gefunden.", e);
+                }
+
+                App.updateDumperStatus();
+                Library.filter(document.getElementById('search-input').value);
+                Editor.update();
+            },
+
+            updateDumperStatus() {
+                const germanCount = State.flipperIndex.filter(d => d.isGerman).length;
+                const totalCount = State.flipperIndex.length;
+                const statusElem = document.getElementById('flipper-status-text');
+                if (statusElem) {
+                    statusElem.innerText = germanCount > 0 ? `${germanCount} DE Dumps` : (totalCount > 0 ? `${totalCount} Dumps` : 'Dumps');
                 }
             },
 
             async forceFlipperUpdate() {
-                localStorage.removeItem('flipper_index_time'); // Cache invalidieren
-                showToast("Suche nach neuen Flipper-Dumps...");
+                localStorage.removeItem('flipper_index_time_v2');
+                localStorage.removeItem('flipper_index_cache_v2');
+                showToast("Prüfe GitHub-Repository auf neue Dumps...");
                 await this.loadFlipperIndex();
-                Editor.update(); // Vorschau aktualisieren
-                showToast(`Aktualisiert! ${State.flipperIndex.length} Dumps gefunden.`);
+                Library.filter(document.getElementById('search-input').value);
+                Editor.update();
+                showToast(`Abgleich fertig: ${State.flipperIndex.length} Dumps geladen`);
             },
 
             switchView(view) {
@@ -947,18 +1101,22 @@
                 }
             },
 
-            loadToEditor(item) {
+            loadToEditor(item, isInitial = false) {
                 State.currentDesign.serie = item.serie || '';
                 State.currentDesign.title = item.ep || item.title || '';
                 State.currentDesign.uid = item.id || '';
                 State.currentDesign.pic = item.pic || '';
                 State.currentDesign.zoom = 100;
+                State.currentDesign.posX = 0;
+                State.currentDesign.posY = 0;
                 State.currentDesign.fontSize = 100;
 
                 document.getElementById('input-serie').value = State.currentDesign.serie;
                 document.getElementById('input-title').value = State.currentDesign.title;
                 document.getElementById('input-uid').value = State.currentDesign.uid;
                 document.getElementById('slider-zoom').value = 100;
+                document.getElementById('slider-posx').value = 0;
+                document.getElementById('slider-posy').value = 0;
                 document.getElementById('slider-fontsize').value = 100;
                 document.getElementById('check-serie').checked = true;
                 document.getElementById('check-title').checked = true;
@@ -969,12 +1127,14 @@
                 State.currentDesign.showUid = false;
 
                 Editor.update();
-                if (window.innerWidth < 1024) {
+
+                // Wichtig: Beim ersten Öffnen die Bibliothek NICHT verstecken
+                if (!isInitial && window.innerWidth < 1024) {
                     document.getElementById('left-sidebar').classList.add('hidden-panel');
-                } else {
-                    App.showLibrary(false);
                 }
-                showToast(`"${State.currentDesign.serie || 'Tonie'}" geladen`);
+                if (!isInitial) {
+                    showToast(`"${State.currentDesign.serie || 'Tonie'}" geladen`);
+                }
             },
 
             async convertImageToBase64(url) {
@@ -1055,6 +1215,52 @@
                 this.filter(query);
             },
 
+            handleFilterDump(checked) {
+                State.filterOnlyWithDump = checked;
+                this.currentPage = 1;
+                this.filter(document.getElementById('search-input').value);
+            },
+
+            isDumpAvailable(item) {
+                if (!State.flipperIndex || State.flipperIndex.length === 0 || !item) return false;
+
+                const clean = (s) => (s || '').toLowerCase()
+                    .replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue').replace(/ß/g, 'ss')
+                    .replace(/[^a-z0-9]/g, '');
+
+                const tTitle = clean(item.ep || item.title);
+                const tSerie = clean(item.serie);
+                const tId = clean(item.id);
+
+                return State.flipperIndex.some(dump => {
+                    const dName = clean(dump.name);
+                    const dFolder = clean(dump.folder);
+                    const dPath = clean(dump.path);
+
+                    // 1. UID Abgleich
+                    if (tId && tId.length >= 6 && dPath.includes(tId)) return true;
+
+                    // 2. Serie und Titel Abgleich
+                    if (tSerie && tTitle && tTitle.length >= 4) {
+                        if (dFolder.includes(tSerie) && (dName.includes(tTitle) || tTitle.includes(dName))) {
+                            return true;
+                        }
+                    }
+
+                    // 3. Eindeutiger Titel-Abgleich
+                    if (tTitle && tTitle.length >= 5) {
+                        if (dName.includes(tTitle) || tTitle.includes(dName)) return true;
+                    }
+
+                    // 4. Pfad-Kombination
+                    if (tSerie && tSerie.length >= 4 && tTitle && tTitle.length >= 3) {
+                        if (dPath.includes(tSerie) && dName.includes(tTitle.slice(0, 8))) return true;
+                    }
+
+                    return false;
+                });
+            },
+
             filter(query = '') {
                 let data = State.db;
                 if (State.currentTab === 'fav') {
@@ -1068,6 +1274,13 @@
                         (item.id && item.id.toLowerCase().includes(q))
                     );
                 }
+
+                // Filter nach Flipper-Dump vorhanden
+                if (State.filterOnlyWithDump) {
+                    data = data.filter(item => this.isDumpAvailable(item));
+                }
+
+                document.getElementById('search-count-label').innerText = `${data.length} Treffer`;
                 this.render(data);
             },
 
@@ -1083,17 +1296,20 @@
                 const paginatedData = this.currentData.slice(start, start + this.itemsPerPage);
 
                 if (paginatedData.length === 0) {
-                    grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: #64748b; padding: 20px;">Keine Einträge gefunden</div>';
+                    grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; color: #64748b; padding: 25px;">Keine Tonies gefunden</div>';
                     return;
                 }
 
                 paginatedData.forEach(item => {
                     const isFav = State.favorites.includes(item.id);
+                    const hasDump = this.isDumpAvailable(item);
+
                     const card = document.createElement('div');
                     card.className = 'asset-card';
                     card.innerHTML = `
                         <div class="asset-thumb" style="background-image: url('${item.pic || ''}')">
-                            <button class="fav-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); Library.toggleFav('${item.id}')">
+                            ${hasDump ? '<div class="flipper-pill-badge" title="Flipper-Zero Dump auf GitHub vorhanden">🐬 FZ Dump</div>' : ''}
+                            <button class="fav-btn ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); Library.toggleFav('${item.id}')" title="Favorit">
                                 ${isFav ? '★' : '☆'}
                             </button>
                         </div>
@@ -1111,7 +1327,7 @@
                     pagination.className = 'pagination-controls';
                     pagination.innerHTML = `
                         <button onclick="Library.prevPage()" ${this.currentPage === 1 ? 'disabled' : ''}>← Zurück</button>
-                        <span>Seite ${this.currentPage} von ${totalPages}</span>
+                        <span>${this.currentPage} / ${totalPages}</span>
                         <button onclick="Library.nextPage()" ${this.currentPage === totalPages ? 'disabled' : ''}>Weiter →</button>
                     `;
                     grid.appendChild(pagination);
@@ -1152,56 +1368,70 @@
                         reader.onload = (event) => {
                             State.currentDesign.pic = event.target.result;
                             this.update();
-                            showToast("Eigenes Bild geladen");
+                            showToast("Eigenes Bild erfolgreich geladen");
                         };
                         reader.readAsDataURL(file);
                     }
                 };
             },
 
+            resetTransform() {
+                State.currentDesign.zoom = 100;
+                State.currentDesign.posX = 0;
+                State.currentDesign.posY = 0;
+                document.getElementById('slider-zoom').value = 100;
+                document.getElementById('slider-posx').value = 0;
+                document.getElementById('slider-posy').value = 0;
+                this.update();
+            },
+
             update() {
                 State.currentDesign.serie = document.getElementById('input-serie').value;
                 State.currentDesign.title = document.getElementById('input-title').value;
                 State.currentDesign.uid = document.getElementById('input-uid').value;
-                State.currentDesign.zoom = document.getElementById('slider-zoom').value;
-                State.currentDesign.fontSize = document.getElementById('slider-fontsize').value;
+                State.currentDesign.zoom = parseInt(document.getElementById('slider-zoom').value) || 100;
+                State.currentDesign.posX = parseInt(document.getElementById('slider-posx').value) || 0;
+                State.currentDesign.posY = parseInt(document.getElementById('slider-posy').value) || 0;
+                State.currentDesign.fontSize = parseInt(document.getElementById('slider-fontsize').value) || 100;
 
                 State.currentDesign.showSerie = document.getElementById('check-serie').checked;
                 State.currentDesign.showTitle = document.getElementById('check-title').checked;
                 State.currentDesign.showUid = document.getElementById('check-uid').checked;
 
-                State.currentDesign.hasFlipperDump = false;
-                
-                if (State.flipperIndex.length > 0) {
-                    const uidMatch = State.currentDesign.uid && 
-                                     State.flipperIndex.some(f => f.includes(State.currentDesign.uid));
-                    
-                    const cleanTitle = State.currentDesign.title.toLowerCase().replace(/[^a-z0-9]/g, "");
-                    const titleMatch = cleanTitle.length > 3 && 
-                                       State.flipperIndex.some(f => f.toLowerCase().replace(/[^a-z0-9]/g, "").includes(cleanTitle));
+                // Labels aktualisieren
+                document.getElementById('zoom-val').innerText = State.currentDesign.zoom + '%';
+                document.getElementById('posx-val').innerText = (State.currentDesign.posX > 0 ? '+' : '') + State.currentDesign.posX + '%';
+                document.getElementById('posy-val').innerText = (State.currentDesign.posY > 0 ? '+' : '') + State.currentDesign.posY + '%';
+                document.getElementById('fontsize-val').innerText = State.currentDesign.fontSize + '%';
 
-                    State.currentDesign.hasFlipperDump = uidMatch || titleMatch;
-                }
+                // Flipper Dump Check
+                State.currentDesign.hasFlipperDump = Library.isDumpAvailable({
+                    serie: State.currentDesign.serie,
+                    title: State.currentDesign.title,
+                    id: State.currentDesign.uid
+                });
 
                 document.getElementById('flipper-badge').style.display = State.currentDesign.hasFlipperDump ? 'block' : 'none';
 
-                document.getElementById('zoom-val').innerText = State.currentDesign.zoom + '%';
-
+                // Bild Transformation
                 const img = document.getElementById('preview-img');
                 img.src = State.currentDesign.pic || '';
-                img.style.transform = `scale(${State.currentDesign.zoom / 100})`;
+                img.style.transform = `translate(${State.currentDesign.posX}%, ${State.currentDesign.posY}%) scale(${State.currentDesign.zoom / 100})`;
 
+                // Schriftgroessen Skalierung
+                const fScale = State.currentDesign.fontSize / 100;
+                const topFontSize = (7.5 * fScale).toFixed(1);
+                const botFontSize = (6.5 * fScale).toFixed(1);
+                const uidFontSize = (5.0 * fScale).toFixed(1);
+
+                document.getElementById('svg-text-top-node').setAttribute('font-size', topFontSize);
+                document.getElementById('svg-text-bottom-node').setAttribute('font-size', botFontSize);
+                document.getElementById('svg-text-uid-node').setAttribute('font-size', uidFontSize);
+
+                // Texte rendern (Serie oben, UID separat oberhalb des Titels, Titel unten)
                 document.getElementById('svg-text-top').textContent = State.currentDesign.showSerie ? State.currentDesign.serie : '';
-                
-                let bottomText = '';
-                if (State.currentDesign.showTitle && State.currentDesign.showUid && State.currentDesign.uid) {
-                    bottomText = `${State.currentDesign.title} • ${State.currentDesign.uid}`;
-                } else if (State.currentDesign.showTitle) {
-                    bottomText = State.currentDesign.title;
-                } else if (State.currentDesign.showUid) {
-                    bottomText = State.currentDesign.uid;
-                }
-                document.getElementById('svg-text-bottom').textContent = bottomText;
+                document.getElementById('svg-text-uid').textContent = (State.currentDesign.showUid && State.currentDesign.uid) ? `ID: ${State.currentDesign.uid}` : '';
+                document.getElementById('svg-text-bottom').textContent = State.currentDesign.showTitle ? State.currentDesign.title : '';
             },
 
             async addToPrintStudio() {
@@ -1211,71 +1441,141 @@
 
                 const emptyIndex = State.printSlots.findIndex(s => s === null);
                 if (emptyIndex === -1) {
-                    showToast("Druckbogen ist voll (12/12)");
+                    showToast(`Druckbogen ist voll (${State.printSlots.length}/${State.printSlots.length})`);
                     return;
                 }
                 State.printSlots[emptyIndex] = JSON.parse(JSON.stringify(State.currentDesign));
-                showToast("Auf den Druckbogen gelegt!");
+                showToast(`Auf Platz ${emptyIndex + 1} platziert!`);
                 App.switchView('print');
             }
         };
 
         const PrintStudio = {
-            changeFormat(val) {
-                const customInput = document.getElementById('custom-size-input');
-                if (val === 'custom') {
-                    customInput.style.display = 'block';
-                    State.labelSize = customInput.value;
-                } else {
-                    customInput.style.display = 'none';
-                    State.labelSize = val;
+            getFormatConfig(formatKey) {
+                switch(formatKey) {
+                    case '40-24':
+                        return { cols: 4, rows: 6, count: 24, sizeMm: 40, padding: '15mm 10mm' };
+                    case '40-12':
+                        return { cols: 3, rows: 4, count: 12, sizeMm: 40, padding: '15mm' };
+                    case '30-48':
+                        return { cols: 6, rows: 8, count: 48, sizeMm: 30, padding: '12mm 8mm' };
+                    case 'custom': {
+                        const customSize = parseInt(document.getElementById('custom-size-input').value) || 43;
+                        return { cols: 3, rows: 4, count: 12, sizeMm: customSize, padding: '15mm' };
+                    }
+                    case '43-12':
+                    default:
+                        return { cols: 3, rows: 4, count: 12, sizeMm: 43, padding: '15mm' };
                 }
+            },
+
+            changeFormat(val) {
+                State.formatKey = val;
+                const customWrap = document.getElementById('custom-size-wrap');
+                customWrap.style.display = (val === 'custom') ? 'flex' : 'none';
+
+                const config = this.getFormatConfig(val);
+                
+                // Slots anpassen und vorhandene Inhalte beibehalten
+                const oldSlots = State.printSlots;
+                State.printSlots = new Array(config.count).fill(null);
+                for (let i = 0; i < Math.min(oldSlots.length, config.count); i++) {
+                    State.printSlots[i] = oldSlots[i];
+                }
+
                 this.renderSheet();
             },
 
             renderSheet() {
                 const sheet = document.getElementById('print-sheet');
                 sheet.innerHTML = '';
-                let count = 0;
 
-                let sizeMm = State.labelSize;
-                if (sizeMm === 'custom') {
-                    sizeMm = document.getElementById('custom-size-input').value || 40;
-                }
+                const config = this.getFormatConfig(State.formatKey);
+                sheet.style.gridTemplateColumns = `repeat(${config.cols}, 1fr)`;
+                sheet.style.gridTemplateRows = `repeat(${config.rows}, 1fr)`;
+                sheet.style.padding = config.padding;
+
+                let count = 0;
 
                 State.printSlots.forEach((slot, index) => {
                     const slotDiv = document.createElement('div');
                     slotDiv.className = 'print-slot';
+                    slotDiv.dataset.index = index;
+
+                    // Slot Nummerierung
+                    const numSpan = document.createElement('span');
+                    numSpan.className = 'print-slot-number';
+                    numSpan.innerText = `${index + 1}`;
+                    slotDiv.appendChild(numSpan);
+
+                    // Drag & Drop Ziel
+                    slotDiv.ondragover = (e) => {
+                        e.preventDefault();
+                        slotDiv.classList.add('drag-over');
+                    };
+                    slotDiv.ondragleave = () => slotDiv.classList.remove('drag-over');
+                    slotDiv.ondrop = (e) => {
+                        e.preventDefault();
+                        slotDiv.classList.remove('drag-over');
+                        const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
+                        if (isNaN(fromIndex) || fromIndex === index) return;
+
+                        // Positionen tauschen
+                        const temp = State.printSlots[fromIndex];
+                        State.printSlots[fromIndex] = State.printSlots[index];
+                        State.printSlots[index] = temp;
+                        PrintStudio.renderSheet();
+                        showToast(`Cover von Platz ${fromIndex + 1} auf Platz ${index + 1} verschoben`);
+                    };
 
                     if (slot) {
                         count++;
-                        let sizeStyle = sizeMm === 'free' ? 'width: 100%; height: 100%;' : `width: ${sizeMm}mm; height: ${sizeMm}mm;`;
-
                         const sticker = document.createElement('div');
                         sticker.className = 'print-sticker';
-                        sticker.style.cssText = sizeStyle;
-                        
+                        sticker.style.width = `${config.sizeMm}mm`;
+                        sticker.style.height = `${config.sizeMm}mm`;
+                        sticker.draggable = true;
+
+                        sticker.ondragstart = (e) => {
+                            e.dataTransfer.setData('text/plain', index);
+                        };
+
+                        const fScale = (slot.fontSize || 100) / 100;
+                        const topFontSize = (7.5 * fScale).toFixed(1);
+                        const botFontSize = (6.5 * fScale).toFixed(1);
+                        const uidFontSize = (5.0 * fScale).toFixed(1);
+
                         sticker.innerHTML = `
                             <div style="width: 100%; height: 100%; position: relative; display: flex; align-items: center; justify-content: center;">
-                                <img src="${slot.pic || ''}" style="width: 100%; height: 100%; object-fit: contain; transform: scale(${slot.zoom / 100}); position: absolute; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
+                                <img src="${slot.pic || ''}" style="width: 100%; height: 100%; object-fit: contain; transform: translate(${slot.posX || 0}%, ${slot.posY || 0}%) scale(${slot.zoom / 100}); position: absolute; -webkit-print-color-adjust: exact; print-color-adjust: exact;">
                                 <svg viewBox="0 0 100 100" style="position: absolute; inset: 0; width: 100%; height: 100%;">
-                                    <path id="p-top-${index}" d="M 18,50 A 32,32 0 0,1 82,50" fill="none"/>
-                                    <path id="p-bot-${index}" d="M 15,50 A 35,35 0 0,0 85,50" fill="none"/>
-                                    <text font-size="7.5" font-weight="bold" fill="#e11d48" text-anchor="middle">
+                                    <path id="p-top-${index}" d="M 16,50 A 34,34 0 0,1 84,50" fill="none"/>
+                                    <path id="p-uid-${index}" d="M 22,50 A 28,28 0 0,0 78,50" fill="none"/>
+                                    <path id="p-bot-${index}" d="M 14,50 A 36,36 0 0,0 86,50" fill="none"/>
+                                    
+                                    <text font-size="${topFontSize}" font-weight="bold" fill="#e11d48" text-anchor="middle">
                                         <textPath href="#p-top-${index}" startOffset="50%" letter-spacing="0.1em">${slot.showSerie ? slot.serie : ''}</textPath>
                                     </text>
-                                    <text font-size="6.5" font-weight="bold" fill="#0f172a" text-anchor="middle">
-                                        <textPath href="#p-bot-${index}" startOffset="50%" letter-spacing="0.15em">${slot.showTitle ? slot.title : ''}${slot.showUid && slot.uid ? ' • ' + slot.uid : ''}</textPath>
+
+                                    <text font-size="${uidFontSize}" font-weight="bold" fill="#64748b" text-anchor="middle">
+                                        <textPath href="#p-uid-${index}" startOffset="50%" letter-spacing="0.12em">${(slot.showUid && slot.uid) ? 'ID: ' + slot.uid : ''}</textPath>
                                     </text>
+
+                                    <text font-size="${botFontSize}" font-weight="bold" fill="#0f172a" text-anchor="middle">
+                                        <textPath href="#p-bot-${index}" startOffset="50%" letter-spacing="0.12em">${slot.showTitle ? slot.title : ''}</textPath>
+                                    </text>
+
                                     ${slot.hasFlipperDump ? `
                                     <g>
-                                        <circle cx="50" cy="75" r="5" fill="#FF8200"/>
-                                        <path d="M47.5 76.5 A 3 3 0 0 1 52.5 76.5 M46 74.5 A 5 5 0 0 1 54 74.5 M48.5 78.5 A 1.5 1.5 0 0 1 51.5 78.5" stroke="white" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+                                        <circle cx="50" cy="71" r="4.2" fill="#FF8200"/>
+                                        <path d="M48 72.2 A 2.5 2.5 0 0 1 52 72.2 M46.8 70.6 A 4.2 4.2 0 0 1 53.2 70.6 M48.8 73.8 A 1.2 1.2 0 0 1 51.2 73.8" stroke="white" stroke-width="0.7" fill="none" stroke-linecap="round"/>
                                     </g>
                                     ` : ''}
                                 </svg>
                             </div>
                             <div class="sticker-actions">
+                                <button class="sticker-action-btn move" title="Nach links verschieben" onclick="PrintStudio.shiftSticker(${index}, -1)">◀</button>
+                                <button class="sticker-action-btn move" title="Nach rechts verschieben" onclick="PrintStudio.shiftSticker(${index}, 1)">▶</button>
                                 <button class="sticker-action-btn clone" title="Duplizieren" onclick="PrintStudio.cloneSticker(${index})">＋</button>
                                 <button class="sticker-action-btn nfc" title="Flipper .nfc Export" onclick="PrintStudio.exportNfc(${index})">🏷️</button>
                                 <button class="sticker-action-btn delete" title="Entfernen" onclick="PrintStudio.removeSticker(${index})">✕</button>
@@ -1286,18 +1586,27 @@
                     sheet.appendChild(slotDiv);
                 });
 
-                document.getElementById('print-counter').innerText = `${count} / 12 belegt`;
+                document.getElementById('print-counter').innerText = `${count} / ${config.count} belegt`;
+            },
+
+            shiftSticker(index, delta) {
+                const targetIndex = index + delta;
+                if (targetIndex < 0 || targetIndex >= State.printSlots.length) return;
+                const temp = State.printSlots[index];
+                State.printSlots[index] = State.printSlots[targetIndex];
+                State.printSlots[targetIndex] = temp;
+                this.renderSheet();
             },
 
             cloneSticker(index) {
                 const emptyIndex = State.printSlots.findIndex(s => s === null);
                 if (emptyIndex === -1) {
-                    showToast("Kein freier Platz mehr auf dem Bogen");
+                    showToast("Kein freier Platz mehr auf diesem Bogen");
                     return;
                 }
                 State.printSlots[emptyIndex] = JSON.parse(JSON.stringify(State.printSlots[index]));
                 this.renderSheet();
-                showToast("Sticker dupliziert");
+                showToast(`Sticker auf Platz ${emptyIndex + 1} dupliziert`);
             },
 
             removeSticker(index) {
@@ -1309,13 +1618,17 @@
             clearSheet() {
                 State.printSlots.fill(null);
                 this.renderSheet();
-                showToast("Bogen geleert");
+                showToast("Bogen vollständig geleert");
             },
 
             exportUIDs() {
-                const uids = State.printSlots.filter(s => s !== null).map((s, i) => `${i+1}. ${s.serie} - ${s.title} (UID: ${s.uid || 'Keine'})`).join('\n');
+                const uids = State.printSlots
+                    .filter(s => s !== null)
+                    .map((s, i) => `${i+1}. ${s.serie} - ${s.title} (UID: ${s.uid || 'Keine'})`)
+                    .join('\n');
+
                 if (!uids) {
-                    showToast("Keine Sticker auf dem Bogen");
+                    showToast("Keine Sticker auf dem Bogen vorhanden");
                     return;
                 }
                 const blob = new Blob([uids], { type: 'text/plain;charset=utf-8' });
