@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TagGen Studio V2.6.7 LTS – Phoenix Fine-Tuned</title>
+    <title>TagGen Studio V2.6.6 LTS – Phoenix Final</title>
     
     <!-- ESP Web Tools -->
     <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
@@ -663,18 +663,18 @@
         }
         #toast.show { transform: translate(-50%, 0); }
 
-        /* --- FINE-TUNED GRID OPTIMIZATION (UP TO 8 CARDS ON DESKTOP) --- */
-        @media (min-width: 1600px) {
+        /* --- LTS FINAL: 8-CARD GRID & MOBILE SWIPE --- */
+        @media (min-width: 1700px) {
+            .asset-scroll { grid-template-columns: repeat(8, minmax(0, 1fr)); }
+            .sidebar-lib { width: 540px; }
+        }
+        @media (min-width: 1400px) and (max-width: 1699px) {
+            .asset-scroll { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+            .sidebar-lib { width: 460px; }
+        }
+        @media (min-width: 961px) and (max-width: 1399px) {
             .asset-scroll { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-            .sidebar-lib { width: 440px; }
-        }
-        @media (min-width: 1300px) and (max-width: 1599px) {
-            .asset-scroll { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-            .sidebar-lib { width: 400px; }
-        }
-        @media (min-width: 961px) and (max-width: 1299px) {
-            .asset-scroll { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-            .sidebar-lib { width: 360px; }
+            .sidebar-lib { width: 380px; }
         }
 
         @media (max-width: 960px) {
@@ -695,7 +695,7 @@
                 overflow: hidden;
                 touch-action: pan-x;
                 transform: translateX(0);
-                transition: transform .22s cubic-bezier(0.2, 0.8, 0.2, 1);
+                transition: transform .25s cubic-bezier(0.2, 0.8, 0.2, 1);
             }
             .sidebar-lib, .canvas-area, .sidebar-controls {
                 width: 100vw;
@@ -706,7 +706,7 @@
             }
             .sidebar-lib { order: 1; }
             .canvas-area { order: 2; padding: 14px; overflow:auto; }
-            .sidebar-controls { order: 3; overflow-y:auto; padding-bottom:24px; }
+            .sidebar-controls { order: 3; overflow-y:auto; padding-bottom:32px; }
             .asset-scroll {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
                 gap: 8px;
@@ -716,7 +716,7 @@
             .card-img-wrap { aspect-ratio: 1 / 1; }
             .card-content { min-height: 42px; }
             .preview-wrapper { width: min(92vw, 420px); padding: 18px; gap: 14px; }
-            .tag-circle { width: min(72vw, 320px); height: min(72vw, 320px); }
+            .tag-circle { width: min(72vw, 300px); height: min(72vw, 300px); }
             .sidebar-controls .control-section { padding: 15px 16px; }
             .sidebar-controls input[type="text"] { font-size: 16px; min-height: 42px; }
             .range-slider { min-height: 34px; }
@@ -793,7 +793,7 @@
         
         <!-- ==================== VIEW 1: STUDIO EDITOR & LIBRARY ==================== -->
         <div class="workspace active" id="view-design">
-            <div class="studio-layout">
+            <div class="studio-layout" id="studio-swipe-container">
                 
                 <!-- Left Column: Tonie Library -->
                 <div class="sidebar-lib">
@@ -987,7 +987,7 @@
 
     <div id="toast">Nachricht</div>
 
-    <!-- Script Architecture -->
+    <!-- Script Architecture (Phoenix LTS Final) -->
     <script>
         const App = {};
         const Data = {
@@ -1054,9 +1054,10 @@
             return [...new Set(ids.map(String).filter(Boolean))];
         };
 
+        // Unified Data Model & Initialization
         Data.init = async () => {
-            UI.showToast("Lade Datenbank...");
-            const cacheV1 = 'phoenix_v267_v1', cacheV2 = 'phoenix_v267_v2';
+            UI.showToast("Lade LTS-Datenbank...");
+            const cacheV1 = 'phoenix_lts_v1', cacheV2 = 'phoenix_lts_v2';
             const urlV1 = 'https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json';
             const urlV2 = 'https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/toniesV2.json';
 
@@ -1221,7 +1222,6 @@
                 grid.appendChild(card);
             });
 
-            // "Load More" / Infinite scroll trigger button for smoother mobile & desktop performance
             if (Library.renderLimit < Library.currentFilteredResults.length) {
                 const moreWrap = document.createElement('div');
                 moreWrap.className = 'load-more-container';
@@ -1435,8 +1435,8 @@
 
         Storage.saveProject = () => {
             const blob = new Blob([JSON.stringify({ format: document.getElementById('print-format').value, slots: PrintStudio.slots })], { type: 'application/json' });
-            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'TagGen_Project.json'; a.click();
-            UI.showToast("Gespeichert.");
+            const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'TagGen_Phoenix_LTS_Final.json'; a.click();
+            UI.showToast("Projekt gespeichert.");
         };
 
         Storage.loadProject = (e) => {
@@ -1501,16 +1501,24 @@
             if (view === 'print') PrintStudio.render();
         };
 
-        // Mobile Swipe & Touch Controls Handler
+        // Mobile Swipe & Touch Controls Handler (LTS Final)
         (() => {
             let startX = 0, startY = 0, dragging = false;
-            const l = () => document.querySelector('.studio-layout');
+            const l = () => document.getElementById('studio-swipe-container');
             const go = (p) => {
                 const layout = l();
                 if (!layout || window.innerWidth > 960) return;
                 const page = Math.max(0, Math.min(2, p));
                 layout.dataset.page = page;
                 layout.style.transform = `translateX(-${page * 100}vw)`;
+                
+                const views = ['design', 'print', 'nfc'];
+                // Sync top view switcher buttons
+                const viewBtns = document.querySelectorAll('.view-btn');
+                if (viewBtns[page]) {
+                    document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+                    viewBtns[page].classList.add('active');
+                }
             };
             window.addEventListener('load', () => {
                 const layout = l();
