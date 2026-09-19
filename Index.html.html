@@ -1,0 +1,1672 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TagGen Studio V2.6.6 LTS – Phoenix</title>
+    
+    <!-- ESP Web Tools -->
+    <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+
+    <style>
+        :root {
+            --primary: #e11d48;
+            --primary-hover: #be123c;
+            --primary-soft: #fff1f2;
+            --bg-canvas: #f8fafc;
+            --bg-sidebar: #ffffff;
+            --border: #e2e8f0;
+            --border-focus: #cbd5e1;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --text-subtle: #94a3b8;
+            
+            /* Match Status Colors */
+            --status-exact: #10b981;
+            --status-strong: #3b82f6;
+            --status-fuzzy: #f59e0b;
+            --status-none: #94a3b8;
+            --flipper-orange: #ff8200;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-main);
+            height: 100vh;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* --- HEADER & NAVIGATION --- */
+        header {
+            height: 60px;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 100;
+            flex-shrink: 0;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 16px;
+            color: var(--text-main);
+            letter-spacing: -0.02em;
+            user-select: none;
+        }
+
+        .brand svg {
+            width: 26px;
+            height: 26px;
+            fill: none;
+            stroke: var(--primary);
+            stroke-width: 2.2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .view-switcher {
+            display: flex;
+            background: var(--bg-canvas);
+            padding: 4px;
+            border-radius: 10px;
+            gap: 4px;
+            border: 1px solid var(--border);
+        }
+
+        .view-btn {
+            background: transparent;
+            border: none;
+            padding: 7px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-radius: 7px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .view-btn.active {
+            background: #ffffff;
+            color: var(--text-main);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .db-badge {
+            background: #f1f5f9;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            white-space: nowrap;
+        }
+
+        /* --- MAIN APP LAYOUT --- */
+        .app-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* --- WORKSPACES --- */
+        .workspace {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            position: relative;
+            background: var(--bg-canvas);
+        }
+        .workspace.active { display: flex; }
+
+        /* --- STUDIO EDITOR (VIEW 1) --- */
+        .studio-layout {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        /* Left: Library Sidebar */
+        .sidebar-lib {
+            width: 350px;
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            z-index: 20;
+            flex-shrink: 0;
+        }
+
+        .lib-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .lib-tabs {
+            display: flex;
+            gap: 16px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .lib-tab {
+            background: none;
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            position: relative;
+            padding-bottom: 4px;
+            transition: color 0.15s;
+        }
+        .lib-tab.active { color: var(--primary); }
+        .lib-tab.active::after {
+            content: ''; position: absolute; bottom: -9px; left: 0; right: 0;
+            height: 2px; background: var(--primary); border-radius: 2px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 13px;
+            outline: none;
+            background: var(--bg-canvas);
+            transition: border-color 0.2s;
+        }
+        .search-input:focus { border-color: var(--primary); background: #fff; }
+
+        .filter-row {
+            display: flex;
+            gap: 6px;
+        }
+        
+        .filter-select {
+            flex: 1;
+            padding: 6px 8px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 11px;
+            color: var(--text-main);
+            background: #fff;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .asset-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        /* Clean Studio Cards */
+        .asset-card {
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            cursor: pointer;
+            display: flex;
+            gap: 12px;
+            padding: 10px;
+            transition: all 0.15s ease;
+            position: relative;
+        }
+
+        .asset-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 14px rgba(225, 29, 72, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .card-img-wrap {
+            width: 68px;
+            height: 68px;
+            background: var(--bg-canvas);
+            border-radius: 7px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid #f1f5f9;
+        }
+
+        .card-img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .card-img-wrap img.fallback {
+            width: 40%;
+            height: 40%;
+            opacity: 0.25;
+        }
+
+        .fav-btn {
+            position: absolute;
+            top: 3px;
+            right: 3px;
+            background: rgba(255,255,255,0.95);
+            border: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 13px;
+            color: #cbd5e1;
+            transition: color 0.15s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+            z-index: 5;
+        }
+        .fav-btn.active { color: #eab308; }
+
+        .match-badge {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            color: #ffffff;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+            pointer-events: none;
+            letter-spacing: 0.02em;
+            z-index: 5;
+        }
+
+        .card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .card-serie {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 1px 0 4px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .card-meta {
+            font-size: 11px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        /* Center: Canvas View */
+        .canvas-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            position: relative;
+            overflow: auto;
+        }
+
+        .preview-wrapper {
+            background: #ffffff;
+            padding: 36px 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.02);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .tag-circle {
+            width: 270px;
+            height: 270px;
+            border-radius: 50%;
+            border: 2px dashed #cbd5e1;
+            position: relative;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        .tag-circle img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            position: absolute;
+            transition: transform 0.08s ease-out;
+        }
+
+        .tag-circle svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        /* Right: Design Controls */
+        .sidebar-controls {
+            width: 320px;
+            background: var(--bg-sidebar);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .control-section {
+            padding: 18px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .control-section h3 {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .input-group label {
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .input-group input[type="text"] {
+            padding: 8px 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+            background: #fff;
+            transition: border-color 0.2s;
+        }
+        .input-group input[type="text"]:focus { border-color: var(--primary); }
+
+        .range-slider {
+            width: 100%;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        .btn {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            user-select: none;
+        }
+        .btn:hover { background: var(--primary-hover); }
+
+        .btn-secondary {
+            background: #fff;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 7px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .btn-secondary:hover { background: #f8fafc; border-color: var(--primary); color: var(--primary); }
+
+        /* --- PRINT STUDIO (VIEW 2) --- */
+        .print-toolbar {
+            background: #fff;
+            padding: 14px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .print-scroll {
+            flex: 1;
+            overflow: auto;
+            padding: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .a4-sheet {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            position: relative;
+            transform-origin: top center;
+            transform: scale(0.85);
+            margin-bottom: -40px;
+        }
+
+        .sheet-grid {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .slot {
+            position: absolute;
+            border: 1px dashed #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            box-sizing: border-box;
+            background: #fafafa;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .slot.drag-over { background: #ffe4e6; border-color: var(--primary); }
+
+        .sticker {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            overflow: hidden;
+            background: #fff;
+            cursor: grab;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        }
+        .sticker:active { cursor: grabbing; }
+
+        .sticker-actions {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            gap: 4px;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(4px);
+            padding: 5px;
+            border-radius: 20px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .sticker:hover .sticker-actions { opacity: 1; pointer-events: auto; }
+        
+        .s-btn {
+            background: none; border: none; color: #fff; font-size: 13px; cursor: pointer;
+            width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
+            border-radius: 50%;
+        }
+        .s-btn:hover { background: rgba(255,255,255,0.2); }
+        .s-btn.del:hover { background: var(--primary); }
+
+        /* --- NFC SETUP (VIEW 3) --- */
+        .nfc-container {
+            max-width: 860px;
+            margin: 40px auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            padding: 0 20px;
+        }
+
+        .nfc-card {
+            background: #fff;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .nfc-card h2 {
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-bottom: 2px solid var(--bg-canvas);
+            padding-bottom: 10px;
+        }
+
+        .hardware-toggle {
+            display: flex;
+            background: var(--bg-canvas);
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .hw-btn {
+            flex: 1; border: none; background: none; padding: 8px; font-size: 12px; font-weight: 600;
+            color: var(--text-muted); border-radius: 6px; cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .hw-btn.active { background: #fff; color: var(--text-main); box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+
+        /* Toast Notifications */
+        #toast {
+            position: fixed; bottom: 30px; left: 50%; transform: translate(-50%, 100px);
+            background: #0f172a; color: #fff; padding: 12px 24px; border-radius: 30px;
+            font-size: 13px; font-weight: 500; transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 1000; box-shadow: 0 10px 25px rgba(0,0,0,0.25); pointer-events: none;
+        }
+        #toast.show { transform: translate(-50%, 0); }
+
+        /* PRINT MEDIA FIXES */
+        @media print {
+            body * { visibility: hidden; }
+            #view-print, #view-print * { visibility: visible; }
+            #view-print { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: #fff; }
+            .print-toolbar, .sticker-actions { display: none !important; }
+            .a4-sheet { transform: none !important; margin: 0 !important; box-shadow: none !important; }
+            .slot { border: none !important; background: transparent !important; }
+            img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand">
+            <!-- Custom NFC Tag/Wave Logo -->
+            <svg viewBox="0 0 24 24">
+                <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
+                <rect x="9" y="9" width="6" height="6"></rect>
+                <line x1="9" y1="1" x2="9" y2="4"></line>
+                <line x1="15" y1="1" x2="15" y2="4"></line>
+                <line x1="9" y1="20" x2="9" y2="23"></line>
+                <line x1="15" y1="20" x2="15" y2="23"></line>
+                <line x1="20" y1="9" x2="23" y2="9"></line>
+                <line x1="20" y1="14" x2="23" y2="14"></line>
+                <line x1="1" y1="9" x2="4" y2="9"></line>
+                <line x1="1" y1="14" x2="4" y2="14"></line>
+            </svg>
+            <span>TagGen <span style="color:var(--primary);">Phoenix</span></span>
+        </div>
+
+        <div class="view-switcher">
+            <button class="view-btn active" data-view="design" onclick="App.switchView('design')">1. Tonie & Editor</button>
+            <button class="view-btn" data-view="print" onclick="App.switchView('print')">2. Druckbogen</button>
+            <button class="view-btn" data-view="nfc" onclick="App.switchView('nfc')" style="color: var(--flipper-orange);">3. NFC Setup</button>
+        </div>
+
+        <div class="header-actions">
+            <span class="db-badge" id="db-status">Lade Datenbank...</span>
+        </div>
+    </header>
+
+    <div class="app-container">
+        
+        <!-- ==================== VIEW 1: STUDIO EDITOR & LIBRARY ==================== -->
+        <div class="workspace active" id="view-design">
+            <div class="studio-layout">
+                
+                <!-- Left Column: Tonie Library -->
+                <div class="sidebar-lib">
+                    <div class="lib-header">
+                        <!-- Restored & Repaired Tabs -->
+                        <div class="lib-tabs">
+                            <button class="lib-tab active" id="tab-db" onclick="Library.switchTab('db')">Datenbank</button>
+                            <button class="lib-tab" id="tab-fav" onclick="Library.switchTab('fav')">Favoriten</button>
+                        </div>
+
+                        <input type="text" class="search-input" id="search-input" placeholder="🔎 Tonie, Serie oder Audio-ID suchen...">
+                        
+                        <div class="filter-row">
+                            <select class="filter-select" id="filter-lang">
+                                <option value="">🌐 Alle Sprachen</option>
+                                <option value="de-de">Deutsch</option>
+                                <option value="en-us">Englisch</option>
+                                <option value="fr-fr">Französisch</option>
+                            </select>
+                            <select class="filter-select" id="filter-dump">
+                                <option value="all">Alle Tonies</option>
+                                <option value="exact">🟢 Exakter Dump</option>
+                                <option value="strong">🔵 Strong Match</option>
+                                <option value="fuzzy">🟡 Fuzzy Match</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="asset-scroll" id="asset-grid">
+                        <!-- Dynamically populated Cards -->
+                    </div>
+                </div>
+
+                <!-- Center Column: Visual Cover Canvas -->
+                <div class="canvas-area" id="drop-zone">
+                    <div class="preview-wrapper">
+                        <div class="tag-circle" id="preview-circle">
+                            <img id="preview-img" src="" alt="" loading="lazy">
+                            <svg viewBox="0 0 100 100" id="preview-svg">
+                                <path id="path-top" d="M 16,50 A 34,34 0 0,1 84,50" fill="none"/>
+                                <path id="path-uid" d="M 22,50 A 28,28 0 0,0 78,50" fill="none"/>
+                                <path id="path-bottom" d="M 14,50 A 36,36 0 0,0 86,50" fill="none"/>
+
+                                <text font-size="7.5" font-weight="bold" fill="#e11d48" text-anchor="middle" id="svg-text-top-node">
+                                    <textPath href="#path-top" startOffset="50%" id="svg-text-top" letter-spacing="0.1em"></textPath>
+                                </text>
+                                <text font-size="5" font-weight="bold" fill="#64748b" text-anchor="middle" id="svg-text-uid-node">
+                                    <textPath href="#path-uid" startOffset="50%" id="svg-text-uid" letter-spacing="0.12em"></textPath>
+                                </text>
+                                <text font-size="6.5" font-weight="bold" fill="#0f172a" text-anchor="middle" id="svg-text-bottom-node">
+                                    <textPath href="#path-bottom" startOffset="50%" id="svg-text-bottom" letter-spacing="0.12em"></textPath>
+                                </text>
+                            </svg>
+                        </div>
+                        <button class="btn" onclick="PrintStudio.addCurrentToSheet()" style="width: 100%;">
+                            + Auf den Druckbogen
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Right Column: Precise Design Controls -->
+                <div class="sidebar-controls">
+                    <div class="control-section">
+                        <h3>Texte & Typografie</h3>
+                        <div class="input-group">
+                            <label>Serie (Oben)</label>
+                            <input type="text" id="input-serie">
+                        </div>
+                        <div class="input-group">
+                            <label>Titel (Unten)</label>
+                            <input type="text" id="input-title">
+                        </div>
+                        <div class="input-group">
+                            <label>Audio-ID (Mitte)</label>
+                            <input type="text" id="input-uid" placeholder="16-stellige Hex-ID">
+                        </div>
+                        <div class="input-group" style="margin-top: 6px;">
+                            <label>Schriftgröße <span id="val-font" style="color:var(--primary)">100%</span></label>
+                            <input type="range" class="range-slider" id="slider-font" min="70" max="150" value="100">
+                        </div>
+                    </div>
+                    
+                    <div class="control-section">
+                        <h3>Bildausrichtung</h3>
+                        <div class="input-group">
+                            <label>Zoom <span id="val-zoom">100%</span></label>
+                            <input type="range" class="range-slider" id="slider-zoom" min="50" max="200" value="100">
+                        </div>
+                        <div class="input-group">
+                            <label>X-Achse <span id="val-x">0%</span></label>
+                            <input type="range" class="range-slider" id="slider-x" min="-40" max="40" value="0">
+                        </div>
+                        <div class="input-group">
+                            <label>Y-Achse <span id="val-y">0%</span></label>
+                            <input type="range" class="range-slider" id="slider-y" min="-40" max="40" value="0">
+                        </div>
+                        <button class="btn-secondary" style="margin-top:6px;" onclick="Editor.resetTransform()">
+                            Achsen zentrieren
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== VIEW 2: PRINT STUDIO ==================== -->
+        <div class="workspace" id="view-print">
+            <div class="print-toolbar">
+                <div style="display:flex; gap:12px; align-items:center;">
+                    <select id="print-format" class="btn-secondary" style="padding:8px 12px; border-radius:8px;">
+                        <option value="43-12">Münzkapsel 43mm (12er • 3×4)</option>
+                        <option value="40-24">Avery Zweckform L3415 / 5080 40mm (24er • 4×6)</option>
+                        <option value="40-12">Avery 40mm Standard (12er • 3×4)</option>
+                        <option value="30-48">Avery Zweckform 6223 30mm (48er • 6×8)</option>
+                        <option value="custom">Frei definierbar (mm)</option>
+                    </select>
+                    
+                    <div id="custom-size-wrap" style="display: none; align-items: center; gap: 4px;">
+                        <input type="number" id="custom-size-input" value="43" min="10" max="90" style="width: 55px; padding: 6px;" oninput="PrintStudio.changeFormat()" title="Durchmesser in mm">
+                        <span style="font-size: 12px; color: var(--text-muted);">mm Ø</span>
+                    </div>
+                    
+                    <span style="font-size:12px; color:var(--text-muted);"><b id="print-count">0</b> Sticker belegt</span>
+                </div>
+                
+                <div style="display:flex; gap:8px;">
+                    <button class="btn-secondary" onclick="Storage.saveProject()">💾 Projekt speichern</button>
+                    <button class="btn-secondary" onclick="document.getElementById('file-load').click()">📂 Laden</button>
+                    <input type="file" id="file-load" style="display:none" accept=".json" onchange="Storage.loadProject(event)">
+                    <button class="btn-secondary" onclick="PrintStudio.clear()">🗑️ Bogen leeren</button>
+                    <button class="btn" onclick="window.print()">🖨️ PDF / Drucken</button>
+                </div>
+            </div>
+            
+            <div class="print-scroll">
+                <div class="a4-sheet" id="print-sheet">
+                    <div class="sheet-grid" id="sheet-grid"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== VIEW 3: NFC SETUP ==================== -->
+        <div class="workspace" id="view-nfc">
+            <div class="nfc-container">
+                
+                <!-- Card 1: ESP32 Flasher -->
+                <div class="nfc-card">
+                    <h2>🛠️ Hardware Bridge Setup</h2>
+                    <p style="font-size:13px; color:var(--text-muted); line-height:1.5;">
+                        Apple iOS und Standard-Android limitieren direkte Magic-Tag-Schreibbefehle. Verwende einen <b>ESP32 + PN5180</b> als Hardware-Bridge, um ICODE SLIX Tags direkt aus dem Browser zu beschreiben.
+                    </p>
+                    <div style="background:#f8fafc; border:1px solid var(--border); padding:16px; border-radius:10px; text-align:center;">
+                        <span style="display:block; font-size:12px; font-weight:700; margin-bottom:10px; color:var(--text-main);">
+                            Firmware Web-Installer (Google Chrome / Edge)
+                        </span>
+                        <esp-web-install-button manifest="https://raw.githubusercontent.com/RFIDfriend/NFC-Archiver/main/flash/manifest.json"></esp-web-install-button>
+                    </div>
+                    <p style="font-size:11px; color:var(--text-muted); text-align:center;">
+                        Basiert auf der offiziellen Firmware von <a href="https://github.com/RFIDfriend/NFC-Archiver" target="_blank" style="color:var(--primary); text-decoration:none; font-weight:600;">RFIDfriend/NFC-Archiver</a>.
+                    </p>
+                </div>
+
+                <!-- Card 2: Tag Writer -->
+                <div class="nfc-card">
+                    <h2>📲 Magic Tag Writer</h2>
+                    
+                    <div class="hardware-toggle">
+                        <button class="hw-btn active" id="hw-usb" onclick="NfcStudio.setMode('usb')">🔌 USB (Web Serial)</button>
+                        <button class="hw-btn" id="hw-ble" onclick="NfcStudio.setMode('ble')">📡 Bluetooth (BLE)</button>
+                    </div>
+
+                    <div style="background:#f8fafc; border:1px solid var(--border); padding:14px; border-radius:10px; font-size:13px; display:flex; flex-direction:column; gap:6px;">
+                        <div style="display:flex; justify-content:space-between;">
+                            <span>Tonie:</span><strong id="nfc-target-title">-</strong>
+                        </div>
+                        <div style="display:flex; justify-content:space-between;">
+                            <span>UID:</span><strong id="nfc-target-uid" style="font-family:monospace;">-</strong>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; padding-top:6px; border-top:1px dashed var(--border);">
+                            <span>Dump Status:</span><strong id="nfc-target-status">-</strong>
+                        </div>
+                    </div>
+
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <span id="nfc-conn-status" style="font-size:12px; font-weight:bold; color:var(--text-muted);">🔴 Getrennt</span>
+                        <button class="btn-secondary" onclick="NfcStudio.connect()">Hardware Verbinden</button>
+                    </div>
+
+                    <button class="btn" style="width:100%; background:var(--flipper-orange); padding:12px;" onclick="NfcStudio.flashTag()">
+                        ⚡ Magic Tag (SLIX) Flashen
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div id="toast">Nachricht</div>
+
+    <!-- Phoenix LTS Script Architecture -->
+    <script>
+        // --- 1. NAMESPACES & REPAIRED MODULE DEFINITIONS ---
+        const App = {};
+        const Data = {
+            tonies: [],          
+            v2Map: new Map(),    
+            dumpIndex: {
+                exactIds: new Set(),
+                strong: new Set(),
+                titles: new Set()
+            }
+        };
+        
+        // BUGFIX 1: Explicitly Define Library Module
+        const Library = {
+            activeTab: 'db'
+        };
+
+        const Search = {};
+        const UI = {};
+        const Editor = {
+            state: { zoom: 100, x: 0, y: 0, fontSize: 100 },
+            current: { serie: '', title: '', uid: '', pic: '' }
+        };
+        const PrintStudio = { slots: [] };
+        const NfcStudio = { mode: 'usb', port: null, writer: null, bleDevice: null, bleChar: null };
+        const Storage = {};
+
+        // Utility: String Normalization
+        const normalizeText = s => String(s ?? '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
+        const clean = s => normalizeText(s).replace(/[^a-z0-9]/g, '');
+        const splitQuery = s => normalizeText(s).split(/\s+/).map(clean).filter(Boolean);
+
+        const fetchJson = async (url, timeout = 30000) => {
+            const controller = new AbortController();
+            const timer = setTimeout(() => controller.abort(), timeout);
+            try {
+                const response = await fetch(url, {
+                    cache: 'no-cache',
+                    signal: controller.signal,
+                    headers: { 'Accept': 'application/json' }
+                });
+                if (!response.ok) throw new Error(`HTTP ${response.status} für ${url}`);
+                return await response.json();
+            } finally {
+                clearTimeout(timer);
+            }
+        };
+
+        const extractV1Tonies = (raw) => {
+            if (Array.isArray(raw)) return raw;
+            if (raw && Array.isArray(raw.tonies)) return raw.tonies;
+            if (raw && Array.isArray(raw.data)) return raw.data;
+            return [];
+        };
+
+        const extractV2Tonies = (raw) => {
+            if (!raw) return [];
+            if (Array.isArray(raw)) {
+                const flattened = [];
+                raw.forEach(article => {
+                    if (!article || typeof article !== 'object') return;
+                    if (Array.isArray(article.data)) {
+                        article.data.forEach(item => {
+                            if (item && typeof item === 'object') {
+                                flattened.push({ ...item, article: item.article || article.article || '' });
+                            }
+                        });
+                    } else if (article.series || article.episode || article.image) {
+                        flattened.push(article);
+                    }
+                });
+                return flattened;
+            }
+            if (Array.isArray(raw.data)) return raw.data;
+            if (Array.isArray(raw.tonies)) return raw.tonies;
+            return [];
+        };
+
+        const collectIds = (item) => {
+            const ids = [];
+            if (!item || typeof item !== 'object') return ids;
+            ['audio_id', 'audioId', 'id', 'hash'].forEach(key => {
+                const value = item[key];
+                if (Array.isArray(value)) ids.push(...value);
+                else if (value !== undefined && value !== null && value !== '') ids.push(value);
+            });
+            if (Array.isArray(item.ids)) {
+                item.ids.forEach(entry => {
+                    if (!entry || typeof entry !== 'object') return;
+                    ['audio-id', 'audio_id', 'audioId', 'id', 'hash'].forEach(key => {
+                        const value = entry[key];
+                        if (value !== undefined && value !== null && value !== '') ids.push(value);
+                    });
+                });
+            }
+            return [...new Set(ids.map(String).filter(Boolean))];
+        };
+
+        // --- 2. DATA LAYER (Normalized V1 + V2 Community Data) ---
+        Data.init = async () => {
+            UI.showToast("Synchronisiere Tonie-Datenbank...");
+            const cacheV1 = 'phoenix_tonies_cache_v2_6_6_v1';
+            const cacheV2 = 'phoenix_tonies_cache_v2_6_6_v2';
+            const legacyCacheV1 = 'phoenix_tonies_cache_v1';
+            const legacyCacheV2 = 'phoenix_tonies_cache_v2';
+            const urlV1 = 'https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json';
+            const urlV2 = 'https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/toniesV2.json';
+
+            try {
+                Data.v2Map.clear();
+                let rawV1 = [];
+                let rawV2 = [];
+                let source = 'online';
+
+                // V1 is the required base database. V2 is optional enrichment.
+                try {
+                    const dataV1 = await fetchJson(urlV1);
+                    rawV1 = extractV1Tonies(dataV1);
+                    if (!rawV1.length) throw new Error('V1 JSON ungültig/leer');
+                    try { localStorage.setItem(cacheV1, JSON.stringify(rawV1)); } catch(lsError) { console.warn('V1 Cache Storage failed:', lsError); }
+                } catch (v1Error) {
+                    console.warn('V1 online load failed, trying cache:', v1Error);
+                    const cached = localStorage.getItem(cacheV1) || localStorage.getItem(legacyCacheV1);
+                    if (!cached) throw new Error(`Netzwerk/Parse-Fehler und kein lokaler Cache vorhanden. (${v1Error.message})`);
+                    try {
+                        rawV1 = extractV1Tonies(JSON.parse(cached));
+                        if (!rawV1.length) throw new Error('Lokaler V1-Cache ist leer');
+                    } catch(cacheError) {
+                        localStorage.removeItem(cacheV1);
+                        localStorage.removeItem(legacyCacheV1);
+                        throw new Error('Datenbank konnte online nicht geladen werden und der lokale Cache ist ungültig.');
+                    }
+                    source = 'cache';
+                }
+
+                try {
+                    const dataV2 = await fetchJson(urlV2);
+                    rawV2 = extractV2Tonies(dataV2);
+                    if (rawV2.length) { try { localStorage.setItem(cacheV2, JSON.stringify(rawV2)); } catch(lsError) { console.warn('V2 Cache Storage failed:', lsError); } }
+                } catch (v2Error) {
+                    console.warn('V2 online load failed, trying cache:', v2Error);
+                    try {
+                        const cachedV2 = localStorage.getItem(cacheV2) || localStorage.getItem(legacyCacheV2);
+                        if (cachedV2) rawV2 = extractV2Tonies(JSON.parse(cachedV2));
+                    } catch (cacheError) {
+                        console.warn('V2 cache invalid:', cacheError);
+                    }
+                }
+
+                rawV2.forEach(item => {
+                    collectIds(item).forEach(id => Data.v2Map.set(id, item));
+                });
+
+                const getImage = (v2, v1) => {
+                    const candidates = [
+                        v2?.image, v2?.picture, v2?.pic, v2?.cover, v2?.coverUrl, v2?.image_url,
+                        v1?.image, v1?.picture, v1?.pic, v1?.cover, v1?.coverUrl, v1?.image_url
+                    ];
+                    return candidates.find(v => typeof v === 'string' && v.trim()) || '';
+                };
+
+                Data.tonies = rawV1.map(v1 => {
+                    if (!v1 || typeof v1 !== 'object') return null;
+                    const rawIds = collectIds(v1);
+                    const primaryId = String(rawIds[0] || '');
+                    const v2 = Data.v2Map.get(primaryId) || {};
+
+                    const v2Ids = collectIds(v2);
+                    const audioIds = [...new Set([...rawIds, ...v2Ids].map(String).filter(Boolean))];
+                    const series = String(v2.series || v1.series || v1.serie || v1.brand || v1.title || 'Unbekannt');
+                    const title = String(v2.episode || v2.title || v1.episodes || v1.episode || v1.subtitle || v1.title || '');
+                    const image = getImage(v2, v1);
+                    const language = String(v2.language || v1.language || 'de-de').toLowerCase();
+                    const tracks = Array.isArray(v2.tracks) ? v2.tracks.length :
+                        (Array.isArray(v2['track-desc']) ? v2['track-desc'].length :
+                        (Array.isArray(v1.tracks) ? v1.tracks.length : 0));
+
+                    return {
+                        id: primaryId, audioIds, hash: v2.hash || v1.hash || '',
+                        series, title, image, pic: image, language,
+                        category: v2.category || v1.category || '',
+                        age: v2.age || v1.age || '', tracks, confidence: v2.confidence || null
+                    };
+                }).filter(t => t && (t.series || t.title || t.id));
+
+                if (!Data.tonies.length) throw new Error('Die Tonie-Datenbank enthält keine Einträge.');
+
+                const v2Text = rawV2.length ? ` · V2 ${rawV2.length}` : '';
+                document.getElementById('db-status').textContent = `${Data.tonies.length} Tonies${v2Text}${source === 'cache' ? ' · Cache' : ''}`;
+
+                // Dump matching is optional and must never block the database.
+                try { await Data.loadDumpIndex(); } catch (dumpError) { console.warn('Dump index skipped:', dumpError); }
+                Search.filter();
+                Editor.load(Data.tonies[0], true);
+            } catch (error) {
+                console.error('DB Load Error:', error);
+                document.getElementById('db-status').textContent = 'Datenbankfehler';
+                UI.showToast(`Datenbankfehler: ${error.message || error}`);
+            }
+        };
+
+        Data.loadDumpIndex = async () => {
+            const cacheKey = 'phoenix_dump_index_v2_6_6';
+            const timeKey = 'phoenix_dump_time_v2_6_6';
+            const now = Date.now();
+
+            const cached = localStorage.getItem(cacheKey);
+            const cachedTime = localStorage.getItem(timeKey);
+
+            let nfcFiles = [];
+
+            if (cached && cachedTime && (now - parseInt(cachedTime, 10) < 24*60*60*1000)) {
+                try {
+                    const parsed = JSON.parse(cached);
+                    nfcFiles = Array.isArray(parsed) ? parsed : [];
+                } catch(e) { nfcFiles = []; }
+            } else {
+                try {
+                    const data = await fetchJson('https://api.github.com/repos/nortakales/flipper-zero-tonies/git/trees/master?recursive=1', 15000);
+                    if (data && Array.isArray(data.tree)) {
+                        nfcFiles = data.tree.filter(f => f.path && f.path.endsWith('.nfc')).map(f => f.path);
+                        localStorage.setItem(cacheKey, JSON.stringify(nfcFiles));
+                        localStorage.setItem(timeKey, now.toString());
+                    }
+                } catch(e) {
+                    console.warn("GitHub Dump Fetch Limit, Fallback aktiv");
+                }
+            }
+
+            // O(1) Sets aufbauen
+            nfcFiles.forEach(path => {
+                const parts = path.split('/');
+                const filename = clean(parts[parts.length-1].replace('.nfc',''));
+                const folder = parts.length > 1 ? clean(parts[parts.length-2]) : '';
+                
+                // Hex ID matches
+                const idMatch = path.match(/[a-fA-F0-9]{8,16}/);
+                if (idMatch) Data.dumpIndex.exactIds.add(idMatch[0].toLowerCase());
+                
+                if (folder && filename) Data.dumpIndex.strong.add(folder + '||' + filename);
+                Data.dumpIndex.titles.add(filename);
+            });
+        };
+
+        // BUGFIX 3: Categorized Exact -> Strong -> Fuzzy Dump Matching
+        Data.getMatchQuality = (tonie) => {
+            if (!tonie || !tonie.id) return 'none';
+            
+            // 1. Exact Audio-ID match
+            const idsToCheck = (tonie.audioIds && tonie.audioIds.length > 0) ? tonie.audioIds : [tonie.id];
+            for (const id of idsToCheck) {
+                if (id && id.length >= 6 && Data.dumpIndex.exactIds.has(id.toLowerCase())) {
+                    return 'exact';
+                }
+            }
+            
+            // 2. Strong Match (Series folder + exact filename match)
+            const tTitle = clean(tonie.title);
+            const tSerie = clean(tonie.series);
+            if (tSerie && tTitle && Data.dumpIndex.strong.has(tSerie + '||' + tTitle)) {
+                return 'strong';
+            }
+
+            // 3. Fuzzy Match (Filename match)
+            if (tTitle.length > 4 && Data.dumpIndex.titles.has(tTitle)) {
+                return 'fuzzy';
+            }
+
+            return 'none';
+        };
+
+        // --- 3. LIBRARY & TABS ---
+        Library.switchTab = (tab) => {
+            Library.activeTab = tab;
+            document.getElementById('tab-db').classList.toggle('active', tab === 'db');
+            document.getElementById('tab-fav').classList.toggle('active', tab === 'fav');
+            Search.filter();
+        };
+
+        Search.filter = () => {
+            const rawQuery = document.getElementById('search-input').value;
+            const query = normalizeText(rawQuery);
+            const queryParts = splitQuery(rawQuery);
+            const lang = document.getElementById('filter-lang').value;
+            const dumpFilter = document.getElementById('filter-dump').value;
+            
+            const favs = JSON.parse(localStorage.getItem('phoenix_favs') || '[]');
+
+            let results = Data.tonies;
+
+            if (Library.activeTab === 'fav') results = results.filter(t => favs.includes(t.id));
+            if (lang) results = results.filter(t => t.language === lang);
+            
+            if (dumpFilter === 'exact') results = results.filter(t => Data.getMatchQuality(t) === 'exact');
+            if (dumpFilter === 'strong') results = results.filter(t => ['exact', 'strong'].includes(Data.getMatchQuality(t)));
+            if (dumpFilter === 'fuzzy') results = results.filter(t => Data.getMatchQuality(t) !== 'none');
+
+            if (queryParts.length) {
+                results = results.filter(t => {
+                    const haystack = clean(`${t.series} ${t.title} ${t.id} ${(t.audioIds || []).join(' ')}`);
+                    return queryParts.every(part => haystack.includes(part));
+                });
+            }
+
+            UI.renderCards(results.slice(0, 50));
+        };
+
+        // --- 4. UI & CARDS ---
+        UI.renderCards = (items) => {
+            const grid = document.getElementById('asset-grid');
+            grid.innerHTML = '';
+            const favs = JSON.parse(localStorage.getItem('phoenix_favs') || '[]');
+
+            items.forEach(item => {
+                const isFav = favs.includes(item.id);
+                const matchQ = Data.getMatchQuality(item);
+                
+                const card = document.createElement('div');
+                card.className = 'asset-card';
+                card.onclick = () => Editor.load(item);
+
+                const imgWrap = document.createElement('div');
+                imgWrap.className = 'card-img-wrap';
+                
+                const img = document.createElement('img');
+                img.loading = 'lazy';
+                img.src = item.pic || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+                img.onerror = () => { img.classList.add('fallback'); };
+                imgWrap.appendChild(img);
+
+                // BUGFIX 4: Missing Badge Classes
+                if (matchQ !== 'none') {
+                    const badge = document.createElement('div');
+                    badge.className = 'match-badge';
+                    if (matchQ === 'exact') {
+                        badge.textContent = '🟢 Exakt';
+                        badge.style.background = 'var(--status-exact)';
+                    } else if (matchQ === 'strong') {
+                        badge.textContent = '🔵 Strong';
+                        badge.style.background = 'var(--status-strong)';
+                    } else {
+                        badge.textContent = '🟡 Fuzzy';
+                        badge.style.background = 'var(--status-fuzzy)';
+                    }
+                    imgWrap.appendChild(badge);
+                }
+
+                const favBtn = document.createElement('button');
+                favBtn.className = `fav-btn ${isFav ? 'active' : ''}`;
+                favBtn.textContent = isFav ? '★' : '☆';
+                favBtn.onclick = (e) => { e.stopPropagation(); UI.toggleFav(item.id); };
+                imgWrap.appendChild(favBtn);
+
+                const content = document.createElement('div');
+                content.className = 'card-content';
+                
+                const serie = document.createElement('div');
+                serie.className = 'card-serie';
+                serie.textContent = item.series;
+                
+                const title = document.createElement('div');
+                title.className = 'card-title';
+                title.textContent = item.title;
+
+                const meta = document.createElement('div');
+                meta.className = 'card-meta';
+                
+                let dotColor = 'var(--status-none)';
+                if (matchQ === 'exact') dotColor = 'var(--status-exact)';
+                if (matchQ === 'strong') dotColor = 'var(--status-strong)';
+                if (matchQ === 'fuzzy') dotColor = 'var(--status-fuzzy)';
+                
+                // Community Data Display (Lang, Tracks, Audio-ID)
+                meta.innerHTML = `<span class="status-dot" style="background:${dotColor}"></span> ${item.language.toUpperCase()} • ${item.tracks} Tracks • ID: ${item.id.slice(0, 8)}...`;
+
+                content.appendChild(serie);
+                content.appendChild(title);
+                content.appendChild(meta);
+
+                card.appendChild(imgWrap);
+                card.appendChild(content);
+                grid.appendChild(card);
+            });
+        };
+
+        UI.toggleFav = (id) => {
+            let favs = JSON.parse(localStorage.getItem('phoenix_favs') || '[]');
+            if (favs.includes(id)) favs = favs.filter(f => f !== id);
+            else favs.push(id);
+            localStorage.setItem('phoenix_favs', JSON.stringify(favs));
+            Search.filter();
+        };
+
+        UI.showToast = (msg) => {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        };
+
+        // --- 5. EDITOR ---
+        Editor.load = (item, silent=false) => {
+            Editor.current = { ...item };
+            Editor.resetTransform();
+            
+            document.getElementById('input-serie').value = item.series;
+            document.getElementById('input-title').value = item.title;
+            document.getElementById('input-uid').value = item.id;
+            
+            Editor.update();
+            if (!silent) UI.showToast(`"${item.series}" geladen`);
+        };
+
+        Editor.resetTransform = () => {
+            Editor.state = { zoom: 100, x: 0, y: 0, fontSize: 100 };
+            document.getElementById('slider-zoom').value = 100;
+            document.getElementById('slider-x').value = 0;
+            document.getElementById('slider-y').value = 0;
+            document.getElementById('slider-font').value = 100;
+            Editor.update();
+        };
+
+        Editor.update = () => {
+            Editor.current.series = document.getElementById('input-serie').value;
+            Editor.current.title = document.getElementById('input-title').value;
+            Editor.current.uid = document.getElementById('input-uid').value;
+            
+            Editor.state.zoom = parseInt(document.getElementById('slider-zoom').value);
+            Editor.state.x = parseInt(document.getElementById('slider-x').value);
+            Editor.state.y = parseInt(document.getElementById('slider-y').value);
+            Editor.state.fontSize = parseInt(document.getElementById('slider-font').value);
+
+            document.getElementById('val-zoom').textContent = Editor.state.zoom + '%';
+            document.getElementById('val-x').textContent = Editor.state.x + '%';
+            document.getElementById('val-y').textContent = Editor.state.y + '%';
+            document.getElementById('val-font').textContent = Editor.state.fontSize + '%';
+
+            const img = document.getElementById('preview-img');
+            img.src = Editor.current.pic || '';
+            img.style.transform = `translate(${Editor.state.x}%, ${Editor.state.y}%) scale(${Editor.state.zoom / 100})`;
+
+            const fScale = Editor.state.fontSize / 100;
+            document.getElementById('svg-text-top-node').setAttribute('font-size', (7.5 * fScale).toFixed(1));
+            document.getElementById('svg-text-uid-node').setAttribute('font-size', (5.0 * fScale).toFixed(1));
+            document.getElementById('svg-text-bottom-node').setAttribute('font-size', (6.5 * fScale).toFixed(1));
+
+            document.getElementById('svg-text-top').textContent = Editor.current.series;
+            document.getElementById('svg-text-uid').textContent = Editor.current.uid ? `ID: ${Editor.current.uid}` : '';
+            document.getElementById('svg-text-bottom').textContent = Editor.current.title;
+            
+            // Sync NFC Studio
+            document.getElementById('nfc-target-title').textContent = Editor.current.title || 'Kein Titel';
+            document.getElementById('nfc-target-uid').textContent = Editor.current.uid || 'Keine UID';
+            
+            const matchQ = Data.getMatchQuality({ ...Editor.current, id: Editor.current.uid });
+            const sBadge = document.getElementById('nfc-target-status');
+            if (matchQ === 'exact') sBadge.innerHTML = '<span style="color:var(--status-exact)">🟢 Exakter Dump</span>';
+            else if (matchQ === 'strong') sBadge.innerHTML = '<span style="color:var(--status-strong)">🔵 Strong Match</span>';
+            else if (matchQ === 'fuzzy') sBadge.innerHTML = '<span style="color:var(--status-fuzzy)">🟡 Fuzzy Match</span>';
+            else sBadge.innerHTML = '<span style="color:var(--text-muted)">⚪ Kein Dump (Nur UID Flash)</span>';
+        };
+
+        Editor.initDragDrop = () => {
+            const zone = document.getElementById('drop-zone');
+            zone.ondragover = e => e.preventDefault();
+            zone.ondrop = e => {
+                e.preventDefault();
+                const file = e.dataTransfer.files[0];
+                if (file && file.type.startsWith('image/')) {
+                    const r = new FileReader();
+                    r.onload = ev => { Editor.current.pic = ev.target.result; Editor.update(); };
+                    r.readAsDataURL(file);
+                }
+            };
+            
+            ['serie','title','uid'].forEach(id => {
+                document.getElementById(`input-${id}`).addEventListener('input', Editor.update);
+            });
+            ['zoom','x','y','font'].forEach(id => {
+                document.getElementById(`slider-${id}`).addEventListener('input', Editor.update);
+            });
+            document.getElementById('filter-lang').addEventListener('change', Search.filter);
+            document.getElementById('filter-dump').addEventListener('change', Search.filter);
+        };
+
+        // --- 6. PRINT STUDIO (Millimeter Calibrated) ---
+        PrintStudio.init = () => {
+            PrintStudio.slots = new Array(12).fill(null);
+            PrintStudio.changeFormat();
+        };
+
+        // BUGFIX 5: Calibrated Presets
+        PrintStudio.getGeometry = (key) => {
+            const geo = {
+                // 43mm Münzkapseln: 3x4 Nutzen, 10mm Gaps, zentriert auf A4
+                '43-12': { w: 43, h: 43, cols: 3, rows: 4, ml: 30.5, mt: 47.5, gx: 10, gy: 10 },
+                
+                // Avery Zweckform L3415 / 5080 (40mm 24er Nutzen)
+                '40-24': { w: 40, h: 40, cols: 4, rows: 6, ml: 17.5, mt: 21.5, gx: 5, gy: 5 },
+                
+                // Avery 40mm 12er
+                '40-12': { w: 40, h: 40, cols: 3, rows: 4, ml: 35.0, mt: 50.0, gx: 10, gy: 10 },
+                
+                // Avery Zweckform 6223 (30mm 48er Nutzen): Ränder nach Datenblatt
+                '30-48': { w: 30, h: 30, cols: 6, rows: 8, ml: 15.0, mt: 28.5, gx: 0, gy: 0 },
+                
+                'custom': { w: 43, h: 43, cols: 3, rows: 4, ml: 30.5, mt: 47.5, gx: 10, gy: 10 }
+            };
+            const customInput = document.getElementById('custom-size-input');
+            const conf = geo[key] || geo['43-12'];
+            if (key === 'custom') {
+                const cVal = parseInt(customInput.value) || 43;
+                conf.w = cVal; conf.h = cVal;
+            }
+            return conf;
+        };
+
+        PrintStudio.changeFormat = () => {
+            const key = document.getElementById('print-format').value;
+            document.getElementById('custom-size-wrap').style.display = key === 'custom' ? 'flex' : 'none';
+            
+            const geo = PrintStudio.getGeometry(key);
+            const total = geo.cols * geo.rows;
+            
+            const old = PrintStudio.slots;
+            PrintStudio.slots = new Array(total).fill(null);
+            for (let i = 0; i < Math.min(old.length, total); i++) {
+                PrintStudio.slots[i] = old[i];
+            }
+            
+            PrintStudio.render();
+        };
+
+        PrintStudio.render = () => {
+            const grid = document.getElementById('sheet-grid');
+            grid.innerHTML = '';
+            
+            const key = document.getElementById('print-format').value;
+            const geo = PrintStudio.getGeometry(key);
+            
+            let count = 0;
+
+            PrintStudio.slots.forEach((data, index) => {
+                const col = index % geo.cols;
+                const row = Math.floor(index / geo.cols);
+                
+                const left = geo.ml + (col * (geo.w + geo.gx));
+                const top = geo.mt + (row * (geo.h + geo.gy));
+
+                const slot = document.createElement('div');
+                slot.className = 'slot';
+                slot.style.left = `${left}mm`;
+                slot.style.top = `${top}mm`;
+                slot.style.width = `${geo.w}mm`;
+                slot.style.height = `${geo.h}mm`;
+                
+                slot.ondragover = e => { e.preventDefault(); slot.classList.add('drag-over'); };
+                slot.ondragleave = () => slot.classList.remove('drag-over');
+                slot.ondrop = e => {
+                    e.preventDefault();
+                    slot.classList.remove('drag-over');
+                    const from = parseInt(e.dataTransfer.getData('text'));
+                    if (from !== index && !isNaN(from)) {
+                        const t = PrintStudio.slots[from];
+                        PrintStudio.slots[from] = PrintStudio.slots[index];
+                        PrintStudio.slots[index] = t;
+                        PrintStudio.render();
+                    }
+                };
+
+                if (data) {
+                    count++;
+                    const s = document.createElement('div');
+                    s.className = 'sticker';
+                    s.draggable = true;
+                    s.ondragstart = e => e.dataTransfer.setData('text', index);
+
+                    const fScale = data.state.fontSize / 100;
+                    
+                    const img = document.createElement('img');
+                    img.src = typeof data.pic === 'string' ? data.pic : '';
+                    img.alt = '';
+                    img.style.cssText = `width:100%;height:100%;object-fit:contain;position:absolute;transform:translate(${Number(data.state.x)||0}%, ${Number(data.state.y)||0}%) scale(${(Number(data.state.zoom)||100)/100})`;
+                    s.appendChild(img);
+
+                    const svgNS = 'http://www.w3.org/2000/svg';
+                    const svg = document.createElementNS(svgNS, 'svg');
+                    svg.setAttribute('viewBox', '0 0 100 100');
+                    svg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
+
+                    const makePath = (id, d) => {
+                        const path = document.createElementNS(svgNS, 'path');
+                        path.setAttribute('id', id); path.setAttribute('d', d); path.setAttribute('fill', 'none');
+                        return path;
+                    };
+                    svg.appendChild(makePath(`p-t-${index}`, 'M 16,50 A 34,34 0 0,1 84,50'));
+                    svg.appendChild(makePath(`p-u-${index}`, 'M 22,50 A 28,28 0 0,0 78,50'));
+                    svg.appendChild(makePath(`p-b-${index}`, 'M 14,50 A 36,36 0 0,0 86,50'));
+
+                    const makeText = (size, fill, pathId, text) => {
+                        const node = document.createElementNS(svgNS, 'text');
+                        node.setAttribute('font-size', size); node.setAttribute('font-weight', 'bold');
+                        node.setAttribute('fill', fill); node.setAttribute('text-anchor', 'middle');
+                        const tp = document.createElementNS(svgNS, 'textPath');
+                        tp.setAttribute('href', `#${pathId}`); tp.setAttribute('startOffset', '50%'); tp.setAttribute('letter-spacing', '0.1em');
+                        tp.textContent = text || ''; node.appendChild(tp); return node;
+                    };
+                    svg.appendChild(makeText((7.5*fScale).toFixed(1), '#e11d48', `p-t-${index}`, data.series));
+                    svg.appendChild(makeText((5*fScale).toFixed(1), '#64748b', `p-u-${index}`, data.uid ? 'ID: '+data.uid : ''));
+                    svg.appendChild(makeText((6.5*fScale).toFixed(1), '#0f172a', `p-b-${index}`, data.title));
+                    s.appendChild(svg);
+
+                    const actions = document.createElement('div');
+                    actions.className = 'sticker-actions';
+                    const del = document.createElement('button');
+                    del.className = 's-btn del'; del.textContent = '✕';
+                    del.onclick = (ev) => { ev.stopPropagation(); PrintStudio.slots[index] = null; PrintStudio.render(); };
+                    actions.appendChild(del); s.appendChild(actions);
+                    slot.appendChild(s);
+                }
+                grid.appendChild(slot);
+            });
+            document.getElementById('print-count').textContent = count;
+        };
+
+        PrintStudio.addCurrentToSheet = async () => {
+            const data = { ...Editor.current, state: { ...Editor.state } };
+            const emptyIdx = PrintStudio.slots.findIndex(s => s === null);
+            if (emptyIdx > -1) {
+                PrintStudio.slots[emptyIdx] = data;
+                UI.showToast(`Cover auf Position ${emptyIdx+1} platziert!`);
+                App.switchView('print');
+            } else {
+                UI.showToast("Druckbogen ist voll!");
+            }
+        };
+
+        PrintStudio.clear = () => {
+            PrintStudio.slots.fill(null);
+            PrintStudio.render();
+            UI.showToast("Druckbogen geleert.");
+        };
+
+        // --- 7. STORAGE & PROJECT PERSISTENCE ---
+        Storage.saveProject = () => {
+            const p = {
+                version: 2.12,
+                format: document.getElementById('print-format').value,
+                slots: PrintStudio.slots
+            };
+            const blob = new Blob([JSON.stringify(p)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'TagGen_Phoenix_Project.json';
+            a.click();
+            UI.showToast("Projektdatei exportiert.");
+        };
+
+        Storage.loadProject = (e) => {
+            const input = e.target;
+            const file = input.files && input.files[0];
+            if (!file) return;
+            const r = new FileReader();
+            r.onload = ev => {
+                try {
+                    const p = JSON.parse(ev.target.result);
+                    const validFormats = ['43-12','40-24','40-12','30-48','custom'];
+                    if (!p || typeof p !== 'object' || !Array.isArray(p.slots) || p.slots.length > 200) throw new Error('slots');
+                    const format = validFormats.includes(p.format) ? p.format : '43-12';
+                    document.getElementById('print-format').value = format;
+                    const geo = PrintStudio.getGeometry(format);
+                    const total = geo.cols * geo.rows;
+                    PrintStudio.slots = new Array(total).fill(null);
+                    for (let i = 0; i < Math.min(p.slots.length, total); i++) {
+                        const item = p.slots[i];
+                        if (!item || typeof item !== 'object') continue;
+                        PrintStudio.slots[i] = {
+                            series: String(item.series ?? ''), title: String(item.title ?? ''), uid: String(item.uid ?? ''),
+                            pic: typeof item.pic === 'string' ? item.pic : '',
+                            state: {
+                                zoom: Number.isFinite(Number(item.state?.zoom)) ? Number(item.state.zoom) : 100,
+                                x: Number.isFinite(Number(item.state?.x)) ? Number(item.state.x) : 0,
+                                y: Number.isFinite(Number(item.state?.y)) ? Number(item.state.y) : 0,
+                                fontSize: Number.isFinite(Number(item.state?.fontSize)) ? Number(item.state.fontSize) : 100
+                            }
+                        };
+                    }
+                    PrintStudio.changeFormat();
+                    UI.showToast('Projekt erfolgreich geladen!');
+                } catch(err) {
+                    console.warn('Project import rejected:', err);
+                    UI.showToast('Ungültige Projektdatei.');
+                } finally {
+                    input.value = '';
+                }
+            };
+            r.onerror = () => { input.value = ''; UI.showToast('Projektdatei konnte nicht gelesen werden.'); };
+            r.readAsText(file);
+        };
+
+        // --- 8. NFC & HARDWARE PROTOCOL ---
+        NfcStudio.setMode = (mode) => {
+            NfcStudio.mode = mode;
+            document.getElementById('hw-usb').classList.toggle('active', mode === 'usb');
+            document.getElementById('hw-ble').classList.toggle('active', mode === 'ble');
+        };
+
+        NfcStudio.connect = async () => {
+            if (NfcStudio.mode === 'usb') {
+                try {
+                    NfcStudio.port = await navigator.serial.requestPort();
+                    await NfcStudio.port.open({ baudRate: 115200 });
+                    NfcStudio.writer = NfcStudio.port.writable.getWriter();
+                    document.getElementById('nfc-conn-status').innerHTML = '<span style="color:var(--status-exact)">🟢 USB Verbunden</span>';
+                    UI.showToast("ESP32 via USB verbunden.");
+                } catch(e) { UI.showToast("USB-Verbindungsfehler."); }
+            } else {
+                try {
+                    NfcStudio.bleDevice = await navigator.bluetooth.requestDevice({
+                        filters: [{ namePrefix: 'NFC' }, { namePrefix: 'ESP' }],
+                        optionalServices: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e']
+                    });
+                    const server = await NfcStudio.bleDevice.gatt.connect();
+                    const srv = await server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
+                    NfcStudio.bleChar = await srv.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e');
+                    document.getElementById('nfc-conn-status').innerHTML = '<span style="color:var(--status-exact)">🟢 BLE Verbunden</span>';
+                    UI.showToast("ESP32 via Bluetooth verbunden.");
+                } catch(e) { UI.showToast("BLE-Verbindungsfehler."); }
+            }
+        };
+
+        NfcStudio.flashTag = async () => {
+            const uid = Editor.current.uid;
+            if (!uid) return UI.showToast("Keine Audio-ID geladen!");
+            
+            const uidHex = uid.length >= 14 ? uid.toUpperCase() : "E00403" + uid.padStart(10, '0').toUpperCase();
+            const cmd = `{"cmd":"write_magic_tag","uid":"${uidHex}"}\n`;
+            const payload = new TextEncoder().encode(cmd);
+
+            try {
+                if (NfcStudio.mode === 'usb' && NfcStudio.writer) await NfcStudio.writer.write(payload);
+                else if (NfcStudio.mode === 'ble' && NfcStudio.bleChar) await NfcStudio.bleChar.writeValue(payload);
+                else return UI.showToast("Bitte erst Hardware verbinden!");
+                UI.showToast("Flash-Kommando gesendet!");
+            } catch(e) { UI.showToast("Übertragungsfehler."); }
+        };
+
+        // --- 9. APP VIEW ROUTING ---
+        App.switchView = (view) => {
+            document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
+            document.querySelectorAll('.workspace').forEach(w => w.classList.remove('active'));
+            document.getElementById(`view-${view}`).classList.add('active');
+            
+            if (view === 'print') PrintStudio.render();
+        };
+
+        // DOM Entrypoint
+        window.onload = () => {
+            Editor.initDragDrop();
+            PrintStudio.init();
+            Data.init();
+            
+            document.getElementById('search-input').addEventListener('input', Search.filter);
+            document.getElementById('print-format').addEventListener('change', PrintStudio.changeFormat);
+        };
+    </script>
+</body>
+</html>
