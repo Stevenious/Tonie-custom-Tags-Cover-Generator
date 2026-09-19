@@ -185,8 +185,4 @@ Veröffentlicht unter der [MIT License](LICENSE)[cite: 10].
 *Disclaimer: TagGen Studio V2 ist ein unabhängiges Open-Source-Projekt von Maker für Maker. Alle Markennamen, Warenzeichen und Produktabbildungen (z. B. Toniebox®, Tonies®) sind Eigentum der jeweiligen Rechteinhaber und dienen hier ausschließlich der Identifikation und Kompatibilitätsbeschreibung.*
 
 
-Möchtest du, dass ich dir direkt die passende `README.md`-Datei als Download generiere, oder sollen wir noch ein Code-Beispiel für den ESP32-UART-Empfangs-Sketch mit aufnehmen?
-
-
-
 Soll ein Troubleshooting-Abschnitt ergänzt werden, falls der COM-Port des ESP32 unter Windows nicht erkannt wird (z. B. CH340 / CP2102 Treiber)?
