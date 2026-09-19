@@ -690,7 +690,12 @@
             <button class="view-btn active" id="btn-view-design" onclick="App.switchView('design')">🎨 Editor</button>
             <button class="view-btn" id="btn-view-print" onclick="App.switchView('print')">🖨️ Print Studio</button>
         </div>
-        <div class="header-info" id="db-counter">Lade Datenbank...</div>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <div class="header-info" id="db-counter">Lade Datenbank...</div>
+            <button onclick="App.forceFlipperUpdate()" title="Flipper-Dumps aktualisieren" style="background: none; border: none; cursor: pointer; font-size: 16px; opacity: 0.6; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6">
+                🔄
+            </button>
+        </div>
     </header>
 
     <div class="app-container">
@@ -840,14 +845,63 @@
             },
 
             async loadFlipperIndex() {
+                const cacheKey = 'flipper_index_cache';
+                const timeKey = 'flipper_index_time';
+                const now = Date.now();
+                
+                // 1. Cache prüfen (24 Stunden gültig)
+                const cached = localStorage.getItem(cacheKey);
+                const cachedTime = localStorage.getItem(timeKey);
+                
+                if (cached && cachedTime && (now - cachedTime < 24 * 60 * 60 * 1000)) {
+                    State.flipperIndex = JSON.parse(cached);
+                    console.log("Flipper-Index aus Cache geladen:", State.flipperIndex.length);
+                    return;
+                }
+
+                // 2. Live-Abgleich von GitHub API
                 try {
-                    const res = await fetch('flipper_index.json');
+                    const res = await fetch('https://api.github.com/repos/nortakales/flipper-zero-tonies/git/trees/main?recursive=1');
                     if (res.ok) {
-                        State.flipperIndex = await res.json();
+                        const data = await res.json();
+                        // Filtere nur .nfc Dateien und extrahiere den reinen Dateinamen
+                        const nfcFiles = data.tree
+                            .filter(file => file.path.endsWith('.nfc'))
+                            .map(file => {
+                                const parts = file.path.split('/');
+                                return parts[parts.length - 1]; 
+                            });
+                        
+                        State.flipperIndex = nfcFiles;
+                        
+                        // Im Cache speichern
+                        localStorage.setItem(cacheKey, JSON.stringify(nfcFiles));
+                        localStorage.setItem(timeKey, now.toString());
+                        console.log("Flipper-Index live aktualisiert:", nfcFiles.length);
+                        return;
                     }
                 } catch(e) {
-                    console.warn("Flipper Index konnte nicht geladen werden", e);
+                    console.warn("GitHub API Fetch fehlgeschlagen, versuche Fallback...", e);
                 }
+
+                // 3. Fallback auf lokale Datei (falls API-Limit erreicht)
+                try {
+                    const fallbackRes = await fetch('flipper_index.json');
+                    if (fallbackRes.ok) {
+                        State.flipperIndex = await fallbackRes.json();
+                        console.log("Flipper-Index (Fallback) geladen");
+                    }
+                } catch(e) {
+                    console.error("Kein Flipper-Index gefunden.", e);
+                }
+            },
+
+            async forceFlipperUpdate() {
+                localStorage.removeItem('flipper_index_time'); // Cache invalidieren
+                showToast("Suche nach neuen Flipper-Dumps...");
+                await this.loadFlipperIndex();
+                Editor.update(); // Vorschau aktualisieren
+                showToast(`Aktualisiert! ${State.flipperIndex.length} Dumps gefunden.`);
             },
 
             switchView(view) {
