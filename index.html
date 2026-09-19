@@ -727,6 +727,11 @@
                             <text font-size="6.5" font-weight="bold" fill="#0f172a" text-anchor="middle">
                                 <textPath href="#path-bottom" startOffset="50%" id="svg-text-bottom" letter-spacing="0.15em"></textPath>
                             </text>
+                            <!-- Flipper Zero NFC Badge (wird dynamisch eingeblendet) -->
+                            <g id="flipper-badge" style="display: none;">
+                                <circle cx="50" cy="75" r="5" fill="#FF8200"/>
+                                <path d="M47.5 76.5 A 3 3 0 0 1 52.5 76.5 M46 74.5 A 5 5 0 0 1 54 74.5 M48.5 78.5 A 1.5 1.5 0 0 1 51.5 78.5" stroke="white" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+                            </g>
                         </svg>
                     </div>
                     <div style="font-size: 11px; color: var(--text-muted); text-align: center;">
@@ -815,19 +820,33 @@
                 fontSize: 100,
                 showSerie: true,
                 showTitle: true,
-                showUid: false
+                showUid: false,
+                hasFlipperDump: false
             },
             printSlots: new Array(12).fill(null),
-            labelSize: '40' // Standard 40mm
+            labelSize: '40', // Standard 40mm
+            flipperIndex: []
         };
 
         const App = {
             async init() {
                 await Library.loadData();
+                await App.loadFlipperIndex();
                 Editor.initDragDrop();
                 PrintStudio.renderSheet();
                 if (State.db.length > 0) {
                     App.loadToEditor(State.db[0]);
+                }
+            },
+
+            async loadFlipperIndex() {
+                try {
+                    const res = await fetch('flipper_index.json');
+                    if (res.ok) {
+                        State.flipperIndex = await res.json();
+                    }
+                } catch(e) {
+                    console.warn("Flipper Index konnte nicht geladen werden", e);
                 }
             },
 
@@ -1097,6 +1116,21 @@
                 State.currentDesign.showTitle = document.getElementById('check-title').checked;
                 State.currentDesign.showUid = document.getElementById('check-uid').checked;
 
+                State.currentDesign.hasFlipperDump = false;
+                
+                if (State.flipperIndex.length > 0) {
+                    const uidMatch = State.currentDesign.uid && 
+                                     State.flipperIndex.some(f => f.includes(State.currentDesign.uid));
+                    
+                    const cleanTitle = State.currentDesign.title.toLowerCase().replace(/[^a-z0-9]/g, "");
+                    const titleMatch = cleanTitle.length > 3 && 
+                                       State.flipperIndex.some(f => f.toLowerCase().replace(/[^a-z0-9]/g, "").includes(cleanTitle));
+
+                    State.currentDesign.hasFlipperDump = uidMatch || titleMatch;
+                }
+
+                document.getElementById('flipper-badge').style.display = State.currentDesign.hasFlipperDump ? 'block' : 'none';
+
                 document.getElementById('zoom-val').innerText = State.currentDesign.zoom + '%';
 
                 const img = document.getElementById('preview-img');
@@ -1179,6 +1213,12 @@
                                     <text font-size="6.5" font-weight="bold" fill="#0f172a" text-anchor="middle">
                                         <textPath href="#p-bot-${index}" startOffset="50%" letter-spacing="0.15em">${slot.showTitle ? slot.title : ''}${slot.showUid && slot.uid ? ' • ' + slot.uid : ''}</textPath>
                                     </text>
+                                    ${slot.hasFlipperDump ? `
+                                    <g>
+                                        <circle cx="50" cy="75" r="5" fill="#FF8200"/>
+                                        <path d="M47.5 76.5 A 3 3 0 0 1 52.5 76.5 M46 74.5 A 5 5 0 0 1 54 74.5 M48.5 78.5 A 1.5 1.5 0 0 1 51.5 78.5" stroke="white" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+                                    </g>
+                                    ` : ''}
                                 </svg>
                             </div>
                             <div class="sticker-actions">
