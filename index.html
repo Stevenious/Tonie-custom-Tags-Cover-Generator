@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TagGen Studio V2 – Phoenix</title>
+    
+    <!-- ESP Web Tools für direkten Firmware-Flash aus dem Browser -->
+    <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+
     <style>
         :root {
             --primary: #e11d48;
@@ -693,6 +697,100 @@
         .sticker-action-btn.nfc:hover { background: #10b981; }
         .sticker-action-btn.delete:hover { background: #e11d48; }
 
+        /* DUMP STUDIO VIEW */
+        .dump-workspace {
+            display: none;
+            flex: 1;
+            background: #e2e8f0;
+            overflow-y: auto;
+            padding: 20px;
+            align-items: flex-start;
+            justify-content: center;
+        }
+        
+        .dump-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            max-width: 1000px;
+            width: 100%;
+        }
+
+        @media(min-width: 800px) {
+            .dump-container { grid-template-columns: 1fr 1fr; }
+        }
+
+        .dump-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .dump-card h3 {
+            color: var(--text-main);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .dump-card p {
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--text-muted);
+        }
+
+        .dump-info-box {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .dump-info-box strong { color: var(--text-main); }
+
+        .connection-toggle {
+            display: flex;
+            background: #e2e8f0;
+            padding: 4px;
+            border-radius: 8px;
+            gap: 4px;
+        }
+
+        .connection-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 8px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .connection-btn.active {
+            background: #ffffff;
+            color: var(--text-main);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
         /* TOAST NOTIFICATION */
         #toast {
             position: fixed;
@@ -774,6 +872,7 @@
         <div class="view-switcher">
             <button class="view-btn active" id="btn-view-design" onclick="App.switchView('design')">🎨 Editor</button>
             <button class="view-btn" id="btn-view-print" onclick="App.switchView('print')">🖨️ Print Studio</button>
+            <button class="view-btn" id="btn-view-dump" onclick="App.switchView('dump')" style="color: var(--flipper-orange);">📲 Dump Studio</button>
         </div>
         <div class="header-actions">
             <div class="header-info" id="db-counter">Lade Tonies...</div>
@@ -883,7 +982,7 @@
 
             <div class="control-group">
                 <span class="control-label">
-                    Bild-Transformation (Pro)
+                    Bild-Transformation
                     <button class="btn-secondary" style="padding: 2px 6px; font-size: 10px; border-radius: 4px; cursor: pointer;" onclick="Editor.resetTransform()">Reset</button>
                 </span>
                 <div class="input-group">
@@ -927,6 +1026,79 @@
             </div>
             <div class="a4-sheet" id="print-sheet"></div>
         </div>
+
+        <!-- DUMP STUDIO VIEW (FELD 4) -->
+        <div class="dump-workspace" id="workspace-dump">
+            <div class="dump-container">
+                <!-- CARD 1: FIRMWARE FLASHER -->
+                <div class="dump-card">
+                    <h3>🛠️ 1. ESP32 Web-Flasher</h3>
+                    <p>
+                        Apple iOS blockiert native Magic Tag Schreibbefehle via WebNFC, und Android ist oft beschränkt. 
+                        <strong>Die Lösung:</strong> Ein ESP32 + PN5180 als Brücke!
+                    </p>
+                    <div style="background: #fffbeb; padding: 12px; border-radius: 8px; border: 1px solid #fde68a; font-size: 12px; color: #92400e;">
+                        Verbinde dein ESP32 Entwicklerboard per USB. Klicke auf "Connect", um die <a href="https://github.com/RFIDfriend/NFC-Archiver" target="_blank" style="color: var(--primary);">NFC-Archiver Firmware</a> von RFIDfriend direkt aus dem Browser zu installieren.
+                    </div>
+                    
+                    <div style="display: flex; justify-content: center; padding: 20px 0;">
+                        <esp-web-install-button manifest="https://raw.githubusercontent.com/RFIDfriend/NFC-Archiver/main/flash/manifest.json"></esp-web-install-button>
+                    </div>
+                    <p style="font-size: 11px; text-align: center; color: var(--text-muted);">
+                        (Firmware-Flash erfordert Chrome/Edge auf Windows, Mac oder Linux)
+                    </p>
+                </div>
+
+                <!-- CARD 2: TAG WRITER -->
+                <div class="dump-card">
+                    <h3>📲 2. Web Tag-Writer</h3>
+                    <p>
+                        Kopple dein Gerät mit dem NFC Archiver, um den SLIX-L Magic Tag drahtlos oder per USB zu beschreiben.
+                    </p>
+
+                    <!-- CONNECTION TOGGLE (USB / BLE) -->
+                    <div class="connection-toggle">
+                        <button class="connection-btn active" id="btn-conn-usb" onclick="DumpStudio.setConnectionType('usb')">🔌 USB (Desktop)</button>
+                        <button class="connection-btn" id="btn-conn-ble" onclick="DumpStudio.setConnectionType('ble')">📡 Bluetooth (Mobile)</button>
+                    </div>
+                    
+                    <div class="dump-info-box" style="margin-top: 5px;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Aktueller Tonie:</span>
+                            <strong id="dump-target-name">Kein Tonie gewählt</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span>Target UID:</span>
+                            <strong id="dump-target-uid">Keine UID</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; margin-top: 5px; padding-top: 5px; border-top: 1px dashed #cbd5e1;">
+                            <span>Dump Status:</span>
+                            <strong id="dump-status-badge">🔴 Kein Dump</strong>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0;">
+                        <span id="hardware-status" style="font-weight: bold; color: #e11d48; font-size: 13px;">🔴 Nicht verbunden</span>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn btn-secondary" onclick="DumpStudio.disconnectHardware()" style="padding: 6px 12px; font-size: 11px;">Trennen</button>
+                            <button class="btn" id="btn-hardware-connect" style="background: #10b981; padding: 6px 12px; font-size: 11px;" onclick="DumpStudio.connectHardware()">Verbinden</button>
+                        </div>
+                    </div>
+                    
+                    <p id="ios-ble-hint" style="display:none; font-size: 11px; text-align: center; margin-top: -10px; color: #d97706;">
+                        ⚠️ iOS-Nutzer: Nutze den <strong>Bluefy</strong> WebBLE Browser aus dem App Store.
+                    </p>
+
+                    <button class="btn" style="width: 100%; padding: 12px; font-size: 14px; justify-content: center; background: var(--flipper-orange);" onclick="DumpStudio.writeTag()">
+                        ⚡ Dump auf Magic Tag flashen
+                    </button>
+                    <p style="font-size: 11px; text-align: center; color: var(--text-muted);">
+                        Leg den Tag auf das PN5180 Modul und klicke auf Flashen.
+                    </p>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <div id="toast">Nachricht</div>
@@ -953,7 +1125,7 @@
             },
             formatKey: '43-12',
             printSlots: new Array(12).fill(null),
-            flipperIndex: [] // Enthält { path, name, folder, isGerman }
+            flipperIndex: []
         };
 
         const App = {
@@ -963,7 +1135,6 @@
                 Editor.initDragDrop();
                 PrintStudio.renderSheet();
 
-                // Erstes Tonie laden ohne die Sidebar zu schliessen
                 if (State.db.length > 0) {
                     App.loadToEditor(State.db[0], true);
                 }
@@ -974,7 +1145,6 @@
                 const timeKey = 'flipper_index_time_v2';
                 const now = Date.now();
 
-                // 1. Lokaler Cache (24h)
                 const cached = localStorage.getItem(cacheKey);
                 const cachedTime = localStorage.getItem(timeKey);
                 if (cached && cachedTime && (now - cachedTime < 24 * 60 * 60 * 1000)) {
@@ -983,7 +1153,6 @@
                     return;
                 }
 
-                // 2. Live-Abgleich von GitHub API (primär 'master', dann 'main')
                 const branches = ['master', 'main'];
                 let loaded = false;
 
@@ -1020,7 +1189,6 @@
                     }
                 }
 
-                // 3. Fallback auf lokale statische Datei
                 if (!loaded) {
                     try {
                         const fallbackRes = await fetch('flipper_index.json');
@@ -1059,22 +1227,25 @@
             },
 
             switchView(view) {
-                const isPrint = view === 'print';
-                document.getElementById('btn-view-design').classList.toggle('active', !isPrint);
-                document.getElementById('btn-view-print').classList.toggle('active', isPrint);
+                document.getElementById('btn-view-design').classList.toggle('active', view === 'design');
+                document.getElementById('btn-view-print').classList.toggle('active', view === 'print');
+                document.getElementById('btn-view-dump').classList.toggle('active', view === 'dump');
                 
-                document.getElementById('workspace-design').style.display = isPrint ? 'none' : 'flex';
-                document.getElementById('workspace-print').style.display = isPrint ? 'flex' : 'none';
+                document.getElementById('workspace-design').style.display = view === 'design' ? 'flex' : 'none';
+                document.getElementById('workspace-print').style.display = view === 'print' ? 'flex' : 'none';
+                document.getElementById('workspace-dump').style.display = view === 'dump' ? 'flex' : 'none';
                 
                 if (window.innerWidth >= 1024) {
-                    document.getElementById('left-sidebar').classList.toggle('hidden-panel', isPrint);
-                    document.getElementById('right-sidebar').classList.toggle('hidden-panel', isPrint);
+                    const hideSides = view !== 'design';
+                    document.getElementById('left-sidebar').classList.toggle('hidden-panel', hideSides);
+                    document.getElementById('right-sidebar').classList.toggle('hidden-panel', hideSides);
                 } else {
                     document.getElementById('left-sidebar').classList.add('hidden-panel');
                     document.getElementById('right-sidebar').classList.remove('mobile-open');
                 }
 
-                if (isPrint) PrintStudio.renderSheet();
+                if (view === 'print') PrintStudio.renderSheet();
+                if (view === 'dump') DumpStudio.updatePreview();
             },
 
             toggleMobilePanel(panel) {
@@ -1128,7 +1299,6 @@
 
                 Editor.update();
 
-                // Wichtig: Beim ersten Öffnen die Bibliothek NICHT verstecken
                 if (!isInitial && window.innerWidth < 1024) {
                     document.getElementById('left-sidebar').classList.add('hidden-panel');
                 }
@@ -1149,6 +1319,194 @@
                     });
                 } catch (e) {
                     return url;
+                }
+            }
+        };
+
+        const DumpStudio = {
+            connType: 'usb', // 'usb' or 'ble'
+            
+            // Web Serial State
+            port: null,
+            writer: null,
+            
+            // Web Bluetooth State
+            bleDevice: null,
+            bleCharacteristic: null,
+
+            setConnectionType(type) {
+                this.connType = type;
+                document.getElementById('btn-conn-usb').classList.toggle('active', type === 'usb');
+                document.getElementById('btn-conn-ble').classList.toggle('active', type === 'ble');
+                
+                const btnConnect = document.getElementById('btn-hardware-connect');
+                const iosHint = document.getElementById('ios-ble-hint');
+                
+                if (type === 'usb') {
+                    btnConnect.innerText = '🔌 USB Verbinden';
+                    iosHint.style.display = 'none';
+                } else {
+                    btnConnect.innerText = '📡 BLE Verbinden';
+                    // Einfache iOS Erkennung für den Hinweis
+                    if (/iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream) {
+                        iosHint.style.display = 'block';
+                    } else {
+                        iosHint.style.display = 'none';
+                    }
+                }
+            },
+
+            updatePreview() {
+                const title = State.currentDesign.title || 'Kein Tonie gewählt';
+                const uid = State.currentDesign.uid || 'Keine UID';
+                document.getElementById('dump-target-name').innerText = title;
+                document.getElementById('dump-target-uid').innerText = uid;
+                
+                const hasDump = State.currentDesign.hasFlipperDump;
+                const statusBadge = document.getElementById('dump-status-badge');
+                if (hasDump) {
+                    statusBadge.innerHTML = '<span style="color:#10b981;">🟢 Flipper Dump verfügbar</span>';
+                } else {
+                    statusBadge.innerHTML = '<span style="color:#e11d48;">🔴 Kein Dump (Nur UID Flash)</span>';
+                }
+            },
+
+            async connectHardware() {
+                if (this.connType === 'usb') {
+                    await this.connectSerial();
+                } else {
+                    await this.connectBLE();
+                }
+            },
+
+            async disconnectHardware() {
+                if (this.connType === 'usb') {
+                    await this.disconnectSerial();
+                } else {
+                    await this.disconnectBLE();
+                }
+            },
+
+            // --- WEB SERIAL (USB) ---
+            async connectSerial() {
+                try {
+                    if (!navigator.serial) {
+                        showToast("Web Serial API nicht unterstützt (Nutze Chrome/Edge auf Desktop/Android).");
+                        return;
+                    }
+                    this.port = await navigator.serial.requestPort();
+                    await this.port.open({ baudRate: 115200 });
+                    this.writer = this.port.writable.getWriter();
+                    this.setHardwareStatus(true, 'USB');
+                    showToast("ESP32 (USB) erfolgreich verbunden!");
+                } catch (e) {
+                    console.error("Serial Error:", e);
+                    showToast("Verbindung fehlgeschlagen oder abgebrochen.");
+                }
+            },
+
+            async disconnectSerial() {
+                if (this.writer) {
+                    this.writer.releaseLock();
+                    this.writer = null;
+                }
+                if (this.port) {
+                    await this.port.close();
+                    this.port = null;
+                }
+                this.setHardwareStatus(false);
+                showToast("USB Verbindung getrennt.");
+            },
+
+            // --- WEB BLUETOOTH (BLE) ---
+            async connectBLE() {
+                try {
+                    if (!navigator.bluetooth) {
+                        showToast("Web Bluetooth API nicht unterstützt (Nutze WebBLE auf iOS).");
+                        return;
+                    }
+                    showToast("Suche nach NFC-Archiver...");
+                    
+                    // Wir filtern nach typischen ESP32 / Nordic UART Namen und Services
+                    this.bleDevice = await navigator.bluetooth.requestDevice({
+                        acceptAllDevices: false,
+                        filters: [{ namePrefix: 'NFC' }, { namePrefix: 'ESP' }, { namePrefix: 'Archiver' }],
+                        optionalServices: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e'] // Nordic UART Service
+                    });
+
+                    this.bleDevice.addEventListener('gattserverdisconnected', () => this.setHardwareStatus(false));
+                    
+                    const server = await this.bleDevice.gatt.connect();
+                    const service = await server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
+                    
+                    // RX Characteristic (aus Sicht des ESP32, also TX vom Browser)
+                    this.bleCharacteristic = await service.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e');
+                    
+                    this.setHardwareStatus(true, 'BLE');
+                    showToast("ESP32 (Bluetooth) erfolgreich verbunden!");
+                } catch (e) {
+                    console.error("BLE Error:", e);
+                    showToast("Bluetooth Verbindung fehlgeschlagen.");
+                }
+            },
+
+            async disconnectBLE() {
+                if (this.bleDevice && this.bleDevice.gatt.connected) {
+                    this.bleDevice.gatt.disconnect();
+                }
+                this.bleCharacteristic = null;
+                this.bleDevice = null;
+                this.setHardwareStatus(false);
+                showToast("Bluetooth Verbindung getrennt.");
+            },
+
+            setHardwareStatus(isConnected, type = '') {
+                const statusEl = document.getElementById('hardware-status');
+                if (isConnected) {
+                    statusEl.innerHTML = `<span style="color:#10b981; font-weight:bold;">🟢 Verbunden mit ESP32 (${type})</span>`;
+                } else {
+                    statusEl.innerHTML = `<span style="color:#e11d48; font-weight:bold;">🔴 Nicht verbunden</span>`;
+                }
+            },
+
+            // --- GENERAL WRITE LOGIC ---
+            async writeTag() {
+                if (this.connType === 'usb' && !this.writer) {
+                    showToast("Fehler: Bitte zuerst via USB verbinden!");
+                    return;
+                }
+                if (this.connType === 'ble' && !this.bleCharacteristic) {
+                    showToast("Fehler: Bitte zuerst via Bluetooth verbinden!");
+                    return;
+                }
+
+                const uid = State.currentDesign.uid;
+                if (!uid) {
+                    showToast("Fehler: Keine UID im Editor hinterlegt!");
+                    return;
+                }
+
+                showToast(`Sende Flash-Befehl via ${this.connType.toUpperCase()}...`);
+                
+                const uidHex = uid.length >= 14 ? uid.toUpperCase() : "E00403" + uid.padStart(10, '0').toUpperCase();
+                
+                // Aufbau analog zu Standard seriellen ASCII-Befehlen des NFC Archivers
+                // Anpassbar je nach finaler Firmware von RFIDfriend
+                const command = `{"cmd": "write_magic_tag", "uid": "${uidHex}"}
+`;
+                const encoder = new TextEncoder();
+                const payload = encoder.encode(command);
+
+                try {
+                    if (this.connType === 'usb') {
+                        await this.writer.write(payload);
+                    } else if (this.connType === 'ble') {
+                        await this.bleCharacteristic.writeValue(payload);
+                    }
+                    setTimeout(() => showToast("✅ Flash-Kommando gesendet!"), 500);
+                } catch (e) {
+                    console.error("Schreibfehler:", e);
+                    showToast("Fehler beim Senden der Daten.");
                 }
             }
         };
@@ -1237,22 +1595,15 @@
                     const dFolder = clean(dump.folder);
                     const dPath = clean(dump.path);
 
-                    // 1. UID Abgleich
                     if (tId && tId.length >= 6 && dPath.includes(tId)) return true;
-
-                    // 2. Serie und Titel Abgleich
                     if (tSerie && tTitle && tTitle.length >= 4) {
                         if (dFolder.includes(tSerie) && (dName.includes(tTitle) || tTitle.includes(dName))) {
                             return true;
                         }
                     }
-
-                    // 3. Eindeutiger Titel-Abgleich
                     if (tTitle && tTitle.length >= 5) {
                         if (dName.includes(tTitle) || tTitle.includes(dName)) return true;
                     }
-
-                    // 4. Pfad-Kombination
                     if (tSerie && tSerie.length >= 4 && tTitle && tTitle.length >= 3) {
                         if (dPath.includes(tSerie) && dName.includes(tTitle.slice(0, 8))) return true;
                     }
@@ -1275,7 +1626,6 @@
                     );
                 }
 
-                // Filter nach Flipper-Dump vorhanden
                 if (State.filterOnlyWithDump) {
                     data = data.filter(item => this.isDumpAvailable(item));
                 }
@@ -1398,13 +1748,11 @@
                 State.currentDesign.showTitle = document.getElementById('check-title').checked;
                 State.currentDesign.showUid = document.getElementById('check-uid').checked;
 
-                // Labels aktualisieren
                 document.getElementById('zoom-val').innerText = State.currentDesign.zoom + '%';
                 document.getElementById('posx-val').innerText = (State.currentDesign.posX > 0 ? '+' : '') + State.currentDesign.posX + '%';
                 document.getElementById('posy-val').innerText = (State.currentDesign.posY > 0 ? '+' : '') + State.currentDesign.posY + '%';
                 document.getElementById('fontsize-val').innerText = State.currentDesign.fontSize + '%';
 
-                // Flipper Dump Check
                 State.currentDesign.hasFlipperDump = Library.isDumpAvailable({
                     serie: State.currentDesign.serie,
                     title: State.currentDesign.title,
@@ -1413,12 +1761,10 @@
 
                 document.getElementById('flipper-badge').style.display = State.currentDesign.hasFlipperDump ? 'block' : 'none';
 
-                // Bild Transformation
                 const img = document.getElementById('preview-img');
                 img.src = State.currentDesign.pic || '';
                 img.style.transform = `translate(${State.currentDesign.posX}%, ${State.currentDesign.posY}%) scale(${State.currentDesign.zoom / 100})`;
 
-                // Schriftgroessen Skalierung
                 const fScale = State.currentDesign.fontSize / 100;
                 const topFontSize = (7.5 * fScale).toFixed(1);
                 const botFontSize = (6.5 * fScale).toFixed(1);
@@ -1428,10 +1774,14 @@
                 document.getElementById('svg-text-bottom-node').setAttribute('font-size', botFontSize);
                 document.getElementById('svg-text-uid-node').setAttribute('font-size', uidFontSize);
 
-                // Texte rendern (Serie oben, UID separat oberhalb des Titels, Titel unten)
                 document.getElementById('svg-text-top').textContent = State.currentDesign.showSerie ? State.currentDesign.serie : '';
-                document.getElementById('svg-text-uid').textContent = (State.currentDesign.showUid && State.currentDesign.uid) ? `ID: ${State.currentDesign.uid}` : '';
+                document.getElementById('svg-text-uid').textContent = (State.currentDesign.showUid && State.currentDesign.uid) ? 'ID: ' + State.currentDesign.uid : '';
                 document.getElementById('svg-text-bottom').textContent = State.currentDesign.showTitle ? State.currentDesign.title : '';
+                
+                // Update Dump Studio falls es offen ist
+                if (document.getElementById('workspace-dump').style.display === 'flex') {
+                    DumpStudio.updatePreview();
+                }
             },
 
             async addToPrintStudio() {
@@ -1453,19 +1803,15 @@
         const PrintStudio = {
             getFormatConfig(formatKey) {
                 switch(formatKey) {
-                    case '40-24':
-                        return { cols: 4, rows: 6, count: 24, sizeMm: 40, padding: '15mm 10mm' };
-                    case '40-12':
-                        return { cols: 3, rows: 4, count: 12, sizeMm: 40, padding: '15mm' };
-                    case '30-48':
-                        return { cols: 6, rows: 8, count: 48, sizeMm: 30, padding: '12mm 8mm' };
+                    case '40-24': return { cols: 4, rows: 6, count: 24, sizeMm: 40, padding: '15mm 10mm' };
+                    case '40-12': return { cols: 3, rows: 4, count: 12, sizeMm: 40, padding: '15mm' };
+                    case '30-48': return { cols: 6, rows: 8, count: 48, sizeMm: 30, padding: '12mm 8mm' };
                     case 'custom': {
                         const customSize = parseInt(document.getElementById('custom-size-input').value) || 43;
                         return { cols: 3, rows: 4, count: 12, sizeMm: customSize, padding: '15mm' };
                     }
                     case '43-12':
-                    default:
-                        return { cols: 3, rows: 4, count: 12, sizeMm: 43, padding: '15mm' };
+                    default: return { cols: 3, rows: 4, count: 12, sizeMm: 43, padding: '15mm' };
                 }
             },
 
@@ -1475,14 +1821,11 @@
                 customWrap.style.display = (val === 'custom') ? 'flex' : 'none';
 
                 const config = this.getFormatConfig(val);
-                
-                // Slots anpassen und vorhandene Inhalte beibehalten
                 const oldSlots = State.printSlots;
                 State.printSlots = new Array(config.count).fill(null);
                 for (let i = 0; i < Math.min(oldSlots.length, config.count); i++) {
                     State.printSlots[i] = oldSlots[i];
                 }
-
                 this.renderSheet();
             },
 
@@ -1502,17 +1845,12 @@
                     slotDiv.className = 'print-slot';
                     slotDiv.dataset.index = index;
 
-                    // Slot Nummerierung
                     const numSpan = document.createElement('span');
                     numSpan.className = 'print-slot-number';
                     numSpan.innerText = `${index + 1}`;
                     slotDiv.appendChild(numSpan);
 
-                    // Drag & Drop Ziel
-                    slotDiv.ondragover = (e) => {
-                        e.preventDefault();
-                        slotDiv.classList.add('drag-over');
-                    };
+                    slotDiv.ondragover = (e) => { e.preventDefault(); slotDiv.classList.add('drag-over'); };
                     slotDiv.ondragleave = () => slotDiv.classList.remove('drag-over');
                     slotDiv.ondrop = (e) => {
                         e.preventDefault();
@@ -1520,7 +1858,6 @@
                         const fromIndex = parseInt(e.dataTransfer.getData('text/plain'));
                         if (isNaN(fromIndex) || fromIndex === index) return;
 
-                        // Positionen tauschen
                         const temp = State.printSlots[fromIndex];
                         State.printSlots[fromIndex] = State.printSlots[index];
                         State.printSlots[index] = temp;
@@ -1536,9 +1873,7 @@
                         sticker.style.height = `${config.sizeMm}mm`;
                         sticker.draggable = true;
 
-                        sticker.ondragstart = (e) => {
-                            e.dataTransfer.setData('text/plain', index);
-                        };
+                        sticker.ondragstart = (e) => { e.dataTransfer.setData('text/plain', index); };
 
                         const fScale = (slot.fontSize || 100) / 100;
                         const topFontSize = (7.5 * fScale).toFixed(1);
@@ -1625,7 +1960,8 @@
                 const uids = State.printSlots
                     .filter(s => s !== null)
                     .map((s, i) => `${i+1}. ${s.serie} - ${s.title} (UID: ${s.uid || 'Keine'})`)
-                    .join('\n');
+                    .join('
+');
 
                 if (!uids) {
                     showToast("Keine Sticker auf dem Bogen vorhanden");
