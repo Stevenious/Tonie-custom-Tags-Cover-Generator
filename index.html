@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TagGen Studio V2.1.2 – Phoenix</title>
+    <title>TagGen Studio V2.1.3 – Phoenix</title>
     
     <!-- ESP Web Tools -->
     <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
@@ -21,11 +21,11 @@
             --text-muted: #64748b;
             --text-subtle: #94a3b8;
             
-            /* Match Status Colors */
-            --status-exact: #10b981;
-            --status-strong: #3b82f6;
-            --status-fuzzy: #f59e0b;
-            --status-none: #94a3b8;
+            /* Status Colors */
+            --status-exact: #10b981;  /* Green */
+            --status-strong: #3b82f6; /* Blue */
+            --status-fuzzy: #f59e0b;  /* Yellow */
+            --status-none: #94a3b8;   /* Gray */
             --flipper-orange: #ff8200;
         }
 
@@ -257,8 +257,8 @@
         }
 
         .card-img-wrap {
-            width: 68px;
-            height: 68px;
+            width: 72px;
+            height: 72px;
             background: var(--bg-canvas);
             border-radius: 7px;
             flex-shrink: 0;
@@ -303,24 +303,6 @@
         }
         .fav-btn.active { color: #eab308; }
 
-        .match-badge {
-            position: absolute;
-            top: 3px;
-            left: 3px;
-            color: #ffffff;
-            font-size: 9px;
-            font-weight: 700;
-            padding: 1px 5px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
-            pointer-events: none;
-            letter-spacing: 0.02em;
-            z-index: 5;
-        }
-
         .card-content {
             flex: 1;
             display: flex;
@@ -344,7 +326,7 @@
             font-size: 13px;
             font-weight: 600;
             color: var(--text-main);
-            margin: 1px 0 4px 0;
+            margin: 2px 0 6px 0;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -354,19 +336,20 @@
             font-size: 11px;
             color: var(--text-muted);
             display: flex;
-            align-items: center;
-            gap: 6px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            flex-direction: column;
+            gap: 4px;
         }
 
-        .status-dot {
-            width: 7px;
-            height: 7px;
-            border-radius: 50%;
-            display: inline-block;
-            flex-shrink: 0;
+        .match-badge {
+            display: inline-flex;
+            align-items: center;
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+            letter-spacing: 0.02em;
+            width: max-content;
         }
 
         /* Center: Canvas View */
@@ -701,13 +684,14 @@
                 <!-- Left Column: Tonie Library -->
                 <div class="sidebar-lib">
                     <div class="lib-header">
-                        <!-- Restored & Repaired Tabs -->
+                        <!-- Navigation Tabs -->
                         <div class="lib-tabs">
                             <button class="lib-tab active" id="tab-db" onclick="Library.switchTab('db')">Datenbank</button>
                             <button class="lib-tab" id="tab-fav" onclick="Library.switchTab('fav')">Favoriten</button>
                         </div>
 
-                        <input type="text" class="search-input" id="search-input" placeholder="🔎 Tonie, Serie oder Audio-ID suchen...">
+                        <!-- Update: User-friendly Placeholder -->
+                        <input type="text" class="search-input" id="search-input" placeholder="Tonie, Serie oder Titel suchen ...">
                         
                         <div class="filter-row">
                             <select class="filter-select" id="filter-lang">
@@ -716,11 +700,12 @@
                                 <option value="en-us">Englisch</option>
                                 <option value="fr-fr">Französisch</option>
                             </select>
+                            <!-- Update: Wording adjusted for Tonie community -->
                             <select class="filter-select" id="filter-dump">
                                 <option value="all">Alle Tonies</option>
-                                <option value="exact">🟢 Exakter Dump</option>
-                                <option value="strong">🔵 Strong Match</option>
-                                <option value="fuzzy">🟡 Fuzzy Match</option>
+                                <option value="exact">🟢 ID-Match (Exakt)</option>
+                                <option value="strong">🔵 Titel-Match</option>
+                                <option value="fuzzy">🟡 Ähnlicher Treffer</option>
                             </select>
                         </div>
                     </div>
@@ -763,7 +748,7 @@
                         <h3>Texte & Typografie</h3>
                         <div class="input-group">
                             <label>Serie (Oben)</label>
-                            <input type="text" id="input-serie">
+                            <input type="text" id="input-series">
                         </div>
                         <div class="input-group">
                             <label>Titel (Unten)</label>
@@ -898,7 +883,7 @@
 
     <!-- Modular Script Architecture -->
     <script>
-        // --- 1. NAMESPACES & REPAIRED MODULE DEFINITIONS ---
+        // --- 1. NAMESPACES ---
         const App = {};
         const Data = {
             tonies: [],          
@@ -910,29 +895,48 @@
             }
         };
         
-        // BUGFIX 1: Explicitly Define Library Module
-        const Library = {
-            activeTab: 'db'
-        };
-
+        const Library = { activeTab: 'db' };
         const Search = {};
         const UI = {};
         const Editor = {
             state: { zoom: 100, x: 0, y: 0, fontSize: 100 },
-            current: { serie: '', title: '', uid: '', pic: '' }
+            current: { series: '', title: '', uid: '', pic: '' }
         };
         const PrintStudio = { slots: [] };
         const NfcStudio = { mode: 'usb', port: null, writer: null, bleDevice: null, bleChar: null };
         const Storage = {};
 
-        // Utility: String Normalization
-        const clean = s => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        // Utility: Robust String Normalization (Handles Umlauts/Accents)
+        const clean = s => {
+            if (!s) return '';
+            return s.normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]/g, '');
+        };
+
+        // Utility: Extract all possible IDs securely
+        const getAllIds = (item1, item2) => {
+            const ids = new Set();
+            const check = (obj) => {
+                if (!obj) return;
+                ['audio_id', 'id', 'hash', 'ids'].forEach(key => {
+                    if (obj[key]) {
+                        if (Array.isArray(obj[key])) obj[key].forEach(i => ids.add(String(i)));
+                        else ids.add(String(obj[key]));
+                    }
+                });
+            };
+            check(item1);
+            check(item2);
+            return Array.from(ids).filter(Boolean);
+        };
 
         // --- 2. DATA LAYER (Normalized V1 + V2 Community Data) ---
         Data.init = async () => {
             UI.showToast("Synchronisiere Tonie-Datenbank...");
             try {
-                // BUGFIX 2: Load Correct toniesV2.json URL
+                // Fetch Official V1 & V2
                 const [resV1, resV2] = await Promise.all([
                     fetch('https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json'),
                     fetch('https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/toniesV2.json').catch(() => null)
@@ -948,7 +952,6 @@
                     const dataV2 = await resV2.json();
                     const arrV2 = Array.isArray(dataV2) ? dataV2 : Object.values(dataV2);
                     arrV2.forEach(item => {
-                        // V2 can have array of IDs or single hash
                         const rawId = item.audio_id || item.id || item.hash;
                         if (Array.isArray(rawId)) {
                             rawId.forEach(id => Data.v2Map.set(String(id), item));
@@ -964,10 +967,7 @@
                     const primaryId = Array.isArray(rawId) ? String(rawId[0] || '') : String(rawId || '');
                     
                     const v2 = Data.v2Map.get(primaryId) || {};
-                    
-                    const audioIds = Array.isArray(v2.audio_id || v1.audio_id) 
-                        ? (v2.audio_id || v1.audio_id).map(String) 
-                        : [primaryId].filter(Boolean);
+                    const audioIds = getAllIds(v1, v2);
 
                     const series = v2.series || v1.series || v1.title || 'Unbekannt';
                     const episode = v2.episode || v1.episodes || v1.episode || v1.title || '';
@@ -980,10 +980,8 @@
                     return {
                         id: primaryId,
                         audioIds: audioIds,
-                        hash: v2.hash || v1.hash || '',
                         series: series,
                         title: episode,
-                        image: image,
                         pic: image,
                         language: language,
                         category: v2.category || v1.category || '',
@@ -1009,8 +1007,8 @@
         };
 
         Data.loadDumpIndex = async () => {
-            const cacheKey = 'phoenix_dump_index_v2_1_2';
-            const timeKey = 'phoenix_dump_time_v2_1_2';
+            const cacheKey = 'phoenix_dump_index_v2_1_3';
+            const timeKey = 'phoenix_dump_time_v2_1_3';
             const now = Date.now();
 
             const cached = localStorage.getItem(cacheKey);
@@ -1034,13 +1032,12 @@
                 }
             }
 
-            // O(1) Sets aufbauen
+            // O(1) Sets build
             nfcFiles.forEach(path => {
                 const parts = path.split('/');
                 const filename = clean(parts[parts.length-1].replace('.nfc',''));
                 const folder = parts.length > 1 ? clean(parts[parts.length-2]) : '';
                 
-                // Hex ID matches
                 const idMatch = path.match(/[a-fA-F0-9]{8,16}/);
                 if (idMatch) Data.dumpIndex.exactIds.add(idMatch[0].toLowerCase());
                 
@@ -1049,11 +1046,10 @@
             });
         };
 
-        // BUGFIX 3: Categorized Exact -> Strong -> Fuzzy Dump Matching
         Data.getMatchQuality = (tonie) => {
-            if (!tonie || !tonie.id) return 'none';
+            if (!tonie) return 'none';
             
-            // 1. Exact Audio-ID match
+            // 1. Exact Audio-ID match across all known IDs
             const idsToCheck = (tonie.audioIds && tonie.audioIds.length > 0) ? tonie.audioIds : [tonie.id];
             for (const id of idsToCheck) {
                 if (id && id.length >= 6 && Data.dumpIndex.exactIds.has(id.toLowerCase())) {
@@ -1068,7 +1064,7 @@
                 return 'strong';
             }
 
-            // 3. Fuzzy Match (Filename match)
+            // 3. Fuzzy Match (Filename match only)
             if (tTitle.length > 4 && Data.dumpIndex.titles.has(tTitle)) {
                 return 'fuzzy';
             }
@@ -1093,6 +1089,7 @@
 
             let results = Data.tonies;
 
+            // Safe Check Bugfix #1 Avoid crash on undefined series
             if (Library.activeTab === 'fav') results = results.filter(t => favs.includes(t.id));
             if (lang) results = results.filter(t => t.language === lang);
             
@@ -1102,9 +1099,9 @@
 
             if (query) {
                 results = results.filter(t => 
-                    t.series.toLowerCase().includes(query) || 
-                    t.title.toLowerCase().includes(query) || 
-                    t.id.toLowerCase().includes(query)
+                    (t.series && t.series.toLowerCase().includes(query)) || 
+                    (t.title && t.title.toLowerCase().includes(query)) || 
+                    (t.audioIds && t.audioIds.some(id => id.toLowerCase().includes(query)))
                 );
             }
 
@@ -1134,23 +1131,6 @@
                 img.onerror = () => { img.classList.add('fallback'); };
                 imgWrap.appendChild(img);
 
-                // BUGFIX 4: Missing Badge Classes
-                if (matchQ !== 'none') {
-                    const badge = document.createElement('div');
-                    badge.className = 'match-badge';
-                    if (matchQ === 'exact') {
-                        badge.textContent = '🟢 Exakt';
-                        badge.style.background = 'var(--status-exact)';
-                    } else if (matchQ === 'strong') {
-                        badge.textContent = '🔵 Strong';
-                        badge.style.background = 'var(--status-strong)';
-                    } else {
-                        badge.textContent = '🟡 Fuzzy';
-                        badge.style.background = 'var(--status-fuzzy)';
-                    }
-                    imgWrap.appendChild(badge);
-                }
-
                 const favBtn = document.createElement('button');
                 favBtn.className = `fav-btn ${isFav ? 'active' : ''}`;
                 favBtn.textContent = isFav ? '★' : '☆';
@@ -1171,13 +1151,25 @@
                 const meta = document.createElement('div');
                 meta.className = 'card-meta';
                 
-                let dotColor = 'var(--status-none)';
-                if (matchQ === 'exact') dotColor = 'var(--status-exact)';
-                if (matchQ === 'strong') dotColor = 'var(--status-strong)';
-                if (matchQ === 'fuzzy') dotColor = 'var(--status-fuzzy)';
-                
-                // Community Data Display (Lang, Tracks, Audio-ID)
-                meta.innerHTML = `<span class="status-dot" style="background:${dotColor}"></span> ${item.language.toUpperCase()} • ${item.tracks} Tracks • ID: ${item.id.slice(0, 8)}...`;
+                const infoText = document.createElement('span');
+                infoText.textContent = `${item.language.toUpperCase()} · ${item.tracks} Tracks`;
+                meta.appendChild(infoText);
+
+                if (matchQ !== 'none') {
+                    const badge = document.createElement('div');
+                    badge.className = 'match-badge';
+                    if (matchQ === 'exact') {
+                        badge.textContent = '🟢 ID-Match';
+                        badge.style.background = 'var(--status-exact)';
+                    } else if (matchQ === 'strong') {
+                        badge.textContent = '🔵 Titel-Match';
+                        badge.style.background = 'var(--status-strong)';
+                    } else {
+                        badge.textContent = '🟡 Ähnlicher Treffer';
+                        badge.style.background = 'var(--status-fuzzy)';
+                    }
+                    meta.appendChild(badge);
+                }
 
                 content.appendChild(serie);
                 content.appendChild(title);
@@ -1209,7 +1201,7 @@
             Editor.current = { ...item };
             Editor.resetTransform();
             
-            document.getElementById('input-serie').value = item.series;
+            document.getElementById('input-series').value = item.series;
             document.getElementById('input-title').value = item.title;
             document.getElementById('input-uid').value = item.id;
             
@@ -1227,7 +1219,7 @@
         };
 
         Editor.update = () => {
-            Editor.current.series = document.getElementById('input-serie').value;
+            Editor.current.series = document.getElementById('input-series').value;
             Editor.current.title = document.getElementById('input-title').value;
             Editor.current.uid = document.getElementById('input-uid').value;
             
@@ -1260,9 +1252,9 @@
             
             const matchQ = Data.getMatchQuality({ ...Editor.current, id: Editor.current.uid });
             const sBadge = document.getElementById('nfc-target-status');
-            if (matchQ === 'exact') sBadge.innerHTML = '<span style="color:var(--status-exact)">🟢 Exakter Dump</span>';
-            else if (matchQ === 'strong') sBadge.innerHTML = '<span style="color:var(--status-strong)">🔵 Strong Match</span>';
-            else if (matchQ === 'fuzzy') sBadge.innerHTML = '<span style="color:var(--status-fuzzy)">🟡 Fuzzy Match</span>';
+            if (matchQ === 'exact') sBadge.innerHTML = '<span style="color:var(--status-exact)">🟢 ID-Match</span>';
+            else if (matchQ === 'strong') sBadge.innerHTML = '<span style="color:var(--status-strong)">🔵 Titel-Match</span>';
+            else if (matchQ === 'fuzzy') sBadge.innerHTML = '<span style="color:var(--status-fuzzy)">🟡 Ähnlicher Treffer</span>';
             else sBadge.innerHTML = '<span style="color:var(--text-muted)">⚪ Kein Dump (Nur UID Flash)</span>';
         };
 
@@ -1279,7 +1271,7 @@
                 }
             };
             
-            ['serie','title','uid'].forEach(id => {
+            ['series','title','uid'].forEach(id => {
                 document.getElementById(`input-${id}`).addEventListener('input', Editor.update);
             });
             ['zoom','x','y','font'].forEach(id => {
@@ -1295,7 +1287,6 @@
             PrintStudio.changeFormat();
         };
 
-        // BUGFIX 5: Calibrated Presets
         PrintStudio.getGeometry = (key) => {
             const geo = {
                 // 43mm Münzkapseln: 3x4 Nutzen, 10mm Gaps, zentriert auf A4
@@ -1425,7 +1416,7 @@
         // --- 7. STORAGE & PROJECT PERSISTENCE ---
         Storage.saveProject = () => {
             const p = {
-                version: 2.12,
+                version: 2.13,
                 format: document.getElementById('print-format').value,
                 slots: PrintStudio.slots
             };
