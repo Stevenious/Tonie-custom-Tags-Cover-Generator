@@ -3,26 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TagGen Studio V2.6 LTS – Community Edition</title>
+    <title>TagGen Studio V2.6.1 LTS – Community Edition</title>
     
     <!-- ESP Web Tools -->
     <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
 
     <style>
         /* =========================================
-           1. DESIGN SYSTEM & VARIABLES
+           1. DESIGN SYSTEM & VARIABLES (Sprint 1)
            ========================================= */
         :root {
             --bg: #0f172a;
             --panel: #182335;
             --panel-light: #22304a;
+
             --accent: #22C55E;
             --accent-hover: #16a34a;
             --accent2: #F59E0B;
+
             --text: #F8FAFC;
             --muted: #94A3B8;
+
             --border: #334155;
             --radius: 18px;
+
             --shadow: 0 8px 24px rgba(0,0,0,.35);
             
             /* Status Colors */
@@ -347,9 +351,6 @@
             color: var(--muted);
             font-weight: 500;
         }
-        .status-dot {
-            width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0;
-        }
 
         /* --- PAGINATION --- */
         .pagination {
@@ -476,6 +477,7 @@
         .slot {
             position: absolute; border: 1px dashed #cbd5e1; display: flex; align-items: center;
             justify-content: center; border-radius: 50%; box-sizing: border-box; background: #fafafa;
+            transition: background 0.15s, border-color 0.15s;
         }
         .slot.drag-over { background: #ffe4e6; border-color: var(--accent); }
         .sticker { width: 100%; height: 100%; border-radius: 50%; position: relative; overflow: hidden; background: #fff; cursor: grab; }
@@ -496,12 +498,8 @@
         .s-btn:hover { background: rgba(255,255,255,0.2); }
         .s-btn.del:hover { background: var(--primary); }
 
-        /* Format Select in Dark Mode */
         select.btn-secondary {
-            appearance: none;
-            background-color: var(--panel-light);
-            color: white;
-            outline: none;
+            appearance: none; background-color: var(--panel-light); color: white; outline: none;
         }
         select.btn-secondary option { background: var(--panel); }
 
@@ -549,9 +547,10 @@
         /* --- MOBILE FIXES --- */
         @media (max-width: 900px) {
             .asset-grid { grid-template-columns: 1fr; }
-            .phoenix-header { flex-direction: column; align-items: flex-start; gap: 16px; padding: 20px; }
+            .phoenix-header { flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px; }
             .version-pill { display: none; }
             .view-switcher { width: 100%; overflow-x: auto; }
+            body { padding: 8px; }
             .sidebar-lib { width: 100%; position: absolute; height: 100%; z-index: 30; }
             .sidebar-controls { position: absolute; right: 0; height: 100%; z-index: 30; transform: translateX(100%); transition: 0.3s; width: 100%; }
             .sidebar-controls.mobile-open { transform: translateX(0); }
@@ -578,7 +577,7 @@
          ========================================= -->
     <header class="phoenix-header">
         <div class="logo-wrap">
-            <svg viewBox="0 0 64 64" class="phoenix-logo">
+            <svg class="phoenix-logo" viewBox="0 0 64 64">
                 <circle cx="32" cy="32" r="28" fill="#22C55E"/>
                 <path fill="#FDBA21" d="M20 32L28 16L34 28L46 32L34 36L28 48L22 36L14 32Z"/>
             </svg>
@@ -596,7 +595,7 @@
 
         <div class="header-actions">
             <span class="db-status" id="db-status">Lade Datenbank...</span>
-            <span class="version-pill">V2.6 LTS</span>
+            <span class="version-pill">V2.6.1 LTS</span>
         </div>
     </header>
 
@@ -630,7 +629,7 @@
                     
                     <div class="asset-scroll">
                         <div class="asset-grid" id="asset-grid">
-                            <!-- JS injected cards via DocumentFragment -->
+                            <!-- JS injected cards -->
                         </div>
                         
                         <div class="pagination" id="pagination-controls" style="display: none;">
@@ -792,7 +791,7 @@
                         <button class="btn-secondary" onclick="NfcStudio.connect()">Hardware Verbinden</button>
                     </div>
 
-                    <button class="btn" style="width:100%; background:var(--flipper-orange); padding:14px;" onclick="NfcStudio.flashTag()">
+                    <button class="btn" style="width:100%; background:var(--flipper-orange); padding:14px; border:none; color:white; border-radius:12px; font-weight:600; font-size:14px; cursor:pointer;" onclick="NfcStudio.flashTag()">
                         ⚡ Magic Tag (SLIX) Flashen
                     </button>
                 </div>
@@ -829,12 +828,11 @@
     <div id="toast">Nachricht</div>
 
     <!-- =========================================
-         JAVASCRIPT ARCHITECTURE (SPRINT 2-5 MERGED)
+         JAVASCRIPT ARCHITECTURE
          ========================================= -->
     <script>
         const App = {
             init() {
-                console.log("TagGen Phoenix V2.6 LTS starting...");
                 Editor.initDragDrop();
                 PrintStudio.init();
                 Data.init();
@@ -851,13 +849,26 @@
         };
 
         const Data = {
-            tonies: [],          
-            v2Map: new Map(),    
-            dumpIndex: { exactIds: new Set(), strong: new Set(), titles: new Set() }
+            tonies: [],
+            v2Map: new Map(),
+            searchIndex: [],
+            dumpIndex: {
+                exactIds: new Set(),
+                strong: new Set(),
+                titles: new Set()
+            }
         };
-        
-        const Library = { currentPage: 1, itemsPerPage: 8, filteredData: [] };
-        const Search = { activeChip: 'all' };
+
+        const Library = {
+            currentPage: 1,
+            itemsPerPage: 8,
+            filteredData: []
+        };
+
+        const Search = {
+            activeChip: 'all'
+        };
+
         const History = {
             add(id) {
                 let recent = JSON.parse(localStorage.getItem('phoenix_recent') || '[]');
@@ -870,43 +881,138 @@
                 return JSON.parse(localStorage.getItem('phoenix_recent') || '[]');
             }
         };
-        const UI = { activeDrawerItem: null };
-        const Editor = { state: { zoom: 100, x: 0, y: 0, fontSize: 100 }, current: { series: '', title: '', uid: '', pic: '' } };
+
+        const UI = {
+            activeDrawerItem: null
+        };
+
+        const Editor = {
+            state: { zoom: 100, x: 0, y: 0, fontSize: 100 },
+            current: { series: '', title: '', uid: '', pic: '' }
+        };
+
         const PrintStudio = { slots: [] };
         const NfcStudio = { mode: 'usb', port: null, writer: null, bleDevice: null, bleChar: null };
         const Storage = {};
 
-        // --- ROBUST PARSER ---
-        const clean = s => {
-            if (!s) return '';
-            return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        /* =========================================================
+           DATABASE NORMALIZATION (Sprint 2 Data Patch)
+           ========================================================= */
+
+        const clean = value => {
+            if (value === null || value === undefined) return '';
+            return String(value)
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .toLowerCase()
+                .replace(/[^a-z0-9]/g, '');
         };
 
-        const getTrackCount = (item) => {
-            if(Array.isArray(item.tracks)) return item.tracks.length;
-            if(Array.isArray(item["track-desc"])) return item["track-desc"].length;
-            if(typeof item.tracks === "number") return item.tracks;
-            if(typeof item.tracks === "string"){
-                if(item.tracks.toLowerCase() === "yes") return item["track-desc"]?.length ?? 0;
-                const n = parseInt(item.tracks);
-                if(!isNaN(n)) return n;
+        const asText = value => {
+            if (value === null || value === undefined) return '';
+            if (Array.isArray(value)) return value.map(asText).filter(Boolean).join(' ');
+            if (typeof value === 'object') return Object.values(value).map(asText).filter(Boolean).join(' ');
+            return String(value);
+        };
+
+        const getFirstValue = (...values) => {
+            for (const value of values) {
+                if (value !== undefined && value !== null && value !== '') return value;
+            }
+            return '';
+        };
+
+        const getTrackCount = item => {
+            if (!item || typeof item !== 'object') return 0;
+            if (Array.isArray(item.tracks)) return item.tracks.length;
+            if (Array.isArray(item["track-desc"])) return item["track-desc"].length;
+            if (typeof item.tracks === 'number') return Number.isFinite(item.tracks) ? item.tracks : 0;
+            if (typeof item.tracks === 'string') {
+                const value = item.tracks.trim().toLowerCase();
+                if (value === 'yes') return Array.isArray(item["track-desc"]) ? item["track-desc"].length : 0;
+                const numeric = parseInt(value, 10);
+                if (!Number.isNaN(numeric)) return numeric;
             }
             return 0;
         };
 
-        const getAllIds = (item1, item2) => {
+        const getAllIds = (...items) => {
             const ids = new Set();
-            const check = (obj) => {
-                if (!obj) return;
-                ['audio_id', 'id', 'hash', 'ids'].forEach(k => {
-                    if (obj[k]) {
-                        if (Array.isArray(obj[k])) obj[k].forEach(i => ids.add(String(i)));
-                        else ids.add(String(obj[k]));
+            const scan = obj => {
+                if (!obj || typeof obj !== 'object') return;
+                const keys = ['audio_id','audioId','id','hash','ids','track_id','trackId','track_ids','trackIds'];
+                keys.forEach(key => {
+                    const value = obj[key];
+                    if (value === undefined || value === null || value === '') return;
+                    if (Array.isArray(value)) {
+                        value.forEach(id => {
+                            if (id !== undefined && id !== null && id !== '') ids.add(String(id));
+                        });
+                    } else {
+                        ids.add(String(value));
                     }
                 });
+                ['tracks', 'track-desc'].forEach(key => {
+                    const tracks = obj[key];
+                    if (!Array.isArray(tracks)) return;
+                    tracks.forEach(track => {
+                        if (!track || typeof track !== 'object') return;
+                        ['id','audio_id','audioId','hash','track_id','trackId'].forEach(idKey => {
+                            const value = track[idKey];
+                            if (value !== undefined && value !== null && value !== '') ids.add(String(value));
+                        });
+                    });
+                });
             };
-            check(item1); check(item2);
+            items.forEach(scan);
             return Array.from(ids).filter(Boolean);
+        };
+
+        Data.buildV2Map = data => {
+            Data.v2Map.clear();
+            const list = Array.isArray(data) ? data : Object.values(data || {});
+            list.forEach(item => {
+                if (!item || typeof item !== 'object') return;
+                getAllIds(item).forEach(id => Data.v2Map.set(String(id), item));
+            });
+        };
+
+        Data.normalize = (v1, v2 = {}) => {
+            const allIds = Array.from(new Set([...getAllIds(v1), ...getAllIds(v2)]));
+            const primaryId = String(getFirstValue(
+                Array.isArray(v2?.audio_id) ? v2.audio_id[0] : v2?.audio_id,
+                Array.isArray(v1?.audio_id) ? v1.audio_id[0] : v1?.audio_id,
+                v2?.id, v1?.id, v2?.hash, v1?.hash, ''
+            ));
+
+            const series = asText(getFirstValue(v2?.series, v1?.series, v1?.brand, v2?.title, v1?.title, 'Unbekannt'));
+            const title = asText(getFirstValue(v2?.episode, v2?.episodes, v2?.subtitle, v1?.episodes, v1?.episode, v1?.subtitle, v1?.title, ''));
+            const category = asText(getFirstValue(v2?.category, v1?.category, ''));
+            const language = asText(getFirstValue(v2?.language, v1?.language, 'de-de')).toLowerCase();
+            const age = asText(getFirstValue(v2?.age, v1?.age, ''));
+            const picture = asText(getFirstValue(v2?.image, v2?.picture, v2?.pic, v1?.picture, v1?.pic, v1?.image, ''));
+            const tracks = Math.max(getTrackCount(v2), getTrackCount(v1));
+
+            const searchableValues = [
+                primaryId, ...allIds, series, title, category, language, age,
+                asText(v1?.description), asText(v1?.["track-desc"]), asText(v1?.tracks),
+                asText(v2?.description), asText(v2?.["track-desc"]), asText(v2?.tracks),
+                asText(v1?.publisher), asText(v1?.artist), asText(v1?.album),
+                asText(v2?.publisher), asText(v2?.artist), asText(v2?.album)
+            ];
+
+            const searchText = clean(searchableValues.filter(Boolean).join(' '));
+
+            return {
+                id: primaryId, audioIds: allIds, series, title, pic: picture,
+                language, category, age, tracks, searchText
+            };
+        };
+
+        Data.buildSearchIndex = () => {
+            Data.searchIndex = Data.tonies.map(item => ({
+                id: item.id, item, text: item.searchText || ''
+            }));
         };
 
         Data.init = async () => {
@@ -918,45 +1024,49 @@
                 ]);
 
                 let rawV1 = resV1.ok ? await resV1.json() : [];
-                if (!Array.isArray(rawV1)) rawV1 = Object.values(rawV1);
+                if (!Array.isArray(rawV1)) rawV1 = Object.values(rawV1 || {});
 
+                let rawV2 = [];
                 if (resV2 && resV2.ok) {
-                    const dataV2 = await resV2.json();
-                    (Array.isArray(dataV2) ? dataV2 : Object.values(dataV2)).forEach(item => {
-                        const rawId = item.audio_id || item.id || item.hash;
-                        if (Array.isArray(rawId)) rawId.forEach(id => Data.v2Map.set(String(id), item));
-                        else if (rawId) Data.v2Map.set(String(rawId), item);
-                    });
+                    rawV2 = await resV2.json();
+                    if (!Array.isArray(rawV2)) rawV2 = Object.values(rawV2 || {});
                 }
 
-                Data.tonies = rawV1.map(v1 => {
-                    const primaryId = String((Array.isArray(v1.audio_id) ? v1.audio_id[0] : v1.audio_id) || v1.id || v1.hash || '');
-                    const v2 = Data.v2Map.get(primaryId) || {};
-                    const series = v2.series || v1.series || v1.title || 'Unbekannt';
-                    const episode = v2.episode || v1.episodes || v1.episode || v1.title || '';
-                    const cat = v2.category || v1.category || '';
-                    const searchStr = clean(`${series} ${episode} ${cat} ${primaryId}`).toLowerCase();
+                Data.buildV2Map(rawV2);
 
-                    return {
-                        id: primaryId,
-                        audioIds: getAllIds(v1, v2),
-                        series: series,
-                        title: episode,
-                        pic: v2.image || v1.picture || v1.pic || v1.image || '',
-                        language: (v2.language || v1.language || 'de-de').toLowerCase(),
-                        category: cat,
-                        age: v2.age || v1.age || '',
-                        tracks: getTrackCount(v2) || getTrackCount(v1),
-                        searchText: searchStr
-                    };
-                }).filter(t => t.series);
+                const normalized = [];
+                rawV1.forEach(v1 => {
+                    if (!v1 || typeof v1 !== 'object') return;
+                    const v1Ids = getAllIds(v1);
+                    let v2 = null;
+                    for (const id of v1Ids) {
+                        v2 = Data.v2Map.get(String(id));
+                        if (v2) break;
+                    }
+                    if (!v2) {
+                        const primaryId = String(getFirstValue(Array.isArray(v1.audio_id) ? v1.audio_id[0] : v1.audio_id, v1.id, v1.hash, ''));
+                        if (primaryId) v2 = Data.v2Map.get(primaryId);
+                    }
+                    const item = Data.normalize(v1, v2 || {});
+                    if (item.series) normalized.push(item);
+                });
 
+                Data.tonies = normalized;
+
+                // De-duplicate primary IDs without losing original data
+                const unique = new Map();
+                Data.tonies.forEach(item => {
+                    if (!item.id) { unique.set(`anonymous-${unique.size}`, item); return; }
+                    if (!unique.has(item.id)) unique.set(item.id, item);
+                });
+                Data.tonies = Array.from(unique.values());
+
+                Data.buildSearchIndex();
                 document.getElementById('db-status').textContent = `${Data.tonies.length} Tonies`;
-                
+
                 await Data.loadDumpIndex();
                 Search.filter();
-                
-                // Load recent or first
+
                 const recent = History.get();
                 if (recent.length > 0) {
                     const last = Data.tonies.find(t => t.id === recent[0]);
@@ -967,6 +1077,7 @@
                 }
 
             } catch (error) {
+                console.error('Database initialization failed:', error);
                 UI.showToast("Offline-Modus aktiv.");
             }
         };
@@ -976,35 +1087,40 @@
             const timeKey = 'px_dump_time_2_6';
             const now = Date.now();
             const cached = localStorage.getItem(cacheKey);
-
             let nfcFiles = [];
-            if (cached && (now - parseInt(localStorage.getItem(timeKey)) < 86400000)) {
-                nfcFiles = JSON.parse(cached);
+
+            if (cached && (now - parseInt(localStorage.getItem(timeKey) || '0', 10)) < 86400000) {
+                try { nfcFiles = JSON.parse(cached); } catch { nfcFiles = []; }
             } else {
                 try {
-                    const res = await fetch(`https://api.github.com/repos/nortakales/flipper-zero-tonies/git/trees/master?recursive=1`);
+                    const res = await fetch('https://api.github.com/repos/nortakales/flipper-zero-tonies/git/trees/master?recursive=1');
                     if (res.ok) {
                         nfcFiles = (await res.json()).tree.filter(f => f.path && f.path.endsWith('.nfc')).map(f => f.path);
                         localStorage.setItem(cacheKey, JSON.stringify(nfcFiles));
                         localStorage.setItem(timeKey, now.toString());
                     }
-                } catch(e) {}
+                } catch (e) {}
             }
+
+            Data.dumpIndex.exactIds.clear();
+            Data.dumpIndex.strong.clear();
+            Data.dumpIndex.titles.clear();
 
             nfcFiles.forEach(path => {
                 const parts = path.split('/');
-                const filename = clean(parts[parts.length-1].replace('.nfc',''));
-                const folder = parts.length > 1 ? clean(parts[parts.length-2]) : '';
+                const filename = clean(parts[parts.length - 1].replace('.nfc', ''));
+                const folder = parts.length > 1 ? clean(parts[parts.length - 2]) : '';
                 const idMatch = path.match(/[a-fA-F0-9]{8,16}/);
+
                 if (idMatch) Data.dumpIndex.exactIds.add(idMatch[0].toLowerCase());
                 if (folder && filename) Data.dumpIndex.strong.add(folder + '||' + filename);
-                Data.dumpIndex.titles.add(filename);
+                if (filename) Data.dumpIndex.titles.add(filename);
             });
         };
 
-        Data.getMatchQuality = (tonie) => {
+        Data.getMatchQuality = tonie => {
             if (!tonie) return 'none';
-            const idsToCheck = (tonie.audioIds && tonie.audioIds.length > 0) ? tonie.audioIds : [tonie.id];
+            const idsToCheck = tonie.audioIds && tonie.audioIds.length > 0 ? tonie.audioIds : [tonie.id];
             for (const id of idsToCheck) {
                 if (id && id.length >= 6 && Data.dumpIndex.exactIds.has(id.toLowerCase())) return 'exact';
             }
@@ -1015,8 +1131,7 @@
             return 'none';
         };
 
-        // --- SEARCH & FILTER ---
-        Search.setChip = (chipId) => {
+        Search.setChip = chipId => {
             Search.activeChip = chipId;
             document.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.filter === chipId));
             Library.currentPage = 1;
@@ -1024,33 +1139,38 @@
         };
 
         Search.filter = () => {
-            const rawQuery = document.getElementById('search-input').value;
-            const query = clean(rawQuery);
+            const rawQuery = document.getElementById('search-input').value || '';
+            const queryParts = clean(rawQuery).split(/\s+/).filter(Boolean);
             const favs = JSON.parse(localStorage.getItem('phoenix_favs') || '[]');
             const recent = History.get();
-            
             let results = Data.tonies;
 
             if (Search.activeChip === 'fav') results = results.filter(t => favs.includes(t.id));
-            if (Search.activeChip === 'recent') {
-                // Keep history order
-                results = recent.map(id => Data.tonies.find(t => t.id === id)).filter(Boolean);
-            }
+            if (Search.activeChip === 'recent') results = recent.map(id => Data.tonies.find(t => t.id === id)).filter(Boolean);
             if (Search.activeChip === 'de') results = results.filter(t => t.language === 'de-de');
             if (Search.activeChip === 'en') results = results.filter(t => t.language === 'en-us');
             if (Search.activeChip === 'dump') results = results.filter(t => Data.getMatchQuality(t) !== 'none');
 
-            if (query) results = results.filter(t => t.searchText.includes(query));
+            if (queryParts.length > 0) {
+                const indexed = new Set(
+                    Data.searchIndex
+                        .filter(entry => queryParts.every(part => entry.text.includes(part)))
+                        .map(entry => entry.item.id)
+                );
+                results = results.filter(item => indexed.has(item.id));
+            }
 
             Library.filteredData = results;
             Library.currentPage = 1;
             UI.renderCards();
         };
 
+        // --- 3. UI RENDERING (Sprint 3) ---
         Library.nextPage = () => { 
             const max = Math.ceil(Library.filteredData.length / Library.itemsPerPage);
             if(Library.currentPage < max) { Library.currentPage++; UI.renderCards(); }
         };
+        
         Library.prevPage = () => { 
             if(Library.currentPage > 1) { Library.currentPage--; UI.renderCards(); }
         };
@@ -1061,7 +1181,6 @@
             if(e.key === 'ArrowRight') Library.nextPage();
         });
 
-        // --- UI & RENDERING ---
         UI.renderCards = () => {
             const grid = document.getElementById('asset-grid');
             const favs = JSON.parse(localStorage.getItem('phoenix_favs') || '[]');
@@ -1099,11 +1218,6 @@
                 img.src = item.pic || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
                 img.onerror = () => { img.classList.add('fallback'); };
                 imgWrap.appendChild(img);
-                
-                const overlay = document.createElement('div');
-                overlay.className = 'card-overlay';
-                overlay.textContent = '👀 Details';
-                imgWrap.appendChild(overlay);
 
                 const favBtn = document.createElement('button');
                 favBtn.className = `fav-btn ${isFav ? 'active' : ''}`;
@@ -1112,9 +1226,12 @@
                 card.appendChild(favBtn);
 
                 const content = document.createElement('div');
+                content.className = 'card-content';
+                
                 const title = document.createElement('div');
                 title.className = 'card-title';
                 title.textContent = item.title;
+                
                 const serie = document.createElement('div');
                 serie.className = 'card-series';
                 serie.textContent = item.series;
@@ -1131,6 +1248,7 @@
 
                 content.appendChild(title);
                 content.appendChild(serie);
+                
                 card.appendChild(imgWrap);
                 card.appendChild(content);
                 card.appendChild(meta);
@@ -1164,7 +1282,6 @@
             setTimeout(() => t.classList.remove('show'), 2500);
         };
         
-        // --- DRAWER ---
         UI.openDrawer = (item) => {
             UI.activeDrawerItem = item;
             document.getElementById('drawer-img').src = item.pic;
@@ -1179,7 +1296,7 @@
             const dDump = document.getElementById('drawer-dump');
             if(matchQ === 'exact') dDump.innerHTML = '<span style="color:var(--status-exact)">🟢 ID-Match</span>';
             else if(matchQ === 'strong') dDump.innerHTML = '<span style="color:var(--status-strong)">🔵 Titel-Match</span>';
-            else if(matchQ === 'fuzzy') dDump.innerHTML = '<span style="color:var(--status-fuzzy)">🟡 Fuzzy</span>';
+            else if(matchQ === 'fuzzy') dDump.innerHTML = '<span style="color:var(--status-fuzzy)">🟡 Ähnlich</span>';
             else dDump.innerHTML = '<span style="color:var(--status-none)">⚪ Kein Dump</span>';
 
             document.getElementById('drawer-overlay').classList.add('active');
@@ -1198,7 +1315,7 @@
             }
         };
 
-        // --- EDITOR ---
+        // --- 4. EDITOR STUDIO (Sprint 4) ---
         Editor.load = (item, silent=false) => {
             Editor.current = { ...item };
             Editor.resetTransform();
@@ -1246,17 +1363,6 @@
             document.getElementById('svg-text-top').textContent = Editor.current.series;
             document.getElementById('svg-text-uid').textContent = Editor.current.uid ? `ID: ${Editor.current.uid}` : '';
             document.getElementById('svg-text-bottom').textContent = Editor.current.title;
-            
-            // Sync NFC Studio
-            document.getElementById('nfc-target-title').textContent = Editor.current.title || 'Kein Titel';
-            document.getElementById('nfc-target-uid').textContent = Editor.current.uid || 'Keine UID';
-            
-            const matchQ = Data.getMatchQuality({ ...Editor.current, id: Editor.current.uid });
-            const sBadge = document.getElementById('nfc-target-status');
-            if (matchQ === 'exact') sBadge.innerHTML = '<span style="color:var(--status-exact)">🟢 ID-Match</span>';
-            else if (matchQ === 'strong') sBadge.innerHTML = '<span style="color:var(--status-strong)">🔵 Titel-Match</span>';
-            else if (matchQ === 'fuzzy') sBadge.innerHTML = '<span style="color:var(--status-fuzzy)">🟡 Ähnlicher Treffer</span>';
-            else sBadge.innerHTML = '<span style="color:var(--muted)">⚪ Kein Dump</span>';
         };
 
         Editor.initDragDrop = () => {
@@ -1276,7 +1382,7 @@
             ['zoom','x','y','font'].forEach(id => document.getElementById(`slider-${id}`).addEventListener('input', Editor.update));
         };
 
-        // --- 6. PRINT STUDIO ---
+        // --- 5. PRINT STUDIO & NFC (Sprint 5) ---
         PrintStudio.init = () => {
             PrintStudio.slots = new Array(12).fill(null);
             PrintStudio.changeFormat();
@@ -1399,7 +1505,6 @@
             UI.showToast("Druckbogen geleert.");
         };
 
-        // --- 7. STORAGE & PROJECT PERSISTENCE ---
         Storage.saveProject = () => {
             const p = {
                 version: 2.6,
@@ -1434,7 +1539,6 @@
             r.readAsText(file);
         };
 
-        // --- 8. NFC & HARDWARE PROTOCOL ---
         NfcStudio.setMode = (mode) => {
             NfcStudio.mode = mode;
             document.getElementById('hw-usb').classList.toggle('active', mode === 'usb');
