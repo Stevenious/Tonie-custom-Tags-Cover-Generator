@@ -1,188 +1,435 @@
-```
-  _____           _____            _____ _             _ _        __      _____  
- |_   _|_ _  __ _/ ____|          / ____| |           | (_)       \ \    / /__ \ 
-   | | / _` |/ _` | |  __  ___ _ _| (___ | |_ _   _  __| |_  ___   \ \  / /   ) |
-   | || (_| | (_| | | |_ |/ _ \ '_ \\___ \| __| | | |/ _` | |/ _ \   \ \/ /   / / 
-  _| |_\__,_|\__, | |__| |  __/ | | |___) | |_| |_| | (_| | | (_) |   \  /   / /_ 
- |_____|     |___/ \_____|\___|_| |_|_____/ \__|\__,_|\__,_|_|\___/     \/   |____|
-                                  [ P H O E N I X ]
-```
+🦅 TagGen Studio V2.6.6 LTS – Phoenix
 
-# 🏷️ TagGen Studio V2 – Phoenix
+Community Edition · Tonie Tag & NFC
 
-**High-Performance Client-Side Vector Label Designer, Print Layout Matrix & Web-Hardware NFC Flasher for Tonie Replacement Tags**[cite: 10, 14]
+TagGen Studio Phoenix ist ein browserbasierter Tonie Cover-, Tag- und NFC-Editor für die Community.
+Die Anwendung läuft vollständig als einzelne index.html und kann direkt über GitHub Pages bereitgestellt werden.
 
+V2.6.6 LTS – Phoenix
+Stabilitäts- und Community-Fokus · Single-File WebApp · GitHub Pages Ready
 
+⸻
 
+✨ Was ist TagGen Studio?
 
+TagGen Studio verbindet mehrere Werkzeuge rund um individuelle Tonie-Tags in einer einzigen WebApp:
 
-[]()
-[](LICENSE)
+* 🔎 Tonie-Datenbank durchsuchen
+* 🖼️ Cover auswählen und bearbeiten
+* ✏️ Serien-, Titel- und Audio-ID-Daten anpassen
+* ⭐ Favoriten verwalten
+* 🏷️ individuelle Cover für Tags erstellen
+* 🖨️ Druckbögen für verschiedene Tag-/Cover-Formate erstellen
+* 📡 NFC-Hardware über USB oder BLE ansprechen
+* 💾 Projekte speichern und wieder laden
+* 🔍 NFC-Dumps mit Datenbankeinträgen abgleichen
+* 📱 Responsive Oberfläche für Desktop und mobile Geräte
 
-[Live Demo](#-live-demo--deployment) • [Key Features](#-key-features) • [Hardware & Protocol](#-hardware-stack--architektur) • [Dos & Don'ts](#-community--maker-dos-and-donts) • [Print Setup](#-druckmatrix--masse) • [Credits](#-credits--ecosystem)
+Das Ziel von Phoenix ist eine möglichst einfache Oberfläche:
 
+Daten suchen → Cover bearbeiten → Druckbogen erstellen → NFC vorbereiten
 
+⸻
 
----
+🚀 Live-Version
 
-## ⚡ TL;DR
+Die aktuelle Community-Version kann direkt über GitHub Pages betrieben werden.
 
-**TagGen Studio V2 (Phoenix)** ist eine kompromisslose, vollständig clientseitige Single-Page-Applikation (SPA) für das Toniebox-Maker-Ökosystem[cite: 10, 14]. Die Suite vereint:
-1. **Multi-Path SVG Typography:** Perfekt zentrierter Kreissatz ohne Textkollisionen für Serien, UIDs und Titel[cite: 10, 14].
-2. **Dynamic Print Matrix:** Skalierbare A4-Druckbögen (Münzkapseln, Avery Zweckform) mit nativem Drag & Drop[cite: 10, 14].
-3. **Flipper Zero Cache Layer:** Live-Sync mit dem `flipper-zero-tonies`-Dump-Archiv via GitHub API v3[cite: 10, 14].
-4. **Dump Studio (Web-to-Hardware):** Direktes Beschreiben von ICODE SLIX Magic Tags (Block 0) aus dem Browser heraus über **ESP32 + NXP PN5180** – via Web Serial (USB) oder Web Bluetooth (BLE)[cite: 14].
+TagGen Studio Phoenix
 
----
+https://stevenious.github.io/Tonie-custom-Tags-Cover-Generator/
 
-## 🚀 Key Features
+⸻
 
-### 🎨 1. Curved Vector Engine (Editor)
-* **Separater 3-Pfad-Kreissatz:**
-  * `#path-top`: Serienname am oberen Rand[cite: 14].
-  * `#path-uid`: Konzentrisch geführter Innenbogen oberhalb des Titels – verhindert Überlappen bei 16-stelligen Hex-IDs[cite: 14].
-  * `#path-bottom`: Folgentitel am unteren Kreisbogen[cite: 14].
-* **Matrix-Transformation:** 2D-Achsenjustierung ($X/Y \pm 40\%$) und Zoom (50 % bis 200 %) für passgenaue Ausrichtung von Cover-Artworks[cite: 14].
-* **Schriftgrößen-Normalisierung:** Responsive SVG-Skalierung (70 % bis 150 %) via Dynamic DOM Attributes[cite: 14].
+🧩 Kernfunktionen
 
-### 📚 2. Tonie-Cloud Library & Dump-Detection
-* **Multi-Source Fetcher:** Asynchrone Anbindung an die weltweite `tonies-json`-Community-Datenbank[cite: 10, 14].
-* **Dump Auto-Matching:** Heuristischer Abgleich der Audio-ID und normalisierter Titel gegen das `nortakales/flipper-zero-tonies`-Archiv (Priorisierung des `German/`-Zweigs)[cite: 10, 14].
-* **Non-Blocking Smart Cache:** 24h LocalStorage-Caching inklusive `AbortController`-Timeout (6s), um API-Rate-Limits zu umgehen[cite: 14].
+🔎 Tonie-Datenbank
 
-### 🖨️ 3. Print Studio V2
-* **Natives HTML5 Drag & Drop:** Tauschen und Reorganisieren von Stickerpositionen direkt auf dem Bogen[cite: 10, 14].
-* **Präzisions-Presets:**
-  * `43 mm (3×4)`: Standard für 43-mm-Münzkapseln[cite: 10, 14].
-  * `40 mm (4×6)`: Avery Zweckform L3415 / 5080[cite: 10, 14].
-  * `40 mm (3×4)`: 12er-Nutzen[cite: 10, 14].
-  * `30 mm (6×8)`: Avery Zweckform 6223[cite: 10, 14].
-  * `Custom`: Millimetergenaue Durchmesser-Definition[cite: 10, 14].
+TagGen Studio verwendet die öffentlichen Tonie-Datenquellen:
 
-### 📲 4. Dump Studio (Web-to-NFC Bridge)
-* **In-Browser Firmware Flasher:** Direkte Installation der RFIDfriend NFC-Archiver Firmware auf ESP32-WROOM-Boards via `` (ESP Web Tools 10)[cite: 14].
-* **Dual-Stack Connection:**
-  * **USB (Web Serial API):** 115200 Baud Stream für macOS, Windows, Linux, Android[cite: 14].
-  * **BLE (Web Bluetooth API):** Nordic UART Service (`6e400001-b5a3-f393-e0a9-e50e24dcca9e`) für drahtlose Workflows[cite: 14].
+* tonies.json
+* toniesV2.json
 
----
+Dabei werden V1- und V2-Daten getrennt verarbeitet.
 
-## 🛠️ Hardware-Stack & Architektur
+Die V2-Datenbank wird unter anderem aus den verschachtelten:
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                    Browser (Client-Side)                    │
-│   TagGen Studio V2 (HTML5 / SVG / CSS3 / Vanilla ES6+)      │
-└──────────────┬───────────────────────────────┬──────────────┘
-               │ Web Serial (USB)              │ Web Bluetooth (BLE)
-               │ (115200 Baud)                 │ (Nordic UART Service)
-               ▼                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│                     ESP32-WROOM Board                       │
-│             Firmware: RFIDfriend NFC-Archiver               │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ SPI Interface
-                               ▼
-┌─────────────────────────────────────────────────────────────┐
-│                      NXP PN5180 RFID                        │
-│                High-Power ISO/IEC 15693 RF                  │
-└──────────────────────────────┬──────────────────────────────┘
-                               │ 13.56 MHz RF Field
-                               ▼
-               ┌───────────────────────────────┐
-               │    Magic Tag (ICODE SLIX-L)   │
-               │   Custom Block 0 UID Flashed  │
-               └───────────────────────────────┘
-```
+article
+ └── data[]
+      ├── series
+      ├── episode
+      ├── image
+      ├── language
+      ├── track-desc[]
+      └── ids[]
 
+aufbereitet.
 
-🔌 Pinout: ESP32 DevKit v1 ↔ NXP PN5180 (Klick zum Ausklappen)
+Dadurch können Informationen aus beiden Datenquellen für die Suche und den Editor zusammengeführt werden.
 
-| PN5180 Pin | ESP32 GPIO | Beschreibung |
-| :--- | :--- | :--- |
-| **3.3V** | 3V3 | Spannungsversorgung |
-| **GND** | GND | Masse |
-| **MISO** | GPIO 19 | SPI Master In Slave Out |
-| **MOSI** | GPIO 23 | SPI Master Out Slave In |
-| **SCK** | GPIO 18 | SPI Serial Clock |
-| **NSS** | GPIO 5 | SPI Chip Select |
-| **BUSY** | GPIO 16 | Handshake Busy Signal |
-| **RST** | GPIO 17 | Hardware Reset |
+⸻
 
+🖼️ Cover Editor
 
+Der integrierte Editor ermöglicht die direkte Bearbeitung eines Covers.
 
----
+Verfügbare Einstellungen:
 
-## 📋 Community & Maker Dos and Don'ts
+* Serie
+* Titel
+* Audio-ID
+* Bild
+* Zoom
+* horizontale Position
+* vertikale Position
+* Schriftgröße
 
-### 🎯 Drucken & Konfektionierung
+Die Vorschau wird direkt im Browser aktualisiert.
 
-> [!IMPORTANT]
-> **DO:** Schalte im Druckdialog deines Browsers die Skalierung zwingend auf **Exakt 100 %** und deaktiviere Optionen wie *„An Seite anpassen“* oder *„Seitenränder ausgleichen“*. Aktiviere stets die Option **„Hintergrundgrafiken drucken“**[cite: 10, 14].
+⸻
 
-> [!WARNING]
-> **DON'T:** Normales 80g-Kopierpapier verwenden. Die Farben bluten aus und die Kapsel wirkt matt. Verwende mindestens **180–230 g/m² Fotopapier** (glänzend oder matt) oder hochwertige Glanz-Klebefolien[cite: 10, 14].
+⭐ Favoriten
 
-### 📡 Flashen & NFC Tags
+Häufig verwendete Tonies können als Favoriten gespeichert werden.
 
-> [!TIP]
-> **DO (Hardware-Auswahl):** Nutze für die Toniebox ausschließlich **ICODE SLIX / SLIX-L kompatible Magic Tags** (ISO 15693) mit veränderbarer UID in Block 0. Standard Mifare Classic 1K (ISO 14443A) oder NTAG213/215 Tags werden von der Toniebox **nicht** erkannt.
+Die Favoriten werden lokal im Browser gespeichert und stehen beim nächsten Besuch weiterhin zur Verfügung.
 
-> [!CAUTION]
-> **DON'T (Mobile Apple iOS):** Versuche nicht, Magic Tags direkt über Safari auf dem iPhone zu beschreiben. Apple blockiert hardwarenahe ISO 15693-Schreibkommandos und Web Bluetooth in Safari. Nutze stattdessen auf dem iPhone den **Bluefy Browser** für Web Bluetooth oder steuere den ESP32 vom Desktop aus an[cite: 12, 14].
+Es ist keine Benutzeranmeldung erforderlich.
 
-### 💻 GitHub & Repository-Pflege
+⸻
 
-* **DO:** Halte die Codebase frei von Node/NPM-Build-Schritten. Der Charme dieses Projekts liegt in der Zero-Dependency-Portabilität: Ein Download der `index.html` genügt, um lokal autark zu arbeiten[cite: 10, 14].
-* **DON'T:** Große `.nfc`-Dumps direkt in dieses Front-End-Repository committen. Nutze die dynamische API-Verbindung zum `nortakales`-Archiv[cite: 10, 14].
+🖨️ Print Studio
 
----
+Mit dem Print Studio können mehrere Cover auf einem Druckbogen zusammengestellt werden.
 
-## 🖨️ Druckmatrix & Maße
+Unterstützte Presets:
 
-| Vorlage / Typ | Nutzen | Maße | Empfohlene Verwendung |
-| :--- | :--- | :--- | :--- |
-| **Münzkapsel Standard**[cite: 10, 14] | 12 (3 × 4)[cite: 10, 14] | Ø 43 mm[cite: 10, 14] | 43 mm Acryl-Münzkapseln (perfekte Passform) |
-| **Avery Zweckform 24er**[cite: 10, 14] | 24 (4 × 6)[cite: 10, 14] | Ø 40 mm[cite: 10, 14] | Etikettenbogen L3415 / 5080[cite: 10, 14] |
-| **Avery Zweckform 12er**[cite: 10, 14] | 12 (3 × 4)[cite: 10, 14] | Ø 40 mm[cite: 10, 14] | Kompakte Stickerbögen |
-| **Avery Zweckform 48er**[cite: 10, 14] | 48 (6 × 8)[cite: 10, 14] | Ø 30 mm[cite: 10, 14] | Mini-Tags & Klebepunkte (6223)[cite: 10, 14] |
-| **Custom Size**[cite: 10, 14] | 12 (3 × 4)[cite: 10, 14] | Variabel | Beliebige Token & Sondermaße[cite: 10, 14] |
+Format	Layout
+43 mm	3 × 4
+40 mm	4 × 6
+40 mm	3 × 4
+30 mm	6 × 8
+Custom	frei definierbar
 
----
+Die Druckpositionen sind in Millimetern definiert und für A4-Druckbögen ausgelegt.
 
-## 🌐 Live-Demo & Deployment
+Funktionen
 
-### Lokaler Schnellstart (Instant Webserver)
-```bash
-# Repo klonen
-git clone https://github.com/Stevenious/Tonie-custom-Tags-Cover-Generator.git
-cd Tonie-custom-Tags-Cover-Generator
+* Cover auf Druckbogen platzieren
+* Positionen per Drag & Drop tauschen
+* einzelne Cover entfernen
+* Druckbogen leeren
+* Projekt exportieren
+* Projekt wieder importieren
+* Druckansicht direkt aus dem Browser
 
-# Lokalen Server starten (verhindert CORS-Einschränkungen bei lokalen Fallbacks)
-python -m http.server 8080
-```
-Anschließend im Browser öffnen: `http://localhost:8080`
+⸻
 
-### 1-Klick Deployment
-* **Netlify Drop:** Ziehe das gesamte Projektverzeichnis per Drag & Drop auf app.netlify.com/drop.
-* **GitHub Pages:** Einstellungen öffnen (`Settings > Pages`), Source auf Branch `main` / `master` setzen, speichern.
+📡 NFC Studio
 
----
+Phoenix besitzt ein integriertes NFC-Studio für kompatible Hardware.
 
-## 🤝 Credits & Ecosystem
+USB
 
-* **RFIDfriend:** Hardware-Design, NFC-Archiver Firmware und Expertise für Custom-UID Magic Tags (SLIX / SLIX-L)[cite: 10, 14].
-* **Toniebox Reverse Engineering Team:** Für die Bereitstellung und Kuration der weltweiten `tonies-json`-Stammdaten[cite: 10, 14].
-* **nortakales / flipper-zero-tonies:** Für das umfassende Community-Archiv an kompatiblen Flipper Zero `.nfc`-Dumps[cite: 10, 14].
-* **Espressif Systems & ESP Web Tools:** Für das offene Web-Serial-Flasher-Framework[cite: 14].
+Die Kommunikation erfolgt über:
 
----
+Web Serial API
 
-## 📄 Lizenz & Rechtlicher Hinweis
+Standard-Baudrate:
 
-Veröffentlicht unter der [MIT License](LICENSE)[cite: 10]. 
+115200
 
-*Disclaimer: TagGen Studio V2 ist ein unabhängiges Open-Source-Projekt von Maker für Maker. Alle Markennamen, Warenzeichen und Produktabbildungen (z. B. Toniebox®, Tonies®) sind Eigentum der jeweiligen Rechteinhaber und dienen hier ausschließlich der Identifikation und Kompatibilitätsbeschreibung.*
+BLE
 
+Für Bluetooth Low Energy wird das Nordic-UART-Profil verwendet.
 
-Soll ein Troubleshooting-Abschnitt ergänzt werden, falls der COM-Port des ESP32 unter Windows nicht erkannt wird (z. B. CH340 / CP2102 Treiber)?
+Service:
+
+6e400001-b5a3-f393-e0a9-e50e24dcca9e
+
+Characteristic:
+
+6e400002-b5a3-f393-e0a9-e50e24dcca9e
+
+Das Flash-Kommando wird als JSON übertragen.
+
+Beispiel:
+
+{
+  "cmd": "write_magic_tag",
+  "uid": "E00403XXXXXXXXXX"
+}
+
+Die tatsächliche NFC-Kompatibilität hängt von der verwendeten Hardware und deren Firmware ab.
+
+⸻
+
+🔍 NFC Dump Matching
+
+Phoenix kann zusätzlich bekannte NFC-Dumps mit den Einträgen der Datenbank abgleichen.
+
+Dabei werden drei Match-Stufen verwendet:
+
+🟢 Exact
+
+Die Audio-ID bzw. eine bekannte ID stimmt direkt mit einem Dump überein.
+
+🔵 Strong
+
+Serie und Titel stimmen mit einer Dump-Struktur überein.
+
+🟡 Fuzzy
+
+Der Titel lässt sich einem bekannten Dump-Dateinamen zuordnen.
+
+Damit kann direkt in der Datenbank erkannt werden, ob für einen Eintrag ein passender Dump vorhanden ist.
+
+⸻
+
+💾 Lokaler Cache
+
+Da die Tonie-Datenbanken relativ groß sind, verwendet Phoenix einen lokalen Browser-Cache.
+
+Dadurch kann die Anwendung nach einem erfolgreichen ersten Laden die Datenbank auch bei späteren Ladeproblemen verwenden.
+
+Phoenix behandelt dabei getrennt:
+
+V1 Database Cache
+V2 Database Cache
+Dump Index Cache
+Favorites
+
+Ungültige oder beschädigte Cache-Daten werden erkannt und verworfen.
+
+⸻
+
+🛡️ LTS-Stabilität
+
+V2.6.6 LTS legt besonderen Wert auf zuverlässiges Laden der Datenbank.
+
+Unter anderem:
+
+* längeres Netzwerk-Timeout
+* HTTP-Caching
+* Fehlerbehandlung beim JSON-Laden
+* getrenntes V1/V2 Parsing
+* V2 data[] Flattening
+* Unterstützung für verschachtelte ids[]
+* Cache-Fallback
+* ungültige Cache-Daten werden entfernt
+* Dump-Index blockiert nicht das Laden der Hauptdatenbank
+
+Ein Fehler beim optionalen Dump-Abgleich soll dadurch nicht mehr den eigentlichen Tonie-Datenbankstart verhindern.
+
+⸻
+
+📱 Browser-Kompatibilität
+
+TagGen Studio ist als moderne Browser-WebApp konzipiert.
+
+Für die vollständige Funktionalität werden moderne Browser-APIs verwendet.
+
+Empfohlen
+
+* Google Chrome
+* Microsoft Edge
+* Chromium-basierte Browser
+* aktuelle Safari-Versionen für unterstützte Web-Funktionen
+
+Für NFC-Hardware können zusätzliche Browser- und Betriebssystemanforderungen gelten.
+
+Insbesondere Web Serial und Web Bluetooth sind nicht in allen Browsern verfügbar.
+
+⸻
+
+🌐 GitHub Pages
+
+TagGen Studio ist bewusst als Single-File-WebApp aufgebaut.
+
+Die Grundstruktur kann daher sehr einfach gehalten werden:
+
+Tonie-custom-Tags-Cover-Generator/
+│
+├── index.html
+├── README.md
+└── ...
+
+Die Anwendung benötigt für die eigentliche Oberfläche keinen klassischen Backend-Server.
+
+GitHub Pages kann die index.html direkt ausliefern.
+
+⸻
+
+🏗️ Technischer Aufbau
+
+Phoenix verwendet eine modulare JavaScript-Struktur innerhalb der einzelnen HTML-Datei.
+
+Wichtige Module:
+
+App
+ └── View Routing
+Data
+ ├── Tonie Database
+ ├── V1 Parser
+ ├── V2 Parser
+ ├── Cache
+ └── Dump Matching
+Library
+ └── Database / Favorites
+Search
+ └── Suche & Filter
+Editor
+ └── Cover Editor
+PrintStudio
+ └── Druckbogen
+NfcStudio
+ └── USB / BLE
+Storage
+ └── Projektdateien
+UI
+ └── Cards / Toasts / Status
+
+Die Anwendung benötigt dadurch keinen Build-Prozess.
+
+⸻
+
+🎨 Phoenix Design
+
+Phoenix verwendet ein bewusst reduziertes Interface.
+
+Grundprinzip:
+
+Nicht möglichst viele Funktionen anzeigen – sondern die benötigten Funktionen schnell erreichbar machen.
+
+Das Design verwendet eine helle Oberfläche mit dem Phoenix-Rot als primäre Akzentfarbe.
+
+Phoenix Red
+#e11d48
+
+Die Oberfläche ist für Desktop und kleinere Displays responsive aufgebaut.
+
+⸻
+
+📂 Projektdateien
+
+Projekte können als JSON-Datei exportiert werden.
+
+Beispiel:
+
+TagGen_Phoenix_Project.json
+
+Die Projektdatei enthält unter anderem:
+
+* Druckformat
+* Cover
+* Positionen
+* Zoom
+* Textdaten
+* Audio-ID
+* weitere Editor-Einstellungen
+
+Dadurch kann ein vorbereiteter Druckbogen später wieder geöffnet werden.
+
+⸻
+
+🔒 Datenschutz
+
+TagGen Studio benötigt grundsätzlich:
+
+* kein Benutzerkonto
+* kein eigenes Backend
+* keine Anmeldung
+* keine persönliche Profildatenbank
+
+Favoriten und lokale Projektdaten werden im Browser gespeichert.
+
+Bei Verwendung von externen Datenquellen gelten zusätzlich deren jeweilige Nutzungs- und Datenschutzbedingungen.
+
+⸻
+
+📚 Datenquellen
+
+Die Tonie-Datenbank basiert auf den öffentlich verfügbaren Daten des Community-Projekts:
+
+toniebox-reverse-engineering / tonies-json
+
+Die Anwendung lädt die Daten zur Laufzeit aus den veröffentlichten JSON-Dateien.
+
+Die Datenbank ist daher nicht Bestandteil des TagGen-Quellcodes.
+
+⸻
+
+🤝 Community Edition
+
+TagGen Studio Phoenix wurde mit Blick auf die Tonie Tag & NFC Community entwickelt.
+
+Das Projekt soll praktische Werkzeuge für:
+
+* individuelle Tags
+* Covergestaltung
+* NFC-Projekte
+* Druckvorbereitung
+* Datenbankrecherche
+
+in einer gemeinsamen Oberfläche bündeln.
+
+Beiträge, Fehlerberichte und Verbesserungsvorschläge sind willkommen.
+
+⸻
+
+🐛 Bug Reports
+
+Bei einem Fehler bitte möglichst folgende Informationen angeben:
+
+Browser:
+Betriebssystem:
+Gerät:
+TagGen Version:
+Fehlerbeschreibung:
+Schritte zum Reproduzieren:
+Browser-Konsole / Fehlermeldung:
+
+Besonders hilfreich sind konkrete Fehlermeldungen aus der Browser-Konsole.
+
+⸻
+
+💡 Feature Requests
+
+Neue Funktionen sollten möglichst zum bestehenden Phoenix-Konzept passen:
+
+* einfach
+* übersichtlich
+* community-orientiert
+* ohne unnötige Komplexität
+* möglichst ohne Backend
+* GitHub-Pages-kompatibel
+
+⸻
+
+⚠️ Hinweis
+
+TagGen Studio ist ein Community-Projekt und steht in keiner offiziellen Verbindung zu Tonies GmbH.
+
+Tonie® und entsprechende Marken gehören ihren jeweiligen Rechteinhabern.
+
+Die Verwendung von Daten, Bildern, NFC-Technologien und Dumps muss jeweils im Rahmen der geltenden Rechte, Lizenzen und gesetzlichen Bestimmungen erfolgen.
+
+⸻
+
+📜 Lizenz
+
+Die Lizenz des Projekts und seiner einzelnen Bestandteile richtet sich nach den im Repository angegebenen Lizenzbedingungen.
+
+Für externe Datenquellen gelten deren jeweilige Lizenzen und Nutzungsbedingungen.
+
+⸻
+
+🦅 TagGen Studio Phoenix
+
+V2.6.6 LTS
+
+Search. Design. Print. Tag.
+
+Made for the Tonie Tag & NFC Community.
+
+⸻
