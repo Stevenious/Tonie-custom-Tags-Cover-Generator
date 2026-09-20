@@ -3,12 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>TagGen Studio V2.7 Phoenix – Community Edition</title>
-<!-- PWA Meta Tags -->
+<title>TagGen Studio V2.7.1 Ultra – Phoenix Community Edition</title>
+<!-- PWA Web App Manifest (Data URI) -->
+<link rel="manifest" href="data:application/manifest+json;utf-8,%7B%22name%22%3A%22TagGen%20Studio%20Phoenix%22%2C%22short_name%22%3A%22TagGen%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%23e11d48%22%7D">
 <meta name="theme-color" content="#e11d48">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="description" content="Tonie Cover Generator, Print Studio & NFC Magic Tag Tool">
+<meta name="apple-mobile-web-app-title" content="TagGen Studio">
+<meta name="description" content="Tonie Cover Generator Pro, Print Studio, NFC Magic Tag Flasher & TeddyCloud Companion">
 <!-- ESP Web Tools -->
 <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
 <style>
@@ -28,14 +30,18 @@
 --status-fuzzy: #f59e0b;
 --status-none: #94a3b8;
 --flipper-orange: #ff8200;
---glass-bg: rgba(255, 255, 255, 0.85);
---glass-border: rgba(255, 255, 255, 0.4);
+--teddy-teal: #0d9488;
+--glass-bg: rgba(255, 255, 255, 0.92);
+--glass-card: rgba(255, 255, 255, 0.88);
+--shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+--shadow-md: 0 4px 14px rgba(15,23,42,0.06);
+--shadow-lg: 0 12px 30px rgba(15,23,42,0.09);
 }
 * {
 box-sizing: border-box;
 margin: 0;
 padding: 0;
-font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 -webkit-tap-highlight-color: transparent;
 }
 body {
@@ -47,10 +53,11 @@ display: flex;
 flex-direction: column;
 overflow: hidden;
 }
+/* --- HEADER & NAVIGATION --- */
 header {
 height: 60px;
 background: var(--glass-bg);
-backdrop-filter: blur(12px);
+backdrop-filter: blur(14px);
 border-bottom: 1px solid var(--border);
 display: flex;
 align-items: center;
@@ -68,6 +75,7 @@ font-size: 15px;
 color: var(--text-main);
 letter-spacing: -0.02em;
 user-select: none;
+cursor: pointer;
 }
 .brand svg {
 width: 24px;
@@ -85,7 +93,7 @@ padding: 3px;
 border-radius: 10px;
 gap: 3px;
 border: 1px solid var(--border);
-max-width: 60vw;
+max-width: 65vw;
 overflow-x: auto;
 scrollbar-width: none;
 }
@@ -101,11 +109,14 @@ border-radius: 7px;
 cursor: pointer;
 transition: all 0.15s ease;
 white-space: nowrap;
+display: flex;
+align-items: center;
+gap: 5px;
 }
 .view-btn.active {
 background: #ffffff;
 color: var(--text-main);
-box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+box-shadow: var(--shadow-sm);
 }
 .header-actions {
 display: flex;
@@ -121,6 +132,7 @@ color: var(--text-muted);
 border: 1px solid var(--border);
 white-space: nowrap;
 }
+/* --- APP WORKSPACES --- */
 .app-container {
 display: flex;
 flex: 1;
@@ -136,6 +148,7 @@ background: var(--bg-canvas);
 overflow: hidden;
 }
 .workspace.active { display: flex; }
+/* --- VIEW 1: STUDIO LAYOUT --- */
 .studio-layout {
 display: flex;
 flex: 1;
@@ -143,7 +156,7 @@ overflow: hidden;
 width: 100%;
 }
 .sidebar-lib {
-width: 420px;
+width: 440px;
 background: var(--bg-sidebar);
 border-right: 1px solid var(--border);
 display: flex;
@@ -157,6 +170,7 @@ border-bottom: 1px solid var(--border);
 display: flex;
 flex-direction: column;
 gap: 8px;
+background: #ffffff;
 }
 .lib-tabs {
 display: flex;
@@ -173,6 +187,7 @@ color: var(--text-muted);
 cursor: pointer;
 position: relative;
 padding-bottom: 4px;
+transition: color 0.15s;
 }
 .lib-tab.active { color: var(--primary); }
 .lib-tab.active::after {
@@ -181,7 +196,7 @@ height: 2px; background: var(--primary); border-radius: 2px;
 }
 .search-input {
 width: 100%;
-padding: 8px 10px;
+padding: 8px 11px;
 border: 1px solid var(--border);
 border-radius: 8px;
 font-size: 13px;
@@ -195,7 +210,7 @@ gap: 6px;
 }
 .filter-select {
 flex: 1;
-padding: 5px 6px;
+padding: 5px 7px;
 border: 1px solid var(--border);
 border-radius: 6px;
 font-size: 11px;
@@ -215,9 +230,10 @@ gap: 8px;
 }
 .load-more-container {
 grid-column: 1 / -1;
-padding: 10px;
+padding: 12px;
 text-align: center;
 }
+/* Clean Studio Cards */
 .asset-card {
 background: #fff;
 border: 1px solid var(--border);
@@ -228,12 +244,12 @@ display: flex;
 flex-direction: column;
 gap: 6px;
 padding: 6px;
-transition: all 0.15s ease;
+transition: transform 0.12s ease, border-color 0.12s ease;
 position: relative;
 }
 .asset-card:hover {
 border-color: var(--primary);
-box-shadow: 0 4px 12px rgba(225, 29, 72, 0.08);
+box-shadow: var(--shadow-md);
 transform: translateY(-1px);
 }
 .card-img-wrap {
@@ -261,8 +277,8 @@ opacity: 0.25;
 }
 .fav-btn {
 position: absolute;
-top: 3px;
-right: 3px;
+top: 4px;
+right: 4px;
 background: rgba(255,255,255,0.95);
 border: none;
 width: 22px;
@@ -280,12 +296,12 @@ z-index: 5;
 .fav-btn.active { color: #eab308; }
 .match-badge {
 position: absolute;
-top: 3px;
-left: 3px;
+top: 4px;
+left: 4px;
 color: #ffffff;
 font-size: 9px;
 font-weight: 700;
-padding: 1px 5px;
+padding: 1px 6px;
 border-radius: 8px;
 display: flex;
 align-items: center;
@@ -337,6 +353,7 @@ border-radius: 50%;
 display: inline-block;
 flex-shrink: 0;
 }
+/* --- CANVAS PREVIEW --- */
 .canvas-area {
 flex: 1;
 display: flex;
@@ -350,7 +367,7 @@ overflow: auto;
 background: #ffffff;
 padding: 28px 32px;
 border-radius: 20px;
-box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.02);
+box-shadow: var(--shadow-lg);
 border: 1px solid var(--border);
 display: flex;
 flex-direction: column;
@@ -358,20 +375,24 @@ align-items: center;
 gap: 16px;
 }
 .tag-circle {
-width: 260px;
-height: 260px;
+width: 270px;
+height: 270px;
 border-radius: 50%;
 border: 2px dashed #cbd5e1;
 position: relative;
 overflow: hidden;
 background: #ffffff;
+transition: box-shadow 0.2s;
 }
+.tag-circle.ring-accent { border: 3px solid var(--primary); }
+.tag-circle.ring-black { border: 3px solid #0f172a; }
 .tag-circle img {
 width: 100%;
 height: 100%;
 object-fit: contain;
 position: absolute;
 transition: transform 0.08s ease-out;
+transform-origin: center center;
 }
 .tag-circle svg {
 position: absolute;
@@ -385,8 +406,9 @@ display: flex;
 gap: 8px;
 width: 100%;
 }
+/* --- SIDEBAR CONTROLS --- */
 .sidebar-controls {
-width: 320px;
+width: 330px;
 background: var(--bg-sidebar);
 border-left: 1px solid var(--border);
 display: flex;
@@ -395,34 +417,37 @@ overflow-y: auto;
 flex-shrink: 0;
 }
 .control-section {
-padding: 16px 18px;
+padding: 14px 16px;
 border-bottom: 1px solid var(--border);
 display: flex;
 flex-direction: column;
-gap: 10px;
+gap: 8px;
 }
 .control-section h3 {
 font-size: 11px;
 text-transform: uppercase;
 letter-spacing: 0.06em;
 color: var(--text-muted);
+display: flex;
+justify-content: space-between;
+align-items: center;
 }
 .input-group {
 display: flex;
 flex-direction: column;
-gap: 4px;
+gap: 3px;
 }
 .input-group label {
-font-size: 12px;
+font-size: 11px;
 font-weight: 600;
 display: flex;
 justify-content: space-between;
 }
-.input-group input[type="text"] {
-padding: 8px 10px;
+.input-group input[type="text"], .input-group select {
+padding: 7px 9px;
 border: 1px solid var(--border);
 border-radius: 6px;
-font-size: 13px;
+font-size: 12px;
 outline: none;
 background: #fff;
 }
@@ -439,7 +464,7 @@ border: none;
 padding: 9px 14px;
 border-radius: 8px;
 font-weight: 600;
-font-size: 13px;
+font-size: 12px;
 cursor: pointer;
 transition: all 0.2s ease;
 display: inline-flex;
@@ -453,9 +478,9 @@ user-select: none;
 background: #fff;
 color: var(--text-main);
 border: 1px solid var(--border);
-padding: 8px 12px;
+padding: 7px 11px;
 border-radius: 7px;
-font-size: 12px;
+font-size: 11px;
 font-weight: 600;
 cursor: pointer;
 transition: all 0.15s ease;
@@ -465,16 +490,16 @@ justify-content: center;
 gap: 5px;
 }
 .btn-secondary:hover { background: #f8fafc; border-color: var(--primary); color: var(--primary); }
-/* Print Studio */
+/* --- VIEW 2: PRINT STUDIO --- */
 .print-toolbar {
 background: #fff;
-padding: 12px 20px;
+padding: 12px 18px;
 border-bottom: 1px solid var(--border);
 display: flex;
 justify-content: space-between;
 align-items: center;
 flex-wrap: wrap;
-gap: 10px;
+gap: 8px;
 }
 .print-scroll {
 flex: 1;
@@ -488,10 +513,9 @@ align-items: flex-start;
 width: 210mm;
 height: 297mm;
 max-width: 100%;
-max-height: 100%;
 min-height: 297mm;
 background: white;
-box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+box-shadow: var(--shadow-lg);
 position: relative;
 transform-origin: top center;
 transform: scale(0.85);
@@ -542,47 +566,47 @@ z-index: 10;
 }
 .sticker:hover .sticker-actions { opacity: 1; pointer-events: auto; }
 .s-btn {
-background: none; border: none; color: #fff; font-size: 12px; cursor: pointer;
+background: none; border: none; color: #fff; font-size: 11px; cursor: pointer;
 width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
 border-radius: 50%;
 }
 .s-btn:hover { background: rgba(255,255,255,0.2); }
 .s-btn.del:hover { background: var(--primary); }
-/* NFC Workspace */
+/* --- VIEW 3: NFC WORKSPACE & FLIPPER EXPORT --- */
 .nfc-container {
-max-width: 900px;
-margin: 30px auto;
+max-width: 960px;
+margin: 24px auto;
 display: grid;
 grid-template-columns: 1fr 1fr;
-gap: 20px;
+gap: 18px;
 padding: 0 16px;
 }
 .nfc-card {
 background: #fff;
 border-radius: 14px;
-padding: 20px;
-box-shadow: 0 4px 20px rgba(0,0,0,0.03);
+padding: 18px;
+box-shadow: var(--shadow-sm);
 border: 1px solid var(--border);
 display: flex;
 flex-direction: column;
 gap: 12px;
 }
 .nfc-card h2 {
-font-size: 15px;
+font-size: 14px;
 display: flex;
 align-items: center;
 gap: 8px;
 border-bottom: 2px solid var(--bg-canvas);
 padding-bottom: 8px;
 }
-.tag-preview-container {
+.tag-dual-preview {
 display: flex;
 justify-content: center;
 align-items: center;
 gap: 16px;
-padding: 12px;
+padding: 14px;
 background: #f8fafc;
-border-radius: 10px;
+border-radius: 12px;
 border: 1px solid var(--border);
 }
 .tag-disc {
@@ -595,27 +619,53 @@ flex-direction: column;
 align-items: center;
 justify-content: center;
 background: #fff;
-box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 position: relative;
 text-align: center;
 padding: 6px;
 }
-.tag-disc span.label {
-font-size: 9px;
+.tag-disc.back-slix {
+background: radial-gradient(circle, #f8fafc 40%, #e2e8f0 100%);
+border: 2px dashed #94a3b8;
+}
+.tag-antenna {
+position: absolute;
+inset: 6px;
+border-radius: 50%;
+border: 1px dotted rgba(225, 29, 72, 0.4);
+pointer-events: none;
+}
+/* --- VIEW 4: TEDDYCLOUD COMPANION --- */
+.teddy-container {
+max-width: 900px;
+margin: 24px auto;
+padding: 0 16px;
+display: flex;
+flex-direction: column;
+gap: 16px;
+}
+.teddy-card {
+background: #fff;
+border-radius: 14px;
+padding: 20px;
+box-shadow: var(--shadow-sm);
+border: 1px solid var(--border);
+display: flex;
+flex-direction: column;
+gap: 14px;
+}
+.teddy-badge {
+background: rgba(13, 148, 136, 0.1);
+color: var(--teddy-teal);
+padding: 3px 8px;
+border-radius: 12px;
+font-size: 11px;
 font-weight: 700;
-color: var(--primary);
-text-transform: uppercase;
+display: inline-block;
 }
-.tag-disc span.code {
-font-size: 9px;
-font-family: monospace;
-color: var(--text-muted);
-margin-top: 2px;
-word-break: break-all;
-}
-/* Debug Center */
+/* --- VIEW 5: DEBUG & CACHE CENTER --- */
 .debug-container {
-max-width: 800px;
+max-width: 820px;
 margin: 20px auto;
 padding: 0 16px;
 display: flex;
@@ -637,19 +687,19 @@ border-bottom: 1px solid var(--border);
 text-align: left;
 }
 .debug-table th { background: #f8fafc; font-weight: 700; }
+/* --- TOAST NOTIFICATIONS --- */
 #toast {
 position: fixed; bottom: 24px; left: 50%; transform: translate(-50%, 100px);
-background: #0f172a; color: #fff; padding: 10px 20px; border-radius: 30px;
+background: #0f172a; color: #fff; padding: 9px 18px; border-radius: 30px;
 font-size: 12px; font-weight: 500; transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 z-index: 1000; box-shadow: 0 10px 25px rgba(0,0,0,0.25); pointer-events: none;
 }
 #toast.show { transform: translate(-50%, 0); }
-/* Error Banner Overlay */
 #db-error-banner {
 display: none;
 background: #fee2e2;
 color: #991b1b;
-padding: 10px 16px;
+padding: 8px 14px;
 font-size: 12px;
 font-weight: 600;
 border-bottom: 1px solid #fca5a5;
@@ -658,7 +708,7 @@ align-items: center;
 justify-content: center;
 gap: 10px;
 }
-/* Responsive Breakpoints */
+/* --- RESPONSIVE GRIDS (8 / 4 / 3 / 2) --- */
 @media (min-width: 1700px) {
 .asset-scroll { grid-template-columns: repeat(8, minmax(0, 1fr)); }
 .sidebar-lib { width: 560px; }
@@ -693,7 +743,7 @@ border: 0;
 }
 .sidebar-lib { order: 1; }
 .canvas-area { order: 2; padding: 12px; }
-.sidebar-controls { order: 3; overflow-y: auto; padding-bottom: 30px; }
+.sidebar-controls { order: 3; overflow-y: auto; padding-bottom: 32px; }
 .asset-scroll { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 8px; }
 .preview-wrapper { width: min(92vw, 380px); padding: 16px; gap: 12px; }
 .tag-circle { width: min(72vw, 280px); height: min(72vw, 280px); }
@@ -723,11 +773,11 @@ img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 </head>
 <body>
 <div id="db-error-banner">
-<span>⚠️ Datenbank konnte online nicht synchronisiert werden.</span>
+<span>⚠️ Datenbank konnte online nicht geladen werden.</span>
 <button class="btn-secondary" onclick="Data.init(true)" style="padding:4px 8px; font-size:11px;">Erneut versuchen</button>
 </div>
 <header>
-<div class="brand">
+<div class="brand" onclick="App.switchView('design')">
 <svg viewBox="0 0 24 24">
 <rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect>
 <rect x="9" y="9" width="6" height="6"></rect>
@@ -740,20 +790,21 @@ img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 <line x1="1" y1="9" x2="4" y2="9"></line>
 <line x1="1" y1="14" x2="4" y2="14"></line>
 </svg>
-<span>TagGen <span style="color:var(--primary);">Phoenix</span> <span style="font-size:10px; background:var(--primary-soft); color:var(--primary); padding:2px 5px; border-radius:8px; margin-left:3px;">V2.7 LTS</span></span>
+<span>TagGen <span style="color:var(--primary);">Phoenix</span> <span style="font-size:10px; background:var(--primary-soft); color:var(--primary); padding:2px 6px; border-radius:8px; margin-left:3px;">V2.7.1 Ultra</span></span>
 </div>
 <div class="view-switcher">
-<button class="view-btn active" data-view="design" onclick="App.switchView('design')">1. Tonie & Cover</button>
+<button class="view-btn active" data-view="design" onclick="App.switchView('design')">1. Studio & Cover</button>
 <button class="view-btn" data-view="print" onclick="App.switchView('print')">2. Druckbogen</button>
 <button class="view-btn" data-view="nfc" onclick="App.switchView('nfc')" style="color: var(--flipper-orange);">3. NFC Workspace</button>
-<button class="view-btn" data-view="debug" onclick="App.switchView('debug')">4. Status & Cache</button>
+<button class="view-btn" data-view="teddy" onclick="App.switchView('teddy')" style="color: var(--teddy-teal);">4. TeddyCloud</button>
+<button class="view-btn" data-view="debug" onclick="App.switchView('debug')">5. System & Cache</button>
 </div>
 <div class="header-actions">
 <span class="db-badge" id="db-status">Initialisiere...</span>
 </div>
 </header>
 <div class="app-container">
-<!-- ==================== VIEW 1: STUDIO & COVER GENERATOR ==================== -->
+<!-- ==================== VIEW 1: STUDIO & COVER PRO ==================== -->
 <div class="workspace active" id="view-design">
 <div class="studio-layout" id="studio-swipe-container">
 <div class="sidebar-lib">
@@ -761,7 +812,8 @@ img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 <div class="lib-tabs">
 <button class="lib-tab active" id="tab-db" onclick="Library.switchTab('db')">Datenbank</button>
 <button class="lib-tab" id="tab-fav" onclick="Library.switchTab('fav')">Favoriten</button>
-<button class="lib-tab" id="tab-custom" onclick="Library.switchTab('custom')">Eigene Tags</button>
+<button class="lib-tab" id="tab-recent" onclick="Library.switchTab('recent')">Verlauf</button>
+<button class="lib-tab" id="tab-custom" onclick="Library.switchTab('custom')">Eigene</button>
 </div>
 <input type="text" class="search-input" id="search-input" placeholder="🔎 Tonie, Serie oder Audio-ID suchen...">
 <div class="filter-row">
@@ -804,15 +856,15 @@ img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 <button class="btn" onclick="PrintStudio.addCurrentToSheet()" style="flex: 2;">
 + Auf Druckbogen
 </button>
-<button class="btn-secondary" onclick="Editor.exportPng()" style="flex: 1;" title="Als PNG Bild herunterladen">
-💾 PNG
+<button class="btn-secondary" onclick="Editor.exportPng()" style="flex: 1;" title="Als hochauflösendes PNG Bild herunterladen">
+💾 PNG (1000px)
 </button>
 </div>
 </div>
 </div>
 <div class="sidebar-controls">
 <div class="control-section">
-<h3>Texte & Typografie</h3>
+<h3>Texte & Beschriftung</h3>
 <div class="input-group">
 <label>Serie (Oben)</label>
 <input type="text" id="input-serie">
@@ -825,16 +877,16 @@ img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 <label>Audio-ID (Mitte)</label>
 <input type="text" id="input-uid" placeholder="16-stellige Hex-ID">
 </div>
-<div class="input-group" style="margin-top: 4px;">
+<div class="input-group" style="margin-top: 2px;">
 <label>Schriftgröße <span id="val-font" style="color:var(--primary)">100%</span></label>
 <input type="range" class="range-slider" id="slider-font" min="70" max="150" value="100">
 </div>
 </div>
 <div class="control-section">
-<h3>Bild & Position</h3>
+<h3>Bild, Zoom & Rand</h3>
 <div class="input-group">
 <label>Zoom <span id="val-zoom">100%</span></label>
-<input type="range" class="range-slider" id="slider-zoom" min="50" max="200" value="100">
+<input type="range" class="range-slider" id="slider-zoom" min="50" max="220" value="100">
 </div>
 <div class="input-group">
 <label>X-Achse <span id="val-x">0%</span></label>
@@ -844,11 +896,26 @@ img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 <label>Y-Achse <span id="val-y">0%</span></label>
 <input type="range" class="range-slider" id="slider-y" min="-40" max="40" value="0">
 </div>
+<div class="input-group">
+<label>Rahmen-Design</label>
+<select id="select-ring" onchange="Editor.setRingStyle(this.value)">
+<option value="dashed">Gepunktet / Schnittkante</option>
+<option value="accent">Phoenix Rot (Ring)</option>
+<option value="black">Schwarzer Kontrastring</option>
+<option value="none">Kein Rahmen</option>
+</select>
+</div>
 <div style="display:flex; gap:6px; margin-top:4px;">
 <button class="btn-secondary" style="flex:1;" onclick="Editor.resetTransform()">Zentrieren</button>
 <button class="btn-secondary" style="flex:1;" onclick="document.getElementById('custom-img-upload').click()">Bild wählen</button>
 <input type="file" id="custom-img-upload" style="display:none" accept="image/*" onchange="Editor.uploadCustomImage(event)">
 </div>
+</div>
+<div class="control-section">
+<h3>Eigene Kreation sichern</h3>
+<button class="btn-secondary" onclick="TeddyCloud.saveCurrentAsCustom()">
+⭐ Als eigenen Tonie abspeichern
+</button>
 </div>
 </div>
 </div>
@@ -871,7 +938,7 @@ img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 <span style="font-size:11px; color:var(--text-muted);"><b id="print-count">0</b> Sticker belegt</span>
 </div>
 <div style="display:flex; gap:6px; flex-wrap:wrap;">
-<button class="btn-secondary" onclick="Storage.saveProject()">💾 Projekt speichern</button>
+<button class="btn-secondary" onclick="Storage.saveProject()">💾 Projekt sichern</button>
 <button class="btn-secondary" onclick="document.getElementById('file-load').click()">📂 Laden</button>
 <input type="file" id="file-load" style="display:none" accept=".json" onchange="Storage.loadProject(event)">
 <button class="btn-secondary" onclick="PrintStudio.clear()">🗑️ Bogen leeren</button>
@@ -884,21 +951,22 @@ img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 </div>
 </div>
 </div>
-<!-- ==================== VIEW 3: NFC WORKSPACE ==================== -->
+<!-- ==================== VIEW 3: NFC WORKSPACE & FLIPPER ==================== -->
 <div class="workspace" id="view-nfc">
 <div class="nfc-container">
 <div class="nfc-card">
-<h2>🏷️ Tag Vorschau (Vorder- & Rückseite)</h2>
-<div class="tag-preview-container">
+<h2>🏷️ Dual-Tag Simulator (Vorder- & Rückseite)</h2>
+<div class="tag-dual-preview">
 <div class="tag-disc">
-<span class="label">Vorderseite</span>
-<div id="nfc-preview-front" style="font-size:11px; font-weight:bold; margin:6px 0; color:var(--primary);">-</div>
-<span style="font-size:9px; color:var(--text-muted);">Cover Label</span>
+<span style="font-size:9px; font-weight:700; color:var(--primary); text-transform:uppercase;">Vorderseite</span>
+<div id="nfc-preview-front" style="font-size:11px; font-weight:bold; margin:6px 0; color:var(--text-main);">-</div>
+<span style="font-size:9px; color:var(--text-muted);">Cover Aufkleber</span>
 </div>
-<div class="tag-disc" style="background:#f1f5f9; border-style:dashed;">
-<span class="label" style="color:var(--text-muted);">Rückseite (NXP SLIX)</span>
-<span class="code" id="nfc-preview-back-uid">E00403...</span>
-<span style="font-size:8px; margin-top:4px; color:#10b981; font-weight:bold;">ISO 15693</span>
+<div class="tag-disc back-slix">
+<div class="tag-antenna"></div>
+<span style="font-size:9px; font-weight:700; color:#475569; text-transform:uppercase;">Rückseite (NXP)</span>
+<span id="nfc-preview-back-uid" style="font-family:monospace; font-size:9px; color:#0f172a; margin-top:2px;">E00403...</span>
+<span style="font-size:8px; margin-top:4px; color:#10b981; font-weight:bold;">ISO 15693 (SLIX)</span>
 </div>
 </div>
 <div style="background:#f8fafc; border:1px solid var(--border); padding:12px; border-radius:8px; font-size:12px; display:flex; flex-direction:column; gap:6px;">
@@ -912,6 +980,9 @@ img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 <span>Dump Status:</span><strong id="nfc-target-status">-</strong>
 </div>
 </div>
+<button class="btn-secondary" onclick="NfcStudio.exportFlipperNfc()" style="width:100%; justify-content:center; color:var(--flipper-orange);">
+🐬 Flipper Zero .nfc Datei herunterladen
+</button>
 </div>
 <div class="nfc-card">
 <h2>📲 Hardware Flash Studio</h2>
@@ -933,21 +1004,73 @@ img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 </div>
 </div>
 </div>
-<!-- ==================== VIEW 4: DEBUG CENTER & PWA ==================== -->
+<!-- ==================== VIEW 4: TEDDYCLOUD COMPANION ==================== -->
+<div class="workspace" id="view-teddy">
+<div class="teddy-container">
+<div class="teddy-card">
+<h2>☁️ TeddyCloud & Custom Tag Companion <span class="teddy-badge">Self-Hosted</span></h2>
+<p style="font-size:12px; color:var(--text-muted); line-height:1.5;">
+Verwalte eigene Metadaten für deinen lokalen Toniebox-Server (TeddyCloud) oder eigene MP3-Sammlungen. Du kannst Daten im offiziellen JSON-Format importieren oder direkt als TeddyCloud-kompatibles JSON exportieren.
+</p>
+<div style="display:flex; gap:10px; flex-wrap:wrap;">
+<button class="btn" style="background:var(--teddy-teal);" onclick="TeddyCloud.exportJson()">
+💾 TeddyCloud JSON Export
+</button>
+<button class="btn-secondary" onclick="document.getElementById('teddy-import-file').click()">
+📂 Eigene JSON/CSV importieren
+</button>
+<input type="file" id="teddy-import-file" style="display:none;" accept=".json,.csv" onchange="TeddyCloud.importJson(event)">
+<button class="btn-secondary" onclick="TeddyCloud.clearCustom()">
+🗑️ Eigene Tags löschen
+</button>
+</div>
+</div>
+<div class="teddy-card">
+<h3>➕ Schnellerfassung: Eigener Kreativ-Tonie</h3>
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+<div class="input-group">
+<label>Serie / Hörspielreihe</label>
+<input type="text" id="tc-input-series" placeholder="z. B. Papa erzählt">
+</div>
+<div class="input-group">
+<label>Titel / Folge</label>
+<input type="text" id="tc-input-title" placeholder="z. B. Gute Nacht Geschichte 1">
+</div>
+<div class="input-group">
+<label>Audio-ID (Hex)</label>
+<input type="text" id="tc-input-uid" placeholder="Beliebige 8-16 Hex-Zeichen">
+</div>
+<div class="input-group">
+<label>Sprache</label>
+<select id="tc-input-lang">
+<option value="de-de">Deutsch (de-de)</option>
+<option value="en-us">Englisch (en-us)</option>
+<option value="fr-fr">Französisch (fr-fr)</option>
+</select>
+</div>
+</div>
+<button class="btn" style="background:var(--teddy-teal); align-self:flex-start; margin-top:6px;" onclick="TeddyCloud.createFromForm()">
+➕ Zur Bibliothek hinzufügen & im Editor öffnen
+</button>
+</div>
+</div>
+</div>
+<!-- ==================== VIEW 5: SYSTEM, CACHE & PWA ==================== -->
 <div class="workspace" id="view-debug">
 <div class="debug-container">
 <div class="nfc-card">
 <h2>🛠️ System & Datenbank Status</h2>
 <table class="debug-table">
 <tr><th>Attribut</th><th>Status / Wert</th></tr>
-<tr><td>Version</td><td>TagGen Studio V2.7 Phoenix (Community Edition)</td></tr>
+<tr><td>Version</td><td>TagGen Studio V2.7.1 Ultra (Phoenix Community Edition)</td></tr>
 <tr><td>Geladene Tonies</td><td id="dbg-count">-</td></tr>
 <tr><td>Datenquelle</td><td id="dbg-source">-</td></tr>
 <tr><td>V2 Metadaten Match</td><td id="dbg-v2-count">-</td></tr>
-<tr><td>Offline Cache Status</td><td id="dbg-cache-status">Aktiv (Sicher isoliert)</td></tr>
-<tr><td>Ladezeit</td><td id="dbg-load-time">-</td></tr>
+<tr><td>Eigene Tags</td><td id="dbg-custom-count">0</td></tr>
+<tr><td>Offline-Fähigkeit</td><td id="dbg-cache-status">Isoliert im Speicher aktiv</td></tr>
+<tr><td>Ladezeit Pipeline</td><td id="dbg-load-time">-</td></tr>
 </table>
-<div style="display:flex; gap:10px; margin-top:10px;">
+<div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
 <button class="btn" onclick="Data.init(true)">🔄 Cache erneuern & Neu laden</button>
 <button class="btn-secondary" onclick="Data.clearCache()">🗑️ Lokalen Cache leeren</button>
 </div>
@@ -972,20 +1095,21 @@ currentFilteredResults: []
 const Search = {};
 const UI = {};
 const Editor = {
-state: { zoom: 100, x: 0, y: 0, fontSize: 100 },
+state: { zoom: 100, x: 0, y: 0, fontSize: 100, ring: 'dashed' },
 current: { serie: '', title: '', uid: '', pic: '' }
 };
 const PrintStudio = { slots: [] };
 const NfcStudio = { mode: 'usb', port: null, writer: null, bleDevice: null, bleChar: null };
+const TeddyCloud = {};
 const Storage = {};
-// Utility: Safe LocalStorage Wrapper preventing QuotaExceededError crashes
+// Safe Storage Wrapper preventing QuotaExceededError crashes
 const safeStorage = {
 set: (k, v) => {
 try {
 localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
 return true;
 } catch (e) {
-console.warn(⁠Storage quota exceeded for key "${k}". Continuing with in-memory state.⁠, e);
+console.warn(⁠LocalStorage Kontingent überschritten für "${k}". Fahre im RAM fort.⁠, e);
 return false;
 }
 },
@@ -1003,7 +1127,7 @@ try { localStorage.removeItem(k); } catch(e) {}
 const normalizeText = s => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 const clean = s => normalizeText(s).replace(/[^a-z0-9]/g, '');
 const splitQuery = s => normalizeText(s).split(/\s+/).map(clean).filter(Boolean);
-// Multi-Source Resilient Fetcher (Primary GitHub Raw -> Fallback jsDelivr CDN)
+// Resilient Fetch with CDN Fallback
 const fetchResilientJson = async (primaryUrl, fallbackUrl, timeout = 15000) => {
 const tryFetch = async (url) => {
 const controller = new AbortController();
@@ -1017,7 +1141,7 @@ return await res.json();
 try {
 return await tryFetch(primaryUrl);
 } catch (errPrimary) {
-console.warn(⁠Primary fetch failed for ${primaryUrl}, trying fallback CDN:⁠, errPrimary);
+console.warn(⁠Primärer Abruf fehlgeschlagen für ${primaryUrl}, teste CDN Fallback:⁠, errPrimary);
 if (!fallbackUrl) throw errPrimary;
 return await tryFetch(fallbackUrl);
 }
@@ -1082,7 +1206,6 @@ const urlV2Primary = 'https://raw.githubusercontent.com/toniebox-reverse-enginee
 const urlV2Fallback = 'https://cdn.jsdelivr.net/gh/toniebox-reverse-engineering/tonies-json@release/toniesV2.json';
 let rawV1 = [], rawV2 = [], source = 'online';
 try {
-// 1. Fetch or retrieve V1 (Base)
 if (!forceRefresh && safeStorage.get(cacheV1Key)) {
 rawV1 = extractV1Tonies(safeStorage.get(cacheV1Key));
 source = 'lokaler Cache';
@@ -1101,20 +1224,16 @@ source = 'Cache Fallback';
 } else throw e;
 }
 }
-// 2. Fetch or retrieve V2 (Enrichment, optional)
 try {
 const v2Data = await fetchResilientJson(urlV2Primary, urlV2Fallback, 10000);
 rawV2 = extractV2Tonies(v2Data);
 safeStorage.set(cacheV2Key, rawV2);
 } catch (v2Err) {
-console.warn('V2 enrichment optional skipped:', v2Err);
 const cachedV2 = safeStorage.get(cacheV2Key);
 if (cachedV2) rawV2 = extractV2Tonies(cachedV2);
 }
-// 3. Map V2 enrichment data
 Data.v2Map.clear();
 rawV2.forEach(item => collectIds(item).forEach(id => Data.v2Map.set(id, item)));
-// 4. Unified Data Model Pipeline
 Data.tonies = rawV1.map(v1 => {
 const rawIds = collectIds(v1);
 const primaryId = String(rawIds[0] || v1.no || v1.id || '');
@@ -1132,23 +1251,21 @@ const language = String(v2.language || v1.language || 'de-de').toLowerCase();
 const tracks = v2.tracks?.length || v1.tracks?.length || 0;
 return { id: primaryId, audioIds, series, title, image, pic: image, language, tracks };
 }).filter(t => t.series || t.title || t.id);
-// Add Custom Tonies from LocalStorage
 const customTonies = safeStorage.get('phoenix_custom_tonies', []);
 if (Array.isArray(customTonies)) {
 Data.tonies.unshift(...customTonies);
+document.getElementById('dbg-custom-count').textContent = customTonies.length;
 }
 const elapsed = Math.round(performance.now() - Data.startTime);
 document.getElementById('db-status').textContent = ⁠${Data.tonies.length} Tonies (${source})⁠;
-// Update Debug Center
 document.getElementById('dbg-count').textContent = ⁠${Data.tonies.length} Tonies⁠;
 document.getElementById('dbg-source').textContent = source;
-document.getElementById('dbg-v2-count').textContent = ⁠${rawV2.length} V2 Einträge⁠;
+document.getElementById('dbg-v2-count').textContent = ⁠${rawV2.length} V2 Datensätze⁠;
 document.getElementById('dbg-load-time').textContent = ⁠${elapsed} ms⁠;
-// Optional Dump Index
 Data.loadDumpIndex().catch(e => console.warn("Dump-Index nicht erreichbar", e));
 Search.filter();
 if (Data.tonies[0]) Editor.load(Data.tonies[0], true);
-UI.showToast(⁠Datenbank geladen: ${Data.tonies.length} Tonies⁠);
+UI.showToast(⁠Datenbank einsatzbereit (${Data.tonies.length} Tonies)⁠);
 } catch (fatalError) {
 console.error("FATAL DATABASE ERROR:", fatalError);
 document.getElementById('db-status').textContent = 'Fehler beim Laden';
@@ -1184,11 +1301,11 @@ if (id && Data.dumpIndex.exactIds.has(id.toLowerCase())) return 'exact';
 if (Data.dumpIndex.titles.has(clean(tonie.title))) return 'fuzzy';
 return 'none';
 };
-// --- LIBRARY & SEARCH ENGINE 2.0 ---
+// --- LIBRARY NAVIGATION & SEARCH ---
 Library.switchTab = (tab) => {
 Library.activeTab = tab;
 Library.renderLimit = 36;
-['db', 'fav', 'custom'].forEach(t => {
+['db', 'fav', 'recent', 'custom'].forEach(t => {
 const el = document.getElementById(⁠tab-${t}⁠);
 if (el) el.classList.toggle('active', t === tab);
 });
@@ -1200,8 +1317,10 @@ const queryParts = splitQuery(queryInput ? queryInput.value : '');
 const lang = document.getElementById('filter-lang')?.value || '';
 const dumpFilter = document.getElementById('filter-dump')?.value || 'all';
 const favs = safeStorage.get('phoenix_favs', []);
+const recent = safeStorage.get('phoenix_recent', []);
 let results = Data.tonies;
 if (Library.activeTab === 'fav') results = results.filter(t => favs.includes(t.id));
+if (Library.activeTab === 'recent') results = results.filter(t => recent.includes(t.id));
 if (Library.activeTab === 'custom') results = results.filter(t => t.isCustom);
 if (lang) results = results.filter(t => t.language === lang);
 if (dumpFilter === 'exact') results = results.filter(t => Data.getMatchQuality(t) === 'exact');
@@ -1235,7 +1354,13 @@ img.loading = 'lazy';
 img.src = item.pic || '';
 img.onerror = () => { img.classList.add('fallback'); img.removeAttribute('src'); };
 imgWrap.appendChild(img);
-if (matchQ !== 'none') {
+if (item.isCustom) {
+const badge = document.createElement('div');
+badge.className = 'match-badge';
+badge.textContent = '☁️ Custom';
+badge.style.background = 'var(--teddy-teal)';
+imgWrap.appendChild(badge);
+} else if (matchQ !== 'none') {
 const badge = document.createElement('div');
 badge.className = 'match-badge';
 badge.textContent = matchQ === 'exact' ? '🟢 Exakt' : '🟡 Match';
@@ -1275,6 +1400,11 @@ favs = favs.includes(id) ? favs.filter(f => f !== id) : [...favs, id];
 safeStorage.set('phoenix_favs', favs);
 UI.renderCards();
 };
+UI.addRecent = (id) => {
+let recent = safeStorage.get('phoenix_recent', []);
+recent = [id, ...recent.filter(r => r !== id)].slice(0, 30);
+safeStorage.set('phoenix_recent', recent);
+};
 UI.showToast = (msg) => {
 const t = document.getElementById('toast');
 if (!t) return;
@@ -1282,9 +1412,10 @@ t.textContent = msg;
 t.classList.add('show');
 setTimeout(() => t.classList.remove('show'), 2500);
 };
-// --- COVER STUDIO & PNG EXPORT ---
+// --- COVER STUDIO PRO & PNG EXPORT ---
 Editor.load = (item, silent = false) => {
 Editor.current = { ...item, pic: item.pic || '' };
+UI.addRecent(item.id);
 Editor.resetTransform();
 document.getElementById('input-serie').value = item.series || '';
 document.getElementById('input-title').value = item.title || '';
@@ -1293,12 +1424,21 @@ Editor.update();
 if (!silent) UI.showToast(⁠"${item.series}" geladen⁠);
 };
 Editor.resetTransform = () => {
-Editor.state = { zoom: 100, x: 0, y: 0, fontSize: 100 };
+Editor.state = { zoom: 100, x: 0, y: 0, fontSize: 100, ring: 'dashed' };
 document.getElementById('slider-zoom').value = 100;
 document.getElementById('slider-x').value = 0;
 document.getElementById('slider-y').value = 0;
 document.getElementById('slider-font').value = 100;
+document.getElementById('select-ring').value = 'dashed';
+Editor.setRingStyle('dashed');
 Editor.update();
+};
+Editor.setRingStyle = (style) => {
+Editor.state.ring = style;
+const circle = document.getElementById('preview-circle');
+circle.className = 'tag-circle';
+if (style === 'accent') circle.classList.add('ring-accent');
+else if (style === 'black') circle.classList.add('ring-black');
 };
 Editor.update = () => {
 Editor.current.series = document.getElementById('input-serie').value;
@@ -1347,7 +1487,7 @@ UI.showToast("Eigenes Bild geladen!");
 reader.readAsDataURL(file);
 };
 Editor.exportPng = () => {
-UI.showToast("Generiere hochauflösendes PNG...");
+UI.showToast("Rendere hochauflösendes PNG (1000px)...");
 const canvas = document.createElement('canvas');
 canvas.width = 1000;
 canvas.height = 1000;
@@ -1377,6 +1517,13 @@ const svgImg = new Image();
 svgImg.onload = () => {
 ctx.drawImage(svgImg, 0, 0, 1000, 1000);
 URL.revokeObjectURL(svgUrl);
+if (Editor.state.ring === 'accent') {
+ctx.lineWidth = 12; ctx.strokeStyle = '#e11d48';
+ctx.beginPath(); ctx.arc(500, 500, 490, 0, Math.PI * 2); ctx.stroke();
+} else if (Editor.state.ring === 'black') {
+ctx.lineWidth = 12; ctx.strokeStyle = '#0f172a';
+ctx.beginPath(); ctx.arc(500, 500, 490, 0, Math.PI * 2); ctx.stroke();
+}
 const a = document.createElement('a');
 a.download = ⁠${clean(Editor.current.title || 'Tonie')}_Cover.png⁠;
 a.href = canvas.toDataURL('image/png');
@@ -1505,7 +1652,7 @@ App.switchView('print');
 } else UI.showToast("Druckbogen ist voll!");
 };
 PrintStudio.clear = () => { PrintStudio.slots.fill(null); PrintStudio.render(); UI.showToast("Bogen geleert."); };
-// --- STORAGE & NFC PROTOCOL ---
+// --- STORAGE & NFC PROTOCOL & FLIPPER EXPORT ---
 Storage.saveProject = () => {
 const fmt = document.getElementById('print-format')?.value || '43-12';
 const blob = new Blob([JSON.stringify({ format: fmt, slots: PrintStudio.slots })], { type: 'application/json' });
@@ -1565,6 +1712,122 @@ else return UI.showToast("Bitte erst Hardware verbinden!");
 UI.showToast("Flash-Befehl gesendet!");
 } catch(e) { UI.showToast("Übertragungsfehler."); }
 };
+NfcStudio.exportFlipperNfc = () => {
+const rawUid = Editor.current.uid || '0102030405060708';
+const fullUid = rawUid.length >= 16 ? rawUid.toUpperCase() : ("E00403" + rawUid.padStart(10, '0')).toUpperCase();
+const formattedUid = fullUid.match(/.{1,2}/g)?.join(' ') || 'E0 04 03 00 00 00 00 01';
+const nfcContent = ⁠Filetype: Flipper NFC device Version: 3 Device type: ISO15693 UID: ${formattedUid} DSFID: 00 AFI: 00 Block size: 4 Block count: 28 Data content: 00 00 00 00 ⁠;
+const blob = new Blob([nfcContent], { type: 'text/plain' });
+const a = document.createElement('a');
+a.href = URL.createObjectURL(blob);
+a.download = ⁠${clean(Editor.current.title || 'Tonie_Tag')}.nfc⁠;
+a.click();
+UI.showToast("Flipper Zero .nfc Datei exportiert!");
+};
+// --- TEDDYCLOUD COMPANION ENGINE ---
+TeddyCloud.saveCurrentAsCustom = () => {
+if (!Editor.current.title && !Editor.current.series) return UI.showToast("Bitte erst Titel oder Serie eingeben!");
+const customTonies = safeStorage.get('phoenix_custom_tonies', []);
+const newTonie = {
+id: Editor.current.uid || 'CUSTOM_' + Date.now().toString(16),
+series: Editor.current.series || 'Eigene Sammlung',
+title: Editor.current.title || 'Neuer Tonie',
+pic: Editor.current.pic || '',
+image: Editor.current.pic || '',
+language: 'de-de',
+tracks: 1,
+isCustom: true
+};
+customTonies.unshift(newTonie);
+safeStorage.set('phoenix_custom_tonies', customTonies);
+Data.tonies.unshift(newTonie);
+document.getElementById('dbg-custom-count').textContent = customTonies.length;
+UI.showToast("Als eigener Tonie gespeichert!");
+Library.switchTab('custom');
+};
+TeddyCloud.createFromForm = () => {
+const series = document.getElementById('tc-input-series').value.trim();
+const title = document.getElementById('tc-input-title').value.trim();
+const uid = document.getElementById('tc-input-uid').value.trim();
+const lang = document.getElementById('tc-input-lang').value;
+if (!title) return UI.showToast("Bitte mindestens einen Titel eingeben!");
+const newTonie = {
+id: uid || 'CUSTOM_' + Date.now().toString(16).toUpperCase(),
+series: series || 'Eigene Sammlung',
+title: title,
+pic: '',
+image: '',
+language: lang,
+tracks: 1,
+isCustom: true
+};
+const customTonies = safeStorage.get('phoenix_custom_tonies', []);
+customTonies.unshift(newTonie);
+safeStorage.set('phoenix_custom_tonies', customTonies);
+Data.tonies.unshift(newTonie);
+document.getElementById('dbg-custom-count').textContent = customTonies.length;
+Editor.load(newTonie);
+App.switchView('design');
+UI.showToast("Eigener Tonie angelegt und im Studio geöffnet!");
+};
+TeddyCloud.exportJson = () => {
+const customTonies = safeStorage.get('phoenix_custom_tonies', []);
+const tcFormat = customTonies.map(t => ({
+no: t.id,
+model: t.id,
+audio_id: [t.id],
+series: t.series,
+episodes: t.title,
+tracks: [t.title],
+language: t.language || 'de-de'
+}));
+const blob = new Blob([JSON.stringify(tcFormat, null, 2)], { type: 'application/json' });
+const a = document.createElement('a');
+a.href = URL.createObjectURL(blob);
+a.download = 'TeddyCloud_Tonies_Export.json';
+a.click();
+UI.showToast("TeddyCloud JSON exportiert!");
+};
+TeddyCloud.importJson = (e) => {
+const file = e.target.files?.[0];
+if (!file) return;
+const r = new FileReader();
+r.onload = ev => {
+try {
+const data = JSON.parse(ev.target.result);
+const list = Array.isArray(data) ? data : (data.tonies || data.data || []);
+const imported = list.map(item => ({
+id: String(item.no || item.id || item.audio_id?.[0] || 'CUSTOM_' + Math.random().toString(36).slice(2, 8)),
+series: item.series || item.brand || 'Importiert',
+title: item.episodes || item.title || item.episode || 'Ohne Titel',
+pic: item.image || item.picture || '',
+language: item.language || 'de-de',
+tracks: item.tracks?.length || 1,
+isCustom: true
+}));
+if (imported.length) {
+const existing = safeStorage.get('phoenix_custom_tonies', []);
+const merged = [...imported, ...existing];
+safeStorage.set('phoenix_custom_tonies', merged);
+Data.tonies.unshift(...imported);
+document.getElementById('dbg-custom-count').textContent = merged.length;
+Library.switchTab('custom');
+UI.showToast(⁠${imported.length} Tonies importiert!⁠);
+} else UI.showToast("Keine gültigen Tonies in der Datei gefunden.");
+} catch(err) { UI.showToast("Fehler beim Lesen der JSON-Datei."); }
+e.target.value = '';
+};
+r.readAsText(file);
+};
+TeddyCloud.clearCustom = () => {
+if (!confirm("Möchtest du wirklich alle eigenen Tonies löschen?")) return;
+safeStorage.remove('phoenix_custom_tonies');
+Data.tonies = Data.tonies.filter(t => !t.isCustom);
+document.getElementById('dbg-custom-count').textContent = '0';
+Library.switchTab('db');
+UI.showToast("Eigene Tags gelöscht.");
+};
+// --- VIEW SWITCHER ---
 App.switchView = (view) => {
 document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
 document.querySelectorAll('.workspace').forEach(w => w.classList.remove('active'));
@@ -1572,7 +1835,7 @@ const vw = document.getElementById(⁠view-${view}⁠);
 if (vw) vw.classList.add('active');
 if (view === 'print') PrintStudio.render();
 };
-// Mobile Swipe Gesture Handler
+// Mobile Swipe Handler
 (() => {
 let startX = 0, startY = 0, dragging = false;
 const l = () => document.getElementById('studio-swipe-container');
