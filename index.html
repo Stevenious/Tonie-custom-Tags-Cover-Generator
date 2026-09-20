@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TagGen Studio V2.8.2 – Ultra Stable</title>
+    <title>TagGen Studio V2.8.3 – Ultra Stable</title>
     
     <!-- PWA Web App Manifest -->
     <link rel="manifest" href="data:application/manifest+json;utf-8,%7B%22name%22%3A%22TagGen%20Studio%20Phoenix%22%2C%22short_name%22%3A%22TagGen%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%23e11d48%22%7D">
@@ -44,6 +44,7 @@
         /* =========================================================
            GLOBAL OVERFLOW & RESET
            ========================================================= */
+        /* STREAMING_CHUNK:Global Styles and Reset */
         *, *::before, *::after {
             box-sizing: border-box;
             margin: 0;
@@ -69,6 +70,7 @@
         }
 
         /* --- HEADER & NAVIGATION --- */
+        /* STREAMING_CHUNK:Header and Navigation Bar Styling */
         header {
             height: 60px;
             background: var(--glass-bg);
@@ -156,6 +158,7 @@
         }
 
         /* --- APP WORKSPACES --- */
+        /* STREAMING_CHUNK:App Workspaces and Studio Layout Containers */
         .app-container {
             display: flex;
             flex: 1;
@@ -178,7 +181,6 @@
         }
         .workspace.active { display: flex; }
 
-        /* --- STUDIO LAYOUT (FLEX CONTROLS) --- */
         .studio-layout {
             display: flex;
             flex: 1;
@@ -265,7 +267,10 @@
             outline: none;
         }
 
-        /* Container Wrap zur Vermeidung von horizontalem Überlauf */
+        /* =========================================================
+           LIBRARY GRID & CARDS (BUGFIX OVERLAP)
+           ========================================================= */
+        /* STREAMING_CHUNK:Library Grid and Asset Cards Styling */
         .library-grid-wrap {
             width: 100%;
             min-width: 0;
@@ -284,16 +289,29 @@
             padding: 10px;
         }
 
-        .load-more-container {
-            grid-column: 1 / -1;
+        #cardGrid {
+            display: grid;
             width: 100%;
-            padding: 12px;
-            text-align: center;
+            max-width: 100%;
+            min-width: 0;
+            grid-template-columns: repeat(8, minmax(0, 1fr));
+            gap: 10px;
+            align-items: start;
+        }
+
+        #cardGrid > * {
+            min-width: 0;
+            max-width: 100%;
         }
 
         .asset-card {
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+            overflow: hidden;
             background: #fff;
             border: 1px solid var(--border);
+            border-radius: 12px;
             position: relative;
             cursor: pointer;
             display: flex;
@@ -309,18 +327,27 @@
             transform: translateY(-1px);
         }
 
+        /* BUGFIX: Padding-Hack verhindert Zusammenfallen (Overlap) in iOS/Safari Safari */
         .card-img-wrap {
             width: 100%;
-            aspect-ratio: 1 / 1;
+            padding-bottom: 100%; /* Ersetzt instabiles aspect-ratio: 1/1 */
             background: var(--bg-canvas);
             border-radius: 6px;
             flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
             position: relative;
+            overflow: hidden;
             border: 1px solid #f1f5f9;
+            display: block;
+        }
+
+        .card-img-wrap img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .fav-btn {
@@ -368,6 +395,7 @@
             justify-content: center;
             min-width: 0;
             max-width: 100%;
+            overflow: hidden;
         }
 
         .card-serie {
@@ -378,6 +406,20 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        .card-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 1px 0 2px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+            max-width: 100%;
         }
 
         .card-meta {
@@ -389,6 +431,8 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            min-width: 0;
+            max-width: 100%;
         }
 
         .status-dot {
@@ -399,7 +443,15 @@
             flex-shrink: 0;
         }
 
+        .load-more-container {
+            grid-column: 1 / -1;
+            width: 100%;
+            padding: 12px;
+            text-align: center;
+        }
+
         /* --- CANVAS PREVIEW --- */
+        /* STREAMING_CHUNK:Canvas Editor Preview Styling */
         .canvas-area {
             flex: 1;
             display: flex;
@@ -409,6 +461,7 @@
             position: relative;
             overflow: auto;
             min-width: 0;
+            max-width: 100%;
         }
 
         .preview-wrapper {
@@ -422,6 +475,7 @@
             align-items: center;
             gap: 16px;
             max-width: 100%;
+            min-width: 0;
         }
 
         .tag-circle {
@@ -458,9 +512,11 @@
             display: flex;
             gap: 8px;
             width: 100%;
+            min-width: 0;
         }
 
         /* --- SIDEBAR CONTROLS --- */
+        /* STREAMING_CHUNK:Sidebar Controls and Input Forms */
         .sidebar-controls {
             width: 330px;
             background: var(--bg-sidebar);
@@ -470,6 +526,7 @@
             overflow-y: auto;
             flex-shrink: 0;
             min-width: 0;
+            max-width: 100%;
         }
 
         .control-section {
@@ -478,6 +535,8 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
+            min-width: 0;
+            max-width: 100%;
         }
 
         .control-section h3 {
@@ -510,6 +569,8 @@
             font-size: 12px;
             outline: none;
             background: #fff;
+            max-width: 100%;
+            min-width: 0;
         }
         .input-group input[type="text"]:focus { border-color: var(--primary); }
 
@@ -534,6 +595,7 @@
             justify-content: center;
             gap: 6px;
             user-select: none;
+            max-width: 100%;
         }
         .btn:hover { background: var(--primary-hover); }
 
@@ -556,6 +618,7 @@
         .btn-secondary:hover { background: #f8fafc; border-color: var(--primary); color: var(--primary); }
 
         /* --- VIEW 2: PRINT STUDIO --- */
+        /* STREAMING_CHUNK:Print Studio View Styles */
         .print-toolbar {
             background: #fff;
             padding: 12px 18px;
@@ -646,6 +709,7 @@
         .s-btn.del:hover { background: var(--primary); }
 
         /* --- VIEW 3: NFC WORKSPACE & FLIPPER EXPORT --- */
+        /* STREAMING_CHUNK:NFC Workspace and TeddyCloud Companion Styles */
         .nfc-container {
             max-width: 960px;
             margin: 24px auto;
@@ -747,6 +811,7 @@
         }
 
         /* --- VIEW 5: DEBUG & CACHE CENTER --- */
+        /* STREAMING_CHUNK:Debug Center and Modal Styles */
         .debug-container {
             max-width: 820px;
             margin: 20px auto;
@@ -845,62 +910,8 @@
         .dot.active { background: var(--primary); transform: scale(1.25); }
         .page-step-label { font-size: 11px; font-weight: 600; color: var(--text-muted); }
 
-        /* ---------- Überlaufschutz & Fixes ---------- */
-        .studio-layout,
-        .sidebar-lib,
-        .canvas-area,
-        .sidebar-controls,
-        .control-section {
-            min-width: 0;
-            max-width: 100%;
-        }
-        img, canvas, svg, input, select, button {
-            max-width: 100%;
-        }
-
-        /* --- MOBILE SWIPE LOGIC (V2.8.2 Studio-Layout Integration) --- */
-        @media (max-width: 960px) {
-            header { height: 54px; padding: 0 10px; }
-            .brand { font-size: 14px; }
-            .header-actions { display: none; }
-            .mobile-pagination-bar { display: flex; }
-
-            .studio-layout {
-                width: 300vw;
-                min-width: 300vw;
-                display: flex;
-                overflow: hidden;
-                touch-action: pan-x;
-                transform: translateX(0);
-                transition: transform .25s ease;
-            }
-            .sidebar-lib, .canvas-area, .sidebar-controls {
-                width: 100vw;
-                min-width: 100vw;
-                max-width: 100vw;
-                flex: 0 0 100vw;
-                border: 0;
-            }
-            .sidebar-lib { order: 1; }
-            .canvas-area { order: 2; padding: 12px; }
-            .sidebar-controls { order: 3; overflow-y: auto; padding-bottom: 32px; }
-
-            .preview-wrapper { width: min(92vw, 380px); padding: 16px; gap: 12px; }
-            .tag-circle { width: min(72vw, 280px); height: min(72vw, 280px); }
-
-            .print-scroll { padding: 10px; }
-            .a4-sheet {
-                width: min(210mm, calc(100vw - 20px));
-                height: auto;
-                aspect-ratio: 210 / 297;
-                transform: none;
-                margin: 0 auto;
-            }
-            .print-toolbar { padding: 8px; }
-            .nfc-container { grid-template-columns: 1fr; margin: 16px auto; }
-        }
-
         /* PRINT MEDIA FIXES */
+        /* STREAMING_CHUNK:Print Styles and Responsive Mobile Patch */
         @page { size: A4 portrait; margin: 0; }
         @media print {
             body * { visibility: hidden; }
@@ -913,189 +924,145 @@
             img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
 
-        /* ============================================================
-           TAGGEN PHOENIX — RESPONSIVE GRID PATCH
-           Desktop: max. 8 Kacheln
-           Tablet:  4–6 Kacheln
-           Mobile:  2–3 Kacheln
-           ============================================================ */
-        /* ---------- Grid-Grundlagen ---------- */
-        .grid,
-        .tonie-grid,
-        .library-grid,
-        .card-grid,
-        #cardGrid,
-        #mobileGrid {
-            display: grid;
-            width: 100%;
-            min-width: 0;
-            grid-template-columns: repeat(8, minmax(0, 1fr));
-            gap: 10px;
-            align-items: start;
-        }
-        .grid > *,
-        .tonie-grid > *,
-        .library-grid > *,
-        .card-grid > *,
-        #cardGrid > *,
-        #mobileGrid > * {
-            min-width: 0;
-            max-width: 100%;
-        }
-        /* ---------- Kacheln ---------- */
-        .card,
-        .tonie-card,
-        .library-card,
-        .asset-card {
-            width: 100%;
-            min-width: 0;
-            max-width: 100%;
-            overflow: hidden;
-            border-radius: 12px;
-        }
-        .card img,
-        .tonie-card img,
-        .library-card img,
-        .asset-card img {
-            display: block;
-            width: 100%;
-            max-width: 100%;
-            aspect-ratio: 1 / 1;
-            object-fit: cover;
-        }
-        /* Lange Titel dürfen niemals das Grid sprengen */
-        .card-title,
-        .tonie-card-title,
-        .library-card-title {
-            min-width: 0;
-            max-width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-        /* ---------- Große Desktop-Auflösung ---------- */
+        /* =========================================================
+           PHOENIX V2.8.2 — MOBILE + 8-COLUMN LIBRARY PATCH
+           Nur Layout / HTML-CSS
+           ========================================================= */
+
+        /* ---------- DESKTOP ---------- */
+        /* >= 1400px = 8 */
         @media (min-width: 1400px) {
-            .grid,
-            .tonie-grid,
-            .library-grid,
-            .card-grid,
             #cardGrid {
                 grid-template-columns: repeat(8, minmax(0, 1fr));
                 gap: 10px;
             }
         }
-        /* ---------- normaler Desktop ---------- */
+        /* 1150–1399 = 6 */
         @media (min-width: 1150px) and (max-width: 1399px) {
-            .grid,
-            .tonie-grid,
-            .library-grid,
-            .card-grid,
             #cardGrid {
                 grid-template-columns: repeat(6, minmax(0, 1fr));
                 gap: 10px;
             }
         }
-        /* ---------- kleiner Desktop / Tablet ---------- */
+        /* 850–1149 = 4 */
         @media (min-width: 850px) and (max-width: 1149px) {
-            .grid,
-            .tonie-grid,
-            .library-grid,
-            .card-grid,
             #cardGrid {
                 grid-template-columns: repeat(4, minmax(0, 1fr));
                 gap: 9px;
             }
         }
-        /* ---------- Tablet ---------- */
+        /* 600–849 = 3 */
         @media (min-width: 600px) and (max-width: 849px) {
-            .grid,
-            .tonie-grid,
-            .library-grid,
-            .card-grid,
             #cardGrid {
                 grid-template-columns: repeat(3, minmax(0, 1fr));
                 gap: 8px;
             }
         }
-        /* ============================================================
-           MOBILE
-           ============================================================ */
+
+        /* =========================================================
+           SMARTPHONE
+           ========================================================= */
         @media (max-width: 599px) {
-            html,
-            body {
-                width: 100%;
-                max-width: 100%;
-                overflow-x: hidden;
-            }
-            .panel {
-                width: 100%;
-                max-width: 100%;
-            }
-            /* 2 schöne große Kacheln */
-            .grid,
-            .tonie-grid,
-            .library-grid,
-            .card-grid,
-            #cardGrid,
-            #mobileGrid {
+            /* Mobile bewusst 2 Spalten */
+            #cardGrid {
                 grid-template-columns: repeat(2, minmax(0, 1fr));
                 gap: 8px;
             }
-            .card,
-            .tonie-card,
-            .library-card,
             .asset-card {
-                border-radius: 11px;
+                border-radius: 10px;
+                padding: 6px;
             }
-            .card-info,
-            .tonie-card-info,
-            .library-card-info,
             .card-content {
-                padding: 7px;
-                min-width: 0;
+                padding: 4px;
             }
-            .card-title,
-            .tonie-card-title,
-            .library-card-title {
+            .card-title {
                 font-size: 12px;
                 line-height: 1.25;
             }
-            .card-meta,
-            .tonie-card-meta,
-            .library-card-meta {
+            .card-meta {
                 font-size: 10px;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
             }
         }
-        /* ============================================================
-           SEHR KLEINE SMARTPHONES
-           ============================================================ */
+
+        /* =========================================================
+           VERY SMALL PHONES
+           ========================================================= */
         @media (max-width: 370px) {
-            .grid,
-            .tonie-grid,
-            .library-grid,
-            .card-grid,
-            #cardGrid,
-            #mobileGrid {
+            #cardGrid {
                 gap: 6px;
             }
-            .card-info,
-            .tonie-card-info,
-            .library-card-info,
             .card-content {
-                padding: 6px;
+                padding: 3px;
             }
-            .card-title,
-            .tonie-card-title,
-            .library-card-title {
+            .card-title {
                 font-size: 11px;
             }
+        }
+
+        /* =========================================================
+           PHOENIX MOBILE 3-PAGE SYSTEM (MAPPED TO V2.8.2)
+           ========================================================= */
+        @media (max-width: 960px) {
+            header { height: 54px; padding: 0 10px; }
+            .brand { font-size: 14px; min-width: 0; flex: 1 1 auto; }
+            .header-actions { display: none; }
+            .mobile-pagination-bar { display: flex; width: 100%; max-width: 100%; min-width: 0; }
+            
+            .view-switcher {
+                max-width: 100%;
+                overflow-x: auto;
+                scrollbar-width: none;
+                flex-basis: 100%;
+                margin-left: auto;
+            }
+            .view-btn { padding: 7px 9px; font-size: 11px; flex: 0 0 auto; }
+
+            .studio-layout {
+                display: flex;
+                width: 300vw;
+                max-width: none;
+                min-width: 0;
+                overflow: hidden;
+                transition: transform 0.25s ease;
+            }
+            
+            .sidebar-lib, .canvas-area, .sidebar-controls {
+                flex: 0 0 100vw;
+                width: 100vw;
+                max-width: 100vw;
+                min-width: 0;
+                border: 0;
+                padding-left: 4px;
+                padding-right: 4px;
+                overflow: hidden;
+                overflow-y: auto;
+            }
+
+            .canvas-area { padding: 12px; }
+            .sidebar-controls { padding-bottom: 32px; }
+            .preview-wrapper { width: min(92vw, 380px); padding: 16px; gap: 12px; }
+            .tag-circle { width: min(72vw, 280px); height: min(72vw, 280px); }
+            
+            .print-scroll { padding: 10px; }
+            .a4-sheet {
+                width: min(210mm, calc(100vw - 20px));
+                height: auto;
+                aspect-ratio: 210 / 297;
+                transform: none;
+                margin: 0 auto;
+            }
+            .print-toolbar { padding: 8px; }
+            .nfc-container { grid-template-columns: 1fr; margin: 16px auto; }
+
+            /* Mobile Search */
+            .lib-header { display: block; width: 100%; min-width: 0; }
+            .search-input { width: 100%; min-width: 0; margin-bottom: 7px; }
+            .filter-row { display: flex; width: 100%; min-width: 0; }
         }
     </style>
 </head>
 <body>
+    <!-- STREAMING_CHUNK:HTML Body Structure and Application Layout -->
 
     <div id="db-error-banner">
         <span>⚠️ Datenbank konnte online nicht geladen werden.</span>
@@ -1116,7 +1083,7 @@
                 <line x1="1" y1="9" x2="4" y2="9"></line>
                 <line x1="1" y1="14" x2="4" y2="14"></line>
             </svg>
-            <span>TagGen <span style="color:var(--primary);">Phoenix</span> <span style="font-size:10px; background:var(--primary-soft); color:var(--primary); padding:2px 6px; border-radius:8px; margin-left:3px;">V2.8.2 Stable</span></span>
+            <span>TagGen <span style="color:var(--primary);">Phoenix</span> <span style="font-size:10px; background:var(--primary-soft); color:var(--primary); padding:2px 6px; border-radius:8px; margin-left:3px;">V2.8.3 Stable</span></span>
         </div>
 
         <div class="view-switcher">
@@ -1173,9 +1140,10 @@
                         <div class="tag-circle" id="preview-circle">
                             <img id="preview-img" src="" alt="" loading="lazy">
                             <svg viewBox="0 0 100 100" id="preview-svg">
-                                <path id="path-top" d="M 16,50 A 34,34 0 0,1 84,50" fill="none"/>
+                                <!-- BUGFIX: Radius erhöht (40/42), damit der Text weiter am Rand liegt -->
+                                <path id="path-top" d="M 10,50 A 40,40 0 0,1 90,50" fill="none"/>
                                 <path id="path-uid" d="M 22,50 A 28,28 0 0,0 78,50" fill="none"/>
-                                <path id="path-bottom" d="M 14,50 A 36,36 0 0,0 86,50" fill="none"/>
+                                <path id="path-bottom" d="M 8,50 A 42,42 0 0,0 92,50" fill="none"/>
 
                                 <text font-size="7.5" font-weight="bold" fill="#e11d48" text-anchor="middle" id="svg-text-top-node">
                                     <textPath href="#path-top" startOffset="50%" id="svg-text-top" letter-spacing="0.1em"></textPath>
@@ -1212,7 +1180,13 @@
                             <input type="text" id="input-title">
                         </div>
                         <div class="input-group">
-                            <label>Audio-ID (Mitte)</label>
+                            <div style="display:flex; justify-content:space-between; align-items:center;">
+                                <label style="display:block;">Audio-ID (Mitte)</label>
+                                <!-- BUGFIX: Checkbox zum Ausblenden der ID auf dem Druck -->
+                                <label style="font-size:10px; display:flex; align-items:center; gap:4px; cursor:pointer; color:var(--text-muted);">
+                                    <input type="checkbox" id="show-uid" checked onchange="Editor.update()"> Drucken
+                                </label>
+                            </div>
                             <input type="text" id="input-uid" placeholder="16-stellige Hex-ID">
                         </div>
                         <div class="input-group" style="margin-top: 2px;">
@@ -1433,7 +1407,7 @@
                     <h2>🛠️ System & Datenbank Status</h2>
                     <table class="debug-table">
                         <tr><th>Attribut</th><th>Status / Wert</th></tr>
-                        <tr><td>Version</td><td>TagGen Studio V2.8.2 (Ultra Stable Edition)</td></tr>
+                        <tr><td>Version</td><td>TagGen Studio V2.8.3 (Ultra Stable Edition)</td></tr>
                         <tr><td>Geladene Tonies</td><td id="dbg-count">-</td></tr>
                         <tr><td>Datenquelle</td><td id="dbg-source">-</td></tr>
                         <tr><td>V2 Metadaten Status</td><td id="dbg-v2-count">Wird im Hintergrund angereichert...</td></tr>
@@ -1467,6 +1441,7 @@
     <div id="toast">Nachricht</div>
 
     <script>
+        /* STREAMING_CHUNK:Javascript Logic Initialization */
         const App = {};
         const Data = {
             tonies: [],          
@@ -1592,6 +1567,7 @@
             return [...new Set(ids.map(String).filter(Boolean))];
         };
 
+        /* STREAMING_CHUNK:Database Initialization */
         Data.init = async (forceRefresh = false) => {
             Data.startTime = performance.now();
             const statusEl = document.getElementById('db-status');
@@ -1785,6 +1761,7 @@
             return 'none';
         };
 
+        /* STREAMING_CHUNK:Search and Filtering Functionality */
         Library.switchTab = (tab) => {
             Library.activeTab = tab;
             Library.renderLimit = 48;
@@ -1829,8 +1806,9 @@
             UI.renderCards();
         };
 
-        const TRANSPARENT_PIXEL = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%23e2e8f0"/></svg>';
+        const TRANSPARENT_PIXEL = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 
+        /* STREAMING_CHUNK:UI Rendering for Cards */
         UI.renderCards = () => {
             const grid = document.getElementById('cardGrid');
             if (!grid) return;
@@ -1987,6 +1965,7 @@
             };
         };
 
+        /* STREAMING_CHUNK:Editor Logic */
         Editor.load = (item, silent = false) => {
             Editor.current = { ...item, pic: item.pic || item.image || '' };
             UI.addRecent(item.id);
@@ -2061,7 +2040,12 @@
             document.getElementById('svg-text-bottom-node').setAttribute('font-size', (6.5 * fScale).toFixed(1));
 
             document.getElementById('svg-text-top').textContent = Editor.current.series;
-            document.getElementById('svg-text-uid').textContent = Editor.current.uid ? `ID: ${Editor.current.uid}` : '';
+            
+            // BUGFIX: UID optional ausblenden über die UI-Checkbox
+            const showUidEl = document.getElementById('show-uid');
+            const showUid = showUidEl ? showUidEl.checked : true;
+            document.getElementById('svg-text-uid').textContent = (Editor.current.uid && showUid) ? `ID: ${Editor.current.uid}` : '';
+            
             document.getElementById('svg-text-bottom').textContent = Editor.current.title;
             
             document.getElementById('nfc-target-title').textContent = Editor.current.title || '-';
@@ -2199,6 +2183,7 @@
             document.getElementById('filter-dump')?.addEventListener('change', Search.filter);
         };
 
+        /* STREAMING_CHUNK:Print Studio Logic */
         PrintStudio.init = () => {
             PrintStudio.slots = new Array(12).fill(null);
             PrintStudio.changeFormat();
@@ -2285,14 +2270,32 @@
                     svg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
                     
                     const fScale = data.state.fontSize / 100;
-                    svg.innerHTML = `
-                        <path id="p-t-${index}" d="M 16,50 A 34,34 0 0,1 84,50" fill="none"/>
-                        <path id="p-u-${index}" d="M 22,50 A 28,28 0 0,0 78,50" fill="none"/>
-                        <path id="p-b-${index}" d="M 14,50 A 36,36 0 0,0 86,50" fill="none"/>
-                        <text font-size="${7.5*fScale}" font-weight="bold" fill="#e11d48" text-anchor="middle"><textPath href="#p-t-${index}" startOffset="50%" letter-spacing="0.1em">${data.series}</textPath></text>
-                        <text font-size="${5*fScale}" font-weight="bold" fill="#64748b" text-anchor="middle"><textPath href="#p-u-${index}" startOffset="50%" letter-spacing="0.12em">${data.uid ? 'ID: '+data.uid : ''}</textPath></text>
-                        <text font-size="${6.5*fScale}" font-weight="bold" fill="#0f172a" text-anchor="middle"><textPath href="#p-b-${index}" startOffset="50%" letter-spacing="0.12em">${data.title}</textPath></text>
-                    `;
+                    
+                    // BUGFIX Radius für Text weiter an den Rand gerückt im PDF Export (passend zum Preview Update)
+                    const makePath = (id, d) => {
+                        const path = document.createElementNS(svgNS, 'path');
+                        path.setAttribute('id', id); path.setAttribute('d', d); path.setAttribute('fill', 'none');
+                        return path;
+                    };
+                    svg.appendChild(makePath(`p-t-${index}`, 'M 10,50 A 40,40 0 0,1 90,50'));
+                    svg.appendChild(makePath(`p-u-${index}`, 'M 22,50 A 28,28 0 0,0 78,50'));
+                    svg.appendChild(makePath(`p-b-${index}`, 'M 8,50 A 42,42 0 0,0 92,50'));
+                    
+                    const showUid = data.state.showUid !== false; // Rückwärtskompatibilität falls Attribut fehlt
+                    
+                    const makeText = (size, fill, pathId, text) => {
+                        const node = document.createElementNS(svgNS, 'text');
+                        node.setAttribute('font-size', size); node.setAttribute('font-weight', 'bold');
+                        node.setAttribute('fill', fill); node.setAttribute('text-anchor', 'middle');
+                        const tp = document.createElementNS(svgNS, 'textPath');
+                        tp.setAttribute('href', `#${pathId}`); tp.setAttribute('startOffset', '50%'); tp.setAttribute('letter-spacing', '0.1em');
+                        tp.textContent = text || ''; node.appendChild(tp); return node;
+                    };
+                    
+                    svg.appendChild(makeText((7.5*fScale).toFixed(1), '#e11d48', `p-t-${index}`, data.series));
+                    svg.appendChild(makeText((5*fScale).toFixed(1), '#64748b', `p-u-${index}`, (data.uid && showUid) ? 'ID: '+data.uid : ''));
+                    svg.appendChild(makeText((6.5*fScale).toFixed(1), '#0f172a', `p-b-${index}`, data.title));
+                    
                     s.appendChild(svg);
 
                     const act = document.createElement('div');
@@ -2308,7 +2311,8 @@
         };
 
         PrintStudio.addCurrentToSheet = () => {
-            const data = { ...Editor.current, state: { ...Editor.state } };
+            const showUidEl = document.getElementById('show-uid');
+            const data = { ...Editor.current, state: { ...Editor.state, showUid: showUidEl ? showUidEl.checked : true } };
             const idx = PrintStudio.slots.findIndex(s => s === null);
             if (idx > -1) {
                 PrintStudio.slots[idx] = data;
@@ -2346,6 +2350,7 @@
             r.readAsText(file);
         };
 
+        /* STREAMING_CHUNK:NFC Studio and TeddyCloud Companion Logic */
         NfcStudio.setMode = (m) => {
             NfcStudio.mode = m;
             document.getElementById('hw-usb')?.classList.toggle('active', m === 'usb');
