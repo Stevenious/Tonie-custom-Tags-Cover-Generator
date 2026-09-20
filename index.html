@@ -306,6 +306,7 @@
             width: 100%;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+            overscroll-behavior: contain;
             padding: 10px;
         }
 
@@ -317,9 +318,11 @@
             grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 10px;
             align-items: stretch;
+            overscroll-behavior: contain;
+            -webkit-overflow-scrolling: touch;
         }
 
-        /* CARD RE-STRUCTURE: BUG 5 & 6 RESOLUTION */
+        /* CARD STRUCTURE & BUG 4/5 FIXES */
         .asset-card {
             width: 100%;
             min-width: 0;
@@ -344,7 +347,7 @@
 
         .card-img-wrap {
             width: 100%;
-            padding-bottom: 100%; /* Safari aspect-ratio fallback */
+            padding-bottom: 100%;
             background: var(--bg-canvas);
             border-bottom: 1px solid var(--border);
             flex-shrink: 0;
@@ -400,9 +403,8 @@
             z-index: 5;
         }
 
-        /* Info hierarchy: Title -> Series -> Meta -> ID at bottom */
         .card-info {
-            padding: 8px;
+            padding: 10px 12px;
             display: flex;
             flex-direction: column;
             gap: 2px;
@@ -411,17 +413,17 @@
             overflow: hidden;
         }
 
-        /* Bug 5 Fix: Line-clamp 2 with fixed height so cards remain even */
+        /* Bug 4 Fix: Line-clamp 2 mit fester 2.8em Höhe */
         .card-title {
             font-size: 12px;
             font-weight: 600;
             color: var(--text-main);
-            line-height: 1.3;
+            line-height: 1.35;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
-            height: 2.6em;
+            height: 2.8em;
         }
 
         .card-serie {
@@ -445,16 +447,16 @@
             margin-top: 2px;
         }
 
-        /* Bug 6 Fix: Cleanly pinned to bottom without floating */
+        /* Bug 5 Fix: margin-top: 6px, sauber unter Serie platziert */
         .card-id {
-            margin-top: auto;
-            font-size: 9px;
+            margin-top: 6px;
+            font-size: 10px;
             font-family: monospace;
-            color: var(--text-subtle);
+            color: var(--text-muted);
+            opacity: 0.75;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            padding-top: 4px;
         }
 
         .status-dot {
@@ -678,6 +680,12 @@
             height: 100%;
             position: absolute;
             inset: 0;
+            background: white !important;
+        }
+
+        .a4-sheet::before,
+        .a4-sheet::after {
+            display: none !important;
         }
 
         .slot {
@@ -703,6 +711,8 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.06);
         }
         .sticker:active { cursor: grabbing; }
+        .sticker.dragging { touch-action: none; }
+        .sticker.selected { outline: 2px solid var(--primary); }
 
         .sticker-actions {
             position: absolute;
@@ -720,7 +730,11 @@
             z-index: 10;
             transition: opacity 0.2s;
         }
-        .sticker:hover .sticker-actions { opacity: 1; pointer-events: auto; }
+        .sticker:hover .sticker-actions,
+        .sticker.selected .sticker-actions {
+            opacity: 1;
+            pointer-events: auto;
+        }
         
         .s-btn {
             background: none; border: none; color: #fff; font-size: 12px; cursor: pointer;
@@ -1008,7 +1022,7 @@
             .a4-wrapper { width: min(210mm, calc(100vw - 20px)); height: auto; aspect-ratio: 210 / 297; margin: 0 auto; }
         }
 
-        /* --- PRINT MEDIA ISOLATION (BUG 4 FIX: ZERO GREY BAR) --- */
+        /* --- PRINT MEDIA ISOLATION (BLOCKER 3 FIX: ZERO GREY BAR) --- */
         @page { size: A4 portrait; margin: 0; }
         @media print {
             body { background: white !important; margin: 0; padding: 0; visibility: hidden; }
@@ -1018,7 +1032,9 @@
             #view-print, #view-print * { visibility: visible; }
             #view-print { position: absolute; left: 0; top: 0; margin: 0; padding: 0; width: 210mm; height: 297mm; display: block !important; background: transparent; }
             .print-scroll { padding: 0 !important; background: transparent !important; display: block !important; }
-            .a4-wrapper { width: 210mm !important; height: 297mm !important; max-width: 210mm !important; box-shadow: none !important; border: none !important; margin: 0 !important; }
+            .a4-wrapper { width: 210mm !important; height: 297mm !important; max-width: 210mm !important; box-shadow: none !important; border: none !important; margin: 0 !important; background: white !important; }
+            .a4-sheet { background: white !important; }
+            .a4-sheet::before, .a4-sheet::after { display: none !important; }
             .slot { border: none !important; background: transparent !important; }
             .sticker-actions { display: none !important; }
             img, svg { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -1078,8 +1094,7 @@
                             <button class="lib-tab" id="tab-custom" onclick="Library.switchTab('custom')">Eigene</button>
                         </div>
 
-                        <!-- Bug 7 Fix: Clean trigger for input -->
-                        <input type="text" class="search-input" id="search-input" placeholder="🔎 Tonie, Serie oder Audio-ID suchen..." oninput="Search.filter()">
+                        <input type="text" class="search-input" id="search-input" placeholder="🔎 Tonie, Serie oder Audio-ID suchen..." oninput="Search.onInputDebounced()">
                         
                         <div class="filter-row">
                             <select class="filter-select" id="filter-lang" onchange="Search.filter()">
@@ -1088,7 +1103,6 @@
                                 <option value="en-us">Englisch</option>
                                 <option value="fr-fr">Französisch</option>
                             </select>
-                            <!-- Bug 1 Fix: Explicit Search Mode Selection -->
                             <select class="filter-select" id="filter-dump" onchange="Search.filter()">
                                 <option value="all">Alle Tonies (Präzise)</option>
                                 <option value="fuzzy">🟡 Fuzzy Suche erlauben</option>
@@ -1450,7 +1464,14 @@
         };
 
         const Search = {
-            mode: 'all' // 'all', 'fuzzy', 'exact', 'strong'
+            mode: 'all', // 'all', 'fuzzy', 'exact', 'strong'
+            debounceTimer: null,
+            onInputDebounced() {
+                clearTimeout(this.debounceTimer);
+                this.debounceTimer = setTimeout(() => {
+                    this.filter();
+                }, 130);
+            }
         };
 
         const UI = {};
@@ -1458,7 +1479,7 @@
             state: { zoom: 100, x: 0, y: 0, fontSize: 100, ring: 'dashed', showUid: true },
             current: { series: '', title: '', uid: '', pic: '' }
         };
-        const PrintStudio = { slots: [] };
+        const PrintStudio = { slots: [], selectedSlot: null };
         const NfcStudio = { mode: 'usb', port: null, writer: null, bleDevice: null, bleChar: null };
         const TeddyCloud = {};
         const Storage = {};
@@ -1786,7 +1807,7 @@
             return 'none';
         };
 
-        // --- SEARCH & FILTER PIPELINE (BUG 1 & 7 FIXES) ---
+        // --- SEARCH & FILTER PIPELINE (BLOCKER 1 FIX) ---
         Library.switchTab = (tab) => {
             Library.activeTab = tab;
             Library.currentPage = 0;
@@ -1817,7 +1838,6 @@
 
             if (lang) pool = pool.filter(t => t.language === lang);
 
-            // Bug 1 Fix: Explicit filter mode handling without losing items on toggle
             if (filterMode === 'exact') {
                 pool = pool.filter(t => Data.getMatchQuality(t.raw) === 'exact');
             } else if (filterMode === 'strong') {
@@ -1827,7 +1847,6 @@
                 });
             }
 
-            // Bug 7 Fix: Empty query restores pool entirely
             if (!q) {
                 Library.currentFilteredResults = pool.map(p => p.raw);
             } else {
@@ -1867,7 +1886,6 @@
                         return;
                     }
 
-                    // Optional Fuzzy matching (only if enabled via filter mode)
                     if (filterMode === 'fuzzy') {
                         const chars = q.replace(/\s+/g, '').split('');
                         let charIdx = 0;
@@ -1885,7 +1903,7 @@
                 Library.currentFilteredResults = [...exactMatches, ...prefixMatches, ...containsMatches, ...fuzzyMatches].map(p => p.raw);
             }
 
-            // Bug 2 Fix: Page reset
+            // Blocker 1 Fix: Reset to page 0 upon search/filter
             Library.currentPage = 0;
             UI.renderCards();
             UI.updateDebugOverlay();
@@ -1896,6 +1914,11 @@
         UI.renderCards = () => {
             const grid = document.getElementById('cardGrid');
             if (!grid) return;
+            
+            // Bug 8 Fix: Record scroll position before rebuilding
+            const scrollContainer = document.getElementById('asset-scroll-container');
+            const currentScroll = scrollContainer ? scrollContainer.scrollTop : 0;
+            
             grid.innerHTML = '';
             
             const favs = safeStorage.get('phoenix_favs', []);
@@ -1910,8 +1933,6 @@
                 const card = document.createElement('div');
                 card.className = 'asset-card';
                 card.onclick = () => {
-                    // Bug 8 Fix: Record scroll position before loading
-                    const scrollContainer = document.getElementById('asset-scroll-container');
                     if (scrollContainer) Library.savedScrollTop = scrollContainer.scrollTop;
                     Editor.load(item);
                 };
@@ -1966,7 +1987,7 @@
                 const content = document.createElement('div');
                 content.className = 'card-info';
 
-                // Bug 5 & 6 Fix: Clean DOM order Title -> Series -> Meta -> ID
+                // Bug 4 & 5 Fix: Line-clamp 2 Titel + Serie + Audio-ID mit margin-top: 6px
                 const titleEl = document.createElement('div');
                 titleEl.className = 'card-title';
                 titleEl.textContent = item.title || 'Ohne Titel';
@@ -1998,7 +2019,12 @@
                 grid.appendChild(card);
             });
 
-            // Bug 2 Fix: Strict totalPages calculation based on filtered results
+            // Bug 8 Fix: Scrollposition wiederherstellen
+            if (scrollContainer && currentScroll > 0) {
+                scrollContainer.scrollTop = currentScroll;
+            }
+
+            // Blocker 1 & 2 Fix: Strikte Gesamtseitenberechnung
             const totalPages = Math.max(1, Math.ceil(totalItems / Library.pageSize));
             document.getElementById('page-indicator').textContent = `${Library.currentPage + 1} / ${totalPages}`;
             document.getElementById('btn-prev').disabled = Library.currentPage === 0;
@@ -2077,13 +2103,13 @@
             overlay.textContent = 
 `TagGen V3.0 LTS Diagnostics
 ──────────────────────────────
-DB Geladen:   ${Data.tonies.length}
-SearchIndex:  ${Data.searchIndex.length}
-Gefiltert:    ${Library.currentFilteredResults.length}
+DB Geladen:     ${Data.tonies.length}
+SearchIndex:    ${Data.searchIndex.length}
+Gefiltert:      ${Library.currentFilteredResults.length}
 Aktuelle Seite: ${Library.currentPage + 1} / ${totalPages}
-Suchmodus:    ${document.getElementById('filter-dump')?.value || 'all'}
-Viewport:     ${window.innerWidth}×${window.innerHeight}
-DPR:          ${window.devicePixelRatio || 1}`;
+Suchmodus:      ${document.getElementById('filter-dump')?.value || 'all'}
+Viewport:       ${window.innerWidth}×${window.innerHeight}
+DPR:            ${window.devicePixelRatio || 1}`;
         };
 
         // --- EDITOR STATE & RENDERING ---
@@ -2273,14 +2299,14 @@ DPR:          ${window.devicePixelRatio || 1}`;
             }
         };
 
-        // --- PRINT STUDIO (BUG 3 & 4 RESOLUTION) ---
+        // --- PRINT STUDIO (BLOCKER 2 & 3 RESOLUTION) ---
         PrintStudio.init = () => {
             PrintStudio.slots = new Array(12).fill(null);
             PrintStudio.changeFormat('43-12');
         };
 
         PrintStudio.getGeometry = (key) => {
-            // Bug 3 Fix: Exact millimeter definitions for DIN A4 standard sheets
+            // Blocker 2: Exakte DIN A4 Millimeter Definitionen
             const geo = {
                 '43-12': { w: 43, h: 43, cols: 3, rows: 4, ml: 30.5, mt: 47.5, gx: 10, gy: 10 },
                 '40-24': { w: 40, h: 40, cols: 4, rows: 6, ml: 17.5, mt: 16.0, gx: 5, gy: 5 },
@@ -2319,7 +2345,7 @@ DPR:          ${window.devicePixelRatio || 1}`;
                 const col = index % geo.cols;
                 const row = Math.floor(index / geo.cols);
                 
-                // Pure % mapping of 210mm x 297mm for true proportional rendering
+                // Exakte mm -> % Projektion von 210mm x 297mm
                 const lP = ((geo.ml + (col * (geo.w + geo.gx))) / 210) * 100;
                 const tP = ((geo.mt + (row * (geo.h + geo.gy))) / 297) * 100;
                 const wP = (geo.w / 210) * 100;
@@ -2343,6 +2369,8 @@ DPR:          ${window.devicePixelRatio || 1}`;
                         const temp = PrintStudio.slots[from];
                         PrintStudio.slots[from] = PrintStudio.slots[index];
                         PrintStudio.slots[index] = temp;
+                        // Bug 7: Behalte ausgewählten Slot nach Drag & Drop
+                        PrintStudio.selectedSlot = index;
                         PrintStudio.render();
                     }
                 };
@@ -2350,9 +2378,22 @@ DPR:          ${window.devicePixelRatio || 1}`;
                 if (data) {
                     count++;
                     const s = document.createElement('div');
-                    s.className = 'sticker';
+                    s.className = `sticker ${PrintStudio.selectedSlot === index ? 'selected' : ''}`;
                     s.draggable = true;
-                    s.ondragstart = e => e.dataTransfer.setData('text', index);
+                    s.onclick = (e) => {
+                        e.stopPropagation();
+                        // Bug 7 Fix: Auswahl beibehalten
+                        PrintStudio.selectedSlot = index;
+                        PrintStudio.render();
+                    };
+                    s.ondragstart = e => {
+                        s.classList.add('dragging');
+                        PrintStudio.selectedSlot = index;
+                        e.dataTransfer.setData('text', index);
+                    };
+                    s.ondragend = () => {
+                        s.classList.remove('dragging');
+                    };
 
                     const img = document.createElement('img');
                     img.onerror = function() {
@@ -2396,14 +2437,14 @@ DPR:          ${window.devicePixelRatio || 1}`;
                     
                     s.appendChild(svg);
 
-                    // Bug 10: Complete Actions Bar (Duplicate + Delete)
+                    // Bug 6 & 10: Kopieren / Duplizieren Toolbar
                     const act = document.createElement('div');
                     act.className = 'sticker-actions';
                     
                     const btnCopy = document.createElement('button');
                     btnCopy.className = 's-btn copy';
                     btnCopy.textContent = '⧉';
-                    btnCopy.title = 'Duplizieren';
+                    btnCopy.title = 'Kopieren';
                     btnCopy.onclick = (e) => {
                         e.stopPropagation();
                         PrintStudio.duplicate(index);
@@ -2416,6 +2457,7 @@ DPR:          ${window.devicePixelRatio || 1}`;
                     btnDel.onclick = (e) => {
                         e.stopPropagation();
                         PrintStudio.slots[index] = null;
+                        if (PrintStudio.selectedSlot === index) PrintStudio.selectedSlot = null;
                         PrintStudio.render();
                     };
 
@@ -2435,6 +2477,7 @@ DPR:          ${window.devicePixelRatio || 1}`;
             const idx = PrintStudio.slots.findIndex(s => s === null);
             if (idx > -1) {
                 PrintStudio.slots[idx] = data;
+                PrintStudio.selectedSlot = idx;
                 UI.showToast(`Auf Position ${idx+1} platziert!`);
                 App.switchView('print');
             } else UI.showToast('Druckbogen ist voll!');
@@ -2444,12 +2487,14 @@ DPR:          ${window.devicePixelRatio || 1}`;
             const emptyIdx = PrintStudio.slots.findIndex(s => s === null);
             if (emptyIdx === -1) return UI.showToast('Kein freier Platz zum Duplizieren!');
             PrintStudio.slots[emptyIdx] = JSON.parse(JSON.stringify(PrintStudio.slots[index]));
+            PrintStudio.selectedSlot = emptyIdx;
             UI.showToast(`Cover auf Position ${emptyIdx+1} dupliziert!`);
             PrintStudio.render();
         };
 
         PrintStudio.clear = () => {
             PrintStudio.slots.fill(null);
+            PrintStudio.selectedSlot = null;
             PrintStudio.render();
             UI.showToast('Bogen geleert.');
         };
@@ -2743,7 +2788,6 @@ Data content: 00 00 00 00
             if (vw) vw.classList.add('active');
             if (view === 'print') PrintStudio.render();
             
-            // Bug 8 Fix: Restore library scroll position if returning
             if (view === 'design') {
                 const scrollContainer = document.getElementById('asset-scroll-container');
                 if (scrollContainer && Library.savedScrollTop > 0) {
@@ -2780,7 +2824,7 @@ Data content: 00 00 00 00
             App.slideToPage(cur - 1);
         };
 
-        // Mobile touch gesture handler (Bug 9 Fix)
+        // Mobile touch gesture handler
         (() => {
             let startX = 0, startY = 0, dragging = false;
             const l = () => document.getElementById('studio-swipe-container');
