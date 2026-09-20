@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>TagGen Studio V2.8.5 – Architecture Update</title>
+    <title>TagGen Studio V2.9 LTS Core – Phoenix Edition</title>
     
     <meta name="theme-color" content="#e11d48">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    
+    <meta name="description" content="Tonie Cover Generator Pro, Print Studio & NFC Magic Tag Companion">
+
     <!-- ESP Web Tools -->
     <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
 
@@ -16,22 +17,15 @@
         :root {
             --primary: #e11d48;
             --primary-hover: #be123c;
-            --primary-soft: #fff1f2;
             --bg-canvas: #f8fafc;
             --bg-sidebar: #ffffff;
             --border: #e2e8f0;
             --text-main: #0f172a;
             --text-muted: #64748b;
-            
+            --text-subtle: #94a3b8;
             --status-exact: #10b981;
-            --status-strong: #3b82f6;
-            --status-fuzzy: #f59e0b;
-            --status-none: #94a3b8;
-            --flipper-orange: #ff8200;
-            --teddy-teal: #0d9488;
             --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
             --shadow-md: 0 4px 14px rgba(15,23,42,0.06);
-            --shadow-lg: 0 12px 30px rgba(15,23,42,0.09);
         }
 
         /* --- GLOBAL RESET --- */
@@ -44,6 +38,15 @@
             -webkit-tap-highlight-color: transparent;
         }
         img, canvas, svg, input, select, button { max-width: 100%; }
+
+        /* --- DEBUG OVERLAY (P0-7) --- */
+        #debug-overlay {
+            display: none; position: fixed; top: 10px; right: 10px;
+            background: rgba(15, 23, 42, 0.9); color: #22d3ee;
+            padding: 10px 14px; border-radius: 8px; font-family: monospace; font-size: 11px;
+            z-index: 9999; box-shadow: var(--shadow-lg); pointer-events: none;
+            backdrop-filter: blur(4px); white-space: pre-wrap; line-height: 1.4;
+        }
 
         /* --- HEADER --- */
         header {
@@ -73,51 +76,43 @@
         .workspace { flex: 1; display: none; flex-direction: column; background: var(--bg-canvas); overflow: hidden; width: 100%; }
         .workspace.active { display: flex; }
 
-        /* --- STUDIO LAYOUT (View 1) --- */
+        /* --- STUDIO LAYOUT --- */
         .studio-layout { display: flex; flex: 1; overflow: hidden; width: 100%; min-width: 0; }
         .sidebar-lib { width: 440px; background: var(--bg-sidebar); border-right: 1px solid var(--border); display: flex; flex-direction: column; z-index: 20; flex-shrink: 0; min-width: 0; }
         .lib-header { padding: 12px 14px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; background: #ffffff; flex-shrink: 0; }
-        .lib-tabs { display: flex; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
-        .lib-tab { background: none; border: none; font-size: 12px; font-weight: 600; color: var(--text-muted); cursor: pointer; position: relative; padding-bottom: 4px; }
-        .lib-tab.active { color: var(--primary); }
-        .lib-tab.active::after { content: ''; position: absolute; bottom: -7px; left: 0; right: 0; height: 2px; background: var(--primary); border-radius: 2px; }
+        
         .search-input { width: 100%; padding: 8px 11px; border: 1px solid var(--border); border-radius: 8px; font-size: 13px; outline: none; background: var(--bg-canvas); }
         .search-input:focus { border-color: var(--primary); background: #fff; }
         .filter-row { display: flex; gap: 6px; min-width: 0; }
         .filter-select { flex: 1; padding: 5px 7px; border: 1px solid var(--border); border-radius: 6px; font-size: 11px; background: #fff; outline: none; }
 
-        /* --- 8-CARD GRID & PAGINATION --- */
+        /* --- LIBRARY GRID (P0-5 & P0-6) --- */
         .library-grid-wrap { width: 100%; min-width: 0; overflow: hidden; flex: 1; display: flex; flex-direction: column; }
         .asset-scroll { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 12px; }
         
-        #cardGrid {
+        .library-grid {
             display: grid; width: 100%; min-width: 0;
-            grid-template-columns: repeat(4, 1fr); gap: 12px; align-items: start;
+            grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; align-items: start;
         }
 
-        /* CARD RE-STRUCTURE (P0: ID overlapping fix) */
-        .asset-card {
+        .card {
             width: 100%; min-width: 0; overflow: hidden; background: #fff; border: 1px solid var(--border);
             border-radius: 10px; cursor: pointer; display: flex; flex-direction: column;
             transition: transform 0.12s ease, border-color 0.12s ease; box-shadow: var(--shadow-sm);
+            height: 100%; /* Ensures cards stretch evenly */
         }
-        .asset-card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .card:hover { border-color: var(--primary); transform: translateY(-2px); box-shadow: var(--shadow-md); }
         
-        .card-img-wrap { width: 100%; padding-bottom: 100%; background: var(--bg-canvas); position: relative; overflow: hidden; border-bottom: 1px solid var(--border); }
-        .card-img-wrap img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+        .card-image { width: 100%; aspect-ratio: 1; background: var(--bg-canvas); position: relative; overflow: hidden; border-bottom: 1px solid var(--border); }
+        .card-image img { width: 100%; height: 100%; object-fit: cover; display: block; }
         
-        .fav-btn { position: absolute; top: 4px; right: 4px; background: rgba(255,255,255,0.9); border: none; width: 24px; height: 24px; border-radius: 50%; font-size: 14px; color: #cbd5e1; box-shadow: 0 1px 3px rgba(0,0,0,0.15); cursor: pointer; z-index: 5; display:flex; align-items:center; justify-content:center; }
-        .fav-btn.active { color: #eab308; }
-        .match-badge { position: absolute; top: 4px; left: 4px; color: #fff; font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.15); z-index: 5; }
-
-        .card-info { padding: 8px; display: flex; flex-direction: column; gap: 3px; overflow: hidden; }
-        .card-serie { font-size: 9px; font-weight: 700; color: var(--primary); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-info { padding: 10px; display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; overflow: hidden; }
+        .card-series { font-size: 9px; font-weight: 700; color: var(--primary); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .card-title { font-size: 12px; font-weight: 600; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .card-id { font-size: 9px; font-family: monospace; color: var(--text-subtle); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .card-meta { font-size: 10px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; }
-        .status-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
+        /* ID explicitly at bottom via auto margin */
+        .card-id { margin-top: auto; font-size: 10px; font-family: monospace; color: var(--text-muted); opacity: 0.85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Pagination Bar */
+        /* Pagination Bar (P0-4) */
         .pagination-bar {
             display: flex; align-items: center; justify-content: space-between; padding: 10px 16px;
             background: #fff; border-top: 1px solid var(--border); flex-shrink: 0;
@@ -129,15 +124,13 @@
         .pagination-bar button:disabled { opacity: 0.5; cursor: not-allowed; }
         .page-indicator { font-size: 12px; font-weight: 600; color: var(--text-muted); }
 
-        /* --- CANVAS PREVIEW --- */
+        /* --- EDITOR AREA --- */
         .canvas-area { flex: 1; display: flex; align-items: center; justify-content: center; padding: 20px; overflow: auto; -webkit-overflow-scrolling: touch; min-width: 0; }
         .preview-wrapper { background: #fff; padding: 28px 32px; border-radius: 20px; box-shadow: var(--shadow-lg); border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; gap: 16px; min-width: 0; }
+        
         .tag-circle { width: 270px; height: 270px; border-radius: 50%; border: 2px dashed #cbd5e1; position: relative; overflow: hidden; background: #fff; }
-        .tag-circle.ring-accent { border: 3px solid var(--primary); }
-        .tag-circle.ring-black { border: 3px solid #0f172a; }
         .tag-circle img { width: 100%; height: 100%; object-fit: contain; position: absolute; transform-origin: center center; }
         .tag-circle svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-        .studio-actions { display: flex; gap: 8px; width: 100%; }
 
         /* --- SIDEBAR CONTROLS --- */
         .sidebar-controls { width: 330px; background: var(--bg-sidebar); border-left: 1px solid var(--border); display: flex; flex-direction: column; overflow-y: auto; -webkit-overflow-scrolling: touch; flex-shrink: 0; min-width: 0; }
@@ -147,123 +140,76 @@
         .input-group label { font-size: 11px; font-weight: 600; display: flex; justify-content: space-between; }
         .input-group input[type="text"], .input-group select { padding: 7px 9px; border: 1px solid var(--border); border-radius: 6px; font-size: 12px; outline: none; background: #fff; min-width: 0; }
         .input-group input[type="text"]:focus { border-color: var(--primary); }
+        
         .btn { background: var(--primary); color: #fff; border: none; padding: 9px 14px; border-radius: 8px; font-weight: 600; font-size: 12px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-secondary { background: #fff; color: var(--text-main); border: 1px solid var(--border); padding: 7px 11px; border-radius: 7px; font-size: 11px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
 
-        /* --- VIEW 2: PRINT STUDIO (A4 PERCENTAGE SCALING FIX) --- */
+        /* --- PRINT STUDIO (P0-8: A4 ISOLATION) --- */
         .print-toolbar { background: #fff; padding: 12px 18px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
         .print-scroll { flex: 1; overflow: auto; -webkit-overflow-scrolling: touch; padding: 24px; display: flex; justify-content: center; align-items: flex-start; background: #e2e8f0; }
         
-        .a4-wrapper {
-            width: 100%; max-width: 210mm;
-            aspect-ratio: 210 / 297;
-            background: white;
-            box-shadow: var(--shadow-lg);
-            position: relative;
-        }
+        .a4-wrapper { width: 100%; max-width: 210mm; aspect-ratio: 210 / 297; background: white; box-shadow: var(--shadow-lg); position: relative; }
+        .a4-sheet { width: 100%; height: 100%; position: absolute; inset: 0; }
 
-        .a4-sheet {
-            width: 100%; height: 100%;
-            position: absolute; inset: 0;
-        }
-
-        .slot {
-            position: absolute; border: 1px dashed #cbd5e1;
-            display: flex; align-items: center; justify-content: center; border-radius: 50%; box-sizing: border-box; background: #fafafa;
-        }
-        .slot.drag-over { background: #ffe4e6; border-color: var(--primary); }
-        .sticker { width: 100%; height: 100%; border-radius: 50%; position: relative; overflow: hidden; background: #fff; cursor: grab; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
-        
-        .sticker-actions {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            display: flex; gap: 4px; background: rgba(15,23,42,0.85); backdrop-filter: blur(4px);
-            padding: 6px; border-radius: 20px; opacity: 0; pointer-events: none; z-index: 10;
-        }
+        .slot { position: absolute; border: 1px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; border-radius: 50%; box-sizing: border-box; background: #fafafa; }
+        .sticker { width: 100%; height: 100%; border-radius: 50%; position: relative; overflow: hidden; background: #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.06); }
+        .sticker-actions { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 4px; background: rgba(15,23,42,0.85); backdrop-filter: blur(4px); padding: 6px; border-radius: 20px; opacity: 0; pointer-events: none; z-index: 10; }
         .sticker:hover .sticker-actions { opacity: 1; pointer-events: auto; }
         .s-btn { background: none; border: none; color: #fff; font-size: 12px; cursor: pointer; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 50%; }
         .s-btn:hover { background: rgba(255,255,255,0.2); }
         .s-btn.del:hover { background: var(--primary); }
-        .s-btn.copy:hover { background: #3b82f6; } /* Duplicate Button */
 
-        /* --- OTHER VIEWS (NFC / TEDDY / DEBUG) --- */
-        .nfc-container, .teddy-container, .debug-container { max-width: 900px; margin: 24px auto; display: grid; gap: 18px; padding: 0 16px; }
-        @media(min-width: 768px) { .nfc-container { grid-template-columns: 1fr 1fr; } }
-        .nfc-card, .teddy-card { background: #fff; border-radius: 14px; padding: 18px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 12px; }
-        .tag-dual-preview { display: flex; justify-content: center; align-items: center; gap: 16px; padding: 14px; background: #f8fafc; border-radius: 12px; border: 1px solid var(--border); }
-        .tag-disc { width: 110px; height: 110px; border-radius: 50%; border: 2px solid #cbd5e1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #fff; position: relative; text-align: center; padding: 6px; }
-
-        /* --- TOAST & NOTIFICATIONS --- */
-        #toast { position: fixed; bottom: 24px; left: 50%; transform: translate(-50%, 100px); background: #0f172a; color: #fff; padding: 9px 18px; border-radius: 30px; font-size: 12px; font-weight: 500; transition: transform 0.25s; z-index: 1000; pointer-events: none; }
-        #toast.show { transform: translate(-50%, 0); }
-        #db-error-banner { display: none; background: #fee2e2; color: #991b1b; padding: 8px 14px; font-size: 12px; font-weight: 600; text-align: center; justify-content: center; gap: 10px; }
-
-        /* --- MOBILE 3-PAGE SYSTEM --- */
+        /* --- MOBILE 3-PAGE VIEW --- */
         @media (max-width: 850px) {
             header { height: 54px; padding: 0 10px; }
             .brand { font-size: 14px; }
             .header-actions { display: none; }
             
             .view-switcher { flex-basis: 100%; margin-left: auto; max-width: 100%; }
-            .view-btn { padding: 7px 9px; font-size: 11px; }
-
             .studio-layout { width: 300vw; max-width: none; overflow: hidden; transition: transform 0.25s ease; }
             .sidebar-lib, .canvas-area, .sidebar-controls { flex: 0 0 100vw; width: 100vw; max-width: 100vw; border: 0; padding-left: 4px; padding-right: 4px; overflow-y: auto; }
             
-            .canvas-area { padding: 12px; }
-            .sidebar-controls { padding-bottom: 32px; }
-            .preview-wrapper { width: min(92vw, 380px); padding: 16px; gap: 12px; }
-            .tag-circle { width: min(72vw, 280px); height: min(72vw, 280px); }
-
-            #cardGrid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .library-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+            .a4-wrapper { width: min(210mm, calc(100vw - 20px)); height: auto; aspect-ratio: 210 / 297; margin: 0 auto; }
         }
 
         .mobile-pagination-bar { display: none; justify-content: space-between; align-items: center; padding: 6px 12px; background: #fff; border-top: 1px solid var(--border); flex-shrink: 0; z-index: 50; padding-bottom: max(6px, env(safe-area-inset-bottom)); }
         .mobile-pagination-dots { display: flex; align-items: center; gap: 8px; }
         .dot { width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; cursor: pointer; }
         .dot.active { background: var(--primary); transform: scale(1.25); }
-        .page-step-label { font-size: 11px; font-weight: 600; color: var(--text-muted); }
-
         @media (max-width: 850px) { .mobile-pagination-bar { display: flex; } }
 
-        /* --- PRINT MEDIA ISOLATION (P0 Fix) --- */
+        /* --- PRINT MEDIA ISOLATION (P0-8) --- */
         @media print {
             body { background: white !important; margin: 0; padding: 0; visibility: hidden; }
-            /* Verstecke alle UI Elemente strikt */
-            header, .view-switcher, .print-toolbar, .mobile-pagination-bar, .sidebar-lib, .sidebar-controls, .lib-header, #toast, #db-error-banner { display: none !important; }
-            
-            /* Isoliere den A4 Bogen */
+            header, .view-switcher, .print-toolbar, .mobile-pagination-bar, .sidebar-lib, .sidebar-controls, .lib-header, #debug-overlay { display: none !important; }
             #view-print, #view-print * { visibility: visible; }
             #view-print { position: absolute; left: 0; top: 0; margin: 0; padding: 0; width: 210mm; height: 297mm; display: block !important; background: transparent; }
             .print-scroll { padding: 0 !important; background: transparent !important; display: block !important; }
             .a4-wrapper { width: 210mm !important; height: 297mm !important; max-width: 210mm !important; box-shadow: none !important; margin: 0 !important; }
             .slot { border: none !important; background: transparent !important; }
             .sticker-actions { display: none !important; }
-            img, svg { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
     </style>
 </head>
 <body>
 
-    <div id="db-error-banner">
-        <span id="db-error-msg">⚠️ Datenbank konnte online nicht geladen werden.</span>
-        <button class="btn-secondary" onclick="App.initDB(true)" style="padding:4px 8px; font-size:11px;">Erneut versuchen</button>
-    </div>
+    <!-- Debug Overlay -->
+    <div id="debug-overlay"></div>
 
     <header>
         <div class="brand" onclick="App.switchView('design')">
             <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
-            <span>TagGen <span style="color:var(--primary);">Phoenix</span> <span style="font-size:10px; background:var(--primary-soft); color:var(--primary); padding:2px 6px; border-radius:8px; margin-left:3px;">V2.8.5</span></span>
+            <span>TagGen <span style="color:var(--primary);">Phoenix</span> <span style="font-size:10px; background:var(--bg-canvas); color:var(--text-muted); padding:2px 6px; border-radius:8px; margin-left:3px;">V2.9 LTS Core</span></span>
         </div>
 
         <div class="view-switcher">
             <button class="view-btn active" data-view="design" onclick="App.switchView('design')">1. Studio & Cover</button>
             <button class="view-btn" data-view="print" onclick="App.switchView('print')">2. Druckbogen</button>
-            <button class="view-btn" data-view="nfc" onclick="App.switchView('nfc')" style="color: var(--flipper-orange);">3. NFC Workspace</button>
-            <button class="view-btn" data-view="debug" onclick="App.switchView('debug')">⚙️ System</button>
         </div>
 
         <div class="header-actions">
-            <span class="db-badge" id="db-status">Initialisiere...</span>
+            <span class="db-badge" id="db-status">Lade...</span>
         </div>
     </header>
 
@@ -275,32 +221,20 @@
                 <!-- LIBRARY -->
                 <div class="sidebar-lib">
                     <div class="lib-header">
-                        <div class="lib-tabs">
-                            <button class="lib-tab active" id="tab-db" onclick="State.setTab('db')">Datenbank</button>
-                            <button class="lib-tab" id="tab-fav" onclick="State.setTab('fav')">Favoriten</button>
-                            <button class="lib-tab" id="tab-custom" onclick="State.setTab('custom')">Eigene</button>
-                        </div>
-                        <input type="text" class="search-input" id="search-input" placeholder="🔎 Tonie, Serie oder Audio-ID suchen..." oninput="State.triggerSearch()">
+                        <input type="text" class="search-input" id="search-input" placeholder="🔎 Exakte Suche (Titel, Serie, ID)..." oninput="State.onSearchInput()">
                         <div class="filter-row">
-                            <select class="filter-select" id="filter-lang" onchange="State.triggerSearch()">
-                                <option value="">🌐 Alle Sprachen</option>
-                                <option value="de-de">Deutsch</option>
-                                <option value="en-us">Englisch</option>
-                            </select>
-                            <select class="filter-select" id="filter-dump" onchange="State.triggerSearch()">
-                                <option value="all">Alle Tonies</option>
-                                <option value="exact">🟢 Exakter Dump</option>
-                                <option value="strong">🔵 Strong Match</option>
-                                <option value="fuzzy">🟡 Fuzzy Match</option>
+                            <select class="filter-select" id="filter-match" onchange="State.onSearchInput()">
+                                <option value="exact">Modus: Präzise</option>
+                                <option value="fuzzy">Modus: Fuzzy Fallback</option>
                             </select>
                         </div>
                     </div>
                     
                     <div class="library-grid-wrap">
                         <div class="asset-scroll">
-                            <div id="cardGrid"></div>
+                            <div class="library-grid" id="cardGrid"></div>
                         </div>
-                        <!-- P0: Echte Pagination -->
+                        <!-- P0-4: Strict Pagination auf filteredDatabase -->
                         <div class="pagination-bar">
                             <button id="btn-prev" onclick="State.prevPage()">◀ Zurück</button>
                             <span class="page-indicator" id="page-indicator">1 / 1</span>
@@ -310,11 +244,11 @@
                 </div>
 
                 <!-- EDITOR CANVAS -->
-                <div class="canvas-area" id="drop-zone">
+                <div class="canvas-area">
                     <div class="preview-wrapper">
                         <div class="tag-circle" id="preview-circle">
-                            <img id="preview-img" src="" alt="">
-                            <svg viewBox="0 0 100 100" id="preview-svg">
+                            <img id="preview-img" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="">
+                            <svg viewBox="0 0 100 100">
                                 <path id="path-top" d="M 10,50 A 40,40 0 0,1 90,50" fill="none"/>
                                 <path id="path-uid" d="M 22,50 A 28,28 0 0,0 78,50" fill="none"/>
                                 <path id="path-bottom" d="M 8,50 A 42,42 0 0,0 92,50" fill="none"/>
@@ -330,8 +264,7 @@
                             </svg>
                         </div>
                         <div class="studio-actions">
-                            <button class="btn" onclick="PrintState.addCurrent()" style="flex: 2;">+ Auf Druckbogen</button>
-                            <button class="btn-secondary" onclick="EditorState.exportPng()" style="flex: 1;">💾 PNG</button>
+                            <button class="btn" onclick="PrintState.addCurrent()" style="flex: 1;">+ Auf Druckbogen</button>
                         </div>
                     </div>
                 </div>
@@ -339,32 +272,24 @@
                 <!-- EDITOR CONTROLS -->
                 <div class="sidebar-controls">
                     <div class="control-section">
-                        <h3>Texte & Beschriftung</h3>
+                        <h3>Texte</h3>
                         <div class="input-group">
-                            <label>Serie (Oben)</label>
-                            <input type="text" id="input-serie" oninput="EditorState.syncFromUI()">
+                            <label>Serie</label><input type="text" id="input-serie" oninput="EditorState.syncFromUI()">
                         </div>
                         <div class="input-group">
-                            <label>Titel (Unten)</label>
-                            <input type="text" id="input-title" oninput="EditorState.syncFromUI()">
+                            <label>Titel</label><input type="text" id="input-title" oninput="EditorState.syncFromUI()">
                         </div>
                         <div class="input-group">
-                            <div style="display:flex; justify-content:space-between; align-items:center;">
-                                <label style="display:block;">Audio-ID (Mitte)</label>
-                                <label style="font-size:10px; display:flex; align-items:center; gap:4px; cursor:pointer; color:var(--text-muted);">
-                                    <input type="checkbox" id="show-uid" checked onchange="EditorState.syncFromUI()"> Drucken
-                                </label>
-                            </div>
-                            <input type="text" id="input-uid" placeholder="Hex-ID" oninput="EditorState.syncFromUI()">
+                            <label>Audio-ID</label><input type="text" id="input-uid" oninput="EditorState.syncFromUI()">
                         </div>
                         <div class="input-group" style="margin-top: 2px;">
-                            <label>Schrift <span id="val-font" style="color:var(--primary)">100%</span></label>
+                            <label>Schrift <span id="val-font">100%</span></label>
                             <input type="range" class="range-slider" id="slider-font" min="70" max="150" value="100" oninput="EditorState.syncFromUI()">
                         </div>
                     </div>
                     
                     <div class="control-section">
-                        <h3>Bild & Ausrichtung</h3>
+                        <h3>Ausrichtung</h3>
                         <div class="input-group">
                             <label>Zoom <span id="val-zoom">100%</span></label>
                             <input type="range" class="range-slider" id="slider-zoom" min="50" max="220" value="100" oninput="EditorState.syncFromUI()">
@@ -377,18 +302,9 @@
                             <label>Y-Achse <span id="val-y">0%</span></label>
                             <input type="range" class="range-slider" id="slider-y" min="-40" max="40" value="0" oninput="EditorState.syncFromUI()">
                         </div>
-                        <div class="input-group">
-                            <label>Rahmen</label>
-                            <select id="select-ring" onchange="EditorState.syncFromUI()">
-                                <option value="dashed">Gepunktet</option>
-                                <option value="accent">Rot</option>
-                                <option value="black">Schwarz</option>
-                                <option value="none">Kein</option>
-                            </select>
-                        </div>
                         <div style="display:flex; gap:6px; margin-top:4px;">
                             <button class="btn-secondary" style="flex:1;" onclick="EditorState.resetTransforms()">Zentrieren</button>
-                            <button class="btn-secondary" style="flex:1;" onclick="document.getElementById('custom-img-upload').click()">Upload</button>
+                            <button class="btn-secondary" style="flex:1;" onclick="document.getElementById('custom-img-upload').click()">Bild wählen</button>
                             <input type="file" id="custom-img-upload" style="display:none" accept="image/*" onchange="EditorState.uploadImage(event)">
                         </div>
                     </div>
@@ -409,7 +325,7 @@
         <!-- ==================== VIEW 2: PRINT STUDIO ==================== -->
         <div class="workspace" id="view-print">
             <div class="print-toolbar">
-                <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <div style="display:flex; gap:10px; align-items:center;">
                     <select id="print-format" class="btn-secondary" style="padding:6px 10px;" onchange="PrintState.changeFormat(this.value)">
                         <option value="43-12">Münzkapsel 43mm (12er)</option>
                         <option value="40-24">Avery 40mm (24er)</option>
@@ -418,288 +334,262 @@
                     </select>
                     <span style="font-size:11px; color:var(--text-muted);"><b id="print-count">0</b> belegt</span>
                 </div>
-                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <div style="display:flex; gap:6px;">
                     <button class="btn-secondary" onclick="PrintState.clear()">🗑️ Leeren</button>
-                    <button class="btn" onclick="window.print()">🖨️ PDF / Drucken</button>
+                    <button class="btn" onclick="window.print()">🖨️ Drucken</button>
                 </div>
             </div>
-            
             <div class="print-scroll">
                 <div class="a4-wrapper">
                     <div class="a4-sheet" id="print-sheet-grid"></div>
                 </div>
             </div>
         </div>
-
-        <!-- ==================== VIEW 3: NFC WORKSPACE ==================== -->
-        <div class="workspace" id="view-nfc">
-            <div class="nfc-container">
-                <div class="nfc-card">
-                    <h2>🏷️ Dual-Tag Simulator</h2>
-                    <div class="tag-dual-preview">
-                        <div class="tag-disc">
-                            <span style="font-size:9px; font-weight:700; color:var(--primary);">FRONT</span>
-                            <div id="nfc-preview-front" style="font-size:11px; font-weight:bold; margin:6px 0;">-</div>
-                        </div>
-                        <div class="tag-disc back-slix">
-                            <div class="tag-antenna"></div>
-                            <span style="font-size:9px; font-weight:700; color:#475569;">BACK (SLIX)</span>
-                            <span id="nfc-preview-back-uid" style="font-family:monospace; font-size:9px; margin-top:2px;">-</span>
-                        </div>
-                    </div>
-                    <div style="background:#f8fafc; border:1px solid var(--border); padding:12px; border-radius:8px; font-size:12px; margin-top:10px;">
-                        <div>UID: <strong id="nfc-target-uid">-</strong></div>
-                        <div style="margin-top:4px;">Status: <strong id="nfc-target-status">-</strong></div>
-                    </div>
-                    <button class="btn-secondary" onclick="App.exportNfcStub()" style="margin-top:10px; color:var(--flipper-orange);">🐬 Flipper .nfc Stub</button>
-                </div>
-                <div class="nfc-card">
-                    <h2>📲 Flash Studio (ESP32)</h2>
-                    <div style="background:#f8fafc; border:1px solid var(--border); padding:10px; border-radius:8px; text-align:center;">
-                        <span style="display:block; font-size:11px; font-weight:700; margin-bottom:6px;">ESP32 Firmware Flashen</span>
-                        <esp-web-install-button manifest="https://raw.githubusercontent.com/RFIDfriend/NFC-Archiver/main/flash/manifest.json"></esp-web-install-button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ==================== VIEW 4: SYSTEM DEBUG ==================== -->
-        <div class="workspace" id="view-debug">
-            <div class="debug-container">
-                <div class="nfc-card">
-                    <h2>🛠️ System Status</h2>
-                    <table class="debug-table">
-                        <tr><th>Version</th><td>V2.8.5 (Architecture Update)</td></tr>
-                        <tr><th>Datenquelle</th><td id="dbg-source">-</td></tr>
-                        <tr><th>Tonies (V1)</th><td id="dbg-count">-</td></tr>
-                        <tr><th>Letzter Fehler</th><td id="dbg-last-error" style="color:var(--text-muted);">Keine</td></tr>
-                    </table>
-                </div>
-            </div>
-        </div>
     </div>
 
-    <div id="toast"></div>
-
     <script>
-        // --- ERROR MONITORING ---
-        window.addEventListener('error', e => {
-            const el = document.getElementById('dbg-last-error');
-            if(el) { el.textContent = `[JS Error] ${e.message}`; el.style.color = 'var(--primary)'; }
-            console.error('[TagGen Error]', e.message);
-        });
-
-        // --- UTILS ---
-        const Toast = (msg) => {
-            const t = document.getElementById('toast');
-            t.textContent = msg; t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 2500);
-        };
-        const safeStorage = {
-            set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch(e) { return false; } },
-            get: (k, fb = null) => { try { const i = localStorage.getItem(k); return i ? JSON.parse(i) : fb; } catch(e) { return fb; } }
-        };
-        const normalize = (val) => {
-            if (val === null || val === undefined) return '';
-            return String(val).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+        // --- 1. CORE UTILITIES ---
+        // Normalization (P0-2) ensures robust string matching
+        const normalizeText = (t) => {
+            if (!t) return "";
+            return String(t)
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/\p{Diacritic}/gu, "")
+                .replace(/[^\p{L}\p{N} ]/gu, " ")
+                .replace(/\s+/g, " ")
+                .trim();
         };
 
-        // --- ARCHITECTURE STATE ---
+        const normalizeId = (id) => {
+            if (!id) return "";
+            return String(id).toUpperCase().replace(/[^A-Z0-9]/g, "");
+        };
+
+        // --- 2. GLOBAL STATE (Single Source of Truth) ---
         const State = {
-            db: [],
-            dumpIndex: { exactIds: new Set(), strong: new Set(), titles: new Set() },
-            favs: safeStorage.get('phoenix_favs', []),
-            
-            // Search & Library State
-            activeTab: 'db',
-            searchQuery: '',
-            searchLang: '',
-            searchDump: 'all',
-            filteredResults: [],
-            pagination: { page: 0, size: 8 },
+            database: [],
+            searchIndex: [],     // Unified mapping
+            filteredDatabase: [], // Output of search
+            currentPage: 1,
+            pageSize: 8,
+            isDebug: new URLSearchParams(window.location.search).has('debug'),
 
-            // Actions
-            setTab(tab) {
-                this.activeTab = tab;
-                ['db', 'fav', 'custom'].forEach(t => document.getElementById(`tab-${t}`)?.classList.toggle('active', t === tab));
-                this.triggerSearch();
+            initIndex(rawData) {
+                // P0-1: Build a clean search index
+                this.searchIndex = rawData.map((item, index) => {
+                    // Extract safe primary audio ID
+                    let primaryId = "";
+                    const ids = item.audio_id || item.audioId || [item.id || item.no];
+                    if (Array.isArray(ids) && ids.length > 0) primaryId = ids[0];
+
+                    return {
+                        id: primaryId || `gen_${index}`,
+                        title: item.episode || item.title || item.episodes || item.name || "",
+                        series: item.series || item.collection || item.brand || "",
+                        audioId: normalizeId(primaryId),
+                        image: item.image || item.pic || item.picture || item.img || "",
+                        raw: item // Keep reference if needed for other UI parts
+                    };
+                }).filter(i => i.title || i.series || i.audioId); // Drop completely empty entries
+
+                this.database = this.searchIndex; // In V2.9 Core, DB is identical to the cleaned Index
+                this.searchDatabase(""); // Init full view
+                
+                document.getElementById('db-status').textContent = `${this.searchIndex.length} Tonies`;
             },
-            triggerSearch() {
-                this.searchQuery = document.getElementById('search-input').value;
-                this.searchLang = document.getElementById('filter-lang').value;
-                this.searchDump = document.getElementById('filter-dump').value;
-                this.pagination.page = 0; // reset to first page
-                this.computeResults();
-            },
-            computeResults() {
-                let results = this.db;
 
-                // Tab Filter
-                if (this.activeTab === 'fav') results = results.filter(t => this.favs.includes(t.id));
-                if (this.activeTab === 'custom') results = results.filter(t => t.isCustom);
+            // --- P0-3 & P0-10: CASCADING SEARCH LOGIC ---
+            searchDatabase(query) {
+                const q = normalizeText(query);
+                const qId = normalizeId(query);
+                const isFuzzy = document.getElementById('filter-match').value === 'fuzzy';
 
-                // Lang Filter
-                if (this.searchLang) results = results.filter(t => t.language === this.searchLang);
-
-                // Dump Filter
-                if (this.searchDump !== 'all') {
-                    results = results.filter(t => {
-                        const mq = App.getMatchQuality(t);
-                        if(this.searchDump === 'exact') return mq === 'exact';
-                        if(this.searchDump === 'strong') return mq === 'exact' || mq === 'strong';
-                        if(this.searchDump === 'fuzzy') return mq !== 'none';
-                        return true;
-                    });
+                if (!q) {
+                    this.filteredDatabase = [...this.searchIndex];
+                } else {
+                    let results = [];
+                    
+                    // 1. Exact Match (ID, Title, Series)
+                    const exact = this.searchIndex.filter(item => 
+                        item.audioId === qId || 
+                        normalizeText(item.title) === q || 
+                        normalizeText(item.series) === q
+                    );
+                    
+                    if (exact.length > 0) {
+                        results = exact;
+                    } else {
+                        // 2. Prefix Match (Starts with)
+                        const prefix = this.searchIndex.filter(item => 
+                            normalizeText(item.title).startsWith(q) || 
+                            normalizeText(item.series).startsWith(q)
+                        );
+                        
+                        if (prefix.length > 0) {
+                            results = prefix;
+                        } else {
+                            // 3. Contains Match (Includes)
+                            const contains = this.searchIndex.filter(item => 
+                                normalizeText(item.title).includes(q) || 
+                                normalizeText(item.series).includes(q)
+                            );
+                            
+                            if (contains.length > 0) {
+                                results = contains;
+                            } else if (isFuzzy) {
+                                // 4. Fuzzy Fallback (Custom implementation without external Fuse.js dependency)
+                                // Only triggers if explicitly enabled and nothing else found
+                                const chars = q.split('');
+                                const fuzzyMatches = this.searchIndex.filter(item => {
+                                    const haystack = normalizeText(item.title) + " " + normalizeText(item.series);
+                                    let j = 0;
+                                    for(let i = 0; i < haystack.length && j < chars.length; i++) {
+                                        if(haystack[i] === chars[j]) j++;
+                                    }
+                                    return j === chars.length; // Found all chars in order
+                                });
+                                results = fuzzyMatches;
+                            }
+                        }
+                    }
+                    this.filteredDatabase = results;
                 }
 
-                // Search Ranking (P0: Exact -> Prefix -> Fuzzy)
-                const q = normalize(this.searchQuery);
-                if (q) {
-                    results = results.map(item => {
-                        let score = 0;
-                        const nTitle = normalize(item.title);
-                        const nSeries = normalize(item.series);
-                        const nId = normalize(item.id);
+                // Bug 5 & 9 Fix: Reset to page 1, then render
+                this.currentPage = 1;
+                this.updateLibrary();
+            },
 
-                        if (nId === q || (item.audioIds||[]).some(id => normalize(id) === q)) score = 100; // Exact ID
-                        else if (nTitle === q) score = 90; // Exact Title
-                        else if (nSeries === q) score = 80; // Exact Series
-                        else if (nTitle.startsWith(q)) score = 70; // Prefix Title
-                        else if (nSeries.startsWith(q)) score = 65; // Prefix Series
-                        else if (nTitle.includes(q)) score = 60; // Fuzzy Title
-                        else if (nSeries.includes(q)) score = 50; // Fuzzy Series
+            onSearchInput() {
+                const query = document.getElementById('search-input').value;
+                this.searchDatabase(query);
+            },
 
-                        return { item, score };
-                    }).filter(obj => obj.score > 0)
-                      .sort((a, b) => b.score - a.score)
-                      .map(obj => obj.item);
-                }
-
-                this.filteredResults = results;
+            // --- P0-4 & P0-6: PAGINATION & VISIBLE RENDER ---
+            updateLibrary() {
+                this.renderPagination();
                 this.renderGrid();
+                this.renderDebug();
             },
+
+            getVisibleItems() {
+                const start = (this.currentPage - 1) * this.pageSize;
+                const end = start + this.pageSize;
+                return this.filteredDatabase.slice(start, end);
+            },
+
+            renderPagination() {
+                const totalPages = Math.ceil(this.filteredDatabase.length / this.pageSize) || 1;
+                document.getElementById('page-indicator').textContent = `${this.currentPage} / ${totalPages}`;
+                document.getElementById('btn-prev').disabled = this.currentPage <= 1;
+                document.getElementById('btn-next').disabled = this.currentPage >= totalPages;
+            },
+
+            prevPage() { if (this.currentPage > 1) { this.currentPage--; this.updateLibrary(); } },
+            nextPage() { const total = Math.ceil(this.filteredDatabase.length / this.pageSize); if (this.currentPage < total) { this.currentPage++; this.updateLibrary(); } },
+
             renderGrid() {
                 const grid = document.getElementById('cardGrid');
                 grid.innerHTML = '';
-                
-                const start = this.pagination.page * this.pagination.size;
-                const pageItems = this.filteredResults.slice(start, start + this.pagination.size);
+                const items = this.getVisibleItems();
 
-                pageItems.forEach(item => {
-                    const isFav = this.favs.includes(item.id);
-                    const mq = App.getMatchQuality(item);
-
+                items.forEach(item => {
                     const card = document.createElement('div');
-                    card.className = 'asset-card';
+                    card.className = 'card';
                     card.onclick = () => EditorState.load(item);
 
-                    // Image Wrap
+                    // P0-6: Card Structure without position:absolute for ID
                     const imgWrap = document.createElement('div');
-                    imgWrap.className = 'card-img-wrap';
+                    imgWrap.className = 'card-image';
                     const img = document.createElement('img');
-                    img.src = item.pic || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+                    img.src = item.image || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
                     imgWrap.appendChild(img);
 
-                    if(item.isCustom) {
-                        const b = document.createElement('div'); b.className = 'match-badge'; b.textContent = '☁️ Custom'; b.style.background = 'var(--teddy-teal)'; imgWrap.appendChild(b);
-                    } else if (mq !== 'none') {
-                        const b = document.createElement('div'); b.className = 'match-badge';
-                        b.textContent = mq === 'exact' ? '🟢 Exakt' : (mq === 'strong' ? '🔵 Strong' : '🟡 Match');
-                        b.style.background = `var(--status-${mq})`;
-                        imgWrap.appendChild(b);
-                    }
-
-                    const favBtn = document.createElement('button');
-                    favBtn.className = `fav-btn ${isFav ? 'active' : ''}`;
-                    favBtn.textContent = isFav ? '★' : '☆';
-                    favBtn.onclick = (e) => { 
-                        e.stopPropagation(); 
-                        if(this.favs.includes(item.id)) this.favs = this.favs.filter(f => f !== item.id);
-                        else this.favs.push(item.id);
-                        safeStorage.set('phoenix_favs', this.favs);
-                        this.renderGrid();
-                    };
-                    imgWrap.appendChild(favBtn);
-
-                    // Info Wrap (P0: Fixed ID Structure)
-                    const info = document.createElement('div');
-                    info.className = 'card-info';
+                    const infoWrap = document.createElement('div');
+                    infoWrap.className = 'card-info';
                     
-                    const ser = document.createElement('div'); ser.className = 'card-serie'; ser.textContent = item.series || '-';
-                    const tit = document.createElement('div'); tit.className = 'card-title'; tit.textContent = item.title || '-';
-                    const idDiv = document.createElement('div'); idDiv.className = 'card-id'; idDiv.textContent = `ID: ${item.id.slice(0,8)}...`;
-                    const meta = document.createElement('div'); meta.className = 'card-meta';
-                    meta.innerHTML = `<span class="status-dot" style="background:var(--status-${mq==='none'?'none':mq})"></span> ${item.language.toUpperCase()} • ${item.tracks} Tracks`;
+                    const series = document.createElement('div'); series.className = 'card-series'; series.textContent = item.series || '-';
+                    const title = document.createElement('div'); title.className = 'card-title'; title.textContent = item.title || 'Ohne Titel';
+                    const idLine = document.createElement('div'); idLine.className = 'card-id'; idLine.textContent = item.audioId ? `ID: ${item.audioId}` : '';
 
-                    info.appendChild(ser); info.appendChild(tit); info.appendChild(idDiv); info.appendChild(meta);
-                    
-                    card.appendChild(imgWrap); card.appendChild(info);
+                    infoWrap.appendChild(series);
+                    infoWrap.appendChild(title);
+                    infoWrap.appendChild(idLine); // Clean flex rendering at bottom
+
+                    card.appendChild(imgWrap);
+                    card.appendChild(infoWrap);
                     grid.appendChild(card);
                 });
+            },
 
-                // Update Pagination Controls
-                const totalPages = Math.ceil(this.filteredResults.length / this.pagination.size);
-                document.getElementById('page-indicator').textContent = `${this.pagination.page + 1} / ${Math.max(1, totalPages)}`;
-                document.getElementById('btn-prev').disabled = this.pagination.page === 0;
-                document.getElementById('btn-next').disabled = this.pagination.page >= totalPages - 1;
-            },
-            nextPage() {
-                const totalPages = Math.ceil(this.filteredResults.length / this.pagination.size);
-                if(this.pagination.page < totalPages - 1) { this.pagination.page++; this.renderGrid(); }
-            },
-            prevPage() {
-                if(this.pagination.page > 0) { this.pagination.page--; this.renderGrid(); }
+            renderDebug() {
+                if(!this.isDebug) return;
+                const overlay = document.getElementById('debug-overlay');
+                overlay.style.display = 'block';
+                const totalPages = Math.ceil(this.filteredDatabase.length / this.pageSize) || 1;
+                overlay.textContent = 
+`TagGen Debug (V2.9 Core)
+──────────────
+DB loaded: ${this.searchIndex.length}
+Filtered:  ${this.filteredDatabase.length}
+Visible:   ${this.getVisibleItems().length}
+Page:      ${this.currentPage} / ${totalPages}
+Mode:      ${document.getElementById('filter-match').value}`;
             }
         };
 
-        // --- EDITOR STATE ---
+        // --- 3. EDITOR STATE ---
         const EditorState = {
-            currentTonie: null,
-            zoom: 100, x: 0, y: 0, font: 100, ring: 'dashed', showUid: true,
+            current: null,
+            zoom: 100, x: 0, y: 0, font: 100,
             
             load(item) {
-                this.currentTonie = { ...item };
-                this.resetTransforms();
+                this.current = item;
+                this.zoom = 100; this.x = 0; this.y = 0; this.font = 100;
+                
                 document.getElementById('input-serie').value = item.series || '';
                 document.getElementById('input-title').value = item.title || '';
-                document.getElementById('input-uid').value = item.id || '';
-                this.syncFromUI();
-                Toast(`"${item.series}" in den Editor geladen`);
-            },
-            resetTransforms() {
-                this.zoom=100; this.x=0; this.y=0; this.font=100; this.ring='dashed';
+                document.getElementById('input-uid').value = item.audioId || '';
+                
                 document.getElementById('slider-zoom').value = 100;
                 document.getElementById('slider-x').value = 0;
                 document.getElementById('slider-y').value = 0;
                 document.getElementById('slider-font').value = 100;
-                document.getElementById('select-ring').value = 'dashed';
+
+                this.syncFromUI();
             },
             syncFromUI() {
-                if(!this.currentTonie) this.currentTonie = {};
-                this.currentTonie.series = document.getElementById('input-serie').value;
-                this.currentTonie.title = document.getElementById('input-title').value;
-                this.currentTonie.id = document.getElementById('input-uid').value;
+                if (!this.current) this.current = { image: 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=' };
+                
+                this.current.series = document.getElementById('input-serie').value;
+                this.current.title = document.getElementById('input-title').value;
+                this.current.audioId = document.getElementById('input-uid').value;
                 
                 this.zoom = parseInt(document.getElementById('slider-zoom').value, 10);
                 this.x = parseInt(document.getElementById('slider-x').value, 10);
                 this.y = parseInt(document.getElementById('slider-y').value, 10);
                 this.font = parseInt(document.getElementById('slider-font').value, 10);
-                this.ring = document.getElementById('select-ring').value;
-                this.showUid = document.getElementById('show-uid').checked;
 
-                this.render();
+                this.renderCanvas();
             },
-            render() {
+            resetTransforms() {
+                this.zoom = 100; this.x = 0; this.y = 0; this.syncFromUI();
+            },
+            uploadImage(e) {
+                const file = e.target.files?.[0]; if(!file) return;
+                const r = new FileReader(); 
+                r.onload = ev => { if(!this.current) this.current={}; this.current.image = ev.target.result; this.renderCanvas(); };
+                r.readAsDataURL(file);
+            },
+            renderCanvas() {
                 document.getElementById('val-zoom').textContent = `${this.zoom}%`;
                 document.getElementById('val-x').textContent = `${this.x}%`;
                 document.getElementById('val-y').textContent = `${this.y}%`;
                 document.getElementById('val-font').textContent = `${this.font}%`;
 
-                const circle = document.getElementById('preview-circle');
-                circle.className = 'tag-circle ' + (this.ring === 'accent' ? 'ring-accent' : (this.ring === 'black' ? 'ring-black' : ''));
-
                 const img = document.getElementById('preview-img');
-                img.src = this.currentTonie?.pic || 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
+                img.src = this.current.image;
                 img.style.transform = `translate(${this.x}%, ${this.y}%) scale(${this.zoom / 100})`;
 
                 const fScale = this.font / 100;
@@ -707,30 +597,16 @@
                 document.getElementById('svg-text-uid-node').setAttribute('font-size', (5.0 * fScale).toFixed(1));
                 document.getElementById('svg-text-bottom-node').setAttribute('font-size', (6.5 * fScale).toFixed(1));
 
-                document.getElementById('svg-text-top').textContent = this.currentTonie?.series || '';
-                document.getElementById('svg-text-bottom').textContent = this.currentTonie?.title || '';
-                document.getElementById('svg-text-uid').textContent = (this.currentTonie?.id && this.showUid) ? `ID: ${this.currentTonie.id}` : '';
-
-                // Update NFC Preview
-                document.getElementById('nfc-target-title').textContent = this.currentTonie?.title || '-';
-                document.getElementById('nfc-target-uid').textContent = this.currentTonie?.id || '-';
-                document.getElementById('nfc-preview-front').textContent = this.currentTonie?.title || '-';
-                
-                const mq = App.getMatchQuality(this.currentTonie);
-                document.getElementById('nfc-target-status').textContent = mq === 'exact' ? 'Exakt' : (mq === 'strong' ? 'Strong' : 'Magic UID');
-            },
-            uploadImage(e) {
-                const file = e.target.files?.[0]; if(!file) return;
-                const r = new FileReader(); r.onload = ev => { if(!this.currentTonie) this.currentTonie={}; this.currentTonie.pic = ev.target.result; this.render(); };
-                r.readAsDataURL(file);
-            },
-            exportPng() { Toast("PNG Export noch nicht vollständig portiert in V2.8.5 (folgt)."); }
+                document.getElementById('svg-text-top').textContent = this.current.series || '';
+                document.getElementById('svg-text-bottom').textContent = this.current.title || '';
+                document.getElementById('svg-text-uid').textContent = this.current.audioId ? `ID: ${this.current.audioId}` : '';
+            }
         };
 
-        // --- PRINT STATE (P0: Percentage based MM geometry) ---
+        // --- 4. PRINT STUDIO (P0-8 ISOLATION) ---
         const PrintState = {
             format: '43-12',
-            slots: [], // Array of objects instead of DOM nodes
+            slots: new Array(12).fill(null),
 
             getGeometry() {
                 const map = {
@@ -745,36 +621,24 @@
                 this.format = val;
                 const geo = this.getGeometry();
                 const total = geo.cols * geo.rows;
-                // keep existing, truncate if too long, pad with nulls
                 this.slots = this.slots.slice(0, total);
                 while(this.slots.length < total) this.slots.push(null);
                 this.render();
             },
             addCurrent() {
-                if(!EditorState.currentTonie) return Toast("Kein Cover im Editor!");
+                if(!EditorState.current) return alert("Kein Cover im Editor!");
                 const emptyIdx = this.slots.findIndex(s => s === null);
-                if(emptyIdx === -1) return Toast("Druckbogen ist voll!");
+                if(emptyIdx === -1) return alert("Druckbogen voll!");
                 
+                // Deep Copy State to freeze values for this slot
                 this.slots[emptyIdx] = {
-                    tonie: { ...EditorState.currentTonie },
-                    state: { zoom: EditorState.zoom, x: EditorState.x, y: EditorState.y, font: EditorState.font, showUid: EditorState.showUid }
+                    item: { ...EditorState.current },
+                    state: { zoom: EditorState.zoom, x: EditorState.x, y: EditorState.y, font: EditorState.font }
                 };
-                Toast(`Cover platziert! (Pos ${emptyIdx+1})`);
+                App.switchView('print');
                 this.render();
             },
-            remove(index) { this.slots[index] = null; this.render(); },
-            duplicate(index) {
-                const emptyIdx = this.slots.findIndex(s => s === null);
-                if(emptyIdx === -1) return Toast("Kein freier Platz zum Duplizieren!");
-                this.slots[emptyIdx] = JSON.parse(JSON.stringify(this.slots[index]));
-                this.render();
-            },
-            swap(from, to) {
-                const temp = this.slots[from];
-                this.slots[from] = this.slots[to];
-                this.slots[to] = temp;
-                this.render();
-            },
+            remove(idx) { this.slots[idx] = null; this.render(); },
             clear() { this.slots.fill(null); this.render(); },
             
             render() {
@@ -785,74 +649,60 @@
                 const geo = this.getGeometry();
                 let count = 0;
 
-                this.slots.forEach((item, index) => {
+                this.slots.forEach((data, index) => {
                     const col = index % geo.cols;
                     const row = Math.floor(index / geo.cols);
                     
-                    // P0: MM to Percentage Conversion for perfect responsive A4 scaling
-                    const leftPercent = ((geo.ml + (col * (geo.w + geo.gx))) / 210) * 100;
-                    const topPercent = ((geo.mt + (row * (geo.h + geo.gy))) / 297) * 100;
-                    const widthPercent = (geo.w / 210) * 100;
-                    const heightPercent = (geo.h / 297) * 100;
+                    // True MM mapping converted to percentages for responsive A4 preview
+                    const lP = ((geo.ml + (col * (geo.w + geo.gx))) / 210) * 100;
+                    const tP = ((geo.mt + (row * (geo.h + geo.gy))) / 297) * 100;
+                    const wP = (geo.w / 210) * 100;
+                    const hP = (geo.h / 297) * 100;
 
                     const slot = document.createElement('div');
                     slot.className = 'slot';
-                    slot.style.left = `${leftPercent}%`;
-                    slot.style.top = `${topPercent}%`;
-                    slot.style.width = `${widthPercent}%`;
-                    slot.style.height = `${heightPercent}%`;
-                    
-                    slot.ondragover = e => { e.preventDefault(); slot.classList.add('drag-over'); };
-                    slot.ondragleave = () => slot.classList.remove('drag-over');
-                    slot.ondrop = e => { e.preventDefault(); slot.classList.remove('drag-over'); const from = parseInt(e.dataTransfer.getData('text')); if(!isNaN(from) && from !== index) this.swap(from, index); };
+                    slot.style.left = `${lP}%`; slot.style.top = `${tP}%`;
+                    slot.style.width = `${wP}%`; slot.style.height = `${hP}%`;
 
-                    if (item) {
+                    if (data) {
                         count++;
                         const s = document.createElement('div');
-                        s.className = 'sticker'; s.draggable = true;
-                        s.ondragstart = e => e.dataTransfer.setData('text', index);
-
-                        // Img
+                        s.className = 'sticker';
+                        
                         const img = document.createElement('img');
-                        img.src = item.tonie.pic || '';
-                        img.style.cssText = `position:absolute;width:100%;height:100%;object-fit:contain;transform:translate(${item.state.x}%, ${item.state.y}%) scale(${item.state.zoom/100})`;
+                        img.src = data.item.image;
+                        img.style.cssText = `position:absolute;width:100%;height:100%;object-fit:contain;transform:translate(${data.state.x}%, ${data.state.y}%) scale(${data.state.zoom/100})`;
                         s.appendChild(img);
 
-                        // SVG
                         const svgNS = 'http://www.w3.org/2000/svg';
                         const svg = document.createElementNS(svgNS, 'svg');
                         svg.setAttribute('viewBox', '0 0 100 100');
                         svg.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;';
-                        const fScale = item.state.font / 100;
                         
-                        const pTop = document.createElementNS(svgNS, 'path'); pTop.setAttribute('id', `pt-${index}`); pTop.setAttribute('d', 'M 10,50 A 40,40 0 0,1 90,50'); pTop.setAttribute('fill', 'none');
-                        const pUid = document.createElementNS(svgNS, 'path'); pUid.setAttribute('id', `pu-${index}`); pUid.setAttribute('d', 'M 22,50 A 28,28 0 0,0 78,50'); pUid.setAttribute('fill', 'none');
-                        const pBot = document.createElementNS(svgNS, 'path'); pBot.setAttribute('id', `pb-${index}`); pBot.setAttribute('d', 'M 8,50 A 42,42 0 0,0 92,50'); pBot.setAttribute('fill', 'none');
-                        svg.append(pTop, pUid, pBot);
+                        const pt = document.createElementNS(svgNS, 'path'); pt.id=`p1-${index}`; pt.setAttribute('d','M 10,50 A 40,40 0 0,1 90,50'); pt.setAttribute('fill','none');
+                        const pu = document.createElementNS(svgNS, 'path'); pu.id=`p2-${index}`; pu.setAttribute('d','M 22,50 A 28,28 0 0,0 78,50'); pu.setAttribute('fill','none');
+                        const pb = document.createElementNS(svgNS, 'path'); pb.id=`p3-${index}`; pb.setAttribute('d','M 8,50 A 42,42 0 0,0 92,50'); pb.setAttribute('fill','none');
+                        svg.append(pt, pu, pb);
 
-                        const makeT = (sz, col, path, txt) => {
-                            const node = document.createElementNS(svgNS, 'text');
-                            node.setAttribute('font-size', sz); node.setAttribute('fill', col); node.setAttribute('text-anchor', 'middle'); node.setAttribute('font-weight', 'bold');
-                            const tp = document.createElementNS(svgNS, 'textPath'); tp.setAttribute('href', `#${path}`); tp.setAttribute('startOffset', '50%'); tp.setAttribute('letter-spacing', '0.1em');
-                            tp.textContent = txt; node.appendChild(tp); return node;
+                        const mkT = (sz, col, path, txt) => {
+                            const n = document.createElementNS(svgNS, 'text');
+                            n.setAttribute('font-size', sz); n.setAttribute('fill', col); n.setAttribute('font-weight', 'bold'); n.setAttribute('text-anchor', 'middle');
+                            const tp = document.createElementNS(svgNS, 'textPath'); tp.setAttribute('href', `#${path}`); tp.setAttribute('startOffset', '50%');
+                            tp.textContent = txt; n.appendChild(tp); return n;
                         };
                         
-                        svg.appendChild(makeT((7.5*fScale).toFixed(1), '#e11d48', `pt-${index}`, item.tonie.series));
-                        svg.appendChild(makeT((5*fScale).toFixed(1), '#64748b', `pu-${index}`, (item.tonie.id && item.state.showUid) ? `ID: ${item.tonie.id}` : ''));
-                        svg.appendChild(makeT((6.5*fScale).toFixed(1), '#0f172a', `pb-${index}`, item.tonie.title));
+                        const fs = data.state.font/100;
+                        svg.appendChild(mkT((7.5*fs).toFixed(1), '#e11d48', `p1-${index}`, data.item.series));
+                        svg.appendChild(mkT((5*fs).toFixed(1), '#64748b', `p2-${index}`, data.item.audioId ? `ID: ${data.item.audioId}` : ''));
+                        svg.appendChild(mkT((6.5*fs).toFixed(1), '#0f172a', `p3-${index}`, data.item.title));
+                        
                         s.appendChild(svg);
 
-                        // Actions overlay (P0 Fix: Delete & Duplicate correctly separated)
-                        const acts = document.createElement('div'); acts.className = 'sticker-actions';
-                        
-                        const btnCopy = document.createElement('button'); btnCopy.className = 's-btn copy'; btnCopy.textContent = '⧉';
-                        btnCopy.onclick = (e) => { e.stopPropagation(); this.duplicate(index); };
-                        
-                        const btnDel = document.createElement('button'); btnDel.className = 's-btn del'; btnDel.textContent = '✕';
-                        btnDel.onclick = (e) => { e.stopPropagation(); this.remove(index); };
-                        
-                        acts.appendChild(btnCopy); acts.appendChild(btnDel);
-                        s.appendChild(acts);
+                        const act = document.createElement('div'); act.className = 'sticker-actions';
+                        const delBtn = document.createElement('button'); delBtn.className='s-btn del'; delBtn.textContent='✕';
+                        delBtn.onclick = () => this.remove(index);
+                        act.appendChild(delBtn); s.appendChild(act);
+
                         slot.appendChild(s);
                     }
                     grid.appendChild(slot);
@@ -861,82 +711,55 @@
             }
         };
 
-        // --- APP CONTROLLER ---
-        App.initDB = async (force=false) => {
-            try {
-                const res = await fetch('https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json', {cache: 'no-cache'});
-                if(!res.ok) throw new Error(`HTTP ${res.status}`);
-                const data = await res.json();
-                if(!Array.isArray(data) && !data.tonies) throw new Error("Kein Tonie JSON Array");
-                
-                const raw = Array.isArray(data) ? data : data.tonies;
-                State.db = raw.map(v => {
-                    const ids = v.audio_id || [v.id||v.no];
-                    return { id: String(ids[0]), audioIds: ids.map(String), series: v.series||v.brand||'', title: v.episodes||v.title||'', pic: v.image||v.pic||'', language: v.language||'de-de', tracks: v.tracks?.length||0 };
-                });
-                
-                document.getElementById('dbg-count').textContent = State.db.length;
-                document.getElementById('db-status').textContent = `${State.db.length} Tonies`;
-                State.triggerSearch();
-                
-                // Lazy Load Dump Index
-                fetch('https://api.github.com/repos/nortakales/flipper-zero-tonies/git/trees/master?recursive=1').then(r=>r.json()).then(d => {
-                    if(d.tree) d.tree.forEach(f => {
-                        if(f.path?.endsWith('.nfc')) {
-                            const name = clean(f.path.split('/').pop().replace('.nfc',''));
-                            State.dumpIndex.titles.add(name);
-                            const idMatch = f.path.match(/[a-fA-F0-9]{8,16}/);
-                            if(idMatch) State.dumpIndex.exactIds.add(idMatch[0].toLowerCase());
-                        }
-                    });
-                    State.renderGrid();
-                }).catch(e=>{});
-
-            } catch(e) {
-                document.getElementById('db-error-banner').style.display='flex';
-                document.getElementById('db-error-msg').textContent = `⚠️ Fehler: ${e.message}`;
-            }
+        // --- APP INITIALIZATION ---
+        const App = {
+            async initDB() {
+                try {
+                    // P0: Fetch with cache bypass logic to avoid stale Github Pages
+                    const res = await fetch('https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json', {cache: 'no-store'});
+                    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+                    const data = await res.json();
+                    
+                    const rawArray = Array.isArray(data) ? data : (data.tonies || []);
+                    if(!rawArray.length) throw new Error("JSON invalid");
+                    
+                    State.initIndex(rawArray);
+                } catch(e) {
+                    console.error("DB Load Error", e);
+                    document.getElementById('db-error-banner').style.display='flex';
+                }
+            },
+            switchView(id) {
+                document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === id));
+                document.querySelectorAll('.workspace').forEach(w => w.classList.remove('active'));
+                document.getElementById(`view-${id}`).classList.add('active');
+            },
+            // Mobile Swipe System
+            mPage: 0,
+            slideToPage(p) {
+                const track = document.getElementById('studio-swipe-container');
+                if(!track || window.innerWidth > 850) return;
+                this.mPage = Math.max(0, Math.min(2, p));
+                track.style.transform = `translateX(-${this.mPage * 100}vw)`;
+                document.querySelectorAll('#mobile-dots .dot').forEach((d,i) => d.classList.toggle('active', i===this.mPage));
+                document.getElementById('mobile-page-label').textContent = ['1/3 Bibliothek', '2/3 Cover-Editor', '3/3 Regler'][this.mPage];
+            },
+            nextMobilePage() { this.slideToPage(this.mPage+1); },
+            prevMobilePage() { this.slideToPage(this.mPage-1); }
         };
 
-        App.getMatchQuality = (tonie) => {
-            if(!tonie) return 'none';
-            for(let id of (tonie.audioIds||[tonie.id])) { if(id && id.length>5 && State.dumpIndex.exactIds.has(id.toLowerCase())) return 'exact'; }
-            if(clean(tonie.title).length>3 && State.dumpIndex.titles.has(clean(tonie.title))) return 'fuzzy';
-            return 'none';
-        };
-
-        App.switchView = (view) => {
-            document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
-            document.querySelectorAll('.workspace').forEach(w => w.classList.remove('active'));
-            document.getElementById(`view-${view}`).classList.add('active');
-        };
-
-        // Mobile Page Swipe
-        App.mobilePage = 0;
-        App.slideToPage = (p) => {
-            const track = document.getElementById('studio-swipe-container');
-            if(!track || window.innerWidth > 850) return;
-            App.mobilePage = Math.max(0, Math.min(2, p));
-            track.style.transform = `translateX(-${App.mobilePage * 100}vw)`;
-            document.querySelectorAll('#mobile-dots .dot').forEach((d,i) => d.classList.toggle('active', i===App.mobilePage));
-            document.getElementById('mobile-page-label').textContent = ['1/3 Bibliothek', '2/3 Cover-Editor', '3/3 Regler'][App.mobilePage];
-        };
-        App.nextMobilePage = () => App.slideToPage(App.mobilePage+1);
-        App.prevMobilePage = () => App.slideToPage(App.mobilePage-1);
-
-        // Bootstrap
         window.onload = () => {
             PrintState.init();
             App.initDB();
-            
-            // Swipe Gesture
+
+            // Setup Mobile Swipe Listener
             let sx=0, sy=0, drag=false;
-            const track = document.getElementById('studio-swipe-container');
-            track.addEventListener('touchstart', e=>{if(e.touches.length===1){sx=e.touches[0].clientX;sy=e.touches[0].clientY;drag=true;}},{passive:true});
-            track.addEventListener('touchend', e=>{
+            const t = document.getElementById('studio-swipe-container');
+            t.addEventListener('touchstart', e=>{if(e.touches.length===1){sx=e.touches[0].clientX;sy=e.touches[0].clientY;drag=true;}},{passive:true});
+            t.addEventListener('touchend', e=>{
                 if(!drag)return; drag=false;
                 const dx=e.changedTouches[0].clientX-sx, dy=e.changedTouches[0].clientY-sy;
-                if(Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)) App.slideToPage(App.mobilePage+(dx<0?1:-1));
+                if(Math.abs(dx)>50 && Math.abs(dx)>Math.abs(dy)) App.slideToPage(App.mPage+(dx<0?1:-1));
             },{passive:true});
         };
     </script>
