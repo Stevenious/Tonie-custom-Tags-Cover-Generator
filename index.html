@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>TagGen Studio V2.8 Pre-Release – Phoenix Repair Edition</title>
-<!-- PWA Web App Manifest (Data URI) -->
+<title>TagGen Studio V2.8.1 – Clean Repair Edition</title>
+<!-- PWA Web App Manifest -->
 <link rel="manifest" href="data:application/manifest+json;utf-8,%7B%22name%22%3A%22TagGen%20Studio%20Phoenix%22%2C%22short_name%22%3A%22TagGen%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%23e11d48%22%7D">
 <meta name="theme-color" content="#e11d48">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -814,7 +814,7 @@ img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 <line x1="1" y1="9" x2="4" y2="9"></line>
 <line x1="1" y1="14" x2="4" y2="14"></line>
 </svg>
-<span>TagGen <span style="color:var(--primary);">Phoenix</span> <span style="font-size:10px; background:var(--primary-soft); color:var(--primary); padding:2px 6px; border-radius:8px; margin-left:3px;">V2.8 Pre-Release</span></span>
+<span>TagGen <span style="color:var(--primary);">Phoenix</span> <span style="font-size:10px; background:var(--primary-soft); color:var(--primary); padding:2px 6px; border-radius:8px; margin-left:3px;">V2.8.1 Clean</span></span>
 </div>
 <div class="view-switcher">
 <button class="view-btn active" data-view="design" onclick="App.switchView('design')">1. Studio & Cover</button>
@@ -943,7 +943,7 @@ img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 </div>
 </div>
 </div>
-<!-- Mobile Pagination Indicator Bar (Patch B) -->
+<!-- Mobile Pagination Indicator Bar -->
 <div class="mobile-pagination-bar" id="mobile-bar">
 <button class="btn-secondary" onclick="App.prevPage()" style="padding:4px 8px; font-size:11px;">◀ Zurück</button>
 <div class="mobile-pagination-dots" id="mobile-dots">
@@ -1100,7 +1100,7 @@ Verwalte eigene Metadaten für deinen lokalen Toniebox-Server (TeddyCloud) oder 
 <h2>🛠️ System & Datenbank Status</h2>
 <table class="debug-table">
 <tr><th>Attribut</th><th>Status / Wert</th></tr>
-<tr><td>Version</td><td>TagGen Studio V2.8 Pre-Release (Phoenix Repair Edition)</td></tr>
+<tr><td>Version</td><td>TagGen Studio V2.8.1 (Clean Repair Edition)</td></tr>
 <tr><td>Geladene Tonies</td><td id="dbg-count">-</td></tr>
 <tr><td>Datenquelle</td><td id="dbg-source">-</td></tr>
 <tr><td>V2 Metadaten Match</td><td id="dbg-v2-count">-</td></tr>
@@ -1142,7 +1142,6 @@ const PrintStudio = { slots: [] };
 const NfcStudio = { mode: 'usb', port: null, writer: null, bleDevice: null, bleChar: null };
 const TeddyCloud = {};
 const Storage = {};
-// Safe Storage Wrapper preventing QuotaExceededError crashes
 const safeStorage = {
 set: (k, v) => {
 try {
@@ -1168,7 +1167,6 @@ try { localStorage.removeItem(k); } catch(e) {}
 const normalizeText = s => String(s ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
 const clean = s => normalizeText(s).replace(/[^a-z0-9]/g, '');
 const splitQuery = s => normalizeText(s).split(/\s+/).map(clean).filter(Boolean);
-// Resilient Fetch with CDN Fallback
 const fetchResilientJson = async (primaryUrl, fallbackUrl, timeout = 15000) => {
 const tryFetch = async (url) => {
 const controller = new AbortController();
@@ -1234,7 +1232,6 @@ if (val != null && val !== '') ids.push(val);
 }
 return [...new Set(ids.map(String).filter(Boolean))];
 };
-// --- HARDENED DATABASE INITIALIZER (Patch A & E) ---
 Data.init = async (forceRefresh = false) => {
 Data.startTime = performance.now();
 const statusEl = document.getElementById('db-status');
@@ -1295,7 +1292,6 @@ if (Object.keys(v2).length) break;
 }
 const v2Ids = collectIds(v2);
 const audioIds = [...new Set([...rawIds, ...v2Ids].map(String))];
-// Robust field priority: V2 metadata first (cleaner titles & high-res covers), fallback to V1
 const series = String(v2.series || v1.series || v1.serie || v1.brand || 'Unbekannt');
 const title = String(v2.episode || v2.title || v1.episodes || v1.episode || '');
 const image = String(v2.image || v2.picture || v1.image || v1.picture || '');
@@ -1303,7 +1299,6 @@ const language = String(v2.language || v1.language || 'de-de').toLowerCase();
 const tracks = Array.isArray(v2.tracks) ? v2.tracks.length : (Array.isArray(v1.tracks) ? v1.tracks.length : 0);
 return { id: primaryId, audioIds, series, title, image, pic: image, language, tracks, isCustom: false };
 }).filter(t => t.series || t.title || t.id);
-// Deduplicate and merge custom Tonies
 let customTonies = safeStorage.get('phoenix_custom_tonies', []);
 if (Array.isArray(customTonies)) {
 const seen = new Set();
@@ -1329,7 +1324,6 @@ if (dbgV2) dbgV2.textContent = ⁠${rawV2.length} V2 Datensätze⁠;
 const dbgTime = document.getElementById('dbg-load-time');
 if (dbgTime) dbgTime.textContent = ⁠${elapsed} ms⁠;
 if (dbgErrorEl) dbgErrorEl.textContent = 'OK (Keine Fehler)';
-// Lazy load dump index
 Data.loadDumpIndex().catch(e => console.warn("Dump-Index nicht erreichbar:", e));
 Search.filter();
 if (Data.tonies[0]) Editor.load(Data.tonies[0], true);
@@ -1387,7 +1381,6 @@ return 'fuzzy';
 }
 return 'none';
 };
-// --- LIBRARY NAVIGATION & SEARCH ---
 Library.switchTab = (tab) => {
 Library.activeTab = tab;
 Library.renderLimit = 48;
@@ -1426,7 +1419,6 @@ Library.currentFilteredResults = results;
 Library.renderLimit = 48;
 UI.renderCards();
 };
-// --- SECURE DOM CARD RENDERING (Patch B: XSS-Safe) ---
 UI.renderCards = () => {
 const grid = document.getElementById('asset-grid');
 if (!grid) return;
@@ -1532,7 +1524,6 @@ t.textContent = msg;
 t.classList.add('show');
 setTimeout(() => t.classList.remove('show'), 2500);
 };
-// --- COVER STUDIO PRO & PNG EXPORT ---
 Editor.load = (item, silent = false) => {
 Editor.current = { ...item, pic: item.pic || item.image || '' };
 UI.addRecent(item.id);
@@ -1588,7 +1579,6 @@ document.getElementById('svg-text-bottom-node').setAttribute('font-size', (6.5 *
 document.getElementById('svg-text-top').textContent = Editor.current.series;
 document.getElementById('svg-text-uid').textContent = Editor.current.uid ? ⁠ID: ${Editor.current.uid}⁠ : '';
 document.getElementById('svg-text-bottom').textContent = Editor.current.title;
-// Sync NFC Workspace simulator
 document.getElementById('nfc-target-title').textContent = Editor.current.title || '-';
 document.getElementById('nfc-target-uid').textContent = Editor.current.uid || '-';
 document.getElementById('nfc-preview-front').textContent = Editor.current.title || 'Kein Titel';
@@ -1602,12 +1592,11 @@ else if (matchQ === 'strong') sBadge.innerHTML = '<span style="color:var(--statu
 else if (matchQ === 'fuzzy') sBadge.innerHTML = '<span style="color:var(--status-fuzzy)">🟡 Fuzzy Match</span>';
 else sBadge.innerHTML = '<span style="color:var(--text-muted)">⚪ Kein Dump (Magic UID Flash)</span>';
 };
-// Encapsulated UID helper (Patch D)
 const formatMagicUid = (rawUid) => {
 if (!rawUid) return 'E004030000000001';
 const cleanUid = clean(rawUid).toUpperCase();
 if (cleanUid.startsWith('E00403') && cleanUid.length >= 14) return cleanUid.slice(0, 16);
-return cleanUid.length >= 14 ? cleanUid.slice(0, 16) : ("E00403" + cleanUid.padStart(10, '0')).slice(0, 16);
+return cleanUid.length >= 14 ? cleanUid.slice(0, 16) : ('E00403' + cleanUid.padStart(10, '0')).slice(0, 16);
 };
 Editor.uploadCustomImage = (e) => {
 const file = e.target.files && e.target.files[0];
@@ -1616,13 +1605,12 @@ const reader = new FileReader();
 reader.onload = ev => {
 Editor.current.pic = ev.target.result;
 Editor.update();
-UI.showToast("Eigenes Bild geladen!");
+UI.showToast('Eigenes Bild geladen!');
 };
 reader.readAsDataURL(file);
 };
-// PNG Render with Canvas & Fallback Protection (Patch E)
 Editor.exportPng = () => {
-UI.showToast("Rendere hochauflösendes PNG (1000px)...");
+UI.showToast('Rendere hochauflösendes PNG (1000px)...');
 const canvas = document.createElement('canvas');
 canvas.width = 1000;
 canvas.height = 1000;
@@ -1632,7 +1620,7 @@ ctx.save();
 ctx.beginPath();
 ctx.arc(500, 500, 495, 0, Math.PI * 2);
 ctx.clip();
-ctx.fillStyle = "#ffffff";
+ctx.fillStyle = '#ffffff';
 ctx.fillRect(0, 0, 1000, 1000);
 if (loadedImg) {
 try {
@@ -1642,8 +1630,8 @@ const oy = (Editor.state.y / 100) * 1000;
 const dw = 1000 * z, dh = 1000 * z;
 ctx.drawImage(loadedImg, (1000 - dw) / 2 + ox, (1000 - dh) / 2 + oy, dw, dh);
 } catch (drawErr) {
-console.warn("Canvas Image Draw Error (CORS tainted):", drawErr);
-UI.showToast("CORS-Einschränkung: Bitte Bild lokal hochladen für PNG Export.");
+console.warn('Canvas Image Draw Error (CORS tainted):', drawErr);
+UI.showToast('CORS-Einschränkung: Bitte Bild lokal hochladen für PNG Export.');
 }
 }
 ctx.restore();
@@ -1669,21 +1657,21 @@ const a = document.createElement('a');
 a.download = ⁠${clean(Editor.current.title || 'Tonie')}_Cover.png⁠;
 a.href = canvas.toDataURL('image/png');
 a.click();
-UI.showToast("Cover-PNG erfolgreich heruntergeladen!");
+UI.showToast('Cover-PNG erfolgreich heruntergeladen!');
 } catch (exportErr) {
-console.warn("CORS Security Error beim Export:", exportErr);
-UI.showToast("CORS-Einschränkung: Bitte Bild lokal hochladen.");
+console.warn('CORS Security Error beim Export:', exportErr);
+UI.showToast('CORS-Einschränkung: Bitte Bild lokal hochladen.');
 }
 };
 svgImg.onerror = () => {
 URL.revokeObjectURL(svgUrl);
-UI.showToast("Fehler beim Erzeugen der SVG-Ebene.");
+UI.showToast('Fehler beim Erzeugen der SVG-Ebene.');
 };
 svgImg.src = svgUrl;
 };
 if (Editor.current.pic) {
 const img = new Image();
-img.crossOrigin = "anonymous";
+img.crossOrigin = 'anonymous';
 img.onload = () => renderCanvasWithImage(img);
 img.onerror = () => {
 const fallbackImg = new Image();
@@ -1719,20 +1707,15 @@ document.getElementById(⁠slider-${id}⁠)?.addEventListener('input', Editor.up
 document.getElementById('filter-lang')?.addEventListener('change', Search.filter);
 document.getElementById('filter-dump')?.addEventListener('change', Search.filter);
 };
-// --- PRINT STUDIO (Patch C: Mathematically Exact A4 Geometry) ---
 PrintStudio.init = () => {
 PrintStudio.slots = new Array(12).fill(null);
 PrintStudio.changeFormat();
 };
 PrintStudio.getGeometry = (key) => {
 const geo = {
-// 43mm (12er • 3×4): 343=129mm + 210mm = 149mm. Rand: (210-149)/2 = 30.5mm. Höhe: 443=172mm + 310mm = 202mm. Rand: (297-202)/2 = 47.5mm.
 '43-12': { w: 43, h: 43, cols: 3, rows: 4, ml: 30.5, mt: 47.5, gx: 10, gy: 10 },
-// Avery Zweckform L3415 / 5080 (24er • 4×6): 440=160mm + 35mm = 175mm. Rand: (210-175)/2 = 17.5mm. Höhe: 640=240mm + 55mm = 265mm. Rand: (297-265)/2 = 16.0mm.
 '40-24': { w: 40, h: 40, cols: 4, rows: 6, ml: 17.5, mt: 16.0, gx: 5, gy: 5 },
-// Avery 40mm Standard (12er • 3×4): 340=120mm + 210mm = 140mm. Rand: (210-140)/2 = 35.0mm. Höhe: 440=160mm + 310mm = 190mm. Rand: (297-190)/2 = 53.5mm.
 '40-12': { w: 40, h: 40, cols: 3, rows: 4, ml: 35.0, mt: 53.5, gx: 10, gy: 10 },
-// Avery Zweckform 6223 30mm (48er • 6×8): 630=180mm + 0mm = 180mm. Rand: (210-180)/2 = 15.0mm. Höhe: 830=240mm + 0mm = 240mm. Rand: (297-240)/2 = 28.5mm.
 '30-48': { w: 30, h: 30, cols: 6, rows: 8, ml: 15.0, mt: 28.5, gx: 0, gy: 0 },
 'custom': { w: 43, h: 43, cols: 3, rows: 4, ml: 30.5, mt: 47.5, gx: 10, gy: 10 }
 };
@@ -1817,15 +1800,14 @@ if (idx > -1) {
 PrintStudio.slots[idx] = data;
 UI.showToast(⁠Auf Position ${idx+1} platziert!⁠);
 App.switchView('print');
-} else UI.showToast("Druckbogen ist voll!");
+} else UI.showToast('Druckbogen ist voll!');
 };
-PrintStudio.clear = () => { PrintStudio.slots.fill(null); PrintStudio.render(); UI.showToast("Bogen geleert."); };
-// --- STORAGE & PROJECT PERSISTENCE ---
+PrintStudio.clear = () => { PrintStudio.slots.fill(null); PrintStudio.render(); UI.showToast('Bogen geleert.'); };
 Storage.saveProject = () => {
 const fmt = document.getElementById('print-format')?.value || '43-12';
 const blob = new Blob([JSON.stringify({ format: fmt, slots: PrintStudio.slots })], { type: 'application/json' });
 const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'TagGen_Phoenix_Project.json'; a.click();
-UI.showToast("Projektdatei exportiert.");
+UI.showToast('Projektdatei exportiert.');
 };
 Storage.loadProject = (e) => {
 const file = e.target.files && e.target.files[0];
@@ -1839,14 +1821,13 @@ PrintStudio.slots = p.slots;
 const fmt = document.getElementById('print-format');
 if (fmt) fmt.value = p.format || '43-12';
 PrintStudio.changeFormat();
-UI.showToast("Projekt geladen!");
+UI.showToast('Projekt geladen!');
 }
-} catch(err) { UI.showToast("Fehler beim Laden."); }
+} catch(err) { UI.showToast('Fehler beim Laden.'); }
 e.target.value = '';
 };
 r.readAsText(file);
 };
-// --- NFC HARDWARE & EXPORT LOGIC (Patch D) ---
 NfcStudio.setMode = (m) => {
 NfcStudio.mode = m;
 document.getElementById('hw-usb')?.classList.toggle('active', m === 'usb');
@@ -1858,31 +1839,30 @@ if (NfcStudio.mode === 'usb') {
 NfcStudio.port = await navigator.serial.requestPort();
 await NfcStudio.port.open({ baudRate: 115200 });
 NfcStudio.writer = NfcStudio.port.writable.getWriter();
-UI.showToast("USB Verbunden.");
+UI.showToast('USB Verbunden.');
 } else {
 NfcStudio.bleDevice = await navigator.bluetooth.requestDevice({ filters: [{ namePrefix: 'NFC' }] });
 const server = await NfcStudio.bleDevice.gatt.connect();
 const srv = await server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
 NfcStudio.bleChar = await srv.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e');
-UI.showToast("BLE Verbunden.");
+UI.showToast('BLE Verbunden.');
 }
 const connStatus = document.getElementById('nfc-conn-status');
 if (connStatus) connStatus.innerHTML = '<span style="color:var(--status-exact)">🟢 Verbunden</span>';
-} catch(e) { UI.showToast("Verbindungsfehler."); }
+} catch(e) { UI.showToast('Verbindungsfehler.'); }
 };
 NfcStudio.flashTag = async () => {
 const uid = Editor.current.uid;
-if (!uid) return UI.showToast("Keine UID geladen!");
+if (!uid) return UI.showToast('Keine UID geladen!');
 const fullUid = formatMagicUid(uid);
 const cmd = ⁠{"cmd":"write_magic_tag","uid":"${fullUid}"}\n⁠;
 try {
 if (NfcStudio.mode === 'usb' && NfcStudio.writer) await NfcStudio.writer.write(new TextEncoder().encode(cmd));
 else if (NfcStudio.mode === 'ble' && NfcStudio.bleChar) await NfcStudio.bleChar.writeValue(new TextEncoder().encode(cmd));
-else return UI.showToast("Bitte erst Hardware verbinden!");
-UI.showToast("Flash-Befehl gesendet!");
-} catch(e) { UI.showToast("Übertragungsfehler."); }
+else return UI.showToast('Bitte erst Hardware verbinden!');
+UI.showToast('Flash-Befehl gesendet!');
+} catch(e) { UI.showToast('Übertragungsfehler.'); }
 };
-// Decoupled Flipper .nfc Export (Descriptor Stub)
 NfcStudio.exportFlipperNfc = () => {
 const rawUid = Editor.current.uid || '0102030405060708';
 const fullUid = formatMagicUid(rawUid);
@@ -1896,14 +1876,16 @@ AFI: 00
 Block size: 4
 Block count: 28
 Data content: 00 00 00 00
-Note: Experimental Descriptor Stub generated by TagGen Studio V2.8
-⁠; const blob = new Blob([nfcContent], { type: 'text/plain;charset=utf-8' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = ⁠${clean(Editor.current.title || 'Tonie_Tag')}_stub.nfc`;
+Note: Experimental Descriptor Stub generated by TagGen Studio V2.8.1`;
+const blob = new Blob([nfcContent], { type: 'text/plain;charset=utf-8' });
+const a = document.createElement('a');
+a.href = URL.createObjectURL(blob);
+a.download = ⁠${clean(Editor.current.title || 'Tonie_Tag')}_stub.nfc⁠;
 a.click();
-UI.showToast("Flipper Zero .nfc Stub exportiert!");
+UI.showToast('Flipper Zero .nfc Stub exportiert!');
 };
-// --- TEDDYCLOUD COMPANION ENGINE ---
 TeddyCloud.saveCurrentAsCustom = () => {
-if (!Editor.current.title && !Editor.current.series) return UI.showToast("Bitte erst Titel oder Serie eingeben!");
+if (!Editor.current.title && !Editor.current.series) return UI.showToast('Bitte erst Titel oder Serie eingeben!');
 let customTonies = safeStorage.get('phoenix_custom_tonies', []);
 if (!Array.isArray(customTonies)) customTonies = [];
 const newTonie = {
@@ -1923,7 +1905,7 @@ Data.tonies = Data.tonies.filter(t => t.id !== newTonie.id);
 Data.tonies.unshift(newTonie);
 const customBadge = document.getElementById('dbg-custom-count');
 if (customBadge) customBadge.textContent = String(customTonies.length);
-UI.showToast("Als eigener Tonie gespeichert!");
+UI.showToast('Als eigener Tonie gespeichert!');
 Library.switchTab('custom');
 };
 TeddyCloud.createFromForm = () => {
@@ -1931,7 +1913,7 @@ const series = document.getElementById('tc-input-series').value.trim();
 const title = document.getElementById('tc-input-title').value.trim();
 const uid = document.getElementById('tc-input-uid').value.trim();
 const lang = document.getElementById('tc-input-lang').value;
-if (!title) return UI.showToast("Bitte mindestens einen Titel eingeben!");
+if (!title) return UI.showToast('Bitte mindestens einen Titel eingeben!');
 const newTonie = {
 id: uid || 'CUSTOM_' + Date.now().toString(16).toUpperCase(),
 series: series || 'Eigene Sammlung',
@@ -1953,7 +1935,7 @@ const customBadge = document.getElementById('dbg-custom-count');
 if (customBadge) customBadge.textContent = String(customTonies.length);
 Editor.load(newTonie);
 App.switchView('design');
-UI.showToast("Eigener Tonie angelegt und im Studio geöffnet!");
+UI.showToast('Eigener Tonie angelegt und im Studio geöffnet!');
 };
 TeddyCloud.exportJson = () => {
 const customTonies = safeStorage.get('phoenix_custom_tonies', []);
@@ -1971,7 +1953,7 @@ const a = document.createElement('a');
 a.href = URL.createObjectURL(blob);
 a.download = 'TeddyCloud_Tonies_Export.json';
 a.click();
-UI.showToast("TeddyCloud JSON exportiert!");
+UI.showToast('TeddyCloud JSON exportiert!');
 };
 TeddyCloud.importJson = (e) => {
 const file = e.target.files && e.target.files[0];
@@ -2005,22 +1987,21 @@ const customBadge = document.getElementById('dbg-custom-count');
 if (customBadge) customBadge.textContent = String(deduplicated.length);
 Library.switchTab('custom');
 UI.showToast(⁠${imported.length} Tonies importiert!⁠);
-} else UI.showToast("Keine gültigen Tonies in der Datei gefunden.");
-} catch(err) { UI.showToast("Fehler beim Lesen der JSON-Datei."); }
+} else UI.showToast('Keine gültigen Tonies in der Datei gefunden.');
+} catch(err) { UI.showToast('Fehler beim Lesen der JSON-Datei.'); }
 e.target.value = '';
 };
 r.readAsText(file);
 };
 TeddyCloud.clearCustom = () => {
-if (!confirm("Möchtest du wirklich alle eigenen Tonies löschen?")) return;
+if (!confirm('Möchtest du wirklich alle eigenen Tonies löschen?')) return;
 safeStorage.remove('phoenix_custom_tonies');
 Data.tonies = Data.tonies.filter(t => !t.isCustom);
 const customBadge = document.getElementById('dbg-custom-count');
 if (customBadge) customBadge.textContent = '0';
 Library.switchTab('db');
-UI.showToast("Eigene Tags gelöscht.");
+UI.showToast('Eigene Tags gelöscht.');
 };
-// --- VIEW SWITCHER & MOBILE SWIPE NAVIGATION ---
 App.switchView = (view) => {
 document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
 document.querySelectorAll('.workspace').forEach(w => w.classList.remove('active'));
@@ -2051,7 +2032,6 @@ const layout = document.getElementById('studio-swipe-container');
 const cur = Number(layout?.dataset.page || 0);
 App.slideToPage(cur - 1);
 };
-// Mobile Swipe Handler with Dot Indicator Sync
 (() => {
 let startX = 0, startY = 0, dragging = false;
 const l = () => document.getElementById('studio-swipe-container');
