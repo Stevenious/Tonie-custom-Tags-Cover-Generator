@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>TagGen Studio V2.9.2 Phoenix – Complete Edition</title>
+    <title>TagGen Studio V2.9.3 Phoenix – Stable Release</title>
     
     <!-- PWA Web App Manifest -->
     <link rel="manifest" href="data:application/manifest+json;utf-8,%7B%22name%22%3A%22TagGen%20Studio%20Phoenix%22%2C%22short_name%22%3A%22TagGen%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%23e11d48%22%7D">
@@ -319,7 +319,6 @@
             transform: translateY(-2px);
         }
 
-        /* Stabilisiertes Cover-Bild */
         .card-img-wrap {
             width: 100%;
             padding-bottom: 100%;
@@ -378,7 +377,6 @@
             z-index: 5;
         }
 
-        /* Karten-Info Block: ID sitzt sauber ganz unten */
         .card-info {
             padding: 8px;
             display: flex;
@@ -437,7 +435,6 @@
             flex-shrink: 0;
         }
 
-        /* Pagination Bar */
         .pagination-bar {
             display: flex;
             align-items: center;
@@ -638,7 +635,7 @@
         }
         .btn-secondary:hover { background: #f8fafc; border-color: var(--primary); color: var(--primary); }
 
-        /* --- VIEW 2: PRINT STUDIO (A4 PERCENTAGE SCALING FIX) --- */
+        /* --- VIEW 2: PRINT STUDIO --- */
         .print-toolbar {
             background: #fff;
             padding: 12px 18px;
@@ -728,7 +725,7 @@
         .s-btn.del:hover { background: var(--primary); }
         .s-btn.copy:hover { background: #3b82f6; }
 
-        /* --- VIEW 3: NFC WORKSPACE & FLIPPER EXPORT --- */
+        /* --- VIEW 3: NFC WORKSPACE & HARDWARE SWITCH FIX --- */
         .nfc-container {
             max-width: 960px;
             margin: 24px auto;
@@ -796,6 +793,40 @@
             border-radius: 50%;
             border: 1px dotted rgba(225, 29, 72, 0.4);
             pointer-events: none;
+        }
+
+        /* Dedicated Hardware Toggle Classes */
+        .hardware-toggle {
+            display: flex;
+            background: var(--bg-canvas);
+            padding: 3px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            gap: 3px;
+        }
+        .hw-btn {
+            flex: 1;
+            padding: 7px;
+            border: none;
+            background: transparent;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.18s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        .hw-btn.active {
+            background: #ffffff;
+            color: var(--text-main);
+            box-shadow: var(--shadow-sm);
+        }
+        .hw-btn:hover:not(.active) {
+            color: var(--text-main);
         }
 
         /* --- VIEW 4: TEDDYCLOUD COMPANION --- */
@@ -930,7 +961,7 @@
         .page-step-label { font-size: 11px; font-weight: 600; color: var(--text-muted); }
 
         /* =========================================================
-           RESPONSIVE BREAKPOINTS (DESKTOP 8-GRID / MOBILE 2-GRID)
+           RESPONSIVE BREAKPOINTS
            ========================================================= */
         @media (min-width: 1400px) {
             #cardGrid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
@@ -1013,7 +1044,7 @@
                 <line x1="1" y1="9" x2="4" y2="9"></line>
                 <line x1="1" y1="14" x2="4" y2="14"></line>
             </svg>
-            <span>TagGen <span style="color:var(--primary);">Phoenix</span> <span style="font-size:10px; background:var(--primary-soft); color:var(--primary); padding:2px 6px; border-radius:8px; margin-left:3px;">V2.9.2</span></span>
+            <span>TagGen <span style="color:var(--primary);">Phoenix</span> <span style="font-size:10px; background:var(--primary-soft); color:var(--primary); padding:2px 6px; border-radius:8px; margin-left:3px;">V2.9.3</span></span>
         </div>
 
         <div class="view-switcher">
@@ -1064,7 +1095,6 @@
                         <div class="asset-scroll">
                             <div id="cardGrid"></div>
                         </div>
-                        <!-- P0: Strenge 8-Karten Pagination -->
                         <div class="pagination-bar">
                             <button id="btn-prev" onclick="Library.prevPage()">◀ Zurück</button>
                             <span class="page-indicator" id="page-indicator">1 / 1</span>
@@ -1219,7 +1249,7 @@
             </div>
         </div>
 
-        <!-- ==================== VIEW 3: NFC WORKSPACE & FLIPPER ==================== -->
+        <!-- ==================== VIEW 3: NFC WORKSPACE & HARDWARE FLASH STUDIO ==================== -->
         <div class="workspace" id="view-nfc">
             <div class="nfc-container">
                 <div class="nfc-card">
@@ -1258,9 +1288,11 @@
 
                 <div class="nfc-card">
                     <h2>📲 Hardware Flash Studio</h2>
-                    <div class="hardware-toggle" style="display:flex; background:var(--bg-canvas); padding:3px; border-radius:8px; border:1px solid var(--border);">
-                        <button class="hw-btn active" id="hw-usb" style="flex:1; padding:6px; border:none; background:#fff; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer;" onclick="NfcStudio.setMode('usb')">🔌 USB (Web Serial)</button>
-                        <button class="hw-btn" id="hw-ble" style="flex:1; padding:6px; border:none; background:none; font-size:11px; font-weight:600; color:var(--text-muted); cursor:pointer;" onclick="NfcStudio.setMode('ble')">📡 BLE (Bluetooth)</button>
+                    
+                    <!-- Clean CSS-Driven Hardware Toggle (Bugfix BLE Switch) -->
+                    <div class="hardware-toggle">
+                        <button class="hw-btn active" id="hw-usb" onclick="NfcStudio.setMode('usb')">🔌 USB (Web Serial)</button>
+                        <button class="hw-btn" id="hw-ble" onclick="NfcStudio.setMode('ble')">📡 BLE (Bluetooth)</button>
                     </div>
 
                     <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -1271,6 +1303,10 @@
                     <button class="btn" style="width:100%; background:var(--flipper-orange); padding:10px;" onclick="NfcStudio.flashTag()">
                         ⚡ Magic Tag (SLIX) Flashen
                     </button>
+
+                    <div style="font-size:10px; color:var(--text-muted); line-height:1.4; background:#f8fafc; padding:8px 10px; border-radius:6px; border:1px solid var(--border);">
+                        💡 <b>Hinweis:</b> Web Serial & Bluetooth benötigen Chrome/Edge (PC/Mac/Android). iOS unterstützt Web-BLE/Serial in Safari nicht direkt (auf iPhone/iPad ist dafür die kostenlose App <i>Bluefy</i> erforderlich).
+                    </div>
 
                     <div style="background:#f8fafc; border:1px solid var(--border); padding:10px; border-radius:8px; text-align:center;" id="esp-installer-container">
                         <span style="display:block; font-size:11px; font-weight:700; margin-bottom:6px;">ESP32 Firmware Flashen</span>
@@ -1343,7 +1379,7 @@
                     <h2>🛠️ System & Datenbank Status</h2>
                     <table class="debug-table">
                         <tr><th>Attribut</th><th>Status / Wert</th></tr>
-                        <tr><td>Version</td><td>TagGen Studio V2.9.2 Phoenix (Complete Architecture)</td></tr>
+                        <tr><td>Version</td><td>TagGen Studio V2.9.3 Phoenix (Stable Release)</td></tr>
                         <tr><td>Geladene Tonies</td><td id="dbg-count">-</td></tr>
                         <tr><td>Datenquelle</td><td id="dbg-source">-</td></tr>
                         <tr><td>V2 Metadaten Status</td><td id="dbg-v2-count">Wird im Hintergrund angereichert...</td></tr>
@@ -1391,8 +1427,8 @@
 
         const App = {};
         const Data = {
-            tonies: [],          // Raw Base List
-            searchIndex: [],     // Single Source of Truth for Search
+            tonies: [],          
+            searchIndex: [],     
             v2Map: new Map(),    
             dumpIndex: { exactIds: new Set(), strong: new Set(), titles: new Set() },
             startTime: performance.now(),
@@ -1601,7 +1637,6 @@
                     if (customBadge) customBadge.textContent = String(uniqueCustom.length);
                 }
 
-                // Build Normalized Search Index (Single Source of Truth)
                 Data.buildSearchIndex();
 
                 const elapsed = Math.round(performance.now() - Data.startTime);
@@ -1632,7 +1667,6 @@
             }
         };
 
-        // Generates clean indexed model for ultra-fast and accurate queries
         Data.buildSearchIndex = () => {
             Data.searchIndex = Data.tonies.map(t => {
                 const ids = t.audioIds && t.audioIds.length ? t.audioIds : [t.id];
@@ -1766,15 +1800,12 @@
 
             let pool = Data.searchIndex;
 
-            // 1. Tab Filtering
             if (Library.activeTab === 'fav') pool = pool.filter(t => favs.includes(t.id));
             if (Library.activeTab === 'recent') pool = pool.filter(t => recent.includes(t.id));
             if (Library.activeTab === 'custom') pool = pool.filter(t => t.isCustom);
 
-            // 2. Language Filtering
             if (lang) pool = pool.filter(t => t.language === lang);
 
-            // 3. Match Quality Filtering
             if (dumpFilter !== 'all') {
                 pool = pool.filter(t => {
                     const mq = Data.getMatchQuality(t.raw);
@@ -1785,7 +1816,6 @@
                 });
             }
 
-            // 4. Cascading Ranking: Exact -> Prefix -> Contains -> Fuzzy
             if (q) {
                 const exactMatches = [];
                 const prefixMatches = [];
@@ -1814,7 +1844,6 @@
                         return;
                     }
 
-                    // Multi-word Contains Match
                     const fullHaystack = `${item.normalizedSeries} ${item.normalizedTitle} ${item.cleanAudioIds.join(' ')}`;
                     const allWordsFound = words.every(w => fullHaystack.includes(w));
 
@@ -1824,7 +1853,6 @@
                         return;
                     }
 
-                    // Fuzzy Subsequence Fallback
                     const chars = q.replace(/\s+/g, '').split('');
                     let charIdx = 0;
                     const compactHaystack = fullHaystack.replace(/\s+/g, '');
@@ -1841,13 +1869,12 @@
             }
 
             Library.currentFilteredResults = pool.map(p => p.raw);
-            Library.currentPage = 0; // Reset to page 1 on every search
+            Library.currentPage = 0;
             UI.renderCards();
         };
 
         const TRANSPARENT_PIXEL = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 
-        // --- UI RENDERING (P0-5 STRICT 8 ITEMS PAGINATION) ---
         UI.renderCards = () => {
             const grid = document.getElementById('cardGrid');
             if (!grid) return;
@@ -1913,7 +1940,6 @@
                 else if (matchQ === 'strong') dotColor = 'var(--status-strong)';
                 else if (matchQ === 'fuzzy') dotColor = 'var(--status-fuzzy)';
 
-                // P0-6 Card info structure: ID sitting cleanly at the bottom
                 const content = document.createElement('div');
                 content.className = 'card-info';
 
@@ -1948,7 +1974,6 @@
                 grid.appendChild(card);
             });
 
-            // Pagination Controls Update
             const totalPages = Math.ceil(totalItems / Library.pageSize) || 1;
             document.getElementById('page-indicator').textContent = `${Library.currentPage + 1} / ${totalPages}`;
             document.getElementById('btn-prev').disabled = Library.currentPage === 0;
@@ -2092,7 +2117,6 @@
             document.getElementById('svg-text-uid').textContent = (Editor.current.uid && Editor.state.showUid) ? `ID: ${Editor.current.uid}` : '';
             document.getElementById('svg-text-bottom').textContent = Editor.current.title;
             
-            // Sync with NFC Simulator
             document.getElementById('nfc-target-title').textContent = Editor.current.title || '-';
             document.getElementById('nfc-target-uid').textContent = Editor.current.uid || '-';
             document.getElementById('nfc-preview-front').textContent = Editor.current.title || 'Kein Titel';
@@ -2203,7 +2227,7 @@
             }
         };
 
-        // --- PRINT STUDIO (A4 PERCENTAGE SCALING & STATE PIPELINE) ---
+        // --- PRINT STUDIO ---
         PrintStudio.init = () => {
             PrintStudio.slots = new Array(12).fill(null);
             PrintStudio.changeFormat('43-12');
@@ -2248,7 +2272,6 @@
                 const col = index % geo.cols;
                 const row = Math.floor(index / geo.cols);
                 
-                // Percentage-based coordinates for responsive A4 preview scaling
                 const lP = ((geo.ml + (col * (geo.w + geo.gx))) / 210) * 100;
                 const tP = ((geo.mt + (row * (geo.h + geo.gy))) / 297) * 100;
                 const wP = (geo.w / 210) * 100;
@@ -2324,7 +2347,6 @@
                     
                     s.appendChild(svg);
 
-                    // Actions: Duplicate & Delete
                     const act = document.createElement('div');
                     act.className = 'sticker-actions';
                     
@@ -2409,32 +2431,67 @@
             r.readAsText(file);
         };
 
-        // --- NFC WORKSPACE & FLIPPER EXPORT ---
+        // --- NFC WORKSPACE & HARDWARE FLASH STUDIO (BLE & USB FIX) ---
         NfcStudio.setMode = (m) => {
             NfcStudio.mode = m;
-            document.getElementById('hw-usb')?.classList.toggle('active', m === 'usb');
-            document.getElementById('hw-ble')?.classList.toggle('active', m === 'ble');
+            const usbBtn = document.getElementById('hw-usb');
+            const bleBtn = document.getElementById('hw-ble');
+            if (usbBtn) usbBtn.classList.toggle('active', m === 'usb');
+            if (bleBtn) bleBtn.classList.toggle('active', m === 'ble');
+            
+            const connStatus = document.getElementById('nfc-conn-status');
+            if (connStatus && !NfcStudio.port && !NfcStudio.bleDevice) {
+                connStatus.innerHTML = '<span style="color:var(--text-muted)">🔴 Getrennt</span>';
+            }
+            UI.showToast(m === 'ble' ? 'Modus: Bluetooth (BLE)' : 'Modus: USB (Web Serial)');
         };
 
         NfcStudio.connect = async () => {
             try {
                 if (NfcStudio.mode === 'usb') {
-                    if (!navigator.serial) return UI.showToast('Web Serial wird von diesem Browser nicht unterstützt.');
+                    if (!navigator.serial) {
+                        return UI.showToast('Web Serial wird von diesem Browser/Gerät nicht unterstützt.');
+                    }
                     NfcStudio.port = await navigator.serial.requestPort();
                     await NfcStudio.port.open({ baudRate: 115200 });
                     NfcStudio.writer = NfcStudio.port.writable.getWriter();
                     UI.showToast('USB Verbunden.');
                 } else {
-                    if (!navigator.bluetooth) return UI.showToast('Web Bluetooth wird von diesem Browser nicht unterstützt.');
-                    NfcStudio.bleDevice = await navigator.bluetooth.requestDevice({ filters: [{ namePrefix: 'NFC' }] });
+                    if (!navigator.bluetooth) {
+                        return UI.showToast('Web Bluetooth nicht verfügbar (auf iOS ist z. B. die App "Bluefy" nötig).');
+                    }
+                    // Robust connect with acceptAllDevices to detect all ESP32 devices
+                    NfcStudio.bleDevice = await navigator.bluetooth.requestDevice({
+                        acceptAllDevices: true,
+                        optionalServices: [
+                            '6e400001-b5a3-f393-e0a9-e50e24dcca9e',
+                            '0000ffe0-0000-1000-8000-00805f9b34fb',
+                            0xFFE0
+                        ]
+                    });
                     const server = await NfcStudio.bleDevice.gatt.connect();
-                    const srv = await server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
-                    NfcStudio.bleChar = await srv.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e');
-                    UI.showToast('BLE Verbunden.');
+                    
+                    try {
+                        const srv = await server.getPrimaryService('6e400001-b5a3-f393-e0a9-e50e24dcca9e');
+                        NfcStudio.bleChar = await srv.getCharacteristic('6e400002-b5a3-f393-e0a9-e50e24dcca9e');
+                    } catch(e1) {
+                        try {
+                            const srv = await server.getPrimaryService('0000ffe0-0000-1000-8000-00805f9b34fb');
+                            NfcStudio.bleChar = await srv.getCharacteristic('0000ffe1-0000-1000-8000-00805f9b34fb');
+                        } catch(e2) {
+                            console.warn("BLE Custom UUID Fallback");
+                        }
+                    }
+                    UI.showToast(`BLE Verbunden: ${NfcStudio.bleDevice.name || 'ESP32'}`);
                 }
                 const connStatus = document.getElementById('nfc-conn-status');
                 if (connStatus) connStatus.innerHTML = '<span style="color:var(--status-exact)">🟢 Verbunden</span>';
-            } catch(e) { UI.showToast('Verbindungsfehler.'); }
+            } catch(e) {
+                if (e.name !== 'NotFoundError' && e.name !== 'AbortError') {
+                    console.error('NFC Connect Error:', e);
+                    UI.showToast('Verbindungsfehler: ' + (e.message || 'Abgebrochen'));
+                }
+            }
         };
 
         NfcStudio.flashTag = async () => {
@@ -2443,11 +2500,18 @@
             const fullUid = formatMagicUid(uid);
             const cmd = `{"cmd":"write_magic_tag","uid":"${fullUid}"}\n`;
             try {
-                if (NfcStudio.mode === 'usb' && NfcStudio.writer) await NfcStudio.writer.write(new TextEncoder().encode(cmd));
-                else if (NfcStudio.mode === 'ble' && NfcStudio.bleChar) await NfcStudio.bleChar.writeValue(new TextEncoder().encode(cmd));
-                else return UI.showToast('Bitte erst Hardware verbinden!');
+                if (NfcStudio.mode === 'usb' && NfcStudio.writer) {
+                    await NfcStudio.writer.write(new TextEncoder().encode(cmd));
+                } else if (NfcStudio.mode === 'ble' && NfcStudio.bleChar) {
+                    await NfcStudio.bleChar.writeValue(new TextEncoder().encode(cmd));
+                } else {
+                    return UI.showToast('Bitte erst Hardware verbinden!');
+                }
                 UI.showToast('Flash-Befehl gesendet!');
-            } catch(e) { UI.showToast('Übertragungsfehler.'); }
+            } catch(e) { 
+                console.error(e);
+                UI.showToast('Übertragungsfehler beim Flashen.'); 
+            }
         };
 
         NfcStudio.exportFlipperNfc = () => {
@@ -2464,7 +2528,7 @@ AFI: 00
 Block size: 4
 Block count: 28
 Data content: 00 00 00 00
-# Note: Experimental Descriptor Stub generated by TagGen Studio V2.9.2`;
+# Note: Experimental Descriptor Stub generated by TagGen Studio V2.9.3`;
 
             const blob = new Blob([nfcContent], { type: 'text/plain;charset=utf-8' });
             const a = document.createElement('a');
