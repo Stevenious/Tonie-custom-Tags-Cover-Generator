@@ -49,14 +49,16 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        body {
+        html, body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
             background-color: var(--bg-canvas);
             color: var(--text-main);
             height: 100vh;
             height: 100dvh;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
         }
 
         /* --- HEADER & NAVIGATION --- */
@@ -153,6 +155,8 @@
             overflow: hidden;
             position: relative;
             flex-direction: column;
+            width: 100%;
+            max-width: 100%;
         }
 
         .workspace {
@@ -162,6 +166,8 @@
             position: relative;
             background: var(--bg-canvas);
             overflow: hidden;
+            width: 100%;
+            max-width: 100%;
         }
         .workspace.active { display: flex; }
 
@@ -171,6 +177,7 @@
             flex: 1;
             overflow: hidden;
             width: 100%;
+            max-width: 100%;
         }
 
         .sidebar-lib {
@@ -182,6 +189,8 @@
             z-index: 20;
             flex-shrink: 0;
             transition: width 0.2s ease;
+            min-width: 0;
+            max-width: 100%;
         }
 
         .lib-header {
@@ -191,6 +200,7 @@
             flex-direction: column;
             gap: 8px;
             background: #ffffff;
+            flex-shrink: 0;
         }
 
         .lib-tabs {
@@ -244,36 +254,42 @@
             outline: none;
         }
 
+        /* Container Wrap zur Vermeidung von horizontalem Überlauf */
+        .library-grid-wrap {
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+            overflow-x: hidden;
+            overflow-y: hidden;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
         .asset-scroll {
             flex: 1;
-            min-width: 0;
+            width: 100%;
             overflow-y: auto;
             padding: 10px;
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            align-content: start;
-            gap: 8px;
         }
 
         .load-more-container {
             grid-column: 1 / -1;
+            width: 100%;
             padding: 12px;
             text-align: center;
         }
 
-        /* Clean Studio Cards */
         .asset-card {
             background: #fff;
             border: 1px solid var(--border);
-            border-radius: 8px;
-            overflow: hidden;
+            position: relative;
             cursor: pointer;
             display: flex;
             flex-direction: column;
             gap: 6px;
             padding: 6px;
             transition: transform 0.12s ease, border-color 0.12s ease;
-            position: relative;
         }
 
         .asset-card:hover {
@@ -294,20 +310,6 @@
             overflow: hidden;
             position: relative;
             border: 1px solid #f1f5f9;
-        }
-
-        .card-img-wrap img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            transition: opacity 0.2s;
-        }
-        
-        .card-img-wrap .fallback-icon {
-            width: 40%;
-            height: 40%;
-            opacity: 0.25;
-            display: none;
         }
 
         .fav-btn {
@@ -354,6 +356,7 @@
             flex-direction: column;
             justify-content: center;
             min-width: 0;
+            max-width: 100%;
         }
 
         .card-serie {
@@ -361,16 +364,6 @@
             font-weight: 700;
             color: var(--primary);
             text-transform: uppercase;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .card-title {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-main);
-            margin: 1px 0 2px 0;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -404,6 +397,7 @@
             padding: 20px;
             position: relative;
             overflow: auto;
+            min-width: 0;
         }
 
         .preview-wrapper {
@@ -416,6 +410,7 @@
             flex-direction: column;
             align-items: center;
             gap: 16px;
+            max-width: 100%;
         }
 
         .tag-circle {
@@ -463,6 +458,7 @@
             flex-direction: column;
             overflow-y: auto;
             flex-shrink: 0;
+            min-width: 0;
         }
 
         .control-section {
@@ -765,7 +761,7 @@
         }
         .debug-table th { background: #f8fafc; font-weight: 700; }
 
-        /* --- TOAST & SYSTEM NOTIFICATIONS --- */
+        /* --- TOAST & NOTIFICATIONS --- */
         #toast {
             position: fixed; bottom: 24px; left: 50%; transform: translate(-50%, 100px);
             background: #0f172a; color: #fff; padding: 9px 18px; border-radius: 30px;
@@ -788,7 +784,7 @@
             gap: 10px;
         }
 
-        /* Modal Overlay for confirming actions without browser confirm() */
+        /* Modal Overlay */
         #modal-overlay {
             display: none;
             position: fixed;
@@ -837,20 +833,20 @@
         .dot.active { background: var(--primary); transform: scale(1.25); }
         .page-step-label { font-size: 11px; font-weight: 600; color: var(--text-muted); }
 
-        /* --- DESKTOP 8-GRID BREAKPOINTS --- */
-        @media (min-width: 1400px) {
-            .asset-scroll { grid-template-columns: repeat(8, minmax(0, 1fr)) !important; }
-            .sidebar-lib { width: 540px; }
+        /* ---------- Überlaufschutz & Fixes ---------- */
+        .studio-layout,
+        .sidebar-lib,
+        .canvas-area,
+        .sidebar-controls,
+        .control-section {
+            min-width: 0;
+            max-width: 100%;
         }
-        @media (min-width: 1150px) and (max-width: 1399px) {
-            .asset-scroll { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; }
-            .sidebar-lib { width: 440px; }
-        }
-        @media (min-width: 961px) and (max-width: 1149px) {
-            .asset-scroll { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
-            .sidebar-lib { width: 380px; }
+        img, canvas, svg, input, select, button {
+            max-width: 100%;
         }
 
+        /* --- MOBILE SWIPE LOGIC (V2.8.2 Studio-Layout Integration) --- */
         @media (max-width: 960px) {
             header { height: 54px; padding: 0 10px; }
             .brand { font-size: 14px; }
@@ -864,7 +860,7 @@
                 overflow: hidden;
                 touch-action: pan-x;
                 transform: translateX(0);
-                transition: transform .22s cubic-bezier(0.2, 0.8, 0.2, 1);
+                transition: transform .25s ease;
             }
             .sidebar-lib, .canvas-area, .sidebar-controls {
                 width: 100vw;
@@ -877,7 +873,6 @@
             .canvas-area { order: 2; padding: 12px; }
             .sidebar-controls { order: 3; overflow-y: auto; padding-bottom: 32px; }
 
-            .asset-scroll { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; padding: 8px; }
             .preview-wrapper { width: min(92vw, 380px); padding: 16px; gap: 12px; }
             .tag-circle { width: min(72vw, 280px); height: min(72vw, 280px); }
 
@@ -893,6 +888,7 @@
             .nfc-container { grid-template-columns: 1fr; margin: 16px auto; }
         }
 
+        /* PRINT MEDIA FIXES */
         @page { size: A4 portrait; margin: 0; }
         @media print {
             body * { visibility: hidden; }
@@ -903,6 +899,187 @@
             .a4-sheet { transform: none !important; margin: 0 !important; box-shadow: none !important; }
             .slot { border: none !important; background: transparent !important; }
             img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        }
+
+        /* ============================================================
+           TAGGEN PHOENIX — RESPONSIVE GRID PATCH
+           Desktop: max. 8 Kacheln
+           Tablet:  4–6 Kacheln
+           Mobile:  2–3 Kacheln
+           ============================================================ */
+        /* ---------- Grid-Grundlagen ---------- */
+        .grid,
+        .tonie-grid,
+        .library-grid,
+        .card-grid,
+        #cardGrid,
+        #mobileGrid {
+            display: grid;
+            width: 100%;
+            min-width: 0;
+            grid-template-columns: repeat(8, minmax(0, 1fr));
+            gap: 10px;
+            align-items: start;
+        }
+        .grid > *,
+        .tonie-grid > *,
+        .library-grid > *,
+        .card-grid > *,
+        #cardGrid > *,
+        #mobileGrid > * {
+            min-width: 0;
+            max-width: 100%;
+        }
+        /* ---------- Kacheln ---------- */
+        .card,
+        .tonie-card,
+        .library-card,
+        .asset-card {
+            width: 100%;
+            min-width: 0;
+            max-width: 100%;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+        .card img,
+        .tonie-card img,
+        .library-card img,
+        .asset-card img {
+            display: block;
+            width: 100%;
+            max-width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+        }
+        /* Lange Titel dürfen niemals das Grid sprengen */
+        .card-title,
+        .tonie-card-title,
+        .library-card-title {
+            min-width: 0;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        /* ---------- Große Desktop-Auflösung ---------- */
+        @media (min-width: 1400px) {
+            .grid,
+            .tonie-grid,
+            .library-grid,
+            .card-grid,
+            #cardGrid {
+                grid-template-columns: repeat(8, minmax(0, 1fr));
+                gap: 10px;
+            }
+        }
+        /* ---------- normaler Desktop ---------- */
+        @media (min-width: 1150px) and (max-width: 1399px) {
+            .grid,
+            .tonie-grid,
+            .library-grid,
+            .card-grid,
+            #cardGrid {
+                grid-template-columns: repeat(6, minmax(0, 1fr));
+                gap: 10px;
+            }
+        }
+        /* ---------- kleiner Desktop / Tablet ---------- */
+        @media (min-width: 850px) and (max-width: 1149px) {
+            .grid,
+            .tonie-grid,
+            .library-grid,
+            .card-grid,
+            #cardGrid {
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: 9px;
+            }
+        }
+        /* ---------- Tablet ---------- */
+        @media (min-width: 600px) and (max-width: 849px) {
+            .grid,
+            .tonie-grid,
+            .library-grid,
+            .card-grid,
+            #cardGrid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 8px;
+            }
+        }
+        /* ============================================================
+           MOBILE
+           ============================================================ */
+        @media (max-width: 599px) {
+            html,
+            body {
+                width: 100%;
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+            .panel {
+                width: 100%;
+                max-width: 100%;
+            }
+            /* 2 schöne große Kacheln */
+            .grid,
+            .tonie-grid,
+            .library-grid,
+            .card-grid,
+            #cardGrid,
+            #mobileGrid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 8px;
+            }
+            .card,
+            .tonie-card,
+            .library-card,
+            .asset-card {
+                border-radius: 11px;
+            }
+            .card-info,
+            .tonie-card-info,
+            .library-card-info,
+            .card-content {
+                padding: 7px;
+                min-width: 0;
+            }
+            .card-title,
+            .tonie-card-title,
+            .library-card-title {
+                font-size: 12px;
+                line-height: 1.25;
+            }
+            .card-meta,
+            .tonie-card-meta,
+            .library-card-meta {
+                font-size: 10px;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+            }
+        }
+        /* ============================================================
+           SEHR KLEINE SMARTPHONES
+           ============================================================ */
+        @media (max-width: 370px) {
+            .grid,
+            .tonie-grid,
+            .library-grid,
+            .card-grid,
+            #cardGrid,
+            #mobileGrid {
+                gap: 6px;
+            }
+            .card-info,
+            .tonie-card-info,
+            .library-card-info,
+            .card-content {
+                padding: 6px;
+            }
+            .card-title,
+            .tonie-card-title,
+            .library-card-title {
+                font-size: 11px;
+            }
         }
     </style>
 </head>
@@ -974,7 +1151,9 @@
                         </div>
                     </div>
                     
-                    <div class="asset-scroll" id="asset-grid"></div>
+                    <div class="library-grid-wrap">
+                        <div class="asset-scroll grid" id="cardGrid"></div>
+                    </div>
                 </div>
 
                 <div class="canvas-area" id="drop-zone">
@@ -1536,7 +1715,6 @@
                 const dbgV2 = document.getElementById('dbg-v2-count');
                 if (dbgV2) dbgV2.textContent = `${updatedCount} angereichert (${rawV2.length} V2 Datensätze)`;
                 
-                // Refresh current card views with enriched data
                 Search.filter();
             } catch (v2Err) {
                 console.warn("V2-Hintergrundabruf fehlgeschlagen (optional):", v2Err);
@@ -1569,7 +1747,6 @@
                             if (filename) Data.dumpIndex.titles.add(filename);
                         }
                     });
-                    // Re-render visible badges
                     UI.renderCards();
                 }
             } catch(e) {
@@ -1640,11 +1817,10 @@
             UI.renderCards();
         };
 
-        // Fallback transparent 1x1 data uri
         const TRANSPARENT_PIXEL = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%23e2e8f0"/></svg>';
 
         UI.renderCards = () => {
-            const grid = document.getElementById('asset-grid');
+            const grid = document.getElementById('cardGrid');
             if (!grid) return;
             grid.innerHTML = '';
             const favs = safeStorage.get('phoenix_favs', []);
@@ -1655,7 +1831,7 @@
                 const matchQ = Data.getMatchQuality(item);
                 
                 const card = document.createElement('div');
-                card.className = 'asset-card';
+                card.className = 'asset-card card tonie-card';
                 card.onclick = () => Editor.load(item);
 
                 const imgWrap = document.createElement('div');
@@ -1665,9 +1841,8 @@
                 img.loading = 'lazy';
                 img.alt = item.title || '';
                 
-                // CRITICAL FIX: Ensure onerror doesn't trigger an infinite loop
                 img.onerror = function() {
-                    this.onerror = null; // Unbind handler immediately!
+                    this.onerror = null;
                     this.src = TRANSPARENT_PIXEL;
                     this.style.opacity = '0.35';
                 };
@@ -1708,18 +1883,18 @@
                 else if (matchQ === 'fuzzy') dotColor = 'var(--status-fuzzy)';
 
                 const content = document.createElement('div');
-                content.className = 'card-content';
+                content.className = 'card-content card-info';
 
                 const serieEl = document.createElement('div');
                 serieEl.className = 'card-serie';
                 serieEl.textContent = item.series || '';
 
                 const titleEl = document.createElement('div');
-                titleEl.className = 'card-title';
+                titleEl.className = 'card-title tonie-card-title';
                 titleEl.textContent = item.title || '';
 
                 const metaEl = document.createElement('div');
-                metaEl.className = 'card-meta';
+                metaEl.className = 'card-meta tonie-card-meta';
                 
                 const dotSpan = document.createElement('span');
                 dotSpan.className = 'status-dot';
@@ -1776,7 +1951,6 @@
             setTimeout(() => t.classList.remove('show'), 2500);
         };
 
-        // Custom Modal Confirmation without alert/confirm
         UI.showConfirm = (title, message, onConfirm) => {
             const overlay = document.getElementById('modal-overlay');
             const mTitle = document.getElementById('modal-title');
