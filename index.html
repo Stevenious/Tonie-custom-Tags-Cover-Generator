@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>TagGen Studio V2.7.1 Ultra – Phoenix Community Edition</title>
+<title>TagGen Studio V2.8 Pre-Release – Phoenix Repair Edition</title>
 <!-- PWA Web App Manifest (Data URI) -->
 <link rel="manifest" href="data:application/manifest+json;utf-8,%7B%22name%22%3A%22TagGen%20Studio%20Phoenix%22%2C%22short_name%22%3A%22TagGen%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f8fafc%22%2C%22theme_color%22%3A%22%23e11d48%22%7D">
 <meta name="theme-color" content="#e11d48">
@@ -11,8 +11,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="TagGen Studio">
 <meta name="description" content="Tonie Cover Generator Pro, Print Studio, NFC Magic Tag Flasher & TeddyCloud Companion">
-<!-- ESP Web Tools -->
-<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+<!-- ESP Web Tools with Resilience Fallback -->
+<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module" onerror="window.espWebToolsFailed=true;"></script>
 <style>
 :root {
 --primary: #e11d48;
@@ -32,7 +32,6 @@
 --flipper-orange: #ff8200;
 --teddy-teal: #0d9488;
 --glass-bg: rgba(255, 255, 255, 0.92);
---glass-card: rgba(255, 255, 255, 0.88);
 --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
 --shadow-md: 0 4px 14px rgba(15,23,42,0.06);
 --shadow-lg: 0 12px 30px rgba(15,23,42,0.09);
@@ -138,6 +137,7 @@ display: flex;
 flex: 1;
 overflow: hidden;
 position: relative;
+flex-direction: column;
 }
 .workspace {
 flex: 1;
@@ -156,13 +156,14 @@ overflow: hidden;
 width: 100%;
 }
 .sidebar-lib {
-width: 440px;
+width: 420px;
 background: var(--bg-sidebar);
 border-right: 1px solid var(--border);
 display: flex;
 flex-direction: column;
 z-index: 20;
 flex-shrink: 0;
+transition: width 0.2s ease;
 }
 .lib-header {
 padding: 12px 14px;
@@ -687,7 +688,7 @@ border-bottom: 1px solid var(--border);
 text-align: left;
 }
 .debug-table th { background: #f8fafc; font-weight: 700; }
-/* --- TOAST NOTIFICATIONS --- */
+/* --- TOAST & SYSTEM NOTIFICATIONS --- */
 #toast {
 position: fixed; bottom: 24px; left: 50%; transform: translate(-50%, 100px);
 background: #0f172a; color: #fff; padding: 9px 18px; border-radius: 30px;
@@ -708,23 +709,46 @@ align-items: center;
 justify-content: center;
 gap: 10px;
 }
-/* --- RESPONSIVE GRIDS (8 / 4 / 3 / 2) --- */
-@media (min-width: 1700px) {
-.asset-scroll { grid-template-columns: repeat(8, minmax(0, 1fr)); }
-.sidebar-lib { width: 560px; }
+/* --- MOBILE PAGINATION INDICATOR BAR --- */
+.mobile-pagination-bar {
+display: none;
+justify-content: space-between;
+align-items: center;
+padding: 6px 12px;
+background: #ffffff;
+border-top: 1px solid var(--border);
+flex-shrink: 0;
+z-index: 50;
 }
-@media (min-width: 1350px) and (max-width: 1699px) {
-.asset-scroll { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.mobile-pagination-dots {
+display: flex;
+align-items: center;
+gap: 8px;
+}
+.dot {
+width: 8px; height: 8px; border-radius: 50%; background: #cbd5e1; transition: background 0.2s, transform 0.2s;
+cursor: pointer;
+}
+.dot.active { background: var(--primary); transform: scale(1.25); }
+.page-step-label { font-size: 11px; font-weight: 600; color: var(--text-muted); }
+/* --- DESKTOP 8-GRID BREAKPOINTS (Starting at 1400px) --- */
+@media (min-width: 1400px) {
+.asset-scroll { grid-template-columns: repeat(8, minmax(0, 1fr)) !important; }
+.sidebar-lib { width: 520px; }
+}
+@media (min-width: 1150px) and (max-width: 1399px) {
+.asset-scroll { grid-template-columns: repeat(6, minmax(0, 1fr)) !important; }
 .sidebar-lib { width: 440px; }
 }
-@media (min-width: 961px) and (max-width: 1349px) {
-.asset-scroll { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (min-width: 961px) and (max-width: 1149px) {
+.asset-scroll { grid-template-columns: repeat(4, minmax(0, 1fr)) !important; }
 .sidebar-lib { width: 380px; }
 }
 @media (max-width: 960px) {
 header { height: 54px; padding: 0 10px; }
 .brand { font-size: 14px; }
 .header-actions { display: none; }
+.mobile-pagination-bar { display: flex; }
 .studio-layout {
 width: 300vw;
 min-width: 300vw;
@@ -790,7 +814,7 @@ img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 <line x1="1" y1="9" x2="4" y2="9"></line>
 <line x1="1" y1="14" x2="4" y2="14"></line>
 </svg>
-<span>TagGen <span style="color:var(--primary);">Phoenix</span> <span style="font-size:10px; background:var(--primary-soft); color:var(--primary); padding:2px 6px; border-radius:8px; margin-left:3px;">V2.7.1 Ultra</span></span>
+<span>TagGen <span style="color:var(--primary);">Phoenix</span> <span style="font-size:10px; background:var(--primary-soft); color:var(--primary); padding:2px 6px; border-radius:8px; margin-left:3px;">V2.8 Pre-Release</span></span>
 </div>
 <div class="view-switcher">
 <button class="view-btn active" data-view="design" onclick="App.switchView('design')">1. Studio & Cover</button>
@@ -919,6 +943,17 @@ img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 </div>
 </div>
 </div>
+<!-- Mobile Pagination Indicator Bar (Patch B) -->
+<div class="mobile-pagination-bar" id="mobile-bar">
+<button class="btn-secondary" onclick="App.prevPage()" style="padding:4px 8px; font-size:11px;">◀ Zurück</button>
+<div class="mobile-pagination-dots" id="mobile-dots">
+<div class="dot active" onclick="App.slideToPage(0)" title="Bibliothek"></div>
+<div class="dot" onclick="App.slideToPage(1)" title="Editor"></div>
+<div class="dot" onclick="App.slideToPage(2)" title="Controls"></div>
+</div>
+<span class="page-step-label" id="page-label">1/3 Bibliothek</span>
+<button class="btn-secondary" onclick="App.nextPage()" style="padding:4px 8px; font-size:11px;">Weiter ▶</button>
+</div>
 </div>
 <!-- ==================== VIEW 2: PRINT STUDIO ==================== -->
 <div class="workspace" id="view-print">
@@ -980,9 +1015,10 @@ img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 <span>Dump Status:</span><strong id="nfc-target-status">-</strong>
 </div>
 </div>
-<button class="btn-secondary" onclick="NfcStudio.exportFlipperNfc()" style="width:100%; justify-content:center; color:var(--flipper-orange);">
-🐬 Flipper Zero .nfc Datei herunterladen
+<button class="btn-secondary" onclick="NfcStudio.exportFlipperNfc()" style="width:100%; justify-content:center; color:var(--flipper-orange);" title="Experimenteller .nfc Descriptor-Export (ISO15693 Stub)">
+🐬 Flipper Zero .nfc (Experimenteller Export / Stub)
 </button>
+<span style="font-size:10px; color:var(--text-muted); text-align:center;">Hinweis: Dies ist ein Export-Descriptor (Stub) und kein vollständiger physischer Rohsektor-Dump.</span>
 </div>
 <div class="nfc-card">
 <h2>📲 Hardware Flash Studio</h2>
@@ -997,9 +1033,11 @@ img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 <button class="btn" style="width:100%; background:var(--flipper-orange); padding:10px;" onclick="NfcStudio.flashTag()">
 ⚡ Magic Tag (SLIX) Flashen
 </button>
-<div style="background:#f8fafc; border:1px solid var(--border); padding:10px; border-radius:8px; text-align:center;">
+<div style="background:#f8fafc; border:1px solid var(--border); padding:10px; border-radius:8px; text-align:center;" id="esp-installer-container">
 <span style="display:block; font-size:11px; font-weight:700; margin-bottom:6px;">ESP32 Firmware Flashen</span>
+<div id="esp-web-mount">
 <esp-web-install-button manifest="https://raw.githubusercontent.com/RFIDfriend/NFC-Archiver/main/flash/manifest.json"></esp-web-install-button>
+</div>
 </div>
 </div>
 </div>
@@ -1062,13 +1100,14 @@ Verwalte eigene Metadaten für deinen lokalen Toniebox-Server (TeddyCloud) oder 
 <h2>🛠️ System & Datenbank Status</h2>
 <table class="debug-table">
 <tr><th>Attribut</th><th>Status / Wert</th></tr>
-<tr><td>Version</td><td>TagGen Studio V2.7.1 Ultra (Phoenix Community Edition)</td></tr>
+<tr><td>Version</td><td>TagGen Studio V2.8 Pre-Release (Phoenix Repair Edition)</td></tr>
 <tr><td>Geladene Tonies</td><td id="dbg-count">-</td></tr>
 <tr><td>Datenquelle</td><td id="dbg-source">-</td></tr>
 <tr><td>V2 Metadaten Match</td><td id="dbg-v2-count">-</td></tr>
 <tr><td>Eigene Tags</td><td id="dbg-custom-count">0</td></tr>
 <tr><td>Offline-Fähigkeit</td><td id="dbg-cache-status">Isoliert im Speicher aktiv</td></tr>
 <tr><td>Ladezeit Pipeline</td><td id="dbg-load-time">-</td></tr>
+<tr><td>Letzter Systemstatus</td><td id="dbg-last-error" style="color:var(--text-muted);">Keine Fehler</td></tr>
 </table>
 <div style="display:flex; gap:10px; margin-top:10px; flex-wrap:wrap;">
 <button class="btn" onclick="Data.init(true)">🔄 Cache erneuern & Neu laden</button>
@@ -1085,11 +1124,12 @@ const Data = {
 tonies: [],
 v2Map: new Map(),
 dumpIndex: { exactIds: new Set(), strong: new Set(), titles: new Set() },
-startTime: performance.now()
+startTime: performance.now(),
+source: 'online'
 };
 const Library = {
 activeTab: 'db',
-renderLimit: 36,
+renderLimit: 48,
 currentFilteredResults: []
 };
 const Search = {};
@@ -1106,17 +1146,18 @@ const Storage = {};
 const safeStorage = {
 set: (k, v) => {
 try {
-localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
+const str = typeof v === 'string' ? v : JSON.stringify(v);
+localStorage.setItem(k, str);
 return true;
 } catch (e) {
-console.warn(⁠LocalStorage Kontingent überschritten für "${k}". Fahre im RAM fort.⁠, e);
+console.warn(⁠LocalStorage Kontingent überschritten für "${k}". Speichere im Arbeitsspeicher.⁠);
 return false;
 }
 },
 get: (k, fallback = null) => {
 try {
 const item = localStorage.getItem(k);
-if (!item) return fallback;
+if (item === null || item === undefined) return fallback;
 try { return JSON.parse(item); } catch(e) { return item; }
 } catch(e) { return fallback; }
 },
@@ -1141,7 +1182,7 @@ return await res.json();
 try {
 return await tryFetch(primaryUrl);
 } catch (errPrimary) {
-console.warn(⁠Primärer Abruf fehlgeschlagen für ${primaryUrl}, teste CDN Fallback:⁠, errPrimary);
+console.warn(⁠Primärer Abruf fehlgeschlagen für ${primaryUrl}, teste Fallback:⁠, errPrimary);
 if (!fallbackUrl) throw errPrimary;
 return await tryFetch(fallbackUrl);
 }
@@ -1164,7 +1205,7 @@ if (item && typeof item === 'object') {
 flattened.push({ ...item, article: item.article || article.article || '' });
 }
 });
-} else if (article?.series || article?.episode || article?.image) {
+} else if (article.series || article.episode || article.image) {
 flattened.push(article);
 }
 });
@@ -1193,34 +1234,38 @@ if (val != null && val !== '') ids.push(val);
 }
 return [...new Set(ids.map(String).filter(Boolean))];
 };
-// --- HARDENED DATABASE INITIALIZER ---
+// --- HARDENED DATABASE INITIALIZER (Patch A & E) ---
 Data.init = async (forceRefresh = false) => {
 Data.startTime = performance.now();
-document.getElementById('db-status').textContent = 'Lade Tonies...';
-document.getElementById('db-error-banner').style.display = 'none';
+const statusEl = document.getElementById('db-status');
+const errorBanner = document.getElementById('db-error-banner');
+const dbgErrorEl = document.getElementById('dbg-last-error');
+if (statusEl) statusEl.textContent = 'Lade Tonies...';
+if (errorBanner) errorBanner.style.display = 'none';
 const cacheV1Key = 'phoenix_db_v1_cache';
 const cacheV2Key = 'phoenix_db_v2_cache';
 const urlV1Primary = 'https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json';
 const urlV1Fallback = 'https://cdn.jsdelivr.net/gh/toniebox-reverse-engineering/tonies-json@release/tonies.json';
 const urlV2Primary = 'https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/toniesV2.json';
 const urlV2Fallback = 'https://cdn.jsdelivr.net/gh/toniebox-reverse-engineering/tonies-json@release/toniesV2.json';
-let rawV1 = [], rawV2 = [], source = 'online';
+let rawV1 = [], rawV2 = [];
+Data.source = 'online';
 try {
 if (!forceRefresh && safeStorage.get(cacheV1Key)) {
 rawV1 = extractV1Tonies(safeStorage.get(cacheV1Key));
-source = 'lokaler Cache';
+Data.source = 'lokaler Cache';
 }
 if (!rawV1.length) {
 try {
 const v1Data = await fetchResilientJson(urlV1Primary, urlV1Fallback);
 rawV1 = extractV1Tonies(v1Data);
 safeStorage.set(cacheV1Key, rawV1);
-source = 'GitHub / CDN';
+Data.source = 'GitHub / CDN';
 } catch (e) {
 const cached = safeStorage.get(cacheV1Key);
 if (cached) {
 rawV1 = extractV1Tonies(cached);
-source = 'Cache Fallback';
+Data.source = 'Cache Fallback';
 } else throw e;
 }
 }
@@ -1233,43 +1278,67 @@ const cachedV2 = safeStorage.get(cacheV2Key);
 if (cachedV2) rawV2 = extractV2Tonies(cachedV2);
 }
 Data.v2Map.clear();
-rawV2.forEach(item => collectIds(item).forEach(id => Data.v2Map.set(id, item)));
+rawV2.forEach(item => {
+const cIds = collectIds(item);
+cIds.forEach(id => {
+Data.v2Map.set(String(id).toLowerCase(), item);
+Data.v2Map.set(clean(String(id)), item);
+});
+});
 Data.tonies = rawV1.map(v1 => {
 const rawIds = collectIds(v1);
 const primaryId = String(rawIds[0] || v1.no || v1.id || '');
 let v2 = {};
 for (const cid of rawIds) {
-v2 = Data.v2Map.get(String(cid)) || {};
+v2 = Data.v2Map.get(String(cid).toLowerCase()) || Data.v2Map.get(clean(String(cid))) || {};
 if (Object.keys(v2).length) break;
 }
 const v2Ids = collectIds(v2);
 const audioIds = [...new Set([...rawIds, ...v2Ids].map(String))];
+// Robust field priority: V2 metadata first (cleaner titles & high-res covers), fallback to V1
 const series = String(v2.series || v1.series || v1.serie || v1.brand || 'Unbekannt');
 const title = String(v2.episode || v2.title || v1.episodes || v1.episode || '');
-const image = v2.image || v2.picture || v1.image || v1.picture || '';
+const image = String(v2.image || v2.picture || v1.image || v1.picture || '');
 const language = String(v2.language || v1.language || 'de-de').toLowerCase();
-const tracks = v2.tracks?.length || v1.tracks?.length || 0;
-return { id: primaryId, audioIds, series, title, image, pic: image, language, tracks };
+const tracks = Array.isArray(v2.tracks) ? v2.tracks.length : (Array.isArray(v1.tracks) ? v1.tracks.length : 0);
+return { id: primaryId, audioIds, series, title, image, pic: image, language, tracks, isCustom: false };
 }).filter(t => t.series || t.title || t.id);
-const customTonies = safeStorage.get('phoenix_custom_tonies', []);
+// Deduplicate and merge custom Tonies
+let customTonies = safeStorage.get('phoenix_custom_tonies', []);
 if (Array.isArray(customTonies)) {
-Data.tonies.unshift(...customTonies);
-document.getElementById('dbg-custom-count').textContent = customTonies.length;
+const seen = new Set();
+const uniqueCustom = [];
+for (const ct of customTonies) {
+if (ct && ct.id && !seen.has(ct.id)) {
+seen.add(ct.id);
+uniqueCustom.push({ ...ct, isCustom: true });
+}
+}
+Data.tonies.unshift(...uniqueCustom);
+const customBadge = document.getElementById('dbg-custom-count');
+if (customBadge) customBadge.textContent = String(uniqueCustom.length);
 }
 const elapsed = Math.round(performance.now() - Data.startTime);
-document.getElementById('db-status').textContent = ⁠${Data.tonies.length} Tonies (${source})⁠;
-document.getElementById('dbg-count').textContent = ⁠${Data.tonies.length} Tonies⁠;
-document.getElementById('dbg-source').textContent = source;
-document.getElementById('dbg-v2-count').textContent = ⁠${rawV2.length} V2 Datensätze⁠;
-document.getElementById('dbg-load-time').textContent = ⁠${elapsed} ms⁠;
-Data.loadDumpIndex().catch(e => console.warn("Dump-Index nicht erreichbar", e));
+if (statusEl) statusEl.textContent = ⁠${Data.tonies.length} Tonies (${Data.source})⁠;
+const dbgCount = document.getElementById('dbg-count');
+if (dbgCount) dbgCount.textContent = ⁠${Data.tonies.length} Tonies⁠;
+const dbgSource = document.getElementById('dbg-source');
+if (dbgSource) dbgSource.textContent = Data.source;
+const dbgV2 = document.getElementById('dbg-v2-count');
+if (dbgV2) dbgV2.textContent = ⁠${rawV2.length} V2 Datensätze⁠;
+const dbgTime = document.getElementById('dbg-load-time');
+if (dbgTime) dbgTime.textContent = ⁠${elapsed} ms⁠;
+if (dbgErrorEl) dbgErrorEl.textContent = 'OK (Keine Fehler)';
+// Lazy load dump index
+Data.loadDumpIndex().catch(e => console.warn("Dump-Index nicht erreichbar:", e));
 Search.filter();
 if (Data.tonies[0]) Editor.load(Data.tonies[0], true);
 UI.showToast(⁠Datenbank einsatzbereit (${Data.tonies.length} Tonies)⁠);
 } catch (fatalError) {
 console.error("FATAL DATABASE ERROR:", fatalError);
-document.getElementById('db-status').textContent = 'Fehler beim Laden';
-document.getElementById('db-error-banner').style.display = 'flex';
+if (statusEl) statusEl.textContent = 'Fehler beim Laden';
+if (errorBanner) errorBanner.style.display = 'flex';
+if (dbgErrorEl) dbgErrorEl.textContent = String(fatalError.message || fatalError);
 UI.showToast('Datenbankfehler. Bitte prüfe die Internetverbindung.');
 }
 };
@@ -1282,29 +1351,46 @@ Data.init(true);
 Data.loadDumpIndex = async () => {
 try {
 const data = await fetchResilientJson('https://api.github.com/repos/nortakales/flipper-zero-tonies/git/trees/master?recursive=1', null, 8000);
-if (data?.tree) {
+if (data && Array.isArray(data.tree)) {
 data.tree.forEach(f => {
-if (f.path?.endsWith('.nfc')) {
-const m = f.path.match(/[a-fA-F0-9]{8,16}/);
-if (m) Data.dumpIndex.exactIds.add(m[0].toLowerCase());
-Data.dumpIndex.titles.add(clean(f.path.split('/').pop().replace('.nfc','')));
+if (f.path && f.path.endsWith('.nfc')) {
+const parts = f.path.split('/');
+const rawFileName = parts[parts.length - 1].replace(/.nfc$/i, '');
+const filename = clean(rawFileName);
+const folder = parts.length > 1 ? clean(parts[parts.length - 2]) : '';
+const idMatch = f.path.match(/[a-fA-F0-9]{8,16}/);
+if (idMatch) Data.dumpIndex.exactIds.add(idMatch[0].toLowerCase());
+if (folder && filename) Data.dumpIndex.strong.add(folder + '||' + filename);
+if (filename) Data.dumpIndex.titles.add(filename);
 }
 });
 }
-} catch(e) {}
+} catch(e) {
+console.warn("Dump-Index nicht geladen (optional):", e);
+}
 };
 Data.getMatchQuality = (tonie) => {
-const ids = tonie.audioIds?.length ? tonie.audioIds : [tonie.id];
+if (!tonie) return 'none';
+const ids = tonie.audioIds && tonie.audioIds.length ? tonie.audioIds : [tonie.id];
 for (const id of ids) {
-if (id && Data.dumpIndex.exactIds.has(id.toLowerCase())) return 'exact';
+if (id && String(id).length >= 6 && Data.dumpIndex.exactIds.has(String(id).toLowerCase())) {
+return 'exact';
 }
-if (Data.dumpIndex.titles.has(clean(tonie.title))) return 'fuzzy';
+}
+const s = clean(tonie.series);
+const t = clean(tonie.title);
+if (s && t && Data.dumpIndex.strong.has(s + '||' + t)) {
+return 'strong';
+}
+if (t && t.length > 3 && Data.dumpIndex.titles.has(t)) {
+return 'fuzzy';
+}
 return 'none';
 };
 // --- LIBRARY NAVIGATION & SEARCH ---
 Library.switchTab = (tab) => {
 Library.activeTab = tab;
-Library.renderLimit = 36;
+Library.renderLimit = 48;
 ['db', 'fav', 'recent', 'custom'].forEach(t => {
 const el = document.getElementById(⁠tab-${t}⁠);
 if (el) el.classList.toggle('active', t === tab);
@@ -1323,8 +1409,13 @@ if (Library.activeTab === 'fav') results = results.filter(t => favs.includes(t.i
 if (Library.activeTab === 'recent') results = results.filter(t => recent.includes(t.id));
 if (Library.activeTab === 'custom') results = results.filter(t => t.isCustom);
 if (lang) results = results.filter(t => t.language === lang);
-if (dumpFilter === 'exact') results = results.filter(t => Data.getMatchQuality(t) === 'exact');
-if (dumpFilter === 'fuzzy') results = results.filter(t => Data.getMatchQuality(t) !== 'none');
+if (dumpFilter === 'exact') {
+results = results.filter(t => Data.getMatchQuality(t) === 'exact');
+} else if (dumpFilter === 'strong') {
+results = results.filter(t => ['exact', 'strong'].includes(Data.getMatchQuality(t)));
+} else if (dumpFilter === 'fuzzy') {
+results = results.filter(t => Data.getMatchQuality(t) !== 'none');
+}
 if (queryParts.length) {
 results = results.filter(t => {
 const haystack = clean(⁠${t.series} ${t.title} ${t.id} ${(t.audioIds || []).join(' ')}⁠);
@@ -1332,9 +1423,10 @@ return queryParts.every(p => haystack.includes(p));
 });
 }
 Library.currentFilteredResults = results;
-Library.renderLimit = 36;
+Library.renderLimit = 48;
 UI.renderCards();
 };
+// --- SECURE DOM CARD RENDERING (Patch B: XSS-Safe) ---
 UI.renderCards = () => {
 const grid = document.getElementById('asset-grid');
 if (!grid) return;
@@ -1363,8 +1455,16 @@ imgWrap.appendChild(badge);
 } else if (matchQ !== 'none') {
 const badge = document.createElement('div');
 badge.className = 'match-badge';
-badge.textContent = matchQ === 'exact' ? '🟢 Exakt' : '🟡 Match';
-badge.style.background = matchQ === 'exact' ? 'var(--status-exact)' : 'var(--status-fuzzy)';
+if (matchQ === 'exact') {
+badge.textContent = '🟢 Exakt';
+badge.style.background = 'var(--status-exact)';
+} else if (matchQ === 'strong') {
+badge.textContent = '🔵 Strong';
+badge.style.background = 'var(--status-strong)';
+} else {
+badge.textContent = '🟡 Match';
+badge.style.background = 'var(--status-fuzzy)';
+}
 imgWrap.appendChild(badge);
 }
 const favBtn = document.createElement('button');
@@ -1372,9 +1472,29 @@ favBtn.className = ⁠fav-btn ${isFav ? 'active' : ''}⁠;
 favBtn.textContent = isFav ? '★' : '☆';
 favBtn.onclick = (e) => { e.stopPropagation(); UI.toggleFav(item.id); };
 imgWrap.appendChild(favBtn);
+let dotColor = 'var(--status-none)';
+if (matchQ === 'exact') dotColor = 'var(--status-exact)';
+else if (matchQ === 'strong') dotColor = 'var(--status-strong)';
+else if (matchQ === 'fuzzy') dotColor = 'var(--status-fuzzy)';
 const content = document.createElement('div');
 content.className = 'card-content';
-content.innerHTML = ⁠<div class="card-serie">${item.series}</div> <div class="card-title">${item.title}</div> <div class="card-meta"> <span class="status-dot" style="background:${matchQ === 'exact' ? 'var(--status-exact)' : 'var(--status-none)'}"></span> ${item.language ? item.language.toUpperCase() : 'DE'} • ${item.tracks || 0} Tracks </div>⁠;
+const serieEl = document.createElement('div');
+serieEl.className = 'card-serie';
+serieEl.textContent = item.series || '';
+const titleEl = document.createElement('div');
+titleEl.className = 'card-title';
+titleEl.textContent = item.title || '';
+const metaEl = document.createElement('div');
+metaEl.className = 'card-meta';
+const dotSpan = document.createElement('span');
+dotSpan.className = 'status-dot';
+dotSpan.style.background = dotColor;
+const metaText = document.createTextNode(⁠ ${item.language ? item.language.toUpperCase() : 'DE'} • ${item.tracks || 0} Tracks⁠);
+metaEl.appendChild(dotSpan);
+metaEl.appendChild(metaText);
+content.appendChild(serieEl);
+content.appendChild(titleEl);
+content.appendChild(metaEl);
 card.appendChild(imgWrap);
 card.appendChild(content);
 grid.appendChild(card);
@@ -1387,7 +1507,7 @@ moreBtn.className = 'btn-secondary';
 moreBtn.style.width = '100%';
 moreBtn.textContent = ⁠Weitere Laden (${Library.currentFilteredResults.length - Library.renderLimit} übrig)...⁠;
 moreBtn.onclick = () => {
-Library.renderLimit += 36;
+Library.renderLimit += 48;
 UI.renderCards();
 };
 moreWrap.appendChild(moreBtn);
@@ -1414,12 +1534,15 @@ setTimeout(() => t.classList.remove('show'), 2500);
 };
 // --- COVER STUDIO PRO & PNG EXPORT ---
 Editor.load = (item, silent = false) => {
-Editor.current = { ...item, pic: item.pic || '' };
+Editor.current = { ...item, pic: item.pic || item.image || '' };
 UI.addRecent(item.id);
 Editor.resetTransform();
-document.getElementById('input-serie').value = item.series || '';
-document.getElementById('input-title').value = item.title || '';
-document.getElementById('input-uid').value = item.id || '';
+const serieEl = document.getElementById('input-serie');
+if (serieEl) serieEl.value = item.series || '';
+const titleEl = document.getElementById('input-title');
+if (titleEl) titleEl.value = item.title || '';
+const uidEl = document.getElementById('input-uid');
+if (uidEl) uidEl.value = item.id || '';
 Editor.update();
 if (!silent) UI.showToast(⁠"${item.series}" geladen⁠);
 };
@@ -1436,6 +1559,7 @@ Editor.update();
 Editor.setRingStyle = (style) => {
 Editor.state.ring = style;
 const circle = document.getElementById('preview-circle');
+if (!circle) return;
 circle.className = 'tag-circle';
 if (style === 'accent') circle.classList.add('ring-accent');
 else if (style === 'black') circle.classList.add('ring-black');
@@ -1444,17 +1568,19 @@ Editor.update = () => {
 Editor.current.series = document.getElementById('input-serie').value;
 Editor.current.title = document.getElementById('input-title').value;
 Editor.current.uid = document.getElementById('input-uid').value;
-Editor.state.zoom = parseInt(document.getElementById('slider-zoom').value);
-Editor.state.x = parseInt(document.getElementById('slider-x').value);
-Editor.state.y = parseInt(document.getElementById('slider-y').value);
-Editor.state.fontSize = parseInt(document.getElementById('slider-font').value);
+Editor.state.zoom = parseInt(document.getElementById('slider-zoom').value, 10);
+Editor.state.x = parseInt(document.getElementById('slider-x').value, 10);
+Editor.state.y = parseInt(document.getElementById('slider-y').value, 10);
+Editor.state.fontSize = parseInt(document.getElementById('slider-font').value, 10);
 document.getElementById('val-zoom').textContent = Editor.state.zoom + '%';
 document.getElementById('val-x').textContent = Editor.state.x + '%';
 document.getElementById('val-y').textContent = Editor.state.y + '%';
 document.getElementById('val-font').textContent = Editor.state.fontSize + '%';
 const img = document.getElementById('preview-img');
+if (img) {
 img.src = Editor.current.pic || '';
 img.style.transform = ⁠translate(${Editor.state.x}%, ${Editor.state.y}%) scale(${Editor.state.zoom / 100})⁠;
+}
 const fScale = Editor.state.fontSize / 100;
 document.getElementById('svg-text-top-node').setAttribute('font-size', (7.5 * fScale).toFixed(1));
 document.getElementById('svg-text-uid-node').setAttribute('font-size', (5.0 * fScale).toFixed(1));
@@ -1466,17 +1592,25 @@ document.getElementById('svg-text-bottom').textContent = Editor.current.title;
 document.getElementById('nfc-target-title').textContent = Editor.current.title || '-';
 document.getElementById('nfc-target-uid').textContent = Editor.current.uid || '-';
 document.getElementById('nfc-preview-front').textContent = Editor.current.title || 'Kein Titel';
-const rawUid = Editor.current.uid;
-const fullUid = rawUid.length >= 14 ? rawUid.toUpperCase() : "E00403" + rawUid.padStart(10, '0').toUpperCase();
+const rawUid = Editor.current.uid || '';
+const fullUid = formatMagicUid(rawUid);
 document.getElementById('nfc-preview-back-uid').textContent = fullUid;
 const matchQ = Data.getMatchQuality({ ...Editor.current, id: rawUid });
 const sBadge = document.getElementById('nfc-target-status');
 if (matchQ === 'exact') sBadge.innerHTML = '<span style="color:var(--status-exact)">🟢 Exakter Dump</span>';
+else if (matchQ === 'strong') sBadge.innerHTML = '<span style="color:var(--status-strong)">🔵 Strong Match</span>';
 else if (matchQ === 'fuzzy') sBadge.innerHTML = '<span style="color:var(--status-fuzzy)">🟡 Fuzzy Match</span>';
 else sBadge.innerHTML = '<span style="color:var(--text-muted)">⚪ Kein Dump (Magic UID Flash)</span>';
 };
+// Encapsulated UID helper (Patch D)
+const formatMagicUid = (rawUid) => {
+if (!rawUid) return 'E004030000000001';
+const cleanUid = clean(rawUid).toUpperCase();
+if (cleanUid.startsWith('E00403') && cleanUid.length >= 14) return cleanUid.slice(0, 16);
+return cleanUid.length >= 14 ? cleanUid.slice(0, 16) : ("E00403" + cleanUid.padStart(10, '0')).slice(0, 16);
+};
 Editor.uploadCustomImage = (e) => {
-const file = e.target.files?.[0];
+const file = e.target.files && e.target.files[0];
 if (!file) return;
 const reader = new FileReader();
 reader.onload = ev => {
@@ -1486,29 +1620,35 @@ UI.showToast("Eigenes Bild geladen!");
 };
 reader.readAsDataURL(file);
 };
+// PNG Render with Canvas & Fallback Protection (Patch E)
 Editor.exportPng = () => {
 UI.showToast("Rendere hochauflösendes PNG (1000px)...");
 const canvas = document.createElement('canvas');
 canvas.width = 1000;
 canvas.height = 1000;
 const ctx = canvas.getContext('2d');
+const renderCanvasWithImage = (loadedImg) => {
+ctx.save();
 ctx.beginPath();
 ctx.arc(500, 500, 495, 0, Math.PI * 2);
 ctx.clip();
 ctx.fillStyle = "#ffffff";
-ctx.fill();
-const img = new Image();
-img.crossOrigin = "anonymous";
-img.onload = () => {
+ctx.fillRect(0, 0, 1000, 1000);
+if (loadedImg) {
+try {
 const z = Editor.state.zoom / 100;
 const ox = (Editor.state.x / 100) * 1000;
 const oy = (Editor.state.y / 100) * 1000;
 const dw = 1000 * z, dh = 1000 * z;
-ctx.drawImage(img, (1000 - dw) / 2 + ox, (1000 - dh) / 2 + oy, dw, dh);
+ctx.drawImage(loadedImg, (1000 - dw) / 2 + ox, (1000 - dh) / 2 + oy, dw, dh);
+} catch (drawErr) {
+console.warn("Canvas Image Draw Error (CORS tainted):", drawErr);
+UI.showToast("CORS-Einschränkung: Bitte Bild lokal hochladen für PNG Export.");
+}
+}
+ctx.restore();
 drawSvgOverlay();
 };
-img.onerror = () => drawSvgOverlay();
-img.src = Editor.current.pic || '';
 const drawSvgOverlay = () => {
 const svgXml = new XMLSerializer().serializeToString(document.getElementById('preview-svg'));
 const svgBlob = new Blob([svgXml], { type: 'image/svg+xml;charset=utf-8' });
@@ -1518,34 +1658,58 @@ svgImg.onload = () => {
 ctx.drawImage(svgImg, 0, 0, 1000, 1000);
 URL.revokeObjectURL(svgUrl);
 if (Editor.state.ring === 'accent') {
-ctx.lineWidth = 12; ctx.strokeStyle = '#e11d48';
+ctx.lineWidth = 14; ctx.strokeStyle = '#e11d48';
 ctx.beginPath(); ctx.arc(500, 500, 490, 0, Math.PI * 2); ctx.stroke();
 } else if (Editor.state.ring === 'black') {
-ctx.lineWidth = 12; ctx.strokeStyle = '#0f172a';
+ctx.lineWidth = 14; ctx.strokeStyle = '#0f172a';
 ctx.beginPath(); ctx.arc(500, 500, 490, 0, Math.PI * 2); ctx.stroke();
 }
+try {
 const a = document.createElement('a');
 a.download = ⁠${clean(Editor.current.title || 'Tonie')}_Cover.png⁠;
 a.href = canvas.toDataURL('image/png');
 a.click();
 UI.showToast("Cover-PNG erfolgreich heruntergeladen!");
+} catch (exportErr) {
+console.warn("CORS Security Error beim Export:", exportErr);
+UI.showToast("CORS-Einschränkung: Bitte Bild lokal hochladen.");
+}
+};
+svgImg.onerror = () => {
+URL.revokeObjectURL(svgUrl);
+UI.showToast("Fehler beim Erzeugen der SVG-Ebene.");
 };
 svgImg.src = svgUrl;
 };
+if (Editor.current.pic) {
+const img = new Image();
+img.crossOrigin = "anonymous";
+img.onload = () => renderCanvasWithImage(img);
+img.onerror = () => {
+const fallbackImg = new Image();
+fallbackImg.onload = () => renderCanvasWithImage(fallbackImg);
+fallbackImg.onerror = () => renderCanvasWithImage(null);
+fallbackImg.src = Editor.current.pic;
+};
+img.src = Editor.current.pic;
+} else {
+renderCanvasWithImage(null);
+}
 };
 Editor.initDragDrop = () => {
 const zone = document.getElementById('drop-zone');
-if (!zone) return;
+if (zone) {
 zone.ondragover = e => e.preventDefault();
 zone.ondrop = e => {
 e.preventDefault();
 const file = e.dataTransfer.files[0];
-if (file?.type.startsWith('image/')) {
+if (file && file.type.startsWith('image/')) {
 const r = new FileReader();
 r.onload = ev => { Editor.current.pic = ev.target.result; Editor.update(); };
 r.readAsDataURL(file);
 }
 };
+}
 ['serie','title','uid'].forEach(id => {
 document.getElementById(⁠input-${id}⁠)?.addEventListener('input', Editor.update);
 });
@@ -1555,22 +1719,26 @@ document.getElementById(⁠slider-${id}⁠)?.addEventListener('input', Editor.up
 document.getElementById('filter-lang')?.addEventListener('change', Search.filter);
 document.getElementById('filter-dump')?.addEventListener('change', Search.filter);
 };
-// --- PRINT STUDIO ---
+// --- PRINT STUDIO (Patch C: Mathematically Exact A4 Geometry) ---
 PrintStudio.init = () => {
 PrintStudio.slots = new Array(12).fill(null);
 PrintStudio.changeFormat();
 };
 PrintStudio.getGeometry = (key) => {
 const geo = {
+// 43mm (12er • 3×4): 343=129mm + 210mm = 149mm. Rand: (210-149)/2 = 30.5mm. Höhe: 443=172mm + 310mm = 202mm. Rand: (297-202)/2 = 47.5mm.
 '43-12': { w: 43, h: 43, cols: 3, rows: 4, ml: 30.5, mt: 47.5, gx: 10, gy: 10 },
-'40-24': { w: 40, h: 40, cols: 4, rows: 6, ml: 17.5, mt: 21.5, gx: 5, gy: 5 },
-'40-12': { w: 40, h: 40, cols: 3, rows: 4, ml: 35.0, mt: 50.0, gx: 10, gy: 10 },
+// Avery Zweckform L3415 / 5080 (24er • 4×6): 440=160mm + 35mm = 175mm. Rand: (210-175)/2 = 17.5mm. Höhe: 640=240mm + 55mm = 265mm. Rand: (297-265)/2 = 16.0mm.
+'40-24': { w: 40, h: 40, cols: 4, rows: 6, ml: 17.5, mt: 16.0, gx: 5, gy: 5 },
+// Avery 40mm Standard (12er • 3×4): 340=120mm + 210mm = 140mm. Rand: (210-140)/2 = 35.0mm. Höhe: 440=160mm + 310mm = 190mm. Rand: (297-190)/2 = 53.5mm.
+'40-12': { w: 40, h: 40, cols: 3, rows: 4, ml: 35.0, mt: 53.5, gx: 10, gy: 10 },
+// Avery Zweckform 6223 30mm (48er • 6×8): 630=180mm + 0mm = 180mm. Rand: (210-180)/2 = 15.0mm. Höhe: 830=240mm + 0mm = 240mm. Rand: (297-240)/2 = 28.5mm.
 '30-48': { w: 30, h: 30, cols: 6, rows: 8, ml: 15.0, mt: 28.5, gx: 0, gy: 0 },
 'custom': { w: 43, h: 43, cols: 3, rows: 4, ml: 30.5, mt: 47.5, gx: 10, gy: 10 }
 };
 const conf = geo[key] || geo['43-12'];
 if (key === 'custom') {
-const cVal = parseInt(document.getElementById('custom-size-input')?.value || '43') || 43;
+const cVal = parseInt(document.getElementById('custom-size-input')?.value || '43', 10) || 43;
 conf.w = cVal; conf.h = cVal;
 }
 return conf;
@@ -1606,7 +1774,7 @@ slot.ondragleave = () => slot.classList.remove('drag-over');
 slot.ondrop = e => {
 e.preventDefault();
 slot.classList.remove('drag-over');
-const from = parseInt(e.dataTransfer.getData('text'));
+const from = parseInt(e.dataTransfer.getData('text'), 10);
 if (!isNaN(from) && from !== index) {
 const t = PrintStudio.slots[from];
 PrintStudio.slots[from] = PrintStudio.slots[index];
@@ -1652,7 +1820,7 @@ App.switchView('print');
 } else UI.showToast("Druckbogen ist voll!");
 };
 PrintStudio.clear = () => { PrintStudio.slots.fill(null); PrintStudio.render(); UI.showToast("Bogen geleert."); };
-// --- STORAGE & NFC PROTOCOL & FLIPPER EXPORT ---
+// --- STORAGE & PROJECT PERSISTENCE ---
 Storage.saveProject = () => {
 const fmt = document.getElementById('print-format')?.value || '43-12';
 const blob = new Blob([JSON.stringify({ format: fmt, slots: PrintStudio.slots })], { type: 'application/json' });
@@ -1660,24 +1828,25 @@ const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.dow
 UI.showToast("Projektdatei exportiert.");
 };
 Storage.loadProject = (e) => {
-const file = e.target.files?.[0];
+const file = e.target.files && e.target.files[0];
 if (!file) return;
 const r = new FileReader();
 r.onload = ev => {
 try {
 const p = JSON.parse(ev.target.result);
-if (p?.slots) {
+if (p && Array.isArray(p.slots)) {
 PrintStudio.slots = p.slots;
 const fmt = document.getElementById('print-format');
 if (fmt) fmt.value = p.format || '43-12';
 PrintStudio.changeFormat();
 UI.showToast("Projekt geladen!");
 }
-} catch(e) { UI.showToast("Fehler beim Laden."); }
+} catch(err) { UI.showToast("Fehler beim Laden."); }
 e.target.value = '';
 };
 r.readAsText(file);
 };
+// --- NFC HARDWARE & EXPORT LOGIC (Patch D) ---
 NfcStudio.setMode = (m) => {
 NfcStudio.mode = m;
 document.getElementById('hw-usb')?.classList.toggle('active', m === 'usb');
@@ -1704,7 +1873,8 @@ if (connStatus) connStatus.innerHTML = '<span style="color:var(--status-exact)">
 NfcStudio.flashTag = async () => {
 const uid = Editor.current.uid;
 if (!uid) return UI.showToast("Keine UID geladen!");
-const cmd = ⁠{"cmd":"write_magic_tag","uid":"${uid.length >= 14 ? uid.toUpperCase() : "E00403" + uid.padStart(10, '0').toUpperCase()}"}\n⁠;
+const fullUid = formatMagicUid(uid);
+const cmd = ⁠{"cmd":"write_magic_tag","uid":"${fullUid}"}\n⁠;
 try {
 if (NfcStudio.mode === 'usb' && NfcStudio.writer) await NfcStudio.writer.write(new TextEncoder().encode(cmd));
 else if (NfcStudio.mode === 'ble' && NfcStudio.bleChar) await NfcStudio.bleChar.writeValue(new TextEncoder().encode(cmd));
@@ -1712,22 +1882,30 @@ else return UI.showToast("Bitte erst Hardware verbinden!");
 UI.showToast("Flash-Befehl gesendet!");
 } catch(e) { UI.showToast("Übertragungsfehler."); }
 };
+// Decoupled Flipper .nfc Export (Descriptor Stub)
 NfcStudio.exportFlipperNfc = () => {
 const rawUid = Editor.current.uid || '0102030405060708';
-const fullUid = rawUid.length >= 16 ? rawUid.toUpperCase() : ("E00403" + rawUid.padStart(10, '0')).toUpperCase();
+const fullUid = formatMagicUid(rawUid);
 const formattedUid = fullUid.match(/.{1,2}/g)?.join(' ') || 'E0 04 03 00 00 00 00 01';
-const nfcContent = ⁠Filetype: Flipper NFC device Version: 3 Device type: ISO15693 UID: ${formattedUid} DSFID: 00 AFI: 00 Block size: 4 Block count: 28 Data content: 00 00 00 00 ⁠;
-const blob = new Blob([nfcContent], { type: 'text/plain' });
-const a = document.createElement('a');
-a.href = URL.createObjectURL(blob);
-a.download = ⁠${clean(Editor.current.title || 'Tonie_Tag')}.nfc⁠;
+const nfcContent = `Filetype: Flipper NFC device
+Version: 3
+Device type: ISO15693
+UID: ${formattedUid}
+DSFID: 00
+AFI: 00
+Block size: 4
+Block count: 28
+Data content: 00 00 00 00
+Note: Experimental Descriptor Stub generated by TagGen Studio V2.8
+⁠; const blob = new Blob([nfcContent], { type: 'text/plain;charset=utf-8' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = ⁠${clean(Editor.current.title || 'Tonie_Tag')}_stub.nfc`;
 a.click();
-UI.showToast("Flipper Zero .nfc Datei exportiert!");
+UI.showToast("Flipper Zero .nfc Stub exportiert!");
 };
 // --- TEDDYCLOUD COMPANION ENGINE ---
 TeddyCloud.saveCurrentAsCustom = () => {
 if (!Editor.current.title && !Editor.current.series) return UI.showToast("Bitte erst Titel oder Serie eingeben!");
-const customTonies = safeStorage.get('phoenix_custom_tonies', []);
+let customTonies = safeStorage.get('phoenix_custom_tonies', []);
+if (!Array.isArray(customTonies)) customTonies = [];
 const newTonie = {
 id: Editor.current.uid || 'CUSTOM_' + Date.now().toString(16),
 series: Editor.current.series || 'Eigene Sammlung',
@@ -1738,10 +1916,13 @@ language: 'de-de',
 tracks: 1,
 isCustom: true
 };
+customTonies = customTonies.filter(c => c.id !== newTonie.id);
 customTonies.unshift(newTonie);
 safeStorage.set('phoenix_custom_tonies', customTonies);
+Data.tonies = Data.tonies.filter(t => t.id !== newTonie.id);
 Data.tonies.unshift(newTonie);
-document.getElementById('dbg-custom-count').textContent = customTonies.length;
+const customBadge = document.getElementById('dbg-custom-count');
+if (customBadge) customBadge.textContent = String(customTonies.length);
 UI.showToast("Als eigener Tonie gespeichert!");
 Library.switchTab('custom');
 };
@@ -1761,18 +1942,22 @@ language: lang,
 tracks: 1,
 isCustom: true
 };
-const customTonies = safeStorage.get('phoenix_custom_tonies', []);
+let customTonies = safeStorage.get('phoenix_custom_tonies', []);
+if (!Array.isArray(customTonies)) customTonies = [];
+customTonies = customTonies.filter(c => c.id !== newTonie.id);
 customTonies.unshift(newTonie);
 safeStorage.set('phoenix_custom_tonies', customTonies);
+Data.tonies = Data.tonies.filter(t => t.id !== newTonie.id);
 Data.tonies.unshift(newTonie);
-document.getElementById('dbg-custom-count').textContent = customTonies.length;
+const customBadge = document.getElementById('dbg-custom-count');
+if (customBadge) customBadge.textContent = String(customTonies.length);
 Editor.load(newTonie);
 App.switchView('design');
 UI.showToast("Eigener Tonie angelegt und im Studio geöffnet!");
 };
 TeddyCloud.exportJson = () => {
 const customTonies = safeStorage.get('phoenix_custom_tonies', []);
-const tcFormat = customTonies.map(t => ({
+const tcFormat = (Array.isArray(customTonies) ? customTonies : []).map(t => ({
 no: t.id,
 model: t.id,
 audio_id: [t.id],
@@ -1789,7 +1974,7 @@ a.click();
 UI.showToast("TeddyCloud JSON exportiert!");
 };
 TeddyCloud.importJson = (e) => {
-const file = e.target.files?.[0];
+const file = e.target.files && e.target.files[0];
 if (!file) return;
 const r = new FileReader();
 r.onload = ev => {
@@ -1797,20 +1982,27 @@ try {
 const data = JSON.parse(ev.target.result);
 const list = Array.isArray(data) ? data : (data.tonies || data.data || []);
 const imported = list.map(item => ({
-id: String(item.no || item.id || item.audio_id?.[0] || 'CUSTOM_' + Math.random().toString(36).slice(2, 8)),
+id: String(item.no || item.id || (item.audio_id && item.audio_id[0]) || 'CUSTOM_' + Math.random().toString(36).slice(2, 8)),
 series: item.series || item.brand || 'Importiert',
 title: item.episodes || item.title || item.episode || 'Ohne Titel',
 pic: item.image || item.picture || '',
 language: item.language || 'de-de',
-tracks: item.tracks?.length || 1,
+tracks: Array.isArray(item.tracks) ? item.tracks.length : 1,
 isCustom: true
 }));
 if (imported.length) {
-const existing = safeStorage.get('phoenix_custom_tonies', []);
-const merged = [...imported, ...existing];
-safeStorage.set('phoenix_custom_tonies', merged);
-Data.tonies.unshift(...imported);
-document.getElementById('dbg-custom-count').textContent = merged.length;
+let existing = safeStorage.get('phoenix_custom_tonies', []);
+if (!Array.isArray(existing)) existing = [];
+const mergedMap = new Map();
+[...imported, ...existing].forEach(item => {
+if (item && item.id) mergedMap.set(item.id, item);
+});
+const deduplicated = Array.from(mergedMap.values());
+safeStorage.set('phoenix_custom_tonies', deduplicated);
+Data.tonies = Data.tonies.filter(t => !mergedMap.has(t.id));
+Data.tonies.unshift(...deduplicated);
+const customBadge = document.getElementById('dbg-custom-count');
+if (customBadge) customBadge.textContent = String(deduplicated.length);
 Library.switchTab('custom');
 UI.showToast(⁠${imported.length} Tonies importiert!⁠);
 } else UI.showToast("Keine gültigen Tonies in der Datei gefunden.");
@@ -1823,11 +2015,12 @@ TeddyCloud.clearCustom = () => {
 if (!confirm("Möchtest du wirklich alle eigenen Tonies löschen?")) return;
 safeStorage.remove('phoenix_custom_tonies');
 Data.tonies = Data.tonies.filter(t => !t.isCustom);
-document.getElementById('dbg-custom-count').textContent = '0';
+const customBadge = document.getElementById('dbg-custom-count');
+if (customBadge) customBadge.textContent = '0';
 Library.switchTab('db');
 UI.showToast("Eigene Tags gelöscht.");
 };
-// --- VIEW SWITCHER ---
+// --- VIEW SWITCHER & MOBILE SWIPE NAVIGATION ---
 App.switchView = (view) => {
 document.querySelectorAll('.view-btn').forEach(b => b.classList.toggle('active', b.dataset.view === view));
 document.querySelectorAll('.workspace').forEach(w => w.classList.remove('active'));
@@ -1835,26 +2028,54 @@ const vw = document.getElementById(⁠view-${view}⁠);
 if (vw) vw.classList.add('active');
 if (view === 'print') PrintStudio.render();
 };
-// Mobile Swipe Handler
+App.slideToPage = (pageIndex) => {
+const layout = document.getElementById('studio-swipe-container');
+if (!layout || window.innerWidth > 960) return;
+const clamped = Math.max(0, Math.min(2, pageIndex));
+layout.dataset.page = String(clamped);
+layout.style.transform = ⁠translateX(-${clamped * 100}vw)⁠;
+document.querySelectorAll('#mobile-dots .dot').forEach((dot, idx) => {
+dot.classList.toggle('active', idx === clamped);
+});
+const labels = ['1/3 Bibliothek', '2/3 Cover-Editor', '3/3 Regler & Zoom'];
+const labelEl = document.getElementById('page-label');
+if (labelEl) labelEl.textContent = labels[clamped];
+};
+App.nextPage = () => {
+const layout = document.getElementById('studio-swipe-container');
+const cur = Number(layout?.dataset.page || 0);
+App.slideToPage(cur + 1);
+};
+App.prevPage = () => {
+const layout = document.getElementById('studio-swipe-container');
+const cur = Number(layout?.dataset.page || 0);
+App.slideToPage(cur - 1);
+};
+// Mobile Swipe Handler with Dot Indicator Sync
 (() => {
 let startX = 0, startY = 0, dragging = false;
 const l = () => document.getElementById('studio-swipe-container');
-const go = (p) => {
-const layout = l();
-if (!layout || window.innerWidth > 960) return;
-const page = Math.max(0, Math.min(2, p));
-layout.dataset.page = page;
-layout.style.transform = ⁠translateX(-${page * 100}vw)⁠;
-};
 window.addEventListener('load', () => {
 const layout = l();
 if (!layout) return;
-layout.addEventListener('touchstart', e => { if (e.touches.length === 1) { startX = e.touches[0].clientX; startY = e.touches[0].clientY; dragging = true; } }, {passive:true});
+layout.addEventListener('touchstart', e => {
+if (e.touches.length === 1) {
+startX = e.touches[0].clientX;
+startY = e.touches[0].clientY;
+dragging = true;
+}
+}, { passive: true });
 layout.addEventListener('touchend', e => {
-if (!dragging) return; dragging = false;
-const dx = e.changedTouches[0].clientX - startX, dy = e.changedTouches[0].clientY - startY;
-if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) go(Number(layout.dataset.page || 0) + (dx < 0 ? 1 : -1));
-}, {passive:true});
+if (!dragging) return;
+dragging = false;
+const dx = e.changedTouches[0].clientX - startX;
+const dy = e.changedTouches[0].clientY - startY;
+if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy)) {
+const currentPage = Number(layout.dataset.page || 0);
+const nextPage = currentPage + (dx < 0 ? 1 : -1);
+App.slideToPage(nextPage);
+}
+}, { passive: true });
 layout.dataset.page = '0';
 });
 })();
