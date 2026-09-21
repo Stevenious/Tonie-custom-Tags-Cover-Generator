@@ -768,7 +768,8 @@
         /* V3.0.1 mobile repair: separate visual A4 scaling from physical print geometry. */
         @media (max-width:960px){
           .asset-card{min-height:0!important;overflow:hidden!important}
-          .card-img-wrap{height:auto!important;min-height:0!important;padding-bottom:0!important}
+          .card-img-wrap{position:relative!important;height:0!important;min-height:0!important;padding-bottom:100%!important;aspect-ratio:auto!important}
+          .card-img-wrap img{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:contain!important}
           .card-content{display:block!important;min-height:70px!important;padding:5px 2px 2px!important;overflow:hidden!important}
           .card-serie,.card-title,.card-meta{display:block!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
           .print-scroll{overflow:hidden!important}
@@ -1139,8 +1140,8 @@
             const cacheV2 = 'phoenix_tonies_cache_v2_6_6_v2';
             const legacyCacheV1 = 'phoenix_tonies_cache_v1';
             const legacyCacheV2 = 'phoenix_tonies_cache_v2';
-            const urlV1 = ['./tonies.json', './Tonies.json', 'https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json'];
-            const urlV2 = ['./toniesV2.json', './ToniesV2.json', 'https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/toniesV2.json'];
+            const urlV1 = ['https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/tonies.json'];
+            const urlV2 = ['https://raw.githubusercontent.com/toniebox-reverse-engineering/tonies-json/release/toniesV2.json'];
 
             try {
                 Data.v2Map.clear();
@@ -1229,9 +1230,9 @@
                 document.getElementById('db-status').textContent = `${Data.tonies.length} Tonies${v2Text}${source === 'cache' ? ' · Cache' : ''}`;
 
                 // Dump matching is optional and must never block the database.
-                try { await Data.loadDumpIndex(); } catch (dumpError) { console.warn('Dump index skipped:', dumpError); }
                 Search.filter();
                 if (Data.tonies[0]) Editor.load(Data.tonies[0], true);
+                Data.loadDumpIndex().then(() => Search.filter()).catch(error => console.warn('Dump index skipped:', error));
             } catch (error) {
                 console.error('DB Load Error:', error);
                 document.getElementById('db-status').textContent = 'Datenbankfehler';
@@ -1318,6 +1319,29 @@
             Search.filter();
         };
 
+        // Search quality is independent from optional dump filename matching.
+        Search.distance = (a, b) => {
+            let row = Array.from({length: b.length + 1}, (_, i) => i);
+            for (let i = 1; i <= a.length; i++) {
+                const next = [i];
+                for (let j = 1; j <= b.length; j++) next[j] = Math.min(
+                    next[j - 1] + 1, row[j] + 1, row[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+                row = next;
+            }
+            return row[b.length];
+        };
+        Search.rank = (item, input) => {
+            const q = clean(input);
+            if (!q) return 3;
+            const fields = [item.series, item.title, `${item.series} ${item.title}`, item.id, ...(item.audioIds || [])];
+            if (fields.some(value => clean(value) === q)) return 3;
+            const words = normalizeText(`${item.series} ${item.title}`).split(/[^a-z0-9]+/).filter(Boolean);
+            const parts = splitQuery(input);
+            if (parts.every(part => words.some(word => word.includes(part)))) return 2;
+            if (parts.every(part => words.some(word => word === part ||
+                (part.length >= 4 && Math.abs(part.length - word.length) <= 1 && Search.distance(part, word) <= 1)))) return 1;
+            return 0;
+        };
         Search.filter = () => {
             const rawQuery = document.getElementById('search-input').value;
             const query = normalizeText(rawQuery);
@@ -1337,16 +1361,9 @@
             if (dumpFilter === 'fuzzy') results = results.filter(t => Data.getMatchQuality(t) !== 'none');
 
             if (queryParts.length) {
-                results = results.filter(t => {
-                    const haystack = clean(`${t.series} ${t.title} ${t.id} ${(t.audioIds || []).join(' ')}`);
-                    const exact = clean(`${t.series}${t.title}`) === clean(rawQuery) || (t.audioIds || []).some(id => clean(id) === clean(rawQuery));
-                    const strong = queryParts.every(part => haystack.includes(part));
-                    const fuzzy = queryParts.every(part => {
-                        if (part.length < 4) return false;
-                        return haystack.includes(part.slice(0, -1)) || part.split('').every(ch => haystack.includes(ch));
-                    });
-                    return exact || strong || fuzzy;
-                });
+                results = results.map(item => ({item, rank: Search.rank(item, rawQuery)}))
+                    .filter(hit => hit.rank > 0).sort((a, b) => b.rank - a.rank)
+                    .map(hit => hit.item);
             }
 
             Library.results = results;
@@ -1807,6 +1824,8 @@
         };
 
         NfcStudio.flashTag = async () => {
+            UI.showToast('Experimentell: Schreiben bis zur geprüften NFC-Archiver-Anbindung deaktiviert.');
+            return;
             const uid = Editor.current.uid;
             if (!uid) return UI.showToast("Keine Audio-ID geladen!");
             
