@@ -748,9 +748,12 @@
         /* PRINT MEDIA FIXES */
         @page { size: A4 portrait; margin: 0; }
         @media print {
+            @page { size: A4 portrait; margin: 0; }
+            html, body { width: 210mm !important; min-width: 210mm !important; background: #fff !important; }
             body * { visibility: hidden; }
             #view-print, #view-print * { visibility: visible; }
             #view-print { position: absolute; left: 0; top: 0; width: 210mm; height: 297mm; background: #fff; }
+            .topbar, header, .app-nav, .view-switcher { display: none !important; }
             .print-scroll { padding: 0 !important; overflow: visible !important; display: block !important; }
             .print-toolbar, .sticker-actions { display: none !important; }
             .a4-sheet { transform: none !important; margin: 0 !important; box-shadow: none !important; }
@@ -765,6 +768,13 @@
         .view-btn{border-radius:12px!important;min-height:42px!important}.view-btn.active{box-shadow:0 7px 16px rgba(225,29,72,.22)}
         .search-input,.filter-select{border-radius:13px!important;background:rgba(255,255,255,.82)!important;min-height:44px}.asset-card{border-radius:16px!important;box-shadow:0 7px 18px rgba(15,23,42,.06)!important}.asset-card:hover{transform:translateY(-2px);box-shadow:0 14px 26px rgba(15,23,42,.12)!important}.card-img-wrap{border-radius:13px 13px 0 0!important}.btn,.btn-secondary{border-radius:13px!important;min-height:44px!important}.pagination-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 2px;color:var(--text-muted);font-size:12px}.pagination-bar button:disabled{opacity:.45}
         @media(max-width:960px){.topbar{padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}.sidebar-lib,.canvas-area,.sidebar-controls{border-radius:0!important;box-shadow:none!important}.pagination-bar{padding:12px 14px 24px}.view-btn{font-size:11px!important}.asset-card{min-width:0}}
+        @media(max-width:960px){
+          #view-print{overflow-x:hidden!important}
+          .print-toolbar{display:block!important;width:100%!important;box-sizing:border-box!important;padding:12px!important;overflow:hidden!important}
+          .print-toolbar > div{display:flex!important;flex-wrap:wrap!important;min-width:0!important;max-width:100%!important}
+          .print-toolbar .btn,.print-toolbar .btn-secondary,.print-toolbar select{max-width:100%!important;min-width:0!important;flex:1 1 auto!important;white-space:normal!important}
+          .print-toolbar .btn{flex-basis:100%!important}
+        }
         /* V3.0.1 mobile repair: separate visual A4 scaling from physical print geometry. */
         @media (max-width:960px){
           .asset-card{min-height:0!important;overflow:hidden!important}
@@ -899,6 +909,7 @@
                             <label>Audio-ID (Mitte)</label>
                             <input type="text" id="input-uid" placeholder="16-stellige Hex-ID">
                         </div>
+                        <label class="advanced-toggle"><input type="checkbox" id="toggle-uid" onchange="Editor.update()"> ID auf Cover anzeigen</label>
                         <div class="input-group" style="margin-top: 6px;">
                             <label>Schriftgröße <span id="val-font" style="color:var(--primary)">100%</span></label>
                             <input type="range" class="range-slider" id="slider-font" min="70" max="150" value="100">
@@ -933,9 +944,9 @@
                 <div style="display:flex; gap:12px; align-items:center;">
                     <select id="print-format" class="btn-secondary" style="padding:8px 12px; border-radius:8px;">
                         <option value="43-12">Münzkapsel 43mm (12er • 3×4)</option>
-                        <option value="40-24">Avery Zweckform L3415 / 5080 40mm (24er • 4×6)</option>
-                        <option value="40-12">Avery 40mm Standard (12er • 3×4)</option>
-                        <option value="30-48">Avery Zweckform 6223 30mm (48er • 6×8)</option>
+                        <option value="40-24">Avery rund 40 mm · 24er (4×6)</option>
+                        <option value="40-12">Standard rund 40 mm · 12er (3×4)</option>
+                        <option value="30-48">Avery 6223 rund 30 mm · 48er (6×8)</option>
                         <option value="custom">Frei definierbar (mm)</option>
                     </select>
                     
@@ -1521,7 +1532,8 @@
             document.getElementById('svg-text-bottom-node').setAttribute('font-size', (6.5 * fScale).toFixed(1));
 
             document.getElementById('svg-text-top').textContent = Editor.current.series;
-            document.getElementById('svg-text-uid').textContent = Editor.current.uid ? `ID: ${Editor.current.uid}` : '';
+            const showUid = document.getElementById('toggle-uid')?.checked === true;
+            document.getElementById('svg-text-uid').textContent = showUid && Editor.current.uid ? `ID: ${Editor.current.uid}` : '';
             document.getElementById('svg-text-bottom').textContent = Editor.current.title;
             
             // Sync NFC Studio
@@ -1568,7 +1580,8 @@
                 try { const im = new Image(); im.crossOrigin='anonymous'; await new Promise((ok,no)=>{im.onload=ok;im.onerror=no;im.src=src;}); const scale=Math.max(1600/im.width,1600/im.height)*(Editor.state.zoom/100); x.translate(800+(Editor.state.x*8),800+(Editor.state.y*8)); x.drawImage(im,-im.width*scale/2,-im.height*scale/2,im.width*scale,im.height*scale); x.setTransform(1,0,0,1,0,0); } catch(_) { UI.showToast('Bild-CORS: PNG enthält Texte, aber kein externes Motiv.'); }
             }
             x.fillStyle='#e11d48'; x.font='bold 76px system-ui'; x.textAlign='center'; x.fillText(Editor.current.series||'',800,160);
-            x.fillStyle='#334155'; x.font='600 46px system-ui'; x.fillText(Editor.current.uid?`ID: ${Editor.current.uid}`:'',800,800);
+            const showUid = document.getElementById('toggle-uid')?.checked === true;
+            x.fillStyle='#334155'; x.font='600 46px system-ui'; x.fillText(showUid && Editor.current.uid?`ID: ${Editor.current.uid}`:'',800,800);
             x.fillStyle='#0f172a'; x.font='bold 70px system-ui'; x.fillText(Editor.current.title||'',800,1460); x.restore();
             x.strokeStyle='#e11d48'; x.lineWidth=14; x.beginPath(); x.arc(800,800,790,0,Math.PI*2); x.stroke();
             c.toBlob(blob=>{if(!blob)return UI.showToast('PNG-Export fehlgeschlagen.'); const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`${(Editor.current.title||'taggen-cover').replace(/[^a-z0-9]+/gi,'-')}.png`;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);UI.showToast('PNG exportiert.');},'image/png');
@@ -1697,7 +1710,7 @@
                         tp.textContent = text || ''; node.appendChild(tp); return node;
                     };
                     svg.appendChild(makeText((7.5*fScale).toFixed(1), '#e11d48', `p-t-${index}`, data.series));
-                    svg.appendChild(makeText((5*fScale).toFixed(1), '#64748b', `p-u-${index}`, data.uid ? 'ID: '+data.uid : ''));
+                    svg.appendChild(makeText((5*fScale).toFixed(1), '#64748b', `p-u-${index}`, data.showUid && data.uid ? 'ID: '+data.uid : ''));
                     svg.appendChild(makeText((6.5*fScale).toFixed(1), '#0f172a', `p-b-${index}`, data.title));
                     s.appendChild(svg);
 
@@ -1718,7 +1731,7 @@
         };
 
         PrintStudio.addCurrentToSheet = async () => {
-            const data = { ...Editor.current, state: { ...Editor.state } };
+            const data = { ...Editor.current, showUid: document.getElementById('toggle-uid')?.checked === true, state: { ...Editor.state } };
             const emptyIdx = PrintStudio.slots.findIndex(s => s === null);
             if (emptyIdx > -1) {
                 PrintStudio.slots[emptyIdx] = data;
