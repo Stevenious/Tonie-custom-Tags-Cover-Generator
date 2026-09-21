@@ -756,6 +756,7 @@
             .topbar, header, .app-nav, .view-switcher { display: none !important; }
             .print-scroll { padding: 0 !important; overflow: visible !important; display: block !important; }
             .print-toolbar, .sticker-actions { display: none !important; }
+            #toast, .toast, .print-hint, .print-footer { display: none !important; visibility: hidden !important; }
             .a4-sheet { transform: none !important; margin: 0 !important; box-shadow: none !important; }
             .slot { border: none !important; background: transparent !important; }
             img { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -871,7 +872,7 @@
                             <svg viewBox="0 0 100 100" id="preview-svg">
                                 <path id="path-top" d="M 16,50 A 34,34 0 0,1 84,50" fill="none"/>
                                 <path id="path-uid" d="M 22,50 A 28,28 0 0,0 78,50" fill="none"/>
-                                <path id="path-bottom" d="M 14,50 A 36,36 0 0,0 86,50" fill="none"/>
+                                <path id="path-bottom" d="M 10,50 A 40,40 0 0,0 90,50" fill="none"/>
 
                                 <text font-size="7.5" font-weight="bold" fill="#e11d48" text-anchor="middle" id="svg-text-top-node">
                                     <textPath href="#path-top" startOffset="50%" id="svg-text-top" letter-spacing="0.1em"></textPath>
@@ -1070,6 +1071,11 @@
             .trim();
         const clean = s => normalizeText(s).replace(/[^a-z0-9]/g, '');
         const splitQuery = s => normalizeText(s).split(/\s+/).map(clean).filter(Boolean);
+        const favoriteKey = item => {
+            if (!item) return '';
+            const id = String(item.id || '').trim();
+            return id || `title:${clean(item.series)}|${clean(item.title)}|${clean(item.image || item.pic || '')}`;
+        };
 
         const fetchJson = async (url, timeout = 30000) => {
             const controller = new AbortController();
@@ -1354,6 +1360,7 @@
             return 0;
         };
         Search.filter = () => {
+            Library.pageSize = window.innerWidth <= 960 ? 4 : 8;
             const rawQuery = document.getElementById('search-input').value;
             const query = normalizeText(rawQuery);
             const queryParts = splitQuery(rawQuery);
@@ -1364,7 +1371,7 @@
 
             let results = Data.tonies;
 
-            if (Library.activeTab === 'fav') results = results.filter(t => favs.includes(t.id));
+            if (Library.activeTab === 'fav') results = results.filter(t => favs.includes(favoriteKey(t)));
             if (lang) results = results.filter(t => t.language === lang);
             
             if (dumpFilter === 'exact') results = results.filter(t => Data.getMatchQuality(t) === 'exact');
@@ -1395,7 +1402,8 @@
             const favs = JSON.parse(localStorage.getItem('phoenix_favs') || '[]');
 
             items.forEach(item => {
-                const isFav = favs.includes(item.id);
+                const favKey = favoriteKey(item);
+                const isFav = favs.includes(favKey);
                 const matchQ = Data.getMatchQuality(item);
                 
                 const card = document.createElement('div');
@@ -1431,7 +1439,7 @@
                 const favBtn = document.createElement('button');
                 favBtn.className = `fav-btn ${isFav ? 'active' : ''}`;
                 favBtn.textContent = isFav ? '★' : '☆';
-                favBtn.onclick = (e) => { e.stopPropagation(); UI.toggleFav(item.id); };
+                favBtn.onclick = (e) => { e.stopPropagation(); UI.toggleFav(favKey); };
                 imgWrap.appendChild(favBtn);
 
                 const content = document.createElement('div');
@@ -1699,7 +1707,7 @@
                     };
                     svg.appendChild(makePath(`p-t-${index}`, 'M 16,50 A 34,34 0 0,1 84,50'));
                     svg.appendChild(makePath(`p-u-${index}`, 'M 22,50 A 28,28 0 0,0 78,50'));
-                    svg.appendChild(makePath(`p-b-${index}`, 'M 14,50 A 36,36 0 0,0 86,50'));
+                    svg.appendChild(makePath(`p-b-${index}`, 'M 10,50 A 40,40 0 0,0 90,50'));
 
                     const makeText = (size, fill, pathId, text) => {
                         const node = document.createElementNS(svgNS, 'text');
@@ -1890,7 +1898,7 @@
                 }, {passive:true});
                 l.dataset.page='0';
             };
-            window.addEventListener('resize', () => { if (window.innerWidth > 960) { const l=layout(); if(l) l.style.transform=''; } else go(Number(layout()?.dataset.page||0)); });
+            window.addEventListener('resize', () => { if (window.innerWidth > 960) { const l=layout(); if(l) l.style.transform=''; } else go(Number(layout()?.dataset.page||0)); if (Data.tonies.length) Search.filter(); });
             window.addEventListener('load', bind);
         })();
 
