@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TagGen Phoenix V3.0.0.D LTS – Community Edition</title>
+    <title>TagGen Phoenix V4.0.0 Foundation – Community Edition</title>
     
     <!-- ESP Web Tools -->
     <script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
@@ -765,6 +765,17 @@
         .view-btn{border-radius:12px!important;min-height:42px!important}.view-btn.active{box-shadow:0 7px 16px rgba(225,29,72,.22)}
         .search-input,.filter-select{border-radius:13px!important;background:rgba(255,255,255,.82)!important;min-height:44px}.asset-card{border-radius:16px!important;box-shadow:0 7px 18px rgba(15,23,42,.06)!important}.asset-card:hover{transform:translateY(-2px);box-shadow:0 14px 26px rgba(15,23,42,.12)!important}.card-img-wrap{border-radius:13px 13px 0 0!important}.btn,.btn-secondary{border-radius:13px!important;min-height:44px!important}.pagination-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 2px;color:var(--text-muted);font-size:12px}.pagination-bar button:disabled{opacity:.45}
         @media(max-width:960px){.topbar{padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right))}.sidebar-lib,.canvas-area,.sidebar-controls{border-radius:0!important;box-shadow:none!important}.pagination-bar{padding:12px 14px 24px}.view-btn{font-size:11px!important}.asset-card{min-width:0}}
+        /* V3.0.1 mobile repair: separate visual A4 scaling from physical print geometry. */
+        @media (max-width:960px){
+          .asset-card{min-height:0!important;overflow:hidden!important}
+          .card-img-wrap{height:auto!important;min-height:0!important;padding-bottom:0!important}
+          .card-content{display:block!important;min-height:70px!important;padding:5px 2px 2px!important;overflow:hidden!important}
+          .card-serie,.card-title,.card-meta{display:block!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+          .print-scroll{overflow:hidden!important}
+          .a4-sheet{width:210mm!important;height:297mm!important;min-height:297mm!important;max-width:none!important;transform-origin:top left!important;margin:0!important}
+          .sticker-actions{opacity:1!important;pointer-events:auto!important;transform:translate(-50%,-50%) scale(.82)}
+        }
+        #foundation-diagnostics{position:fixed;z-index:2000;right:14px;bottom:14px;width:min(300px,calc(100vw - 28px));padding:14px;border:1px solid rgba(15,23,42,.12);border-radius:16px;background:rgba(255,255,255,.92);box-shadow:0 16px 45px rgba(15,23,42,.18);backdrop-filter:blur(16px);font-size:12px;color:#334155}#foundation-diagnostics strong{display:block;color:#0f172a;margin-bottom:7px}#foundation-diagnostics div{display:flex;justify-content:space-between;gap:8px;padding:5px 0;border-top:1px solid #e8edf4}#foundation-diagnostics small{color:#64748b;text-align:right}
     </style>
 </head>
 <body>
@@ -1851,11 +1862,56 @@
             window.addEventListener('load', bind);
         })();
 
+        // Screen preview is scaled in pixels; print CSS restores the exact 210 × 297 mm sheet.
+        PrintStudio.fitScreenPreview = () => {
+            if (window.innerWidth > 960) return;
+            const sheet = document.getElementById('print-sheet');
+            const wrap = document.querySelector('.print-scroll');
+            if (!sheet || !wrap) return;
+            const naturalWidth = sheet.offsetWidth || 794;
+            const scale = Math.min(1, (window.innerWidth - 24) / naturalWidth);
+            sheet.style.transform = `scale(${scale})`;
+            wrap.style.height = `${Math.ceil(sheet.offsetHeight * scale + 24)}px`;
+        };
+        const originalPrintRender = PrintStudio.render;
+        PrintStudio.render = () => { originalPrintRender(); requestAnimationFrame(PrintStudio.fitScreenPreview); };
+        window.addEventListener('resize', () => requestAnimationFrame(PrintStudio.fitScreenPreview));
+
+        // --- V4.0 FOUNDATION: diagnostics and safe user-managed pack contract ---
+        const Foundation = {
+            checks: [],
+            check(name, ok, detail='') { this.checks.push({name, ok:!!ok, detail}); },
+            run() {
+                this.checks=[];
+                this.check('Datenbank', Array.isArray(Data.tonies), `${Data.tonies.length} Einträge`);
+                this.check('Bibliothek', !!document.getElementById('asset-grid') && Library.pageSize===8, '8er-Seiten aktiv');
+                this.check('Druckstudio', !!document.getElementById('print-sheet') && Array.isArray(PrintStudio.slots), 'A4-Geometrie bereit');
+                this.check('NFC', !!NfcStudio && !!document.getElementById('nfc-target-uid'), 'Workspace bereit');
+                this.check('Pack-Format', true, 'taggen-pack/1 vorbereitet');
+                if (new URLSearchParams(location.search).has('debug')) this.renderDebug();
+            },
+            renderDebug() {
+                let node=document.getElementById('foundation-diagnostics'); if(node) node.remove();
+                node=document.createElement('aside'); node.id='foundation-diagnostics';
+                node.innerHTML=`<strong>TagGen V4 Foundation</strong>${this.checks.map(c=>`<div>${c.ok?'✓':'×'} ${c.name}<small>${c.detail}</small></div>`).join('')}`;
+                document.body.appendChild(node);
+            },
+            validatePack(input) {
+                if (!input || typeof input!=='object') throw new Error('Keine Pack-Datei.');
+                if (input.format!=='taggen-pack' || input.version!==1) throw new Error('Nicht unterstütztes TagGen-Pack.');
+                if (!input.project || typeof input.project!=='object') throw new Error('Pack enthält kein Projekt.');
+                const safe = {format:'taggen-pack',version:1,name:String(input.name||'TagGen Pack').slice(0,80),project:{title:String(input.project.title||'').slice(0,120),series:String(input.project.series||'').slice(0,120),uid:String(input.project.uid||'').slice(0,80),image:typeof input.project.image==='string'?input.project.image.slice(0,2_000_000):'',printFormat:String(input.project.printFormat||'43-12')}};
+                return safe;
+            }
+        };
+        /* Debug is opt-in: append ?debug=1 to the GitHub Pages URL. */
+
         // DOM Entrypoint
         window.onload = () => {
             Editor.initDragDrop();
             PrintStudio.init();
             Data.init();
+            setTimeout(() => Foundation.run(), 50);
             
             document.getElementById('search-input').addEventListener('input', () => { Library.page = 0; Search.filter(); });
             document.getElementById('filter-lang').addEventListener('change', () => { Library.page = 0; Search.filter(); });
