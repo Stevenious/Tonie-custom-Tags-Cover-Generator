@@ -1,10 +1,10 @@
-# TagGen Orbit 5 · Prerelease
+# TagGen Orbit 5 · Release Candidate 4
 
 **Deine Geschichten. Dein System.**
 
 ![TagGen Orbit](assets/orbit-logo.svg)
 
-Ein Cover für einen Tag. Ein Arbeitsstapel für zwölf Geschichten. Orbit verbindet Tonie-Suche, Gestaltung, private NFC-Dateien und A4-Druck in einer einzigen `index.html` für GitHub Pages.
+Ein Cover für einen Tag. Ein dauerhaft zugeordneter Bogen für zwölf Geschichten. Orbit verbindet Tonie-Suche, Gestaltung, private NFC-Dateien und A4-Druck in einer einzigen `index.html` für GitHub Pages.
 
 ## Schnell starten
 
@@ -17,7 +17,7 @@ Die App benötigt keinen Build, Account oder Server. Beide Tonie-Kataloge werden
 
 ## Neu: Eine Sammlung für zwölf Custom Tags
 
-Eine benannte Arbeitsliste hält Coverzustand und optionale NFC-Originaldatei zusammen. Die Sammlung wird im Browser gespeichert; **Sammlung sichern** erzeugt eine private `.orbit-collection`-Datei für Backups oder den Wechsel zwischen iPhone und Desktop. Mehrere Sammlungen können als getrennte Dateien verwaltet werden; im Browser ist jeweils eine aktiv.
+Eine benannte Arbeitsliste hält Coverzustand, festen Bogenplatz und optionale NFC-Originaldatei zusammen. Die Sammlung wird im Browser gespeichert; **Sammlung sichern** erzeugt eine private `.orbit-collection`-Datei für Backups oder den Wechsel zwischen iPhone und Desktop. Mehrere Sammlungen können als getrennte Dateien verwaltet werden; im Browser ist jeweils eine aktiv.
 
 ### Ich habe zwölf NFC-Dumps
 
@@ -68,7 +68,7 @@ Am Sammlungseintrag öffnet **NFC suchen** die bestehende Dump-Suche mit dem Tit
 
 Die beiden runden Avery-Geometrien und die Kalibrierung wurden aus der zuvor vom Nutzer am Drucker abgenommenen Version übernommen. A4-Vorschau und Druck-CSS bleiben getrennt. Die Druckausgabe enthält nur Cover, keine Menüleiste oder Sammlung.
 
-**Quadratische Kapseln – aktualisierte Recherche:** Im [RevvoX-Thread „Square Custom Tags“](https://forum.revvox.de/t/square-custom-tags/1703) verwenden mehrere Nutzer QUADRUM-Kapseln. Genannt werden 43 × 43 mm (max. 43,5 mm) für den Papiereinleger; gedruckt wird auf Normalpapier, 24 Cover pro A4-Blatt, anschließend ausgeschnitten. Das [Hersteller-Außenmaß](https://www.leuchtturm.de/quadrum-muenzkapseln.html) beträgt 50 × 50 × 6,25 mm und ist nicht das Covermaß. Das ist ein konkreter Bedarf für ein freies Quadratformat; eine Häufigkeitsverteilung oder ein bevorzugtes quadratisches Avery-Produkt ist daraus nicht ableitbar. In diesem Build bleibt der Editor rund.
+**Quadratische Kapseln – aktualisierte Recherche:** Im [RevvoX-Thread „Square Custom Tags“](https://forum.revvox.de/t/square-custom-tags/1703) verwenden mehrere Nutzer QUADRUM-Kapseln. Genannt werden 43 × 43 mm (max. 43,5 mm) für den Papiereinleger; gedruckt wird auf Normalpapier, 24 Cover pro A4-Blatt, anschließend ausgeschnitten. Das [Hersteller-Außenmaß](https://www.leuchtturm.de/quadrum-muenzkapseln.html) beträgt 50 × 50 × 6,25 mm und ist nicht das Covermaß. Das ist ein konkreter Bedarf für ein freies Quadratformat; eine Häufigkeitsverteilung oder ein bevorzugtes quadratisches Avery-Produkt ist daraus nicht ableitbar. Der Editor unterstützt jetzt runde und quadratische Cover; 43 × 43 mm ist als freies 24er-A4-Raster enthalten.
 
 ## Was die Community-Recherche nahelegt
 
@@ -96,7 +96,7 @@ TagGen Orbit behält das bekannte Orbit-T-Zeichen. Das SVG ist als `assets/orbit
 
 Siehe [TEST_REPORT.md](TEST_REPORT.md). Die tatsächlichen JavaScript-Eventhandler und Zustandsänderungen wurden automatisiert mit DOM-/Netzwerk-Testdoubles und einem Canvas-Renderer geprüft. Das ist **keine neue Safari-/Desktop-Browser-Abnahme**: Ein echter Browserlauf war in dieser Umgebung wegen fehlender Browserdateien und fehlgeschlagenem Download nicht möglich. Die bisherigen Nutzerabnahmen betreffen die Ausgangsversion.
 
-NFC-Schreiben, UID-Änderung, direkte TeddyCloud-Synchronisation, quadratische Cover und browserinterne Verwaltung beliebig vieler Sammlungen sind nicht Teil dieses Prereleases. Das bestehende BLE-Modul bleibt ein experimenteller lesender Adapter.
+UID-/Passwortänderungen, direkte TeddyCloud-Synchronisation und browserinterne Verwaltung beliebig vieler Sammlungen sind nicht Teil dieses Prereleases. BLE-Speicherzugriffe sind experimentell und benötigen eine passende Firmware; physische Hardwaretests stehen aus.
 
 ## Nächster Schritt zur V5-Freigabe
 
@@ -109,3 +109,91 @@ Eine Geräteabnahme mit dem fertigen Build: zwölf Einträge sammeln, einen Vors
 - Dump-Suche gleicht ä/ae, ö/oe, ü/ue und ß/ss an; Repository-Pfade bleiben unverändert.
 - Mobil stehen Format und Druckaktion vor der Vorschau. Projekte, Kalibrierung und Hinweise sind unter der Vorschau gebündelt. Zwei Sprungbuttons machen Bogen und weitere Optionen direkt erreichbar.
 - „Das versunkene Schiff“ ist im am 22.09.2026 geprüften Fuenf-Freunde-Ordner nicht enthalten. Die App ersetzt einen fehlenden Dump nicht durch eine andere Folge.
+
+
+## Neu in Prerelease 4: Form, Rückseite und Reader
+
+### Quadratische Cover
+
+Im Editor unter **Coverform → Quadratisch** wählen. Gerade Serie-/Titelzeilen ersetzen den Kreistext. „Ganzes Bild“ zeigt das Motiv vollständig; „Flächig“ füllt den Ausschnitt. Zoom und X/Y bleiben verfügbar. Leere Textfelder ergeben ein reines Bildcover. Form und Bildmodus bleiben in Projekten und Sammlungen erhalten.
+
+| Quadratisches Papier | Raster | Linker Rand | Oberer Rand | Abstand X/Y |
+| --- | --- | --- | --- | --- |
+| Frei 43 × 43 mm | 4 × 6 = 24 | 13 mm | 9,5 mm | 4 / 4 mm |
+| Avery Vorlage 40×40-S | 4 × 6 = 24 | 19 mm | 18,46628 mm | 4 / 4 mm |
+| Avery Vorlage 45×45-S | 4 × 6 = 24 | 12 mm | 8,46628 mm | 2 / 2 mm |
+
+Die Avery-Koordinaten stammen aus den expliziten, seitenbezogenen Stanzkonturen der bereitgestellten DOCX-Dateien, nicht aus den Text-/Zellrändern. Die Konturen haben abgerundete Ecken; das Motiv wird vollquadratisch ausgegeben, wichtige Texte liegen innen. Die neuen Quadratvorlagen benötigen noch einen Kontrollausdruck. HERMA 9642 wird nicht ohne eigene Geometrieprüfung mit der Avery-Vorlage gleichgesetzt.
+
+Ein Formwechsel auf einem belegten Bogen fragt vor der Anpassung der Druckkopien nach. Gespeicherte Sammlungseinträge bleiben erhalten. Rückgängig stellt den vorherigen Bogen wieder her.
+
+### Rückseite & QR
+
+Im eingeklappten Editorbereich Rückseite aktivieren. Titel und Serie kommen aus dem Cover; Audio-ID und optional Tag-UID stehen auch ausgeschrieben darauf. QR kann ausgeschaltet werden. Der Sammlungs-QR enthält Titel, Serie, Audio-ID und Notiz; im NFC-Modus zusätzlich Dateiname und Status. „Metadaten aus geladenem NFC-Dump“ übernimmt UID/Dateiname aus der Werkstatt. Die UID erscheint nur mit aktiviertem Schalter. Es werden keine Passwörter oder Speicherblöcke im QR hinterlegt. Ein normaler QR-Scanner kann den JSON-Text lesen; automatischer Orbit-Import aus QR ist noch nicht enthalten.
+
+QR-Erzeugung läuft vollständig lokal. PNG-Export der Rückseite benötigt keine externen Coverbilder. Nach Änderungen das Cover erneut auf den Druckbogen legen bzw. in der Sammlung übernehmen: Bereits platzierte Cover sind eigenständige Kopien.
+
+Druckausgabe: Vorderseiten, nur Rückseiten oder Duplex. Duplex erzeugt absichtlich zwei A4-Seiten. Die Wendekante im Druckdialog muss der Einstellung in Orbit entsprechen. Lange Kante spiegelt die X-Positionen, kurze Kante die Y-Positionen — niemals den QR oder die Schrift. Nicht aktivierte Rückseiten bleiben leer. Kalibrierungsdruck im Duplexmodus erzeugt zwei passende Kontrollbögen. Für Duplex Normalpapier verwenden; Klebeetiketten werden einseitig bedruckt. QR-Rückseiten ab 40 mm empfohlen; bei viel Text/kleinen Formaten reale Scanbarkeit prüfen.
+
+Private .taggen-Projekte speichern Rückseitendesign und Druckmodus. Öffentliche Cover-Pakete entfernen Audio-IDs, Tag-UID, NFC-Dateiname/-Status und Rückseitennotizen.
+
+### BLE · experimentelles Auslesen
+
+Orbit verbindet sich mit einem externen ESP32 + PN5180 mit NFC-Archiver-Firmware. Gerätefähigkeiten entscheiden, ob Erkennen, Speicherlesen und Archivzugriff verfügbar sind. Bei fehlendem InventoryAll nutzt Orbit den vorhandenen Raw-ISO15693-Leseweg.
+
+1. Auf iPhone/iPad Orbit in [Bluefy](https://apps.apple.com/app/id1492822055) öffnen und den Reader verbinden.
+2. Einen Tag auflegen, erkennen und Speicher lesen.
+3. **Gelesenen Tag öffnen** übernimmt ihn als NFC-Datei in die Werkstatt; dort sichern oder einem Cover zuordnen.
+
+Safari bleibt für Bibliothek, Cover, Sammlung, Druck und Dateiimport nutzbar. Bluefy steuert den externen Reader; der eingebaute iPhone-NFC-Leser wird nicht angesprochen. Safari und Bluefy teilen ihren lokalen Browser-Speicher nicht: Projekte beziehungsweise Sammlungen über die vorhandenen Export-/Importdateien übertragen.
+
+Der Schreibmodus wurde vollständig entfernt. Der Raw-Adapter erlaubt ausschließlich Inventory, Get System Information und Read Single Block; andere Tag-Befehle werden vor dem BLE-Versand abgewiesen. Speicher, UID, Passwörter und Sperren werden nicht verändert. Geschützte Speicherbereiche können nicht automatisch entsperrt werden. Ausgelesene Speicherdateien enthalten keine ausgelesenen Geheimnisse, die das Gerät nicht liefert, und sind kein garantiert vollständiges Backup aller Tag-Eigenschaften.
+
+Hardware, Installation und Protokolldokumentation: [NFC-Archiver](https://github.com/RFIDfriend/NFC-Archiver). Physische Reader-Abnahme offen. Die App benötigt für Cover und Druck keine BLE-Hardware.
+
+### Drittsoftware
+
+QR Code Generator von Kazuhiko Arase, Copyright 2009, MIT-Lizenz: https://github.com/kazuhikoarase/qrcode-generator. Quelltext und vollständiger Lizenzhinweis sind in index.html eingebettet. Keine CDN-Abhängigkeit.
+
+
+## Prerelease 5 — Duplex-Korrektur nach mobiler Abnahme
+
+Quadratische Cover wurden vom Nutzer mobil abgenommen. Neu ist die Standardausgabe **Automatisch**: Sobald mindestens eine platzierte Rückseite aktiv ist, erstellt Orbit zwei Seiten. „Nur Vorderseiten“ bleibt ausdrücklich wählbar. Das Druckstudio zeigt die erwartete Seitenzahl und einen eigenen Rückseitenbogen vor dem Öffnen des Druckdialogs.
+
+Wurde das Cover bereits platziert, erscheint nach einer Rückseitenänderung **Rückseite an Position … aktualisieren**. Dies ersetzt die Rückseite der passenden ausgewählten Position und fügt kein zweites Cover hinzu. Die Zuordnung erfordert ein identisches Vorderseitendesign. Bei mehreren gleichen Vorderseiten zunächst die gewünschte Position wählen. Beim Drucken fragt Orbit nach, falls diese Übernahme noch aussteht; ein Abbruch verhindert das Drucken der alten Rückseite.
+
+Bestehende Projekte mit ausdrücklich gespeichertem Modus „Vorderseiten“ behalten ihn. Für Duplex dort einmal „Automatisch“ oder „Duplex“ wählen. Bei richtig vorbereitetem Olchi-Bogen muss die Druckvorschau **Seite 1 von 2** zeigen. Als Duplex-Hilfe wurde zusätzlich `page-break-before: always` zur modernen Umbruchregel ergänzt.
+
+Im RC1 ersetzt der ausschließlich lesende Adapter den früheren experimentellen Schreibmodus.
+
+## RC1 · Sprint 1–2
+
+Ein gemeinsamer Release Candidate: ausschließlich lesendes BLE, klare Bluefy-Hilfe, unveränderte Duplex-Korrektur und erneute Regression des Sammlungs-/Druckworkflows. Eine Logoanimation bleibt zurückgestellt. Keine neuen Sammlungsfunktionen, kein Schemawechsel.
+
+Zur finalen Freigabe bleiben reale Safari-Duplexausgabe, QR-Scan vom Papier und der konkrete BLE-Reader zu prüfen. Der RC ist keine Behauptung einer abgeschlossenen Hardwareabnahme.
+
+## RC2 · Bogen-Manager für zwölf feste Tags
+
+**Sammlung → bis zu zwölf Dateien ablegen → gelbe Einträge prüfen → Stapel auf Druckbogen → Ausgabe „Automatisch“ drucken.** Auf dem Desktop können `.nfc`- und `.nfc.txt`-Dateien gesammelt auf das Dropfeld gezogen werden; auf dem iPhone steht die Dateiauswahl bereit. Ein Ordner klappt nur, wenn der Browser dessen Dateien als abgelegte Dateien bereitstellt. Der vorhandene Katalog wird für Vorschläge genutzt. Dateinamen sind Hinweise, keine sichere Audioidentifikation; Audio-IDs aus beliebigen NFC-Speicherblöcken werden nicht behauptet.
+
+Jeder Sammlungseintrag erhält einen stabilen Platz von 1–12. Im Raster Plätze per Maus ziehen oder nacheinander antippen; auf Mobil den Platz am Eintrag auswählen. Ein Tausch mit belegtem Platz vertauscht die Positionen. Grün bedeutet bestätigtes Cover mit NFC-Datei; Gelb zeigt fehlendes Cover, unbestätigte Zuordnung oder einen Covereintrag ohne NFC-Datei. Eintrag „NFC austauschen“ wählt den vorhandenen Platz. Ändert sich die Datei oder UID, muss das Cover ausdrücklich bestätigt werden. Unveränderte Einträge bleiben auf ihren Plätzen.
+
+„Stapel auf Druckbogen“ erzeugt Vorderseiten und immer automatisch die zugehörigen QR-Rückseiten. Ohne NFC-Datei enthält der QR-Code Titel und Serie sowie eine vorhandene Audio-ID; mit NFC-Datei kommen Dateiname, Status und Tag-UID hinzu. Bei gleichem Papierformat werden nur Sammlungseinträge neu übernommen; fremde belegte Positionen erfordern Zustimmung. Mit anderer Vorlage fragt Orbit vor dem Ersetzen des Bogens. Die private `.taggen`-Projektdatei sichert zusätzlich die komplette Sammlung samt Positionsnummern und NFC-Originaldateien; das eigenständige `.orbit-collection`-Format wurde auf Version 2 angehoben und liest Version 1 weiter (alte Reihenfolge wird zu Plätzen 1–12). Öffentliche Cover-Pakete enthalten keine Sammlung und keine Positions-IDs.
+
+Duplex erzeugt bei aktivierten Rückseiten zwei A4-Seiten: auf Seite 2 wandern die **Positionen** passend zur eingestellten langen oder kurzen Wendekante. Text und QR-Code bleiben lesbar. Die printerabhängige Wendekante und QR-Scanbarkeit am Papier vor dem Einsatz mit Etiketten prüfen.
+
+## RC3 · Rückseiten ohne Studio-Schritt
+
+Sammlungsdruck aktiviert die Rückseite für **jedes** bestätigte Cover. Auch ein reiner Coverstapel ohne NFC-Dateien erzeugt bei Ausgabe „Automatisch“ zwei A4-Seiten. Für acht ausgewählte Cover gibt es acht QR-Rückseiten an den passenden Positionen. Eine UID wird nur ergänzt, wenn sie aus einer zugeordneten NFC-Datei stammt. Im Druckstudio lässt sich „Nur Vorderseiten“ weiterhin ausdrücklich auswählen; ein erneuter Sammlungsdruck stellt „Automatisch“ her.
+
+Die bestehende private Projektdatei und die Sammlung bleiben lesbar. Vor einer physischen Etikettenausgabe sind QR-Scan und Wendekante auf Normalpapier zu prüfen.
+
+## RC4 · Offline-Start und bedienbarer Druckbogen
+
+GitHub Pages veröffentlicht jetzt **`index.html`, `sw.js`, `manifest.webmanifest` und `assets/orbit-icon-192.png`/`orbit-icon-512.png` zusammen im selben Verzeichnisbaum**. Nur `index.html` zu aktualisieren aktiviert den Offline-Start nicht. Das Manifest verwendet relative URLs, damit Orbit auch unter dem GitHub-Pages-Projektpfad funktioniert. Nach dem ersten vollständigen Online-Laden speichert der Service Worker App-Seite, Manifest und Icons. Bei weiterer Verbindung lädt er aktuelle Oberflächenversionen; alte eigene Shell-Caches werden nach Aktivierung entfernt. Installiere Orbit auf unterstützten Geräten über „Zum Home-Bildschirm“/„App installieren“, falls der Browser es anbietet.
+
+Der vorhandene Katalog-Cache bleibt separat: Beim Offline-Start greift die bestehende Anwendung auf zuvor gespeicherte Katalogdaten zurück. **Externe Coverbilder sind dadurch nicht automatisch offline.** Private `.taggen`-, `.orbit-collection`- und `.nfc`-Dateien werden nicht vom Service Worker abgefangen oder in dessen Cache geschrieben. Sichere deine Sammlung weiterhin als private Datei, insbesondere beim Gerätewechsel oder wenn der Browser Daten löscht. NFC-Hardware und Bluefy benötigen weiterhin ihre passende Browser-/Geräteumgebung.
+
+Druckpositionen sind native Buttons mit Position und Cover im zugänglichen Namen. Mit Tab zu einem Platz, Enter/Leertaste zum Wählen, dann „Verschieben“ und Zielplatz mit Tab und Enter wählen. „Kopieren“ und „Löschen“ sind ebenfalls Buttons mit Positionsbeschriftung. Nach einer Positionsänderung bleibt der Fokus beim neuen Platz; die Sammlung hat eine Positionsauswahl für Tastatur und Touch. Änderungen werden als Status angesagt. Drag & Drop bleibt eine zusätzliche Mausbedienung.
+
+Automatisierte Tests prüfen Zustandsaktionen, Fokus nach Neuaufbau und den simulierten Service-Worker-Zyklus mit Offline-Navigation. Offene Geräteabnahme: Safari zum Home-Bildschirm hinzufügen, Offline-Neustart nach erfolgtem Online-Laden und VoiceOver/Tastatur durch alle Druckaktionen. Ein automatisierter Test ist keine WCAG-Konformitätsprüfung.
