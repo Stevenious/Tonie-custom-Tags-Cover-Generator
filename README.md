@@ -1,14 +1,14 @@
-# TagGen Orbit 5 · Release Candidate 4
+# TagGen Orbit 5 · Release Candidate 6
 
 **Deine Geschichten. Dein System.**
 
 ![TagGen Orbit](assets/orbit-logo.svg)
 
-Ein Cover für einen Tag. Ein dauerhaft zugeordneter Bogen für zwölf Geschichten. Orbit verbindet Tonie-Suche, Gestaltung, private NFC-Dateien und A4-Druck in einer einzigen `index.html` für GitHub Pages.
+Ein Cover für einen Tag. Ein dauerhaft zugeordneter Bogen für zwölf Geschichten. Orbit verbindet Tonie-Suche, Gestaltung, private NFC-Dateien und A4-Druck als statische App für GitHub Pages.
 
 ## Schnell starten
 
-1. `index.html` in das GitHub-Pages-Verzeichnis legen; bestehende Datei vorher sichern.
+1. `index.html`, `sw.js`, `manifest.webmanifest` und den Ordner `assets/` gemeinsam in das GitHub-Pages-Verzeichnis legen; bestehende Dateien vorher sichern.
 2. Tonie suchen und anklicken. Figurenbilder werden bei gleicher Trefferqualität bevorzugt.
 3. Cover anpassen und auf den Druckbogen legen – oder mit **＋ In Sammlung** sammeln.
 4. Papierformat wählen und bei **100 % / tatsächliche Größe** drucken.
@@ -197,3 +197,15 @@ Der vorhandene Katalog-Cache bleibt separat: Beim Offline-Start greift die beste
 Druckpositionen sind native Buttons mit Position und Cover im zugänglichen Namen. Mit Tab zu einem Platz, Enter/Leertaste zum Wählen, dann „Verschieben“ und Zielplatz mit Tab und Enter wählen. „Kopieren“ und „Löschen“ sind ebenfalls Buttons mit Positionsbeschriftung. Nach einer Positionsänderung bleibt der Fokus beim neuen Platz; die Sammlung hat eine Positionsauswahl für Tastatur und Touch. Änderungen werden als Status angesagt. Drag & Drop bleibt eine zusätzliche Mausbedienung.
 
 Automatisierte Tests prüfen Zustandsaktionen, Fokus nach Neuaufbau und den simulierten Service-Worker-Zyklus mit Offline-Navigation. Offene Geräteabnahme: Safari zum Home-Bildschirm hinzufügen, Offline-Neustart nach erfolgtem Online-Laden und VoiceOver/Tastatur durch alle Druckaktionen. Ein automatisierter Test ist keine WCAG-Konformitätsprüfung.
+
+## RC5 · Safari-Duplexdruck
+
+Der Druckbereich endet jetzt hinter dem letzten belegten Motiv und der Seitenwechsel erfolgt einmal zwischen Vorder- und Rückseite. Das verhindert die zusätzliche Leerseite, die Safari bei einer fast A4-hohen Druckfläche vor dem erzwungenen Umbruch erzeugt hat. Nach dem Upload `index.html` einmal neu laden; bei installierter PWA gegebenenfalls die Seite schließen und erneut öffnen. Physische Safari-Druckabnahme steht aus.
+
+## RC6 · Flow Lock und BLE Read Lock
+
+Die Bibliothek zeigt während des ersten Ladevorgangs „Kataloge werden geladen …“ statt „0 Treffer“. Nach Abschluss unterscheidet sie Treffer und Ladefehler. JSON-Importe bleiben beim nachfolgenden Online-Abgleich erhalten. Der Filter „Verlauf/Eigene“ wird nicht durch einen zweiten Eventhandler überschrieben. Wiederholtes Tippen auf „Auf den Druckbogen“ während des Coverladens erzeugt nur einen Slot.
+
+Unter „System & Verbindungen → Flow prüfen“ führt Orbit fünf lesende Laufzeitprüfungen aus: Katalog, Suchdatensatz, Cover-Rendering, belegter Druckslot und gültige Druckdaten. Ohne einen gewählten Tonie oder belegten Druckbogen sind weniger als 5/5 korrekt. Das ersetzt keinen physischen Drucktest.
+
+Beim BLE-Lesezugriff bleibt der Reader ausschließlich lesend. „Gelesenen Tag öffnen“ zeigt bei einer eindeutig bereits in der Sammlung gespeicherten UID das zugehörige Cover im Studio. Bei unbekannter UID bleibt die Werkstatt offen; das Motiv muss bewusst zugeordnet werden. Die bestehende Sammlung und ihre gespeicherten Dumps werden durch Lesen nicht geändert. UID allein beweist keinen Audioinhalt.
