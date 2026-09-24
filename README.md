@@ -1,4 +1,4 @@
-# TagGen Orbit 5 · Release Candidate 6
+# TagGen Orbit 5 · Release Candidate 7
 
 **Deine Geschichten. Dein System.**
 
@@ -209,3 +209,10 @@ Die Bibliothek zeigt während des ersten Ladevorgangs „Kataloge werden geladen
 Unter „System & Verbindungen → Flow prüfen“ führt Orbit fünf lesende Laufzeitprüfungen aus: Katalog, Suchdatensatz, Cover-Rendering, belegter Druckslot und gültige Druckdaten. Ohne einen gewählten Tonie oder belegten Druckbogen sind weniger als 5/5 korrekt. Das ersetzt keinen physischen Drucktest.
 
 Beim BLE-Lesezugriff bleibt der Reader ausschließlich lesend. „Gelesenen Tag öffnen“ zeigt bei einer eindeutig bereits in der Sammlung gespeicherten UID das zugehörige Cover im Studio. Bei unbekannter UID bleibt die Werkstatt offen; das Motiv muss bewusst zugeordnet werden. Die bestehende Sammlung und ihre gespeicherten Dumps werden durch Lesen nicht geändert. UID allein beweist keinen Audioinhalt.
+
+
+## RC7 · Tag Identity
+
+Jeder Sammlungseintrag speichert nun drei getrennte Bereiche: `content` (Titel, Serie, Cover/Editorzustand und Inhalts-Audio-ID), `tag` (UID und private originale .nfc-Datei) und `physical` (43-mm-Kapsel, Custom Tag, Kreativ-Tonie, Original-Tonie oder Custom-Figur). Der Träger wird direkt am Sammlungseintrag gewählt. Eine neue NFC-Datei ändert Cover und Titel nicht; ein neues Cover lässt Tag-UID und Datei unverändert. Die private Sammlung nutzt Formatversion 3; ältere Versionen 1 und 2 werden beim Laden migriert. Die .taggen-Projektdatei enthält und lädt diese Sammlung ebenfalls. Exportiere vor einem Gerätewechsel eine private Sicherung.
+
+In der Werkstatt findest du „TeddyCloud nutzen · Dateien & Zuordnung“ mit der Reihenfolge Orbit-Cover/PNG, .nfc-Dokumentation und Zuordnung in TeddyCloud. Orbit ist eine statische GitHub-Pages-App, besitzt keine TeddyCloud-Authentifizierung und synchronisiert keine privaten NFC-Dumps oder Tag-UIDs mit einem Server. Orbit-Backups steuern die Wiedergabe der Toniebox nicht.

@@ -77,3 +77,16 @@ Offen: echte iPhone-Safari-Druckvorschau mit acht QR-Rückseiten und Papierkontr
 ### Nicht automatisch abgenommen
 
 Kein physischer iPhone-/Desktop-Browserlauf und kein Screenreader in dieser Umgebung. „Fehlerfreie Barrierefreiheit“ und vollständige PWA-Installierbarkeit können daraus nicht abgeleitet werden. Zu prüfen: VoiceOver-Ansagen/Fokus und Tastatur auf echten Geräten, Home-Screen-Installation, Offline-Neustart nach einmaligem Online-Laden, Bildverfügbarkeit im Offline-Katalog und die zweitseitige Safari-Druckausgabe. Externe Cover mit blockierter CORS-Einbettung benötigen für eine Offline-Projektkopie weiterhin eine eigene Bilddatei.
+
+## RC5 · Druckseiten
+
+Safari-Screenshot: vier Seiten mit leerer Seite 2 und 4 bei Duplex. Print-CSS reservierte zuvor 296,5 mm und setzte `break-before` auf die Rückseite. Die Druckhöhe wird jetzt aus den tatsächlich belegten Positionen berechnet; nur Vorderseite erhält einen expliziten Seitenwechsel, wenn Duplex gewählt ist. Fokussierter Node-Test für zwei Motive und CSS-Umbruch bestanden. Die umfassende Regression konnte in dieser Sitzung nicht erneut laufen, weil `/tmp/orbit-jsqr.js` als Testabhängigkeit fehlt. Reale Safari-Abnahme steht noch aus.
+
+## RC6 · Flow Lock / BLE Read Lock
+
+`node flow-lock-test.cjs` besteht mit kontrollierten Katalog- und NFC-Fixtures: Laden → Cache bei Netzwerkfehler, Lade-Platzhalter statt falschem 0-Treffer, Suche, Bild und Audio-ID beim Öffnen, doppelter Hinzufügen-Klick → ein Slot, Kopieren → ein zusätzlicher identischer Slot, Löschen → nur der gewählte Slot, Print-Root nur Vorderseite bzw. Front und Back im Duplex, Diagnose 5/5, UID-Treffer öffnet bekanntes Cover, unbekannte UID verändert die Sammlung nicht, und BLE-Write-Opcode wird abgewiesen. Diese Prüfungen laufen mit simuliertem DOM und Canvas; echter Bluetooth-Reader, iPhone VoiceOver und physischer Druck wurden in dieser Sitzung nicht erneut geprüft. Die Safari-Druckabnahme von RC5 stammt vom Nutzer.
+
+
+## RC7 · Sammlung und TeddyCloud-Hilfe
+
+`node flow-lock-test.cjs` prüft zusätzlich: Import einer alten Sammlung V2 mit Standardträger, V3-Export mit `content`/`tag`/`physical`, unabhängige Änderung der verschachtelten Inhalt/Tag-Felder, UI-Dateitausch per `NFC austauschen` bei unverändertem Cover/Titel, UI-Covertausch bei unveränderter Tag-UID, privaten `.taggen`-Projektexport mit Sammlung und Import-Wiederherstellung. Der Test verwendet simulierte Datei-Eingaben; echter TeddyCloud-Abgleich wird bewusst nicht behauptet. Ein echter Gerätewechsel mit großen Bildern und reale Safari-Abnahme stehen noch aus.
